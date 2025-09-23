@@ -8,5 +8,9 @@ namespace ASAPPVC.UI.Controllers
         {
             return View();
         }
+        public IActionResult viewPart()
+        {
+            return View();
+        }
     }
 }
