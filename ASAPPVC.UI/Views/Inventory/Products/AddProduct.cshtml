@@ -21,7 +21,7 @@
     }
 
     /* ---------- Container Layout ---------- */
-    .addproduct-container { /* CHANGE: renamed from addpart-container */
+    .addproduct-container {
         display: grid;
         grid-template-columns: 2fr 3fr;
         gap: 20px;
@@ -29,7 +29,7 @@
         border: 2px solid #c62929;
         border-radius: 12px;
         padding: 20px;
-        max-width: 1100px; /* a bit wider to fit the parts table */
+        max-width: 1100px;
         width: 100%;
         box-shadow: 0 16px 40px rgba(0,0,0,.35);
     }
@@ -39,11 +39,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
     }
 
     .image-box {
-        width: 200px; /* a little larger for product */
+        width: 200px;
         height: 200px;
         border: 2px solid rgba(198, 41, 41, 0.7);
         border-radius: 10px;
@@ -71,6 +70,10 @@
         font-weight: 600;
         cursor: pointer;
         transition: filter .2s ease;
+        display: inline-flex;
+        align-items: center; 
+        justify-content: center; 
+        text-align: center;
     }
 
         .upload-btn:hover {
@@ -87,7 +90,7 @@
     }
 
         .form-section h2 {
-            font-size: 22px; /* CHANGE: “Add New Product” */
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 15px;
             text-align: center;
@@ -114,7 +117,7 @@
 
         .form-group input, .form-group textarea, .form-group select {
             height: 38px;
-            border: 1px solid rgba(198, 41, 41, 0.5);
+            border: 1px solid rgba(198,41,41,.5);
             border-radius: 8px;
             padding: 0 10px;
             font-size: 14px;
@@ -134,8 +137,8 @@
             }
 
     /* ---------- Parts Collection Card ---------- */
-    .parts-card { /* CHANGE: new white card for parts collection */
-        grid-column: 1 / -1; /* full width */
+    .parts-card {
+        grid-column: 1 / -1;
         background: #fff;
         color: #1a1a1a;
         border: 2px solid #c62929;
@@ -177,11 +180,14 @@
         }
 
     .parts-table-wrap {
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden; 
     }
 
     .parts-table {
         width: 100%;
+        max-width: 100%; 
+        table-layout: fixed; 
         border-collapse: separate;
         border-spacing: 0;
     }
@@ -190,8 +196,8 @@
             position: sticky;
             top: 0;
             background: #fff;
-            border-bottom: 2px solid #c62929;
             color: #333;
+            border-bottom: 2px solid #c62929;
             font-weight: 800;
             text-align: left;
             padding: 10px 12px;
@@ -202,49 +208,73 @@
             border-bottom: 1px dashed #f0d0d0;
         }
 
-        .parts-table tfoot td {
-            padding: 10px 12px;
-            font-weight: 800;
-            text-align: right;
+        .parts-table th,
+        .parts-table td {
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-    .num {
-        width: 110px;
-        text-align: right;
-    }
+            .parts-table th.remove-cell,
+            .parts-table td.remove-cell {
+                overflow: visible;
+                text-align: right;
+                width: auto; 
+                min-width: 120px;
+            }
+
+        .parts-table select,
+        .parts-table input {
+            max-width: 100%; 
+            width: 100%; 
+        }
+
+        .parts-table th.part-col { 
+            min-width: 0 !important;
+        }
 
     .qty {
         width: 90px;
         text-align: right;
     }
 
+    .unit-price, .subtotal {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        min-width: 110px;
+    }
+
     .remove-cell {
         width: 80px;
     }
 
-    .btn-remove {
-        height: 30px;
-        padding: 0 10px;
-        border-radius: 16px;
-        border: 2px solid #c62929;
-        background: #fff;
-        color: #c62929;
-        font-weight: 700;
-        cursor: pointer;
-    }
+ .btn-remove{
+  display:inline-flex;               
+  align-items:center;             
+  justify-content:center;           
+  white-space:nowrap;             
+  height:30px;
+  padding:0 12px;   
+  border-radius:16px;
+  border:2px solid #c62929;
+  background:#fff;
+  color:#c62929;
+  font-weight:700;
+  cursor:pointer;
+}
 
         .btn-remove:hover {
             background: #c62929;
             color: #fff;
         }
 
-    .subtotal {
-        min-width: 120px;
-        text-align: right;
-        font-weight: 700;
+    tfoot td {
+        padding: 10px 12px;
+        font-weight: 800;
     }
 
     .grand {
+        text-align: right;
         font-size: 16px;
         font-weight: 900;
     }
@@ -282,7 +312,6 @@
         filter: brightness(1.1);
     }
 
-    /* small responsive tweak */
     .media (max-width: 980px) {
         .addproduct-container
 
@@ -310,25 +339,25 @@
 
         <!-- Right: Form -->
         <div class="form-section">
-            <h2>Add New Product</h2> <!-- CHANGE: Product -->
+            <h2>Add New Product</h2>
             <form id="addProductForm" asp-controller="Products" asp-action="Add" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <div class="form-grid">
                     <!-- Basic product info -->
                     <div class="form-group">
-                        <label>Product Name</label> <!-- CHANGE -->
+                        <label>Product Name</label>
                         <input type="text" name="ProductName" placeholder="Enter product name" />
                     </div>
                     <div class="form-group">
-                        <label>SKU</label> <!-- CHANGE -->
+                        <label>SKU</label>
                         <input type="text" name="Sku" placeholder="Enter SKU" />
                     </div>
                     <div class="form-group">
-                        <label>Base Price</label> <!-- CHANGE -->
+                        <label>Base Price</label>
                         <input type="number" step="0.01" name="BasePrice" placeholder="Enter base price" />
                     </div>
                     <div class="form-group">
-                        <label>Description (optional)</label> <!-- CHANGE -->
+                        <label>Description (optional)</label>
                         <textarea name="Description" placeholder="Short description"></textarea>
                     </div>
 
@@ -336,41 +365,37 @@
                     <div class="parts-card">
                         <h3>Parts in this Product</h3>
                         <div class="parts-toolbar">
-                            <!-- You can replace this simple Add Row with a search/lookup later -->
-                            <button type="button" class="btn-addrow" id="addRowBtn">+ Add Part</button> <!-- CHANGE -->
+                            <button type="button" class="btn-addrow" id="addRowBtn">+ Add Part</button>
                         </div>
 
                         <div class="parts-table-wrap">
                             <table class="parts-table" id="partsTable">
                                 <thead>
                                     <tr>
-                                        <th style="min-width:160px;">Part</th>
+                                        <!-- CHANGE: remove inline min-width, use class so CSS can shrink it -->
+                                        <th class="part-col">Part</th>
                                         <th class="qty">Qty</th>
-                                        <th class="num">Unit Price</th>
+                                        <th class="unit-price">Unit Price</th>
                                         <th class="subtotal">Subtotal</th>
                                         <th class="remove-cell"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="partsTbody">
-                                    <!-- Initial empty row for UX (index 0) -->
+                                    <!-- Initial row (example options show price & a null price) -->
                                     <tr data-index="0">
-                                        <!-- For model binding: Parts[0].PartId -->
                                         <td>
-                                            <!-- Replace this select with your real parts list -->
-                                            <select name="Parts[0].PartId">
+                                            <select name="Parts[0].PartId" class="part-select">
                                                 <option value="">-- Select part --</option>
-                                                <option value="101">PVC Elbow 32mm</option>
-                                                <option value="102">PVC Tee 50mm</option>
-                                                <option value="103">End Cap 20mm</option>
+                                                <option value="101" data-price="12.99">PVC Elbow 32mm</option>
+                                                <option value="102" data-price="">PVC Tee 50mm</option> <!-- null price -->
+                                                <option value="103" data-price="6.50">End Cap 20mm</option>
                                             </select>
                                         </td>
                                         <td>
                                             <input class="qty" type="number" name="Parts[0].Quantity" value="1" min="1" />
                                         </td>
-                                        <td>
-                                            <input class="num unit" type="number" name="Parts[0].UnitPrice" step="0.01" value="0.00" />
-                                        </td>
-                                        <td class="subtotal">0.00</td>
+                                        <td class="unit-price">—</td>
+                                        <td class="subtotal">—</td>
                                         <td class="remove-cell">
                                             <button type="button" class="btn-remove">Remove</button>
                                         </td>
@@ -379,7 +404,7 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="3" style="text-align:right;">Grand Total:</td>
-                                        <td class="subtotal grand" id="grandTotal">0.00</td>
+                                        <td class="grand" id="grandTotal">0.00</td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
@@ -389,7 +414,7 @@
 
                     <!-- Action Buttons -->
                     <div class="actions">
-                        <button type="submit" class="btn btn-save">Save Product</button> <!-- CHANGE -->
+                        <button type="submit" class="btn btn-save">Save Product</button>
                         <button type="reset" class="btn btn-reset">Reset</button>
                     </div>
                 </div>
@@ -413,35 +438,57 @@
             });
         }
 
-        /* Parts dynamic rows + totals */
+        /* Parts dynamic rows with unit price (nullable) + subtotals + grand total */
         const tbody = document.getElementById('partsTbody');
         const addRowBtn = document.getElementById('addRowBtn');
         const grandEl = document.getElementById('grandTotal');
 
+        function getUnitPrice(tr){
+            const sel = tr.querySelector('.part-select');
+            const opt = sel && sel.selectedOptions && sel.selectedOptions[0];
+            if (!opt) return null;
+            const raw = opt.getAttribute('data-price');
+            if (raw === null || raw === '') return null;          // null price allowed
+            const num = parseFloat(raw);
+            return Number.isFinite(num) ? num : null;
+        }
+
+        function formatMoney(n){ return n.toFixed(2); }
+
         function recalcRow(tr){
-            const qty  = parseFloat(tr.querySelector('input.qty')?.value || '0');
-            const unit = parseFloat(tr.querySelector('input.unit')?.value || '0');
-            const subtotal = (qty * unit) || 0;
-            const td = tr.querySelector('.subtotal');
-            if (td) td.textContent = subtotal.toFixed(2);
+            const qtyInput = tr.querySelector('input.qty');
+            const qty = parseFloat(qtyInput?.value || '0');
+            const unit = getUnitPrice(tr);
+
+            const unitCell = tr.querySelector('.unit-price');
+            unitCell.textContent = (unit == null) ? '—' : formatMoney(unit);
+
+            const subCell = tr.querySelector('.subtotal');
+            if (!Number.isFinite(qty) || qty <= 0 || unit == null){
+                subCell.textContent = '—';
+                return 0;
+            }
+            const subtotal = qty * unit;
+            subCell.textContent = formatMoney(subtotal);
             return subtotal;
         }
 
         function recalcGrand(){
-            let sum = 0;
-            tbody.querySelectorAll('tr').forEach(tr => sum += recalcRow(tr));
-            if (grandEl) grandEl.textContent = sum.toFixed(2);
+            let total = 0;
+            tbody.querySelectorAll('tr').forEach(tr => { total += recalcRow(tr); });
+            grandEl.textContent = formatMoney(total);
         }
 
         function wireRowEvents(tr){
             tr.addEventListener('input', e => {
-                if (e.target.matches('input.qty, input.unit')) recalcGrand();
+                if (e.target.matches('input.qty')) recalcGrand();
             });
+            const sel = tr.querySelector('.part-select');
+            if (sel) sel.addEventListener('change', recalcGrand);
+
             const removeBtn = tr.querySelector('.btn-remove');
             if (removeBtn) removeBtn.addEventListener('click', () => {
-                tr.remove();
-                renumberIndexes();
-                recalcGrand();
+                tr.remove(); renumberIndexes(); recalcGrand();
             });
         }
 
@@ -450,20 +497,19 @@
             tr.setAttribute('data-index', index);
             tr.innerHTML = `
                 <td>
-                    <select name="Parts[${index}].PartId">
+                    <select name="Parts[${index}].PartId" class="part-select">
+                        <!-- Server should render real options; data-price may be empty for null -->
                         <option value="">-- Select part --</option>
-                        <option value="101">PVC Elbow 32mm</option>
-                        <option value="102">PVC Tee 50mm</option>
-                        <option value="103">End Cap 20mm</option>
+                        <option value="101" data-price="12.99">PVC Elbow 32mm</option>
+                        <option value="102" data-price="">PVC Tee 50mm</option>
+                        <option value="103" data-price="6.50">End Cap 20mm</option>
                     </select>
                 </td>
                 <td>
                     <input class="qty" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
                 </td>
-                <td>
-                    <input class="num unit" type="number" name="Parts[${index}].UnitPrice" step="0.01" value="0.00" />
-                </td>
-                <td class="subtotal">0.00</td>
+                <td class="unit-price">—</td>
+                <td class="subtotal">—</td>
                 <td class="remove-cell"><button type="button" class="btn-remove">Remove</button></td>
             `;
             wireRowEvents(tr);
@@ -474,7 +520,6 @@
             const rows = Array.from(tbody.querySelectorAll('tr'));
             rows.forEach((tr, i) => {
                 tr.setAttribute('data-index', i);
-                // update name attributes to Parts[i].*
                 tr.querySelectorAll('select, input').forEach(inp => {
                     if (!inp.name) return;
                     inp.name = inp.name.replace(/Parts\[\d+\]/, `Parts[${i}]`);
@@ -486,10 +531,10 @@
             addRowBtn.addEventListener('click', () => {
                 const next = tbody.querySelectorAll('tr').length;
                 tbody.appendChild(createRow(next));
+                recalcGrand();
             });
         }
 
-        // wire initial row
         tbody.querySelectorAll('tr').forEach(wireRowEvents);
         recalcGrand();
     })();
