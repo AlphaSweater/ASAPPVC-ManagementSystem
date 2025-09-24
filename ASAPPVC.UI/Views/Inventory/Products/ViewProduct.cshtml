@@ -1,5 +1,357 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@* Optional strongly-typed model (adjust names to your app) *@
+@* @model ASAPPVC.UI.Models.ProductViewModel *@
 @{
+    ViewData["Title"] = "View Product";
+
+    // ---- Product fallbacks so the page renders before wiring a model ----
+    var pimg = Model?.ImageUrl ?? Url.Content("~/Assets/Images/placeholder.png");
+    var pname = Model?.ProductName ?? "—";
+    var sku = Model?.Sku ?? "—";
+    var baseP = Model?.BasePrice?.ToString("0.00") ?? "—";
+    var desc = Model?.Description ?? "—";
 }
+
+<style>
+    /* ---------- Page Background ---------- */
+    html, body {
+        height: 100%;
+        margin: 0;
+        font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background: linear-gradient(135deg, #215c99 0%, #252d6a 100%);
+        color: #000;
+    }
+
+    .viewport {
+        min-height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 24px;
+    }
+
+    /* ---------- Card Container (outer shell) ---------- */
+    .viewprod-card {
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: 20px;
+        width: 100%;
+        max-width: 1100px;
+        background: #f9f9f9; /* light background */
+        border: 2px solid #c62929; /* red outline */
+        border-radius: 12px;
+        box-shadow: 0 16px 40px rgba(0,0,0,.35);
+        padding: 20px;
+    }
+
+    /* ---------- Header Row ---------- */
+    .header {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .back-link {
+        justify-self: start;
+        background: transparent;
+        border: 0;
+        color: #c62929;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 8px 0;
+        text-decoration: none;
+    }
+
+    .title {
+        justify-self: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    /* ---------- Image Column ---------- */
+    .image-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 10px;
+    }
+
+    .image-box {
+        width: 200px;
+        height: 200px;
+        border: 2px solid rgba(255, 0, 0, 0.7);
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+        display: grid;
+        place-items: center;
+    }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    /* ---------- Details Column ---------- */
+    .details-col {
+        padding: 10px;
+        border: 2px solid rgba(255, 0, 0, 0.7);
+        border-radius: 10px;
+        background: #fff;
+    }
+
+    .details-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 12px;
+        text-align: center;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 20px;
+    }
+
+    .pair {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    /* ---------- Parts in Product (read-only) ---------- */
+    .parts-card {
+        grid-column: 1 / -1;
+        background: #fff;
+        border: 2px solid #c62929;
+        border-radius: 12px;
+        box-shadow: 0 16px 40px rgba(0,0,0,.15);
+        padding: 14px;
+    }
+
+    .parts-title {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 800;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .parts-wrap {
+        overflow-x: hidden; /* no horizontal bar */
+        overflow-y: auto;
+        max-height: 420px; /* adjust if needed */
+    }
+
+    table.parts {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed; /* keep inside the card */
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        table.parts thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            color: #333;
+            border-bottom: 2px solid #c62929;
+            text-align: left;
+            font-weight: 800;
+            padding: 10px 12px;
+        }
+
+        table.parts tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px dashed #f0d0d0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+        }
+
+    .num, .money {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .tfoot td {
+        padding: 10px 12px;
+        font-weight: 800;
+    }
+
+    .grand {
+        text-align: right;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    /* ---------- Footer Actions ---------- */
+    .footer {
+        grid-column: 2;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    .btn {
+        min-width: 110px;
+        height: 38px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: filter .2s ease;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #ef4723, #c62929);
+        color: #fff;
+    }
+
+    .btn:hover {
+        filter: brightness(1.08);
+    }
+
+    /* ---------- Responsive ---------- */
+    .media (max-width: 820px) {
+        .viewprod-card
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .footer {
+        grid-column: 1;
+    }
+
+    }
+</style>
+
+<div class="viewport">
+    <section class="viewprod-card">
+        <!-- Header -->
+        <div class="header">
+            <a href="javascript:history.back()" class="back-link">← Back</a>
+            <div class="title">View Product</div>
+        </div>
+
+        <!-- Image Column -->
+        <div class="image-col">
+            <div class="image-box">
+                <img src="@pimg" alt="Product Image" />
+            </div>
+        </div>
+
+        <!-- Details Column -->
+        <div class="details-col">
+            <h2 class="details-title">Product Details</h2>
+            <div class="details-grid">
+                <div class="pair">
+                    <div class="label">Product Name:</div>
+                    <div class="value">@pname</div>
+                </div>
+                <div class="pair">
+                    <div class="label">SKU:</div>
+                    <div class="value">@sku</div>
+                </div>
+                <div class="pair">
+                    <div class="label">Base Price:</div>
+                    <div class="value">@baseP</div>
+                </div>
+                <div class="pair" style="grid-column: span 2;">
+                    <div class="label">Description:</div>
+                    <div class="value">@desc</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parts in this Product -->
+        <section class="parts-card">
+            <div class="parts-title">Parts in this Product</div>
+            <div class="parts-wrap">
+                <table class="parts">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th class="num" style="width:110px;">Qty</th>
+                            <th class="money" style="width:140px;">Unit Price</th>
+                            <th class="money" style="width:160px;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.Parts != null && Model.Parts.Any())
+                        {
+                            decimal grand = 0m;
+                            foreach (var item in Model.Parts)
+                            {
+                                var qty = item.Quantity;
+                                decimal? unit = item.UnitPrice;       // nullable allowed
+                                decimal sub = unit.HasValue ? unit.Value * qty : 0m;
+                                grand += sub;
+
+                                <tr>
+                                    <td>@item.PartName</td>
+                                    <td class="num">@qty</td>
+                                    <td class="money">@(unit.HasValue ? unit.Value.ToString("0.00") : "—")</td>
+                                    <td class="money">@(unit.HasValue ? sub.ToString("0.00") : "—")</td>
+                                </tr>
+                            }
+                            <tr class="tfoot">
+                                <td colspan="3" style="text-align:right;">Grand Total:</td>
+                                <td class="money grand">@grand.ToString("0.00")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @* Fallback/example rows so the layout shows before data is wired *@
+                            <tr>
+                                <td>PVC Elbow 32mm</td>
+                                <td class="num">2</td>
+                                <td class="money">12.99</td>
+                                <td class="money">25.98</td>
+                            </tr>
+                            <tr>
+                                <td>PVC Tee 50mm</td>
+                                <td class="num">1</td>
+                                <td class="money">—</td>        @* null price example *@
+                                <td class="money">—</td>
+                            </tr>
+                            <tr class="tfoot">
+                                <td colspan="3" style="text-align:right;">Grand Total:</td>
+                                <td class="money grand">25.98</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer Actions -->
+        <div class="footer">
+            <form asp-controller="Products" asp-action="Edit" method="get">
+                @* <input type="hidden" name="id" value="@Model?.Id" /> *@
+                <button type="submit" class="btn btn-edit">Edit</button>
+            </form>
+        </div>
+    </section>
+</div>
