@@ -1,0 +1,321 @@
+﻿@{
+    ViewData["Title"] = "Inventory";
+}
+
+<style>
+    /* ===== tokens ===== */
+    :root {
+        --bg1: #1b2a66;
+        --bg2: #16235b;
+        --container1: #1e2d72;
+        --container2: #182967;
+        --white: #ffffff;
+        --ink: #1a1a1a;
+        --muted: #cfd3eb;
+        --accent: #c62929; /* red */
+        --accent-2: #ef4723; /* warm red */
+        --radius: 14px;
+        --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    /* ==== PAGE-ONLY OVERRIDES: remove outer white gutter ==== */
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    /* CHANGE: full-bleed page */
+    body {
+        background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+    /* CHANGE: page bg */
+    .main {
+        padding: 0 !important;
+    }
+    /* CHANGE: no layout padding on this page */
+
+    /* ==== PAGE/BACKDROP ==== */
+    .inventory-page {
+        min-height: calc(100vh - 40px);
+        padding: 20px;
+        background: linear-gradient(135deg, var(--bg1), var(--bg2));
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    /* ==== BLUE CONTAINER ==== */
+    .content-wrap {
+        background: linear-gradient(135deg, var(--container1), var(--container2));
+        border: 2px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 16px;
+    }
+
+    /* ===== Toolbar ===== */
+    .toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 12px;
+        background: rgba(0,0,0,.18);
+        border: 1.5px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        margin-bottom: 14px;
+    }
+
+    .search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-ico {
+        font-size: 18px;
+        opacity: .95;
+    }
+
+    .search-input {
+        width: 420px;
+        max-width: 100%;
+        background: transparent;
+        color: #fff;
+        height: 32px;
+        border: 0;
+        border-bottom: 1.5px solid rgba(255,255,255,.6);
+        outline: 0;
+        padding: 0 6px;
+        font-weight: 600;
+    }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,.65);
+        }
+
+        .search-input:focus {
+            border-bottom-color: var(--accent);
+            box-shadow: 0 2px 0 -1px var(--accent);
+        }
+
+    .btn-search {
+        height: 36px;
+        min-width: 120px;
+        border: 0;
+        border-radius: 18px;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .02em;
+        background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        padding: 0 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        transition: filter .2s ease, transform .04s ease;
+    }
+
+        .btn-search:hover {
+            filter: brightness(1.06);
+        }
+
+        .btn-search:active {
+            transform: translateY(1px);
+        }
+
+    /* ===== WHITE TABLE CARD with RED ACCENTS ===== */
+    .table-card {
+        background: var(--white);
+        color: var(--ink);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-wrap {
+        overflow: auto;
+        max-height: calc(100vh - 280px);
+    }
+
+    table.table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        color: #333;
+        text-align: left;
+        font-weight: 800;
+        padding: 12px 14px;
+        border-bottom: 2px solid var(--accent);
+    }
+
+    tbody td {
+        padding: 12px 14px;
+        color: #222;
+        border-bottom: 1px dashed #f0d0d0; /* subtle red-ish divider */
+    }
+
+    tbody tr {
+        transition: background .12s ease, box-shadow .12s ease;
+    }
+
+        tbody tr:hover {
+            background: #fff6f6;
+        }
+
+            tbody tr:hover td:first-child {
+                box-shadow: inset 4px 0 0 0 var(--accent);
+            }
+
+    /* rounded corners */
+    thead th:first-child {
+        border-top-left-radius: calc(var(--radius) - 2px);
+    }
+
+    thead th:last-child {
+        border-top-right-radius: calc(var(--radius) - 2px);
+    }
+
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: calc(var(--radius) - 2px);
+    }
+
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: calc(var(--radius) - 2px);
+    }
+
+    /* ===== Actions (View/Edit) ===== */
+    .actions {
+        white-space: nowrap;
+    }
+
+    .btn-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: .9rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: filter .15s ease, transform .04s ease, background .15s ease, color .15s ease, border-color .15s ease;
+        margin-right: 8px;
+    }
+
+    .btn-view {
+        background: #fff;
+        color: var(--accent);
+        border: 2px solid var(--accent);
+    }
+
+        .btn-view:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        color: #fff;
+        border: 0;
+        box-shadow: 0 6px 14px rgba(0,0,0,.18);
+    }
+
+        .btn-edit:hover {
+            filter: brightness(1.06);
+        }
+
+    .btn-pill:active {
+        transform: translateY(1px);
+    }
+
+    .media (max-width: 768px) {
+        .search-input
+
+    {
+        width: 100%;
+    }
+
+    }
+</style>
+
+<div class="inventory-page">
+    <div class="content-wrap">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <form class="search-wrap" asp-controller="Inventory" asp-action="Index" method="get">
+                <span class="search-ico">🔍</span>
+                <input class="search-input" type="text" name="q" placeholder="Search..." value="@Context.Request.Query["q"]" />
+            </form>
+            <form asp-controller="Inventory" asp-action="Index" method="get">
+                <button class="btn-search" type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- WHITE TABLE WITH RED ACCENTS -->
+        <section class="table-card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:110px;">ID</th>
+                            <th>Part name</th>
+                            <th>Location</th>
+                            <th>Unit price</th>
+                            <th>Stock</th>
+                            <th style="width:160px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* Replace with your data loop *@
+                        <tr>
+                            <td>2001</td>
+                            <td>PVC Elbow 32mm</td>
+                            <td>Aisle 3 – Bin 12</td>
+                            <td>R 12.99</td>
+                            <td>145</td>
+                            <td class="actions">
+                                <a class="btn-pill btn-view"
+                                   asp-controller="Inventory" asp-action="ViewPart" asp-route-id="2001">View</a>
+                                <a class="btn-pill btn-edit"
+                                   asp-controller="Inventory" asp-action="EditPart" asp-route-id="2001">Edit</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2002</td>
+                            <td>PVC Tee 50mm</td>
+                            <td>Aisle 1 – Bin 4</td>
+                            <td>R 22.50</td>
+                            <td>68</td>
+                            <td class="actions">
+                                <a class="btn-pill btn-view"
+                                   asp-controller="Inventory" asp-action="ViewPart" asp-route-id="2002">View</a>
+                                <a class="btn-pill btn-edit"
+                                   asp-controller="Inventory" asp-action="EditPart" asp-route-id="2002">Edit</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2003</td>
+                            <td>End Cap 20mm</td>
+                            <td>Aisle 2 – Bin 7</td>
+                            <td>R 6.95</td>
+                            <td>412</td>
+                            <td class="actions">
+                                <a class="btn-pill btn-view"
+                                   asp-controller="Inventory" asp-action="ViewPart" asp-route-id="2003">View</a>
+                                <a class="btn-pill btn-edit"
+                                   asp-controller="Inventory" asp-action="EditPart" asp-route-id="2003">Edit</a>
+                            </td>
+                        </tr>
+                        @* /data *@
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
