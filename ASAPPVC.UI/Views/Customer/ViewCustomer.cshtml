@@ -1,0 +1,251 @@
+﻿@{
+    ViewData["Title"] = "Customers";
+}
+
+<style>
+    /* ===== tokens ===== */
+    :root {
+        --bg1: #1b2a66;
+        --bg2: #16235b;
+        --container1: #1e2d72;
+        --container2: #182967;
+        --white: #ffffff;
+        --ink: #1a1a1a;
+        --muted: #cfd3eb;
+        --accent: #c62929;
+        --accent-2: #ef4723;
+        --radius: 14px;
+        --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    body {
+        background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+    .main {
+        padding: 0 !important;
+    }
+
+    /* ==== PAGE/BACKDROP ==== */
+    .customers-page {
+        min-height: calc(100vh - 40px);
+        padding: 20px;
+        background: linear-gradient(135deg, var(--bg1), var(--bg2));
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    /* ==== BLUE CONTAINER ==== */
+    .content-wrap {
+        background: linear-gradient(135deg, var(--container1), var(--container2));
+        border: 2px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 16px;
+    }
+
+    /* ===== Toolbar ===== */
+    .toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 12px;
+        background: rgba(0,0,0,.18);
+        border: 1.5px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        margin-bottom: 14px;
+    }
+
+    .search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-ico {
+        font-size: 18px;
+        opacity: .95;
+    }
+
+    .search-input {
+        width: 420px;
+        max-width: 100%;
+        background: transparent;
+        border: 0;
+        border-bottom: 1.5px solid rgba(255,255,255,.6);
+        color: #fff;
+        outline: none;
+        height: 32px;
+        padding: 0 6px;
+        font-weight: 600;
+    }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,.65);
+        }
+
+        .search-input:focus {
+            border-bottom-color: var(--accent);
+            box-shadow: 0 2px 0 -1px var(--accent);
+        }
+
+    .btn-search {
+        height: 36px;
+        min-width: 120px;
+        border: 0;
+        border-radius: 18px;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .02em;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        padding: 0 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        transition: filter .2s ease, transform .04s ease;
+    }
+
+        .btn-search:hover {
+            filter: brightness(1.06);
+        }
+
+        .btn-search:active {
+            transform: translateY(1px);
+        }
+
+    /* ===== WHITE TABLE CARD with RED ACCENTS ===== */
+    .table-card {
+        background: var(--white);
+        color: var(--ink);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-wrap {
+        overflow: auto;
+        max-height: calc(100vh - 280px);
+    }
+
+    table.table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        color: #333;
+        text-align: left;
+        font-weight: 800;
+        padding: 12px 14px;
+        border-bottom: 2px solid var(--accent);
+    }
+
+    tbody td {
+        padding: 12px 14px;
+        border-bottom: 1px dashed #f0d0d0;
+        color: #222;
+    }
+
+    tbody tr {
+        transition: background .12s ease, box-shadow .12s ease;
+    }
+
+        tbody tr:hover {
+            background: #fff6f6;
+        }
+
+            tbody tr:hover td:first-child {
+                box-shadow: inset 4px 0 0 0 var(--accent);
+            }
+
+    thead th:first-child {
+        border-top-left-radius: calc(var(--radius) - 2px);
+    }
+
+    thead th:last-child {
+        border-top-right-radius: calc(var(--radius) - 2px);
+    }
+
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: calc(var(--radius) - 2px);
+    }
+
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: calc(var(--radius) - 2px);
+    }
+    .media (max-width: 768px) {
+        */ .search-input
+
+    {
+        width: 100%;
+    }
+
+    }
+</style>
+
+<div class="customers-page">
+    <div class="content-wrap">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <form class="search-wrap" asp-controller="Customers" asp-action="Index" method="get">
+                <span class="search-ico">🔍</span>
+                <input class="search-input" type="text" name="q" placeholder="Search..." value="@Context.Request.Query["q"]" />
+            </form>
+            <form asp-controller="Customers" asp-action="Index" method="get">
+                <button class="btn-search" type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- WHITE TABLE WITH RED ACCENTS -->
+        <section class="table-card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:110px;">ID</th>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>Phone</th>
+                            <th>Number</th>
+                            <th>Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1001</td>
+                            <td>Jane</td>
+                            <td>Doe</td>
+                            <td>+27 82 555 1234</td>
+                            <td>CUST-0001</td>
+                            <td>123 Long Street, Cape Town</td>
+                        </tr>
+                        <tr>
+                            <td>1002</td>
+                            <td>John</td>
+                            <td>Smith</td>
+                            <td>+27 73 777 9000</td>
+                            <td>CUST-0002</td>
+                            <td>45 Main Rd, Johannesburg</td>
+                        </tr>
+                        <tr>
+                            <td>1003</td>
+                            <td>Ayanda</td>
+                            <td>Khumalo</td>
+                            <td>+27 61 333 8888</td>
+                            <td>CUST-0003</td>
+                            <td>10 Florida Rd, Durban</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>

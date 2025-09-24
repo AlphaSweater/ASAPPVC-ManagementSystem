@@ -4,8 +4,7 @@
     var routeKey = $"{controller}/{action}";
     var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
-        "Auth/Login"   // hide sidebar on login
-        // add more if needed
+        "Auth/Login"
     };
     var explicitHide = ViewData["HideNavbar"] is bool b && b;
     var hideSidebar = explicitHide || excludedRoutes.Contains(routeKey);
@@ -32,7 +31,6 @@
             font-family: "Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
         }
 
-        /* Sidebar (single red gradient variant) */
         .sidebar {
             position: fixed;
             inset: 0 auto 0 0;
@@ -112,7 +110,7 @@
                     bottom: 8px;
                     width: 4px;
                     border-radius: 2px;
-                    background: #fff; /* white accent line */
+                    background: #fff;
                 }
 
         /* Main content */
@@ -156,7 +154,7 @@
     {
         <aside class="sidebar">
             <div class="sb-brand">
-                <img src="~/Assets/Images/Logos/asap-pvc-logo.png" alt="ASAPPVC" />
+                <img src="~/Assets/Images/Logos/asap-pvc-logo-dark.png" alt="ASAPPVC" />
                 <span class="name">ASAPPVC</span>
             </div>
 
@@ -164,7 +162,7 @@
                 <a class="sb-item @(current == "home/index" ? "active" : "")" asp-controller="Home" asp-action="Index">
                     <span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
                 </a>
-                <a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customers" asp-action="Index">
+                <a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
                     <span class="sb-icon">👥</span><span class="sb-label">Customers</span>
                 </a>
                 <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Orders" asp-action="Index">
@@ -179,11 +177,11 @@
                 <a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
                     <span class="sb-icon">💼</span><span class="sb-label">Financial</span>
                 </a>
-                <a class="sb-item @(current == "report/index" ? "active" : "")" asp-controller="Report" asp-action="Index">
-                    <span class="sb-icon">📊</span><span class="sb-label">Report</span>
+                <a class="sb-item @(current == "report/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPart">
+                    <span class="sb-icon">📊</span><span class="sb-label">View part</span>
                 </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Settings" asp-action="Index">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">Settings</span>
+                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Inventory" asp-action="AddPart">
+                    <span class="sb-icon">🛠️</span><span class="sb-label">Add Part</span>
                 </a>
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Auth" asp-action="Login">
                     <span class="sb-icon">🛠️</span><span class="sb-label">Login</span>
