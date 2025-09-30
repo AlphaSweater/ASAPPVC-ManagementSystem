@@ -10,5 +10,6 @@ namespace ASAPPVC.UI.Data
         public DbSet<UserProfileModel> User { get; set; }
         public DbSet<PartModel> Part { get; set; }
         public DbSet<ProductModel> Product { get; set; }
+        public DbSet<CustomerModel> Customer { get; set; }
     }
 }
