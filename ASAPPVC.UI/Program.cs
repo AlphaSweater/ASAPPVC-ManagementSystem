@@ -1,4 +1,8 @@
 using ASAPPVC.UI.Data;
+using ASAPPVC.UI.Repositories.Implementation;
+using ASAPPVC.UI.Repositories.Interfaces;
+using ASAPPVC.UI.Services.Implementation;
+using ASAPPVC.UI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,13 @@ builder.Services.AddControllersWithViews();
 //creates database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//registering repositories
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
+//registering services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

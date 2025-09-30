@@ -1,6 +1,9 @@
-﻿namespace ASAPPVC.UI.Repositories.Implementation
+﻿using ASAPPVC.UI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
+
+namespace ASAPPVC.UI.Repositories.Implementation
 {
-    public class UserProfileRepository
+    public class UserProfileRepository : IUserProfileRepository
     {
     }
 }

@@ -2,8 +2,7 @@
 
 namespace ASAPPVC.UI.Services.Implementation
 {
-    public class AuthService : IAuthService
+    public class UserService : IUserService
     {
-
     }
 }
