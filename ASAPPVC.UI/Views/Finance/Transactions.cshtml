@@ -1,0 +1,347 @@
+﻿@{
+    ViewData["Title"] = "Transactions";
+}
+
+<style>
+    :root {
+        --bg1: #1b2a66;
+        --bg2: #16235b;
+        --container1: #1e2d72;
+        --container2: #182967;
+        --white: #fff;
+        --ink: #1a1a1a;
+        --muted: #cfd3eb;
+        --accent: #c62929;
+        --accent-2: #ef4723;
+        --radius: 14px;
+        --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    }
+
+    .main {
+        padding: 0 !important;
+    }
+
+    /* page backdrop */
+    .transactions-page {
+        min-height: calc(100vh - 40px);
+        padding: 20px;
+        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    /* container */
+    .content-wrap {
+        background: linear-gradient(135deg,var(--container1),var(--container2));
+        border: 2px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 16px;
+    }
+
+    /* toolbar (UI only) */
+    .toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        background: rgba(0,0,0,.18);
+        border: 1.5px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+    }
+
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search-ico {
+        font-size: 18px;
+        opacity: .95;
+    }
+
+    .input, .select {
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,.35);
+        background: rgba(255,255,255,.05);
+        color: #fff;
+        padding: 0 10px;
+        outline: 0;
+    }
+
+        .input::placeholder {
+            color: rgba(255,255,255,.65);
+        }
+
+        .input:focus, .select:focus {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255,255,255,.18);
+        }
+
+    .btn-search {
+        height: 36px;
+        min-width: 120px;
+        border: 0;
+        border-radius: 18px;
+        cursor: default;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .02em;
+        background: linear-gradient(135deg,var(--accent-2),var(--accent));
+        padding: 0 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        opacity: .9; /* visually enabled, functionally inert */
+    }
+
+    /* table card */
+    .table-card {
+        background: var(--white);
+        color: var(--ink);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-wrap {
+        overflow: auto;
+        max-height: calc(100vh - 300px);
+    }
+
+    table.table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        color: #333;
+        text-align: left;
+        font-weight: 800;
+        padding: 12px 14px;
+        border-bottom: 2px solid var(--accent);
+    }
+
+    tbody td {
+        padding: 12px 14px;
+        color: #222;
+        border-bottom: 1px dashed #f0d0d0;
+    }
+
+    tbody tr {
+        transition: background .12s ease;
+    }
+
+        tbody tr:hover {
+            background: #fff6f6;
+        }
+
+            tbody tr:hover td:first-child {
+                box-shadow: inset 4px 0 0 0 var(--accent);
+            }
+
+    thead th:first-child {
+        border-top-left-radius: calc(var(--radius)-2px);
+    }
+
+    thead th:last-child {
+        border-top-right-radius: calc(var(--radius)-2px);
+    }
+
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: calc(var(--radius)-2px);
+    }
+
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: calc(var(--radius)-2px);
+    }
+
+    .num, .money {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .85rem;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        background: #fff;
+    }
+
+    .status-paid {
+        border-color: #19a55a;
+        color: #19a55a;
+    }
+
+    .status-pending {
+        border-color: #c99917;
+        color: #c99917;
+    }
+
+    .status-failed {
+        border-color: #c62929;
+        color: #c62929;
+    }
+
+    .actions {
+        white-space: nowrap;
+    }
+
+    .btn-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: .9rem;
+        text-decoration: none;
+        margin-right: 8px;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        background: #fff;
+    }
+
+        .btn-pill:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+    /* pager (UI only) */
+    .pager {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 10px 4px;
+        background: #fff;
+        border-top: 2px solid var(--accent);
+    }
+
+    .page-btn {
+        height: 32px;
+        min-width: 90px;
+        border-radius: 16px;
+        border: 2px solid var(--accent);
+        background: #fff;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .media (max-width:768px) {
+        .filters .input, .filters .select
+
+    {
+        width: 100%;
+    }
+
+    }
+</style>
+
+<div class="transactions-page">
+    <div class="content-wrap">
+
+        <!-- Toolbar (UI only) -->
+        <div class="toolbar">
+            <div class="filters">
+                <span class="search-ico">🔍</span>
+                <input class="input" type="text" placeholder="Search by party, ref…" />
+                <select class="select">
+                    <option>All types</option>
+                    <option>Sale</option>
+                    <option>Purchase</option>
+                    <option>Return</option>
+                    <option>Adjustment</option>
+                </select>
+                <input class="input" type="date" />
+                <span>to</span>
+                <input class="input" type="date" />
+            </div>
+            <button type="button" class="btn-search">Search</button>
+        </div>
+
+        <!-- Table -->
+        <section class="table-card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:110px;">ID</th>
+                            <th style="width:140px;">Date</th>
+                            <th>Party</th>
+                            <th style="width:130px;">Type</th>
+                            <th style="width:130px;">Status</th>
+                            <th style="width:160px;">Reference</th>
+                            <th style="width:140px;" class="money">Amount</th>
+                            <th style="width:120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- sample rows -->
+                        <tr>
+                            <td>9001</td>
+                            <td>2025-03-04</td>
+                            <td>ABC Builders</td>
+                            <td>Sale</td>
+                            <td><span class="status-pill status-paid">Paid</span></td>
+                            <td>INV-10231</td>
+                            <td class="money">1,780.00</td>
+                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>9002</td>
+                            <td>2025-03-03</td>
+                            <td>PipeWare Ltd.</td>
+                            <td>Purchase</td>
+                            <td><span class="status-pill status-pending">Pending</span></td>
+                            <td>PO-8842</td>
+                            <td class="money">-950.00</td>
+                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>9003</td>
+                            <td>2025-03-01</td>
+                            <td>XYZ Retail</td>
+                            <td>Return</td>
+                            <td><span class="status-pill status-failed">Failed</span></td>
+                            <td>RET-2205</td>
+                            <td class="money">-120.00</td>
+                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pager (UI only) -->
+            <div class="pager">
+                <button type="button" class="page-btn">← Prev</button>
+                <div style="align-self:center; color:#333; background:#fff; padding:0 8px; border-radius:8px;">
+                    Page 1 of 20
+                </div>
+                <button type="button" class="page-btn">Next →</button>
+            </div>
+        </section>
+
+    </div>
+</div>
