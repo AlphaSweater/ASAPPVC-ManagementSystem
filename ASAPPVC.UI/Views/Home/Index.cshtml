@@ -1,19 +1,364 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
+
 <style>
+    :root {
+        --bg1: #1b2a66;
+        --bg2: #16235b;
+        --panel1: #1e2d72;
+        --panel2: #182967;
+        --white: #fff;
+        --ink: #1a1a1a;
+        --muted: #6b7280;
+        --accent: #c62929;
+        --accent2: #ef4723;
+        --radius: 14px;
+        --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
     html, body {
         height: 100%;
         margin: 0;
-        font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        background: linear-gradient(135deg, #215c99 0%, #252d6a 100%);
-        color: #000;
+    }
+
+    body {
+        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    }
+
+    .main {
+        padding: 0 !important;
+    }
+
+    .dashboard-page {
+        min-height: calc(100vh - 40px);
+        padding: 20px;
+        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+        border-radius: 10px;
+        color: #fff;
+    }
+
+    .wrap {
+        background: linear-gradient(135deg,var(--panel1),var(--panel2));
+        border: 2px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+    }
+
+    /* ===== header row ===== */
+    .head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .head .crumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            background: rgba(0,0,0,.15);
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.25);
+        }
+
+    /* ===== grid ===== */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    /* ===== cards (white with red outline) ===== */
+    .card {
+        background: var(--white);
+        color: var(--ink);
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        padding: 14px;
+    }
+
+        .card h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .kpi {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 90px;
+    }
+
+        .kpi .big {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg,var(--accent2),var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .kpi .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,var(--accent2),var(--accent));
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 900;
+            box-shadow: 0 8px 18px rgba(0,0,0,.18);
+        }
+
+    /* spans like the reference layout */
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    .chart-box {
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .chart-box svg {
+            width: 100%;
+            height: 100%;
+        }
+
+    /* ===== last transactions ===== */
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 600px;
+        overflow: auto;
+    }
+
+    .tx {
+        display: grid;
+        grid-template-columns: 36px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px dashed #f0d0d0;
+        background: #fff;
+    }
+
+        .tx .ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg,var(--accent2),var(--accent));
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .tx .who {
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .tx .meta {
+            font-size: .85rem;
+            color: #6b7280;
+        }
+
+        .tx .amt {
+            font-weight: 900;
+            color: #1f2937;
+            font-variant-numeric: tabular-nums;
+        }
+
+    /* tiny helper */
+    .muted {
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    /* responsive (using your custom `.media` style) */
+    .media (max-width: 1100px) {
+        .grid
+
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .span-3 {
+        grid-column: span 2;
+    }
+
     }
 </style>
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-<body>
 
-</body>
+<div class="dashboard-page">
+    <div class="wrap">
+        <!-- header / breadcrumb -->
+        <div class="head">
+            <div class="crumb">🏠 Dashboard</div>
+        </div>
+
+        <!-- KPIs -->
+        <section class="grid" style="margin-bottom:10px;">
+            <div class="card kpi">
+                <h3>Customers</h3>
+                <div class="kpi">
+                    <div class="big">780</div>
+                    <div class="icon">👥</div>
+                </div>
+            </div>
+            <div class="card kpi">
+                <h3>Orders</h3>
+                <div class="kpi">
+                    <div class="big">4,780</div>
+                    <div class="icon">🚚</div>
+                </div>
+            </div>
+            <div class="card kpi">
+                <h3>Transactions</h3>
+                <div class="kpi">
+                    <div class="big">1,780</div>
+                    <div class="icon">💳</div>
+                </div>
+            </div>
+            <div class="card kpi">
+                <h3>Your income</h3>
+                <div class="kpi">
+                    <div class="big">R 1,780</div>
+                    <div class="icon">₵</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- middle charts row -->
+        <section class="grid" style="margin-bottom:10px;">
+            <!-- Pie chart placeholder -->
+            <div class="card span-2">
+                <h3>Pie chart title</h3>
+                <div class="chart-box">
+                    <!-- simple pie placeholder -->
+                    <svg viewBox="0 0 200 200" role="img" aria-label="Pie chart placeholder">
+                        <circle cx="100" cy="100" r="90" fill="#fafafa" stroke="#f0d0d0" stroke-width="2" />
+                        <path d="M100,100 L100,10 A90,90 0 0,1 175,145 z" fill="#ff9aa2" />
+                        <path d="M100,100 L175,145 A90,90 0 0,1 25,145 z" fill="#ffd1a9" />
+                        <path d="M100,100 L25,145 A90,90 0 0,1 100,10 z" fill="#a7f3d0" />
+                        <circle cx="100" cy="100" r="34" fill="#fff" />
+                    </svg>
+                </div>
+                <div class="muted">Legend: 1st, 2nd, 3rd, 4th</div>
+            </div>
+
+            <!-- Column chart placeholder -->
+            <div class="card">
+                <h3>Column chart title</h3>
+                <div class="chart-box">
+                    <!-- simple bars -->
+                    <svg viewBox="0 0 320 200" role="img" aria-label="Bar chart placeholder">
+                        <rect x="20" y="120" width="30" height="60" fill="#ff9aa2" />
+                        <rect x="70" y="90" width="30" height="90" fill="#a7f3d0" />
+                        <rect x="120" y="110" width="30" height="70" fill="#93c5fd" />
+                        <rect x="170" y="60" width="30" height="120" fill="#fcd34d" />
+                        <rect x="220" y="100" width="30" height="80" fill="#fda4af" />
+                        <rect x="270" y="70" width="30" height="110" fill="#c7d2fe" />
+                        <line x1="10" x2="310" y1="180" y2="180" stroke="#e5e7eb" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Income card styled like a stat -->
+            <div class="card">
+                <h3>Income (month)</h3>
+                <div class="kpi" style="min-height:200px;">
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="big">R 17,800</div>
+                        <div class="muted">+12% vs last month</div>
+                    </div>
+                    <div class="icon">📈</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- bottom: line chart + last transactions -->
+        <section class="grid">
+            <!-- Line chart placeholder -->
+            <div class="card span-3">
+                <h3>Line chart title</h3>
+                <div class="chart-box" style="height:300px;">
+                    <svg viewBox="0 0 600 200" role="img" aria-label="Line chart placeholder">
+                        <rect x="0" y="0" width="600" height="200" fill="#fff" />
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <line x1="40" x2="580" y1="170" y2="170" />
+                            <line x1="40" x2="580" y1="130" y2="130" />
+                            <line x1="40" x2="580" y1="90" y2="90" />
+                            <line x1="40" x2="580" y1="50" y2="50" />
+                        </g>
+                        <polyline fill="none" stroke="#ef4444" stroke-width="3"
+                                  points="40,160 140,120 240,130 340,95 440,110 540,80" />
+                        <polyline fill="none" stroke="#3b82f6" stroke-width="3"
+                                  points="40,150 140,140 240,115 340,130 440,125 540,145" />
+                        <polyline fill="none" stroke="#10b981" stroke-width="3"
+                                  points="40,165 140,150 240,140 340,125 440,115 540,100" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Last transactions list -->
+            <div class="card">
+                <h3>Last transactions</h3>
+                <div class="list">
+                    <div class="tx">
+                        <div class="ico">💸</div>
+                        <div>
+                            <div class="who">Deposit</div>
+                            <div class="meta">ABC Builders • 2025-03-04</div>
+                        </div>
+                        <div class="amt">+1,526.00</div>
+                    </div>
+                    <div class="tx">
+                        <div class="ico">🧾</div>
+                        <div>
+                            <div class="who">Sale</div>
+                            <div class="meta">Invoice INV-10231 • 2025-03-03</div>
+                        </div>
+                        <div class="amt">+780.00</div>
+                    </div>
+                    <div class="tx">
+                        <div class="ico">↩️</div>
+                        <div>
+                            <div class="who">Return</div>
+                            <div class="meta">XYZ Retail • 2025-03-01</div>
+                        </div>
+                        <div class="amt">-120.00</div>
+                    </div>
+                    <div class="tx">
+                        <div class="ico">💳</div>
+                        <div>
+                            <div class="who">Payment</div>
+                            <div class="meta">PO-8842 • 2025-02-28</div>
+                        </div>
+                        <div class="amt">-950.00</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
