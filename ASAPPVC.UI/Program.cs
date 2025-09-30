@@ -16,10 +16,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //registering repositories
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 //registering services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 
