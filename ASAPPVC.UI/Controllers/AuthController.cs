@@ -1,4 +1,5 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Auth;
+﻿// Controllers/AuthController.cs
+using ASAPPVC.UI.Models.ViewModels.Auth;
 using ASAPPVC.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,46 +8,70 @@ namespace ASAPPVC.UI.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IAuthService _authService;
-        private const string AuthIndexViewPath = "~/Views/Auth/Login.cshtml";
+        private readonly IAuthService _auth;
+        public AuthController(IAuthService auth) => _auth = auth;
 
-        public AuthController(IAuthService authService)
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Login()
         {
-            _authService = authService;
+            ViewData["HideNavbar"] = true;
+            return View(); 
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel viewModel)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .Where(e => !string.IsNullOrWhiteSpace(e))
-                    .ToList();
-
-                return RedirectToAction(nameof(Index), new
-                {
-                    showForm = "login",
-                    email = viewModel.Email,
-                    loginError = string.Join("|", errors)
-                });
+                ViewData["HideNavbar"] = true;
+                return View(vm);
             }
 
-            var result = await _authService.LoginAsync(viewModel);
-
+            var result = await _auth.LoginAsync(vm);
             if (result.Succeeded)
-                return RedirectToAction("Index", "Dashboard");
+                return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+                    ? Redirect(returnUrl)
+                    : RedirectToAction("Index", "Dashboard");
 
-            return RedirectToAction(nameof(Index), new
+            ModelState.AddModelError(string.Empty, "Incorrect email or password.");
+            ViewData["HideNavbar"] = true;
+            return View(vm);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Register()
+        {
+            ViewData["HideNavbar"] = true;
+            return View(); 
+        }
+
+        [AllowAnonymous]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel vm)
+        {
+            if (!ModelState.IsValid)
             {
-                showForm = "login",
-                email = viewModel.Email,
-                loginError = "Incorrect email or password used."
-            });
+                ViewData["HideNavbar"] = true;
+                return View(vm);
+            }
+
+            var result = await _auth.RegisterAsync(vm);
+            if (result.Succeeded) return RedirectToAction(nameof(Login));
+
+            foreach (var e in result.Errors) ModelState.AddModelError(string.Empty, e.Description);
+            ViewData["HideNavbar"] = true;
+            return View(vm);
+        }
+
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _auth.LogoutAsync();
+            return RedirectToAction(nameof(Login));
         }
     }
 }

@@ -1,0 +1,46 @@
+﻿@model ASAPPVC.UI.Models.ViewModels.Auth.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout"; // or null if you want a blank test page
+}
+<div style="max-width:420px;margin:60px auto;padding:24px;border:2px solid #c62929;border-radius:12px;background:#fff;">
+    <h2 style="margin-top:0;text-align:center;">Register (test)</h2>
+    <form asp-controller="Auth" asp-action="Register" method="post">
+        @Html.AntiForgeryToken()
+        <div style="margin-bottom:12px;">
+            <label>Email</label>
+            <input name="FirstName" type="text" class="form-control" required />
+        </div>
+        <div style="margin-bottom:12px;">
+            <label>Email</label>
+            <input name="LastName" type="text" class="form-control" required />
+        </div>
+        <div style="margin-bottom:12px;">
+            <label>Email</label>
+            <input name="Email" type="email" class="form-control" required />
+        </div>
+        <div style="margin-bottom:12px;">
+            <label>Password</label>
+            <input name="Password" type="password" class="form-control" required />
+        </div>
+        <div style="margin-bottom:12px;">
+            <label>Confirm password</label>
+            <input name="ConfirmPassword" type="password" class="form-control" required />
+        </div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="color:#c62929;margin-bottom:10px;">
+                @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    @e.ErrorMessage
+
+                    <br />
+                }
+            </div>
+        }
+        <button type="submit" class="btn btn-primary" style="width:100%;">Create account</button>
+    </form>
+    <div style="text-align:center;margin-top:12px;">
+        <a asp-action="Login" asp-controller="Auth">Back to login</a>
+    </div>
+</div>

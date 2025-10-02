@@ -9,22 +9,26 @@ namespace ASAPPVC.UI.Services.Implementation
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public AuthService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+        public AuthService(UserManager<IdentityUser> userManager,
+                           SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
+            => await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+        public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
         {
-            return await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded) return result;
+
+            return result;
         }
 
-        public async Task LogoutAsync()
-        {
-            await _signInManager.SignOutAsync();
-        }
+        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
+
     }
 }

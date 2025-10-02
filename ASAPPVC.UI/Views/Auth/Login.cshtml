@@ -153,28 +153,23 @@
 
 <div class="viewport">
     <div class="card">
-        <!-- Logo + Brand -->
         <div class="logo-wrap">
             <img class="logo" src="/Assets/Images/Logos/asap-pvc-logo.png" alt="A.S.A.P PVC" />
         </div>
-
         <div class="brand">A.S.A.P PVC</div>
 
-        <!-- Login Form -->
         <form asp-controller="Auth" asp-action="Login" method="post" novalidate>
             @Html.AntiForgeryToken()
 
-            <!-- Username -->
-            <div class="field-label first">Username</div>
+            <!-- Email -->
+            <div class="field-label first">Email</div>
             <div class="field">
-                <span class="icon">👤</span>
-                <input class="input" type="text" name="Username" placeholder="Enter username" autocomplete="username" />
+                <span class="icon">📧</span>
+                <input class="input" type="email" name="Email" placeholder="Enter email" autocomplete="username" />
             </div>
-            @if (ViewData.ModelState["Username"]?.Errors.Count > 0)
+            @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
             {
-                <span class="text-danger">
-                    @ViewData.ModelState["Username"]?.Errors[0]?.ErrorMessage
-                </span>
+                <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
             }
 
             <!-- Password -->
@@ -185,10 +180,13 @@
             </div>
             @if (ViewData.ModelState["Password"]?.Errors.Count > 0)
             {
-                <span class="text-danger">
-                    @ViewData.ModelState["Password"]?.Errors[0]?.ErrorMessage
-                </span>
+                <span class="text-danger">@ViewData.ModelState["Password"]?.Errors[0]?.ErrorMessage</span>
             }
+
+            <!-- Remember me (optional) -->
+            <div style="margin-top:10px;text-align:left;">
+                <label><input type="checkbox" name="RememberMe" /> Remember me</label>
+            </div>
 
             <!-- Actions -->
             <div class="actions">
@@ -198,6 +196,19 @@
                     <a asp-controller="Auth" asp-action="ForgotPassword">Reset</a>
                 </div>
             </div>
+
+            <!-- Show any general errors -->
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+            {
+                <div class="text-danger" style="text-align:center;margin-top:10px;">
+                    @foreach (var e in ViewData.ModelState[string.Empty].Errors)
+                    {
+                        @e.ErrorMessage
+
+                        <br />
+                    }
+                </div>
+            }
         </form>
     </div>
 </div>

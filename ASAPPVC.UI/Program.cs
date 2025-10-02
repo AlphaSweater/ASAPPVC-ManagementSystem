@@ -3,16 +3,30 @@ using ASAPPVC.UI.Repositories.Implementation;
 using ASAPPVC.UI.Repositories.Interfaces;
 using ASAPPVC.UI.Services.Implementation;
 using ASAPPVC.UI.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
 //creates database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ASP.NET Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 
 //registering repositories
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
@@ -44,6 +58,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Authentication & Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
