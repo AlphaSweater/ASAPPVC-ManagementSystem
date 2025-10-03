@@ -33,7 +33,7 @@ namespace ASAPPVC.UI.Controllers
             if (result.Succeeded)
                 return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
                     ? Redirect(returnUrl)
-                    : RedirectToAction("Index", "Dashboard");
+                    : RedirectToAction("Index", "Home");
 
             ModelState.AddModelError(string.Empty, "Incorrect email or password.");
             ViewData["HideNavbar"] = true;
