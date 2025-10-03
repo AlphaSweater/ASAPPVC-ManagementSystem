@@ -1,5 +1,268 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Create Customer";
 }
+
+<style>
+    :root {
+        --bg1: #1b2a66;
+        --bg2: #16235b;
+        --white: #ffffff;
+        --ink: #1a1a1a;
+        --muted: #6b7280;
+        --accent: #c62929;
+        --accent-2: #ef4723;
+        --radius: 14px;
+        --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+        font-family: "Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+
+    .viewport {
+        min-height: calc(100vh - 40px);
+        padding: 20px;
+        color: #fff;
+    }
+
+    .content-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #1e2d72, #182967);
+        border: 2px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+    }
+
+    .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(0,0,0,.18);
+        border: 1.5px solid rgba(255,255,255,.28);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        margin-bottom: 16px;
+    }
+
+    .title {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: .3px;
+    }
+
+    .back-link {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        border: 2px solid rgba(255,255,255,.35);
+        padding: 6px 12px;
+        border-radius: 999px;
+        transition: all .15s ease;
+    }
+
+        .back-link:hover {
+            background: rgba(255,255,255,.1);
+        }
+
+    .form-card {
+        background: var(--white);
+        color: var(--ink);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+    }
+
+    .form-header {
+        text-align: center;
+        font-weight: 900;
+        font-size: 22px;
+        margin: 4px 0 14px 0;
+        color: #333;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 20px;
+    }
+
+    .group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #444;
+        margin-bottom: 6px;
+        letter-spacing: .2px;
+    }
+
+    .input {
+        height: 40px;
+        border: 1px solid rgba(198,41,41,.5);
+        border-radius: 10px;
+        outline: none;
+        padding: 0 12px;
+        font-size: 14px;
+        background: #fff;
+        color: #1a1a1a;
+    }
+
+        .input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(198,41,41,.2);
+        }
+
+    .help {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+    }
+
+    .text-danger {
+        color: var(--accent);
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* Actions */
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .btn {
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 999px;
+        font-weight: 800;
+        cursor: pointer;
+        border: 0;
+        transition: filter .15s ease, transform .04s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg,var(--accent-2),var(--accent));
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(0,0,0,.2);
+    }
+
+        .btn-primary:hover {
+            filter: brightness(1.06);
+        }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #1f2937;
+        border: 2px solid #d1d5db;
+    }
+
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+    .media (max-width: 760px) {
+        .form-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }
+</style>
+
+<div class="viewport">
+    <div class="content-wrap">
+        <div class="toolbar">
+            <a class="back-link" href="javascript:history.back()">← Back</a>
+            <div class="title">Customers • Create</div>
+        </div>
+
+        <section class="form-card">
+            <h2 class="form-header">Create New Customer</h2>
+
+            <form asp-controller="Customers" asp-action="Create" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="form-grid">
+                    <div class="group">
+                        <label class="label">First Name</label>
+                        <input class="input" type="text" name="FirstName" placeholder="e.g. Jane" />
+                        @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["FirstName"]?.Errors[0]?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="group">
+                        <label class="label">Surname</label>
+                        <input class="input" type="text" name="LastName" placeholder="e.g. Doe" />
+                        @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["LastName"]?.Errors[0]?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="group">
+                        <label class="label">Phone Number</label>
+                        <input class="input" type="tel" name="PhoneNumber" placeholder="+27 82 555 1234" />
+                        <span class="help">Use country code (e.g. +27 for SA)</span>
+                        @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["PhoneNumber"]?.Errors[0]?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="group">
+                        <label class="label">Company (optional)</label>
+                        <input class="input" type="text" name="Company" placeholder="Company name" />
+                        @if (ViewData.ModelState["Company"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["Company"]?.Errors[0]?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="group" style="grid-column:1 / -1;">
+                        <label class="label">Email</label>
+                        <input class="input" type="email" name="Email" placeholder="you@company.com" autocomplete="email" />
+                        @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+
+                @* General (summary) errors *@
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+                {
+                    <div class="text-danger" style="text-align:center;margin-top:10px;">
+                        @foreach (var e in ViewData.ModelState[string.Empty].Errors)
+                        {
+                            @e.ErrorMessage
+
+                            <br />
+                        }
+                    </div>
+                }
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
