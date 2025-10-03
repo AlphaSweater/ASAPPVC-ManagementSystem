@@ -194,7 +194,7 @@
         <section class="form-card">
             <h2 class="form-header">Create New Customer</h2>
 
-            <form asp-controller="Customers" asp-action="Create" method="post" novalidate>
+            <form asp-controller="Customer" asp-action="CreateCustomer" method="post" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="form-grid">

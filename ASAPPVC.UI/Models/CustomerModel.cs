@@ -18,7 +18,7 @@ namespace ASAPPVC.UI.Models
         [Required]
         public string PhoneNumber { get; set; }
 
-        public string company { get; set; }
+        public string Company { get; set; }
 
         [Required]
         [EmailAddress]
