@@ -13,5 +13,8 @@ namespace ASAPPVC.UI.Data
         public DbSet<PartModel> Part { get; set; }
         public DbSet<ProductModel> Product { get; set; }
         public DbSet<CustomerModel> Customer { get; set; }
+        public DbSet<OrderModel> Order { get; set; }
+        public DbSet<OrderProductModel> OrderProduct { get; set; }
+        public DbSet<ProductPartModel> ProductPart { get; set; }
     }
 }

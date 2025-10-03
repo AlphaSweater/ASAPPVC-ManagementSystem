@@ -18,7 +18,6 @@ namespace ASAPPVC.UI.Models
         [Required]
         public string Description { get; set; }
 
-
         //image
         public byte[] ImageBytes { get; set; }
         public string ImageContentType { get; set; }
