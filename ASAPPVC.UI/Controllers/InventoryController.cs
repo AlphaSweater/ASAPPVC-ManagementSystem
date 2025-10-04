@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// Controllers/InventoryController.cs
+using ASAPPVC.UI.Models.ViewModels.Inventory;
+using ASAPPVC.UI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers
@@ -6,43 +9,63 @@ namespace ASAPPVC.UI.Controllers
     [Authorize]
     public class InventoryController : Controller
     {
-        //Part constants
+        private readonly IPartService _parts;
+
+        public InventoryController(IPartService parts)
+        {
+            _parts = parts;
+        }
+
+        //part paths
         private const string AddPartPath = "~/Views/Inventory/Parts/AddPart.cshtml";
         private const string ViewPartPath = "~/Views/Inventory/Parts/ViewPart.cshtml";
         private const string PartInventoryPath = "~/Views/Inventory/Parts/ViewPartInventory.cshtml";
 
-        //Product constants
+
+        //Product paths
         private const string AddProductPath = "~/Views/Inventory/Products/AddProduct.cshtml";
         private const string ViewProductPath = "~/Views/Inventory/Products/ViewProduct.cshtml";
         private const string ProductInventoryPath = "~/Views/Inventory/Products/ViewProductInventory.cshtml";
 
-
+        [HttpGet]
         public IActionResult AddPart()
+            => View(AddPartPath);
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddPart(CreatePartViewModel vm, CancellationToken ct)
         {
-            return View(AddPartPath);
-        }
-        public IActionResult viewPart()
-        {
-            return View(ViewPartPath);
-        }
-        public IActionResult viewPartInventory()
-        {
-            return View(PartInventoryPath);
+            if (!ModelState.IsValid)
+                return View(AddPartPath, vm);
+
+            var (ok, error, part) = await _parts.CreateAsync(vm, ct);
+            if (!ok || part is null)
+            {
+                ModelState.AddModelError(string.Empty, error ?? "Unable to create part.");
+                return View(AddPartPath, vm);
+            }
+
+            TempData["AlertMessage"] = $"Part '{part.Name}' created.";
+            return RedirectToAction(nameof(ViewPart), new { id = part.PartID });
         }
 
-        public IActionResult AddProduct()
+        [HttpGet]
+        public async Task<IActionResult> ViewPart(int id, CancellationToken ct)
         {
-            return View(AddProductPath);
+            var part = await _parts.GetAsync(id, ct);
+            if (part is null) return NotFound();
+            return View(ViewPartPath, part);
         }
 
-        public IActionResult viewProduct()
+        [HttpGet]
+        public async Task<IActionResult> ViewPartInventory(CancellationToken ct)
         {
-            return View(ViewProductPath);
+            var list = await _parts.ListAsync(ct);
+            return View(PartInventoryPath, list);
         }
 
-        public IActionResult viewProductInventory()
-        {
-            return View(ProductInventoryPath);
-        }
+
+        public IActionResult AddProduct() => View(AddProductPath);
+        public IActionResult ViewProduct() => View(ViewProductPath);
+        public IActionResult ViewProductInventory() => View(ProductInventoryPath);
     }
 }

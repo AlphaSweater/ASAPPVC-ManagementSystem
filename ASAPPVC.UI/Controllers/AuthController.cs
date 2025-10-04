@@ -19,6 +19,7 @@ namespace ASAPPVC.UI.Controllers
             return View(); 
         }
 
+        //method that allows users to log in
         [AllowAnonymous]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
@@ -48,6 +49,7 @@ namespace ASAPPVC.UI.Controllers
             return View(); 
         }
 
+        //method that allows users to register
         [AllowAnonymous]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel vm)
