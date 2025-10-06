@@ -12,6 +12,9 @@ namespace ASAPPVC.UI.Services.Implementation
 
         public async Task<(bool Ok, string? Error, PartModel? Part)> CreateAsync(CreatePartViewModel vm, CancellationToken ct = default)
         {
+            if (string.IsNullOrWhiteSpace(vm.Name) || string.IsNullOrWhiteSpace(vm.StorageLocation))
+                return (false, "Name and storage location are required.", null);
+
             var part = new PartModel
             {
                 Name = vm.Name.Trim(),

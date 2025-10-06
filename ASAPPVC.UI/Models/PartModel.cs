@@ -22,7 +22,7 @@ namespace ASAPPVC.UI.Models
         [Required]
         public string StorageLocation { get; set; }
 
-        public byte[] ImageBytes { get; set; }
-        public string ImageContentType { get; set; }
+        public byte[]? ImageBytes { get; set; }
+        public string? ImageContentType { get; set; }
     }
 }

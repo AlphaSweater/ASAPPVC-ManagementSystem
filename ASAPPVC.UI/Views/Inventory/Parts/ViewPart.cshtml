@@ -1,14 +1,19 @@
-﻿@* Optional strongly-typed model (you can remove if you prefer ViewBag) *@
-@* @model ASAPPVC.UI.Models.PartViewModel *@
+﻿@model ASAPPVC.UI.Models.PartModel
+
 @{
     ViewData["Title"] = "View Part";
-    // Fallbacks if you aren't passing a model yet:
-    var img = Model?.ImageUrl ?? Url.Content("~/Assets/Images/placeholder.png");
-    var name = Model?.PartName ?? "—";
+    var hasImage = Model?.ImageBytes != null
+                   && Model.ImageBytes.Length > 0
+                   && !string.IsNullOrWhiteSpace(Model.ImageContentType);
+
+    var img = hasImage
+        ? $"data:{Model!.ImageContentType};base64,{Convert.ToBase64String(Model.ImageBytes!)}"
+        : Url.Content("~/Assets/Images/placeholder.png");
+
+    var name = Model?.Name ?? "—";
     var loc = Model?.StorageLocation ?? "—";
-    var cpu = Model?.PricePerUnit?.ToString("0.00") ?? "—";
-    var qty = Model?.StockQuantity?.ToString() ?? "—";
-    var min = Model?.MinimumStockLevel?.ToString() ?? "—";
+    var cpu = Model != null ? Model.UnitCost.ToString("0.00") : "—";
+    var qty = Model?.CurrentAmount.ToString() ?? "—";
 }
 
 <style>
@@ -115,7 +120,7 @@
 
     .details-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr; 
+        grid-template-columns: 1fr 1fr;
         gap: 14px 20px;
     }
 
@@ -139,7 +144,7 @@
 
     /* ---------- Footer Actions ---------- */
     .footer {
-        grid-column: 2; 
+        grid-column: 2;
         display: flex;
         justify-content: center;
         gap: 12px;
@@ -165,7 +170,6 @@
         filter: brightness(1.08);
     }
 
-    /* ---------- Responsive ---------- */
     .media (max-width: 820px) {
         .viewpart-card
 
@@ -184,7 +188,6 @@
     <section class="viewpart-card">
         <!-- Header -->
         <div class="header">
-            <!-- Back: either JS history or a route -->
             <a href="javascript:history.back()" class="back-link">← Back</a>
             <div class="title">View Part</div>
         </div>
@@ -216,18 +219,12 @@
                     <div class="label">Current Stock Amount:</div>
                     <div class="value">@qty</div>
                 </div>
-                <div class="pair">
-                    <div class="label">Restock Value:</div>
-                    <div class="value">@min</div>
-                </div>
             </div>
         </div>
 
         <!-- Footer Actions -->
         <div class="footer">
-            <form asp-controller="Parts" asp-action="Edit" method="get">
-                @* For GET edit?id=... if you have an Id *@
-                @* <input type="hidden" name="id" value="@Model?.Id" /> *@
+            <form asp-controller="Inventory" asp-action="AddPart" method="get">
                 <button type="submit" class="btn btn-edit">Edit</button>
             </form>
         </div>
