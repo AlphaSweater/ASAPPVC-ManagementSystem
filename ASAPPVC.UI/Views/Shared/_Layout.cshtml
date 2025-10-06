@@ -183,11 +183,8 @@
                 <a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
                     <span class="sb-icon">💼</span><span class="sb-label">Financial</span>
                 </a>
-                <a class="sb-item @(current == "report/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPart">
+                <a class="sb-item @(current == "report/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
                     <span class="sb-icon">📊</span><span class="sb-label">View part</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Inventory" asp-action="AddPart">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">Add Part</span>
                 </a>
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Auth" asp-action="Login">
                     <span class="sb-icon">🛠️</span><span class="sb-label">Login</span>

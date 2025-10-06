@@ -1,5 +1,4 @@
-﻿// Controllers/InventoryController.cs
-using ASAPPVC.UI.Models.ViewModels.Inventory;
+﻿using ASAPPVC.UI.Models.ViewModels.Inventory;
 using ASAPPVC.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
