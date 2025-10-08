@@ -21,5 +21,7 @@ namespace ASAPPVC.UI.Models
         //image
         public byte[] ImageBytes { get; set; }
         public string ImageContentType { get; set; }
+
+        public List<ProductPartModel> ProductParts { get; set; } = new();
     }
 }

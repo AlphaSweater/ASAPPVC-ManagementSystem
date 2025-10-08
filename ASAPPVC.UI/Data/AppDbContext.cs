@@ -16,5 +16,22 @@ namespace ASAPPVC.UI.Data
         public DbSet<OrderModel> Order { get; set; }
         public DbSet<OrderProductModel> OrderProduct { get; set; }
         public DbSet<ProductPartModel> ProductPart { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ProductPartModel>()
+                .HasOne(pp => pp.Product)
+                .WithMany(p => p.ProductParts)
+                .HasForeignKey(pp => pp.ProductID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProductPartModel>()
+                .HasOne(pp => pp.Part)
+                .WithMany()
+                .HasForeignKey(pp => pp.PartID)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

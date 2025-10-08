@@ -14,5 +14,10 @@ namespace ASAPPVC.UI.Models
 
         [Required, ForeignKey("ProductModel")]
         public int ProductID { get; set; }
+
+        public int Quantity { get; set; }
+
+        public PartModel? Part { get; set; }
+        public ProductModel? Product { get; set; }
     }
 }
