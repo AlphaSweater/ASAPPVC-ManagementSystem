@@ -1,7 +1,8 @@
-﻿@{
+﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.CreateProductViewModel
+@{
     ViewData["Title"] = "Add New Product";
+    var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.PartModel>;
 }
-
 <style>
     /* ---------- Page Background ---------- */
     html, body {
@@ -334,31 +335,48 @@
                 <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image" />
             </div>
             <label class="upload-btn" for="imageFile">Upload Image</label>
-            <input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file" form="addProductForm" />
         </div>
 
         <!-- Right: Form -->
         <div class="form-section">
             <h2>Add New Product</h2>
-            <form id="addProductForm" asp-controller="Products" asp-action="Add" method="post" enctype="multipart/form-data">
+
+            <!-- IMPORTANT: point to Inventory/AddProduct and keep multipart -->
+            <form id="addProductForm"
+                  asp-controller="Inventory"
+                  asp-action="AddProductPost"
+                  method="post"
+                  enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
+
+                <!-- put the actual file input INSIDE the form and bind it -->
+                <input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+
                 <div class="form-grid">
-                    <!-- Basic product info -->
+                    <!-- Basic product info (bind with asp-for so names match VM) -->
                     <div class="form-group">
-                        <label>Product Name</label>
-                        <input type="text" name="ProductName" placeholder="Enter product name" />
+                        <label asp-for="ProductName">Product Name</label>
+                        <input asp-for="ProductName" placeholder="Enter product name" />
+                        <span asp-validation-for="ProductName" class="text-danger"></span>
                     </div>
+
+                    <!-- Optional: SKU (not in VM; remove if you don't want it) -->
                     <div class="form-group">
                         <label>SKU</label>
-                        <input type="text" name="Sku" placeholder="Enter SKU" />
+                        <input name="Sku" placeholder="Enter SKU" />
                     </div>
+
                     <div class="form-group">
-                        <label>Base Price</label>
-                        <input type="number" step="0.01" name="BasePrice" placeholder="Enter base price" />
+                        <label asp-for="BasePrice">Base Price</label>
+                        <input asp-for="BasePrice" step="0.01" placeholder="Enter base price" />
+                        <span asp-validation-for="BasePrice" class="text-danger"></span>
                     </div>
+
                     <div class="form-group">
-                        <label>Description (optional)</label>
-                        <textarea name="Description" placeholder="Short description"></textarea>
+                        <label asp-for="Description">Description (optional)</label>
+                        <textarea asp-for="Description" placeholder="Short description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <!-- Parts collection -->
@@ -372,7 +390,6 @@
                             <table class="parts-table" id="partsTable">
                                 <thead>
                                     <tr>
-                                        <!-- CHANGE: remove inline min-width, use class so CSS can shrink it -->
                                         <th class="part-col">Part</th>
                                         <th class="qty">Qty</th>
                                         <th class="unit-price">Unit Price</th>
@@ -381,14 +398,20 @@
                                     </tr>
                                 </thead>
                                 <tbody id="partsTbody">
-                                    <!-- Initial row (example options show price & a null price) -->
+                                    <!-- First row -->
                                     <tr data-index="0">
                                         <td>
                                             <select name="Parts[0].PartId" class="part-select">
                                                 <option value="">-- Select part --</option>
-                                                <option value="101" data-price="12.99">PVC Elbow 32mm</option>
-                                                <option value="102" data-price="">PVC Tee 50mm</option> <!-- null price -->
-                                                <option value="103" data-price="6.50">End Cap 20mm</option>
+                                                @if (parts != null)
+                                                {
+                                                    foreach (var p in parts)
+                                                    {
+                                                        <option value="@p.PartID" data-price="@p.UnitCost.ToString("0.##")">
+                                                            @p.Name
+                                                        </option>
+                                                    }
+                                                }
                                             </select>
                                         </td>
                                         <td>
@@ -424,18 +447,22 @@
 </div>
 
 <script>
-    (function(){
+    (function () {
         /* Image preview */
         const fileInput = document.getElementById('imageFile');
         const preview   = document.getElementById('previewImg');
         if (fileInput) {
-            fileInput.addEventListener('change', function(){
+            fileInput.addEventListener('change', function () {
                 const f = this.files && this.files[0];
                 if (!f) return;
                 const reader = new FileReader();
                 reader.onload = e => preview.src = e.target.result;
                 reader.readAsDataURL(f);
             });
+
+            // Clicking the image box opens the picker (nice UX)
+            const imgBox = document.querySelector('.image-box');
+            imgBox?.addEventListener('click', () => fileInput.click());
         }
 
         /* Parts dynamic rows with unit price (nullable) + subtotals + grand total */
@@ -443,19 +470,19 @@
         const addRowBtn = document.getElementById('addRowBtn');
         const grandEl = document.getElementById('grandTotal');
 
-        function getUnitPrice(tr){
+        function getUnitPrice(tr) {
             const sel = tr.querySelector('.part-select');
             const opt = sel && sel.selectedOptions && sel.selectedOptions[0];
             if (!opt) return null;
             const raw = opt.getAttribute('data-price');
-            if (raw === null || raw === '') return null;          // null price allowed
+            if (raw === null || raw === '') return null;
             const num = parseFloat(raw);
             return Number.isFinite(num) ? num : null;
         }
 
-        function formatMoney(n){ return n.toFixed(2); }
+        function formatMoney(n) { return n.toFixed(2); }
 
-        function recalcRow(tr){
+        function recalcRow(tr) {
             const qtyInput = tr.querySelector('input.qty');
             const qty = parseFloat(qtyInput?.value || '0');
             const unit = getUnitPrice(tr);
@@ -464,7 +491,7 @@
             unitCell.textContent = (unit == null) ? '—' : formatMoney(unit);
 
             const subCell = tr.querySelector('.subtotal');
-            if (!Number.isFinite(qty) || qty <= 0 || unit == null){
+            if (!Number.isFinite(qty) || qty <= 0 || unit == null) {
                 subCell.textContent = '—';
                 return 0;
             }
@@ -473,13 +500,13 @@
             return subtotal;
         }
 
-        function recalcGrand(){
+        function recalcGrand() {
             let total = 0;
             tbody.querySelectorAll('tr').forEach(tr => { total += recalcRow(tr); });
             grandEl.textContent = formatMoney(total);
         }
 
-        function wireRowEvents(tr){
+        function wireRowEvents(tr) {
             tr.addEventListener('input', e => {
                 if (e.target.matches('input.qty')) recalcGrand();
             });
@@ -492,17 +519,20 @@
             });
         }
 
-        function createRow(index){
+        function createRow(index) {
             const tr = document.createElement('tr');
             tr.setAttribute('data-index', index);
+
+            // Build <option>s from the server-provided parts (copy from the first row)
+            const optionsHtml = (function() {
+                const firstSel = tbody.querySelector('tr select.part-select');
+                return firstSel ? firstSel.innerHTML : '<option value="">-- Select part --</option>';
+            })();
+
             tr.innerHTML = `
                 <td>
                     <select name="Parts[${index}].PartId" class="part-select">
-                        <!-- Server should render real options; data-price may be empty for null -->
-                        <option value="">-- Select part --</option>
-                        <option value="101" data-price="12.99">PVC Elbow 32mm</option>
-                        <option value="102" data-price="">PVC Tee 50mm</option>
-                        <option value="103" data-price="6.50">End Cap 20mm</option>
+                        ${optionsHtml}
                     </select>
                 </td>
                 <td>
@@ -516,7 +546,7 @@
             return tr;
         }
 
-        function renumberIndexes(){
+        function renumberIndexes() {
             const rows = Array.from(tbody.querySelectorAll('tr'));
             rows.forEach((tr, i) => {
                 tr.setAttribute('data-index', i);

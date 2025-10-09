@@ -1,6 +1,7 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories.Implementation
 {

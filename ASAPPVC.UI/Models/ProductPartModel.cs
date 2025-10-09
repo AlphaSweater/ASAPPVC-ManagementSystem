@@ -7,7 +7,7 @@ namespace ASAPPVC.UI.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int OrderProductID { get; set; }
+        public int ProductPartID { get; set; }
 
         [Required, ForeignKey("PartModel")]
         public int PartID { get; set; }
