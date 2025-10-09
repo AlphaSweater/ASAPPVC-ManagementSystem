@@ -25,6 +25,13 @@ namespace ASAPPVC.UI.Repositories.Implementation
         public Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
             => _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
 
+        public Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default)
+            => _db.Product
+                  .AsNoTracking()
+                  .Include(p => p.ProductParts)
+                    .ThenInclude(pp => pp.Part)
+                  .FirstOrDefaultAsync(p => p.ProductID == id, ct);
+
         public Task SaveAsync(CancellationToken ct = default)
             => _db.SaveChangesAsync(ct);
     }

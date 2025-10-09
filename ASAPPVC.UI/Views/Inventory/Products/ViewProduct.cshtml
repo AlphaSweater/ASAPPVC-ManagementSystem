@@ -1,13 +1,12 @@
-﻿@* Optional strongly-typed model (adjust names to your app) *@
-@* @model ASAPPVC.UI.Models.ProductViewModel *@
+﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.ProductDetailViewModel
 @{
     ViewData["Title"] = "View Product";
 
-    // ---- Product fallbacks so the page renders before wiring a model ----
-    var pimg = Model?.ImageUrl ?? Url.Content("~/Assets/Images/placeholder.png");
+    // Use DB image (data URI) or placeholder
+    var pimg = Model?.ImageSrc ?? Url.Content("~/Assets/Images/placeholder.png");
     var pname = Model?.ProductName ?? "—";
     var sku = Model?.Sku ?? "—";
-    var baseP = Model?.BasePrice?.ToString("0.00") ?? "—";
+    var baseP = Model != null ? Model.Price.ToString("0.00") : "—";
     var desc = Model?.Description ?? "—";
 }
 
@@ -305,7 +304,7 @@
                             foreach (var item in Model.Parts)
                             {
                                 var qty = item.Quantity;
-                                decimal? unit = item.UnitPrice;       // nullable allowed
+                                decimal? unit = item.UnitPrice;
                                 decimal sub = unit.HasValue ? unit.Value * qty : 0m;
                                 grand += sub;
 
@@ -323,22 +322,8 @@
                         }
                         else
                         {
-                            @* Fallback/example rows so the layout shows before data is wired *@
                             <tr>
-                                <td>PVC Elbow 32mm</td>
-                                <td class="num">2</td>
-                                <td class="money">12.99</td>
-                                <td class="money">25.98</td>
-                            </tr>
-                            <tr>
-                                <td>PVC Tee 50mm</td>
-                                <td class="num">1</td>
-                                <td class="money">—</td>        @* null price example *@
-                                <td class="money">—</td>
-                            </tr>
-                            <tr class="tfoot">
-                                <td colspan="3" style="text-align:right;">Grand Total:</td>
-                                <td class="money grand">25.98</td>
+                                <td colspan="4" style="text-align:center; padding:14px;">No parts linked to this product.</td>
                             </tr>
                         }
                     </tbody>

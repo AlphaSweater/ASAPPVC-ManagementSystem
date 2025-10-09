@@ -13,12 +13,14 @@ namespace ASAPPVC.UI.Controllers
         private readonly IPartService _parts;
         private readonly IProductService _products;
         private readonly IPartRepository _partsRepo;
+        private readonly IProductRepository _productRepo;
 
-        public InventoryController(IPartService parts, IProductService products, IPartRepository partsRepo)
+        public InventoryController(IPartService parts, IProductService products, IPartRepository partsRepo, IProductRepository productRepo)
         {
             _parts = parts;
             _products = products;
             _partsRepo = partsRepo;
+            _productRepo = productRepo;
         }
 
         // ─────────── View Paths ───────────
@@ -100,8 +102,36 @@ namespace ASAPPVC.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult ViewProduct(int id)
-            => View(ViewProductPath);
+        public async Task<IActionResult> ViewProduct(int id, CancellationToken ct)
+        {
+            var product = await _productRepo.GetProductWithPartsAsync(id, ct);
+            if (product is null) return NotFound();
+
+            
+            string? imgSrc = null;
+            if (product.ImageBytes is { Length: > 0 } && !string.IsNullOrWhiteSpace(product.ImageContentType))
+                imgSrc = $"data:{product.ImageContentType};base64,{Convert.ToBase64String(product.ImageBytes)}";
+
+            var vm = new ProductDetailViewModel
+            {
+                ProductID = product.ProductID,
+                ProductName = product.Name,
+                Price = product.Price,
+                Description = product.Description,
+                ImageSrc = imgSrc,
+                Parts = product.ProductParts
+                                .OrderBy(pp => pp.Part!.Name)
+                                .Select(pp => new ProductDetailPartLine
+                                {
+                                    PartName = pp.Part!.Name,
+                                    Quantity = pp.Quantity,
+                                    UnitPrice = pp.Part.UnitCost
+                                })
+                                .ToList()
+            };
+
+            return View(ViewProductPath, vm);
+        }
 
         [HttpGet]
         public IActionResult ViewProductInventory()
