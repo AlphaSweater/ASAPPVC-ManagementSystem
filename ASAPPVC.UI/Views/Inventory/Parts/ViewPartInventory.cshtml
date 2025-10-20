@@ -14,8 +14,8 @@
         --white: #ffffff;
         --ink: #1a1a1a;
         --muted: #cfd3eb;
-        --accent: #c62929; /* red */
-        --accent-2: #ef4723; /* warm red */
+        --accent: #c62929;
+        --accent-2: #ef4723;
         --radius: 14px;
         --shadow: 0 16px 40px rgba(0,0,0,.35);
     }
@@ -24,17 +24,13 @@
         height: 100%;
         margin: 0;
     }
-    /* CHANGE: full-bleed page */
     body {
         background: linear-gradient(135deg, var(--bg1), var(--bg2));
     }
-    /* CHANGE: page bg */
     .main {
         padding: 0 !important;
     }
-    /* CHANGE: no layout padding on this page */
 
-    /* ==== PAGE/BACKDROP ==== */
     .inventory-page {
         min-height: calc(100vh - 40px);
         padding: 20px;
@@ -43,7 +39,6 @@
         color: #fff;
     }
 
-    /* ==== BLUE CONTAINER ==== */
     .content-wrap {
         background: linear-gradient(135deg, var(--container1), var(--container2));
         border: 2px solid rgba(255,255,255,.28);
@@ -55,7 +50,7 @@
     /* ===== Toolbar ===== */
     .toolbar {
         display: grid;
-        grid-template-columns: 1fr auto auto; /* CHANGE: make room for Add button */
+        grid-template-columns: 1fr auto auto;
         gap: 14px;
         align-items: center;
         padding: 10px 12px;
@@ -183,7 +178,7 @@
     tbody td {
         padding: 12px 14px;
         color: #222;
-        border-bottom: 1px dashed #f0d0d0; /* subtle red-ish divider */
+        border-bottom: 1px dashed #f0d0d0;
     }
 
     tbody tr {
@@ -260,15 +255,6 @@
 
     .btn-pill:active {
         transform: translateY(1px);
-    }
-
-    .media (max-width: 768px) {
-        .search-input
-
-    {
-        width: 100%;
-    }
-
     }
 </style>
 
