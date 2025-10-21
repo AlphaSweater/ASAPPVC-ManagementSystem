@@ -1,0 +1,32 @@
+﻿@model ASAPPVC.UI.Models.OrderModel
+@{
+    ViewData["Title"] = $"Order #{Model.OrderID}";
+}
+<h2>Order #@Model.OrderID</h2>
+<p>
+    <strong>Customer:</strong> @Model.Customer?.Name @Model.Customer?.Surname<br />
+    <strong>Date:</strong> @Model.OrderDate.ToLocalTime()<br />
+    <strong>Status:</strong> @Model.OrderStatus
+</p>
+
+<h4>Products</h4>
+@if (Model.OrderProducts == null || !Model.OrderProducts.Any())
+{
+        <p class="text-muted">No products in this order.</p>
+}
+else
+{
+        <table class="table table-sm">
+            <thead><tr><th>Product</th><th class="text-end" style="width:140px;">Price</th></tr></thead>
+            <tbody>
+            @foreach (var line in Model.OrderProducts)
+            {
+                    <tr>
+                        <td>@line.Product?.Name</td>
+                        <td class="text-end">@line.Product?.Price.ToString("C")</td>
+                    </tr>
+            }
+            </tbody>
+        </table>
+}
+<a asp-action="ViewOrders" class="btn btn-secondary">Back</a>

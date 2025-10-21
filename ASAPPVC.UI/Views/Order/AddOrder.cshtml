@@ -1,5 +1,43 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Add Order";
+    var customers = ViewData["Customers"] as List<ASAPPVC.UI.Models.CustomerModel> ?? new();
+    var products = ViewData["Products"] as List<ASAPPVC.UI.Models.ProductModel> ?? new();
 }
+<h2>Add Order</h2>
+<form asp-action="AddOrder" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Customer</label>
+        <select name="customerId" class="form-select" required>
+            <option value="">-- choose customer --</option>
+            @foreach (var c in customers)
+            {
+                    <option value="@c.CustomerID">@c.Name @c.Surname (@c.Email)</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Products (Ctrl/Cmd to select multiple)</label>
+        <select name="productIds" class="form-select" multiple size="10" required>
+            @foreach (var p in products)
+            {
+                    <option value="@p.ProductID">@p.Name — @p.Price.ToString("C")</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select name="orderStatus" class="form-select">
+            <option>Pending</option>
+            <option>Processing</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Order</button>
+    <a asp-action="ViewOrders" class="btn btn-secondary">Back</a>
+</form>

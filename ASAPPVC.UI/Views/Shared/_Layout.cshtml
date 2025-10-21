@@ -183,6 +183,12 @@
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
                     <span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>
                 </a>
+                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="AddOrder">
+                    <span class="sb-icon">🛠️</span><span class="sb-label">order add</span>
+                </a>
+                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
+                    <span class="sb-icon">🛠️</span><span class="sb-label">order view</span>
+                </a>
             </nav>
         </aside>
     }
