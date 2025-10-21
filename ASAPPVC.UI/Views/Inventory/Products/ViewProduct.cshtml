@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "View Product";
 
+    // Pre-calculate the image source string for cleaner HTML
     string? imgSrc = null;
     if (Model?.ImageBytes != null && !string.IsNullOrEmpty(Model.ImageContentType))
     {
@@ -10,324 +11,335 @@
 }
 
 <style>
-    /* ---------- Page Background ---------- */
+    /* ---------- Root & Variables ---------- */
+    :root {
+        --primary-red: #d62828;
+        --primary-blue: #0d47a1;
+        --hover-red: #e03a3a;
+        --text-light: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.8);
+    }
+
+    /* ---------- Base & Background ---------- */
+    * {
+        box-sizing: border-box;
+    }
+
     html, body {
         height: 100%;
         margin: 0;
-        font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        background: linear-gradient(135deg, #215c99 0%, #252d6a 100%);
-        color: #000;
+        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
+    body {
+        background-color: #0d47a1;
+        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+        color: var(--text-light);
+        position: relative;
+        overflow-x: hidden;
+        background-attachment: fixed;
+    }
+
+        /* ---------- Decorative Background Shapes ---------- */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        body::before {
+            background: var(--primary-blue);
+            width: 350px;
+            height: 350px;
+            top: -80px;
+            left: -120px;
+        }
+
+        body::after {
+            background: var(--primary-red);
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -180px;
+        }
+
+    /* ---------- Main Content Layout ---------- */
     .viewport {
-        min-height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
         padding: 40px 24px;
+        min-height: 100vh;
     }
 
-    /* ---------- Card Container (outer shell) ---------- */
-    .viewprod-card {
-        display: grid;
-        grid-template-columns: 2fr 3fr;
-        gap: 20px;
-        width: 100%;
-        max-width: 1100px;
-        background: #f9f9f9; /* light background */
-        border: 2px solid #c62929; /* red outline */
-        border-radius: 12px;
-        box-shadow: 0 16px 40px rgba(0,0,0,.35);
-        padding: 20px;
+    .view-container {
+        max-width: 960px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 16px;
+        padding: 32px 40px;
     }
 
-    /* ---------- Header Row ---------- */
-    .header {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        align-items: center;
-        margin-bottom: 8px;
+    /* ---------- HEADER ---------- */
+    .header-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .back-link {
-        justify-self: start;
-        background: transparent;
-        border: 0;
-        color: #c62929;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 8px 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
         text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+        transition: color 0.2s ease;
     }
 
-    .title {
-        justify-self: center;
+        .back-link:hover {
+            color: var(--text-light);
+        }
+
+    .main-title {
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    /* ---------- Details Layout ---------- */
+    .details-layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 40px;
+        align-items: flex-start;
+        margin-bottom: 32px;
+    }
+
+    /* Image Column */
+    .image-col .image-box {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .image-col img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-col .no-image-text {
+        font-style: italic;
+        color: var(--text-muted);
+    }
+
+    /* Info Column */
+    .info-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .info-pair .label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .info-pair .value {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+
+    .info-pair .price {
         font-size: 24px;
         font-weight: 700;
-        color: #333;
+        color: var(--text-light);
     }
 
-    /* ---------- Image Column ---------- */
-    .image-col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
-        padding: 10px;
-    }
-
-    .image-box {
-        width: 200px;
-        height: 200px;
-        border: 2px solid rgba(255, 0, 0, 0.7);
-        border-radius: 10px;
-        overflow: hidden;
-        background: #fff;
-        display: grid;
-        place-items: center;
-    }
-
-        .image-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    /* ---------- Details Column ---------- */
-    .details-col {
-        padding: 10px;
-        border: 2px solid rgba(255, 0, 0, 0.7);
-        border-radius: 10px;
-        background: #fff;
-    }
-
-    .details-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #333;
-        margin: 0 0 12px;
-        text-align: center;
-    }
-
-    .details-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px 20px;
-    }
-
-    .pair {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .label {
-        font-size: 13px;
+    /* ---------- Parts Table Section ---------- */
+    .parts-section h3 {
+        font-size: 20px;
         font-weight: 600;
-        color: #555;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .value {
-        font-size: 15px;
-        font-weight: 600;
-        color: #222;
-    }
-
-    /* ---------- Parts in Product (read-only) ---------- */
-    .parts-card {
-        grid-column: 1 / -1;
-        background: #fff;
-        border: 2px solid #c62929;
-        border-radius: 12px;
-        box-shadow: 0 16px 40px rgba(0,0,0,.15);
-        padding: 14px;
-    }
-
-    .parts-title {
-        text-align: center;
-        font-size: 18px;
-        font-weight: 800;
-        color: #333;
-        margin-bottom: 10px;
-    }
-
-    .parts-wrap {
-        overflow-x: hidden;
-        overflow-y: auto;
-        max-height: 420px;
-    }
-
-    table.parts {
+    .table {
         width: 100%;
-        table-layout: fixed;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
     }
 
-        table.parts thead th {
-            position: sticky;
-            top: 0;
-            background: #fff;
-            color: #333;
-            border-bottom: 2px solid #c62929;
+        .table th, .table td {
+            padding: 12px 10px;
             text-align: left;
-            font-weight: 800;
-            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        table.parts tbody td {
-            padding: 10px 12px;
-            border-bottom: 1px dashed #f0d0d0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-wrap: break-word;
+        .table thead th {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
-    .num, .money {
+        .table td {
+            font-size: 15px;
+        }
+
+    .align-right {
         text-align: right;
-        font-variant-numeric: tabular-nums;
     }
 
-    .tfoot td {
-        padding: 10px 12px;
-        font-weight: 800;
-    }
-
-    .grand {
-        text-align: right;
+    .grand-total-row td {
+        font-weight: 700;
         font-size: 16px;
-        font-weight: 900;
+        border-bottom: none;
+        padding-top: 16px;
     }
 
-    /* ---------- Footer Actions ---------- */
-    .footer {
-        grid-column: 2;
+    /* ---------- Action Buttons ---------- */
+    .actions {
         display: flex;
         justify-content: center;
-        gap: 12px;
-        margin-top: 14px;
+        gap: 16px;
+        margin-top: 40px;
     }
 
     .btn {
-        min-width: 110px;
-        height: 38px;
-        border: none;
+        height: 44px;
+        padding: 0 24px;
         border-radius: 8px;
         font-weight: 600;
+        font-size: 16px;
         cursor: pointer;
-        transition: filter .2s ease;
+        border: none;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .btn-edit {
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+    .btn-primary {
+        background: var(--primary-red);
+        color: var(--text-light);
     }
 
-    .btn:hover {
-        filter: brightness(1.08);
-    }
+        .btn-primary:hover {
+            background: var(--hover-red);
+        }
 
-    .footer {
-        grid-column: 1;
-    }
 </style>
 
 <div class="viewport">
-    <section class="viewprod-card">
-        <!-- Header -->
-        <div class="header">
-            <a href="javascript:history.back()" class="back-link">← Back</a>
-            <div class="title">View Product</div>
+    <div class="view-container">
+        <div class="header-section">
+            <a class="back-link" asp-controller="Inventory" asp-action="ViewProducts">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                </svg>
+                Back to Products
+            </a>
+            <h2 class="main-title">@Model.Name</h2>
         </div>
 
-        <!-- Image Column -->
-        <div class="image-col">
-            <div class="image-box">
-                @if (!string.IsNullOrEmpty(imgSrc))
-                {
-                    <img src="@imgSrc" alt="Product Image" />
-                }
-                else
-                {
-                    <div>No Image</div>
-                }
+        <div class="details-layout-grid">
+            <!-- Image Column -->
+            <div class="image-col">
+                <div class="image-box">
+                    @if (!string.IsNullOrEmpty(imgSrc))
+                    {
+                        <img src="@imgSrc" alt="Product Image" />
+                    }
+                    else
+                    {
+                        <span class="no-image-text">No Image</span>
+                    }
+                </div>
             </div>
-        </div>
 
-        <!-- Details Column -->
-        <div class="details-col">
-            <h2 class="details-title">Product Details</h2>
-            <div class="details-grid">
-                <div class="pair">
-                    <div class="label">Product Name:</div>
-                    <div class="value">@Model?.Name</div>
+            <!-- Details Column -->
+            <div class="info-col">
+                <div class="info-pair">
+                    <div class="label">Product Price</div>
+                    <div class="value price">@Model?.Price.ToString("C")</div>
                 </div>
-                <div class="pair">
-                    <div class="label">Price:</div>
-                    <div class="value">@Model?.Price.ToString("C")</div>
-                </div>
-                <div class="pair" style="grid-column: span 2;">
-                    <div class="label">Description:</div>
-                    <div class="value">@Model?.Description</div>
+                <div class="info-pair">
+                    <div class="label">Description</div>
+                    <div class="value">@(string.IsNullOrEmpty(Model?.Description) ? "No description provided." : Model.Description)</div>
                 </div>
             </div>
         </div>
 
         <!-- Parts in this Product -->
-        <section class="parts-card">
-            <div class="parts-title">Parts in this Product</div>
-            <div class="parts-wrap">
-                <table class="parts">
-                    <thead>
-                        <tr>
-                            <th>Part</th>
-                            <th class="num" style="width:110px;">Qty</th>
-                            <th class="money" style="width:140px;">Unit Price</th>
-                            <th class="money" style="width:160px;">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model?.ProductParts != null && Model.ProductParts.Any())
+        <section class="parts-section">
+            <h3>Parts in this Product</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Part Name</th>
+                        <th class="align-right" style="width:120px;">Quantity</th>
+                        <th class="align-right" style="width:140px;">Unit Price</th>
+                        <th class="align-right" style="width:140px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.ProductParts != null && Model.ProductParts.Any())
+                    {
+                        decimal grandTotal = 0;
+                        foreach (var line in Model.ProductParts)
                         {
-                            decimal grand = 0m;
-                            foreach (var line in Model.ProductParts)
-                            {
-                                var unit = line.Part?.UnitCost;
-                                decimal? sub = unit.HasValue ? unit.Value * line.Quantity : (decimal?)null;
-                                if (sub.HasValue) { grand += sub.Value; }
-                                <tr>
-                                    <td>@line.Part?.Name</td>
-                                    <td class="num">@line.Quantity</td>
-                                    <td class="money">@(unit.HasValue ? unit.Value.ToString("C") : "—")</td>
-                                    <td class="money">@(sub.HasValue ? sub.Value.ToString("C") : "—")</td>
-                                </tr>
-                            }
-                            <tr class="tfoot">
-                                <td colspan="3" style="text-align:right;">Grand Total (Parts):</td>
-                                <td class="money grand">@grand.ToString("C")</td>
-                            </tr>
-                        }
-                        else
-                        {
+                            var unitCost = line.Part?.UnitCost ?? 0;
+                            var subtotal = unitCost * line.Quantity;
+                            grandTotal += subtotal;
                             <tr>
-                                <td colspan="4" style="text-align:center; padding:14px;">No parts linked to this product.</td>
+                                <td>@line.Part?.Name</td>
+                                <td class="align-right">@line.Quantity</td>
+                                <td class="align-right">@unitCost.ToString("C")</td>
+                                <td class="align-right">@subtotal.ToString("C")</td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                        <tr class="grand-total-row">
+                            <td colspan="3" class="align-right">Total Cost of Parts:</td>
+                            <td class="align-right">@grandTotal.ToString("C")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding: 24px; color: var(--text-muted);">
+                                No parts are linked to this product.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </section>
 
         <!-- Footer Actions -->
-        <div class="footer">
-            <form asp-controller="Inventory" asp-action="EditProduct" method="get">
-                @* Add/Edit action later. Include hidden id when you have the endpoint:
-                   <input type="hidden" name="id" value="@Model?.ProductID" />
-                *@
-                <button type="submit" class="btn btn-edit" disabled>Edit</button>
-            </form>
+        <div class="actions">
+            <a class="btn btn-primary" asp-controller="Inventory" asp-action="EditProduct" asp-route-id="@Model.ProductID">Edit Product</a>
         </div>
-    </section>
+    </div>
 </div>
