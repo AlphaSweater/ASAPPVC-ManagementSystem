@@ -55,6 +55,44 @@ builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
+// =============================
+// SEED DEFAULT USER AND ROLE
+// =============================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string adminRole = "Admin";
+    string adminEmail = "admin@asappvc.co.za";
+    string adminPassword = "Admin123!"; // You can change this
+
+    // Create the Admin role if it doesn't exist
+    if (!await roleManager.RoleExistsAsync(adminRole))
+    {
+        await roleManager.CreateAsync(new IdentityRole(adminRole));
+    }
+
+    // Create the default admin user if it doesn't exist
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        var newAdmin = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(newAdmin, adminPassword);
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin, adminRole);
+        }
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
