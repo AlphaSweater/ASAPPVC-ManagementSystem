@@ -8,7 +8,11 @@ namespace ASAPPVC.UI.Repositories.Implementation
     public class CustomerRepository : ICustomerRepository
     {
         private readonly AppDbContext _db;
-        public CustomerRepository(AppDbContext db) => _db = db;
+
+        public CustomerRepository(AppDbContext db)
+        {
+            _db = db;
+        }
 
         public async Task<CustomerModel> AddAsync(CustomerModel customer, CancellationToken ct = default)
         {
@@ -17,10 +21,14 @@ namespace ASAPPVC.UI.Repositories.Implementation
         }
 
         // retrieves a list of customers ordered by name
-        public Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
-            => _db.Customer.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
+        public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _db.Customer.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
+        }
 
-        public Task SaveAsync(CancellationToken ct = default)
-            => _db.SaveChangesAsync(ct);
+        public async Task SaveAsync(CancellationToken ct = default)
+        {
+            await _db.SaveChangesAsync(ct);
+        }
     }
 }

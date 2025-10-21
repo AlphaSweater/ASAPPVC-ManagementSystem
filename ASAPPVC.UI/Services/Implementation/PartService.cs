@@ -8,6 +8,7 @@ namespace ASAPPVC.UI.Services.Implementation
     public class PartService : IPartService
     {
         private readonly IPartRepository _repo;
+
         public PartService(IPartRepository repo) => _repo = repo;
 
         public async Task<(bool Ok, string? Error, PartModel? Part)> CreateAsync(CreatePartViewModel vm, CancellationToken ct = default)
@@ -37,10 +38,14 @@ namespace ASAPPVC.UI.Services.Implementation
             return (true, null, part);
         }
 
-        public Task<PartModel?> GetAsync(int id, CancellationToken ct = default)
-            => _repo.GetByIdAsync(id, ct);
+        public async Task<PartModel?> GetAsync(int id, CancellationToken ct = default)
+        {
+            return await _repo.GetByIdAsync(id, ct);
+        }
 
-        public Task<List<PartModel>> ListAsync(CancellationToken ct = default)
-            => _repo.ListAsync(ct);
+        public async Task<List<PartModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _repo.ListAsync(ct);
+        }
     }
 }

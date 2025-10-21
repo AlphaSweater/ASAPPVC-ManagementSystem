@@ -16,7 +16,6 @@ namespace ASAPPVC.UI.Services.Implementation
             _partsRepository = partsRepo;
         }
 
-
         // creates a new product based on the provided view model
         public async Task<(bool Ok, string? Error, int? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default)
         {
@@ -49,7 +48,6 @@ namespace ASAPPVC.UI.Services.Implementation
                 Description = vm.Description.Trim()
             };
 
-
             if (vm.ImageFile is { Length: > 0 })
             {
                 using var ms = new MemoryStream();
@@ -78,11 +76,15 @@ namespace ASAPPVC.UI.Services.Implementation
         }
 
         // retrieves a product by its ID, including its associated parts
-        public Task<ProductModel?> GetAsync(int id, CancellationToken ct = default)
-            => _productRepository.GetProductWithPartsAsync(id, ct);
+        public async Task<ProductModel?> GetAsync(int id, CancellationToken ct = default)
+        {
+            return await _productRepository.GetProductWithPartsAsync(id, ct);
+        }
 
         // lists all products
-        public Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
-            => _productRepository.ListAsync(ct);
+        public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _productRepository.ListAsync(ct);
+        }
     }
 }

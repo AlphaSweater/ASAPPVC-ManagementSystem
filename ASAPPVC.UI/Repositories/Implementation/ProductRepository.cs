@@ -9,7 +9,10 @@ namespace ASAPPVC.UI.Repositories.Implementation
     {
         private readonly AppDbContext _db;
 
-        public ProductRepository(AppDbContext db) => _db = db;
+        public ProductRepository(AppDbContext db)
+        {
+            _db = db;
+        }
 
         //adds products to the database
         public async Task<ProductModel> AddProductAsync(ProductModel product, CancellationToken ct = default)
@@ -30,19 +33,25 @@ namespace ASAPPVC.UI.Repositories.Implementation
             => _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
 
         //retrieves a product along with its associated parts
-        public Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default)
-            => _db.Product
+        public async Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default)
+        {
+            return await _db.Product
                   .AsNoTracking()
                   .Include(p => p.ProductParts)
                     .ThenInclude(pp => pp.Part)
                   .FirstOrDefaultAsync(p => p.ProductID == id, ct);
+        }
 
         //lists all products ordered by name
-        public Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
-            => _db.Product.AsNoTracking().OrderBy(p => p.Name).ToListAsync(ct);
+        public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _db.Product.AsNoTracking().OrderBy(p => p.Name).ToListAsync(ct);
+        }
 
         //saves changes to the database
-        public Task SaveAsync(CancellationToken ct = default)
-            => _db.SaveChangesAsync(ct);
+        public async Task SaveAsync(CancellationToken ct = default)
+        {
+            await _db.SaveChangesAsync(ct);
+        }
     }
 }

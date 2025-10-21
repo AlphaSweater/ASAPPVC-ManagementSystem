@@ -17,5 +17,8 @@ namespace ASAPPVC.UI.Models
 
         [Required]
         public string OrderStatus { get; set; }
+
+        public CustomerModel? Customer { get; set; }
+        public List<OrderProductModel> OrderProducts { get; set; } = new();
     }
 }

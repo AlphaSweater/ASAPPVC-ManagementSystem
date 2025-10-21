@@ -32,6 +32,24 @@ namespace ASAPPVC.UI.Data
                 .WithMany()
                 .HasForeignKey(pp => pp.PartID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderModel>()
+                .HasOne(o => o.Customer)
+                .WithMany() 
+                .HasForeignKey(o => o.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderProductModel>()
+                .HasOne(op => op.Order)
+                .WithMany(o => o.OrderProducts)
+                .HasForeignKey(op => op.OrderID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OrderProductModel>()
+                .HasOne(op => op.Product)
+                .WithMany()
+                .HasForeignKey(op => op.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

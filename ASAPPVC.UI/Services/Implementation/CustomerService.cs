@@ -9,7 +9,10 @@ namespace ASAPPVC.UI.Services.Implementation
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _repo;
-        public CustomerService(ICustomerRepository repo) => _repo = repo;
+        public CustomerService(ICustomerRepository repo)
+        {
+            _repo = repo;
+        }
 
         public async Task<(bool Ok, string? Error, CustomerModel? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default)
         {
@@ -28,7 +31,9 @@ namespace ASAPPVC.UI.Services.Implementation
             return (true, null, entity);
         }
 
-        public Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
-            => _repo.ListAsync(ct);
+        public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _repo.ListAsync(ct);
+        }
     }
 }

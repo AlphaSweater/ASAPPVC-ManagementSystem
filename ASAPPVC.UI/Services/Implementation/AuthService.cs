@@ -9,15 +9,16 @@ namespace ASAPPVC.UI.Services.Implementation
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public AuthService(UserManager<IdentityUser> userManager,
-                           SignInManager<IdentityUser> signInManager)
+        public AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
-            => await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+        {
+            return await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+        }
 
         public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
         {
@@ -28,7 +29,9 @@ namespace ASAPPVC.UI.Services.Implementation
             return result;
         }
 
-        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
-
+        public async Task LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
     }
 }
