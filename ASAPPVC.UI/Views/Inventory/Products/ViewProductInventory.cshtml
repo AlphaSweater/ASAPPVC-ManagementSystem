@@ -131,8 +131,8 @@
 
     table.table {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
+        table-layout: fixed;
     }
 
     thead th {
@@ -236,31 +236,29 @@
     }
 </style>
 
+
 <div class="products-page">
     <div class="content-wrap">
 
-        <!-- Toolbar -->
         <div class="toolbar">
-            <!-- Simple client-side filter to make the UI useful immediately -->
             <form class="search-wrap" onsubmit="event.preventDefault();">
                 <span class="search-ico">🔍</span>
-                <input id="productSearch" class="search-input" type="text" placeholder="Search products..." />
+                <input class="search-input" type="text" placeholder="Search products..." />
             </form>
             <div>
                 <a class="btn-search" asp-action="AddProductGet" asp-controller="Inventory">Add Product</a>
             </div>
         </div>
 
-        <!-- WHITE TABLE WITH RED ACCENTS -->
         <section class="table-card">
             <div class="table-wrap">
-                <table class="table" id="productsTable">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th style="width:110px;">ID</th>
                             <th>Product</th>
-                            <th style="width:150px;">Price</th>
-                            <th style="width:120px;"># Parts</th>
+                            <th>Description</th>
+                            <th class="right" style="width:150px;">Price</th>
+                            <th class="right" style="width:120px;"># Parts</th>
                             <th style="width:180px;">Actions</th>
                         </tr>
                     </thead>
@@ -268,7 +266,7 @@
                         @if (Model == null || !Model.Any())
                         {
                             <tr>
-                                <td colspan="6" class="muted" style="padding:16px;">No products found.</td>
+                                <td colspan="5" class="muted" style="padding:16px;">No products found.</td>
                             </tr>
                         }
                         else
@@ -277,8 +275,8 @@
                             {
                                 var partsCount = p.ProductParts?.Count ?? 0;
                                 <tr>
-                                    <td>@p.ProductID</td>
                                     <td>@p.Name</td>
+                                    <td>@p.Description</td>
                                     <td class="right">@p.Price.ToString("C")</td>
                                     <td class="right">@partsCount</td>
                                     <td class="actions">

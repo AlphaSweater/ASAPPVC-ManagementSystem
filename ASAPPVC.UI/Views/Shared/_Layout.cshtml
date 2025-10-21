@@ -165,23 +165,23 @@
                 <a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
                     <span class="sb-icon">👥</span><span class="sb-label">Customers</span>
                 </a>
+                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Customer" asp-action="CreateCustomer">
+                    <span class="sb-icon">🛠️</span><span class="sb-label">add customer</span>
+                </a>
                 <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Orders" asp-action="Index">
                     <span class="sb-icon">🚚</span><span class="sb-label">Order</span>
                 </a>
                 <a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
-                    <span class="sb-icon">🧾</span><span class="sb-label">view Product inventory</span>
+                    <span class="sb-icon">🧾</span><span class="sb-label">Product inventory</span>
                 </a>
                 <a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
-                    <span class="sb-icon">📦</span><span class="sb-label">View Part Inventory</span>
+                    <span class="sb-icon">📦</span><span class="sb-label">Part Inventory</span>
                 </a>
                 <a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
                     <span class="sb-icon">💼</span><span class="sb-label">Financial</span>
                 </a>
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
                     <span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Customer" asp-action="CreateCustomer">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">add customer</span>
                 </a>
             </nav>
         </aside>
