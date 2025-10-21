@@ -70,11 +70,10 @@
 
     /* ===== cards (white with red outline) ===== */
     .card {
-        background: var(--white);
-        color: var(--ink);
+        background: linear-gradient(135deg,var(--panel1),var(--panel2));
+        box-shadow: var(--shadow);       
         border: 2px solid var(--accent);
         border-radius: 12px;
-        box-shadow: var(--shadow);
         padding: 14px;
     }
 
@@ -82,7 +81,7 @@
             margin: 0 0 8px 0;
             font-size: 16px;
             font-weight: 800;
-            color: #333;
+            color: var(--accent2);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -98,10 +97,6 @@
         .kpi .big {
             font-size: 28px;
             font-weight: 900;
-            background: linear-gradient(135deg,var(--accent2),var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
         }
 
         .kpi .icon {
