@@ -9,7 +9,10 @@ namespace ASAPPVC.UI.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customers;
-        public CustomerController(ICustomerService customers) => _customers = customers;
+        public CustomerController(ICustomerService customers)
+        {
+            _customers = customers;
+        }
 
         [HttpGet]
         public IActionResult CreateCustomer()
@@ -36,9 +39,10 @@ namespace ASAPPVC.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult ViewCustomer()
+        public async Task<IActionResult> ViewCustomer(CancellationToken ct)
         {
-            return View();
+            var list = await _customers.ListAsync(ct);
+            return View(list);
         }
     }
 }

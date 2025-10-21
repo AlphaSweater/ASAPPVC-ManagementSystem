@@ -168,23 +168,14 @@
                 <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Orders" asp-action="Index">
                     <span class="sb-icon">🚚</span><span class="sb-label">Order</span>
                 </a>
-                <a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="AddProductGet">
-                    <span class="sb-icon">🧾</span><span class="sb-label">Add Product</span>
-                </a>
                 <a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
                     <span class="sb-icon">🧾</span><span class="sb-label">view Product inventory</span>
                 </a>
                 <a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
-                    <span class="sb-icon">📦</span><span class="sb-label">Inventory</span>
+                    <span class="sb-icon">📦</span><span class="sb-label">View Part Inventory</span>
                 </a>
                 <a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
                     <span class="sb-icon">💼</span><span class="sb-label">Financial</span>
-                </a>
-                <a class="sb-item @(current == "report/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
-                    <span class="sb-icon">📊</span><span class="sb-label">View part</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Auth" asp-action="Login">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">Login</span>
                 </a>
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
                     <span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>

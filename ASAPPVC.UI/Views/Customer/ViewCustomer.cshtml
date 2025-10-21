@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<ASAPPVC.UI.Models.CustomerModel>
+@{
     ViewData["Title"] = "Customers";
 }
 
@@ -116,7 +117,6 @@
             transform: translateY(1px);
         }
 
-    /* ===== WHITE TABLE CARD with RED ACCENTS ===== */
     .table-card {
         background: var(--white);
         color: var(--ink);
@@ -186,54 +186,50 @@
 <div class="customers-page">
     <div class="content-wrap">
         <!-- Toolbar -->
-        <div class="toolbar">
-            <form class="search-wrap" asp-controller="Customers" asp-action="Index" method="get">
-                <span class="search-ico">🔍</span>
-                <input class="search-input" type="text" name="q" placeholder="Search..." value="@Context.Request.Query["q"]" />
-            </form>
-            <form asp-controller="Customers" asp-action="Index" method="get">
-                <button class="btn-search" type="submit">Search</button>
-            </form>
+        <div class="toolbar"> 
+            <form class="search-wrap" asp-controller="Customers" asp-action="Index" method="get"> 
+                <span class="search-ico">🔍</span> 
+                <input class="search-input" type="text" name="q" placeholder="Search..." value="@Context.Request.Query["q"]" /> 
+            </form> 
+            <form asp-controller="Customers" asp-action="Index" method="get"> 
+                <button class="btn-search" type="submit">Search</button> 
+            </form> 
         </div>
 
         <section class="table-card">
             <div class="table-wrap">
-                <table class="table">
+                <table class="table" id="customersTable">
                     <thead>
                         <tr>
                             <th style="width:110px;">ID</th>
                             <th>First name</th>
                             <th>Last name</th>
                             <th>Phone</th>
-                            <th>Number</th>
-                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Company</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1001</td>
-                            <td>Jane</td>
-                            <td>Doe</td>
-                            <td>+27 82 555 1234</td>
-                            <td>CUST-0001</td>
-                            <td>123 Long Street, Cape Town</td>
-                        </tr>
-                        <tr>
-                            <td>1002</td>
-                            <td>John</td>
-                            <td>Smith</td>
-                            <td>+27 73 777 9000</td>
-                            <td>CUST-0002</td>
-                            <td>45 Main Rd, Johannesburg</td>
-                        </tr>
-                        <tr>
-                            <td>1003</td>
-                            <td>Ayanda</td>
-                            <td>Khumalo</td>
-                            <td>+27 61 333 8888</td>
-                            <td>CUST-0003</td>
-                            <td>10 Florida Rd, Durban</td>
-                        </tr>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" style="padding:16px; color:#777;">No customers found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var c in Model)
+                            {
+                                <tr>
+                                    <td>@c.CustomerID</td>
+                                    <td>@c.Name</td>
+                                    <td>@c.Surname</td>
+                                    <td>@c.PhoneNumber</td>
+                                    <td>@c.Email</td>
+                                    <td>@(string.IsNullOrWhiteSpace(c.Company) ? "—" : c.Company)</td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>

@@ -1,6 +1,7 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories.Implementation
 {
@@ -14,6 +15,10 @@ namespace ASAPPVC.UI.Repositories.Implementation
             var entry = await _db.Customer.AddAsync(customer, ct);
             return entry.Entity;
         }
+
+        // retrieves a list of customers ordered by name
+        public Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
+            => _db.Customer.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
 
         public Task SaveAsync(CancellationToken ct = default)
             => _db.SaveChangesAsync(ct);

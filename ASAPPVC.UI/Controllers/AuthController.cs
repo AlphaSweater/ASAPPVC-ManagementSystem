@@ -9,7 +9,10 @@ namespace ASAPPVC.UI.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _auth;
-        public AuthController(IAuthService auth) => _auth = auth;
+        public AuthController(IAuthService auth)
+        {
+            _auth = auth;
+        }
 
         [AllowAnonymous]
         [HttpGet]

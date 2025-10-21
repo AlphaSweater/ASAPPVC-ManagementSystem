@@ -27,5 +27,8 @@ namespace ASAPPVC.UI.Services.Implementation
 
             return (true, null, entity);
         }
+
+        public Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
+            => _repo.ListAsync(ct);
     }
 }
