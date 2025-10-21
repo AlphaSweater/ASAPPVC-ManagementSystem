@@ -24,7 +24,8 @@ namespace ASAPPVC.UI.Controllers
 
         //method that allows users to log in
         [AllowAnonymous]
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -54,7 +55,8 @@ namespace ASAPPVC.UI.Controllers
 
         //method that allows users to register
         [AllowAnonymous]
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel vm)
         {
             if (!ModelState.IsValid)
@@ -72,7 +74,8 @@ namespace ASAPPVC.UI.Controllers
         }
 
         [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _auth.LogoutAsync();
