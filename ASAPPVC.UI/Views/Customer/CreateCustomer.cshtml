@@ -4,95 +4,113 @@
 
 <style>
     :root {
-        --bg1: #1b2a66;
-        --bg2: #16235b;
-        --white: #ffffff;
-        --ink: #1a1a1a;
-        --muted: #6b7280;
-        --accent: #c62929;
-        --accent-2: #ef4723;
-        --radius: 14px;
-        --shadow: 0 16px 40px rgba(0,0,0,.35);
+        --primary-red: #d62828;
+        --primary-blue: #0d47a1;
+        --hover-red: #e03a3a;
+        --text-light: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.8);
+        --accent-orange: #ef4723;
     }
 
+    /* ---------- Base & Background ---------- */
     html, body {
         height: 100%;
         margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-        background: linear-gradient(135deg,var(--bg1),var(--bg2));
-        font-family: "Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+        background-color: #0d47a1;
+        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+        color: var(--text-light);
+        position: relative;
+        overflow-x: hidden;
+        background-attachment: fixed;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
+    /* ---------- Decorative Background Shapes ---------- */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(150px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+
+    body::before {
+        background: var(--primary-blue);
+        width: 350px;
+        height: 350px;
+        top: -80px;
+        left: -120px;
+    }
+
+    body::after {
+        background: var(--primary-red);
+        width: 400px;
+        height: 400px;
+        bottom: -150px;
+        right: -180px;
+    }
+
+    /* ---------- Main Content Layout ---------- */
     .viewport {
-        min-height: calc(100vh - 40px);
-        padding: 20px;
-        color: #fff;
+        padding: 40px 24px;
+        min-height: 100vh;
     }
 
-    .content-wrap {
+    .form-container {
         max-width: 860px;
         margin: 0 auto;
-        background: linear-gradient(135deg, #1e2d72, #182967);
-        border: 2px solid rgba(255,255,255,.28);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 18px;
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 16px;
+        padding: 32px 40px; /* Increased padding */
     }
 
-    .toolbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: rgba(0,0,0,.18);
-        border: 1.5px solid rgba(255,255,255,.28);
-        border-radius: var(--radius);
-        padding: 10px 14px;
-        margin-bottom: 16px;
+    /* ---------- HEADER REFACTORED ---------- */
+    .form-header-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
-
-    .title {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: .3px;
-    }
-
+    
     .back-link {
-        color: #fff;
+        display: inline-flex; /* Use inline-flex for alignment */
+        align-items: center;
+        gap: 8px; /* Space between icon and text */
+        color: var(--text-muted); /* Softer color */
         text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px; /* Space between link and title */
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: var(--text-light);
+    }
+
+    .main-title {
         font-weight: 700;
-        border: 2px solid rgba(255,255,255,.35);
-        padding: 6px 12px;
-        border-radius: 999px;
-        transition: all .15s ease;
+        font-size: 28px;
+        color: var(--text-light);
+        margin: 0; /* Remove default margin */
     }
 
-        .back-link:hover {
-            background: rgba(255,255,255,.1);
-        }
-
-    .form-card {
-        background: var(--white);
-        color: var(--ink);
-        border: 2px solid var(--accent);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 18px;
-    }
-
-    .form-header {
-        text-align: center;
-        font-weight: 900;
-        font-size: 22px;
-        margin: 4px 0 14px 0;
-        color: #333;
-    }
-
+    /* ---------- Form Grid & Elements --- UPDATED --- */
     .form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 16px 20px;
+        gap: 24px 20px;
     }
 
     .group {
@@ -101,159 +119,168 @@
     }
 
     .label {
-        font-size: 13px;
-        font-weight: 700;
-        color: #444;
-        margin-bottom: 6px;
-        letter-spacing: .2px;
-    }
-
-    .input {
-        height: 40px;
-        border: 1px solid rgba(198,41,41,.5);
-        border-radius: 10px;
-        outline: none;
-        padding: 0 12px;
         font-size: 14px;
-        background: #fff;
-        color: #1a1a1a;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 8px;
     }
 
-        .input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(198,41,41,.2);
-        }
+    /* --- INPUT REDESIGN for better visibility --- */
+    .input {
+        height: 44px;
+        font-size: 16px;
+        color: var(--text-light);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 0 12px;
+        outline: none;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input:focus {
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.1);
+    }
 
     .help {
         font-size: 12px;
-        color: #666;
-        margin-top: 4px;
+        color: var(--text-muted);
+        margin-top: 6px;
     }
 
     .text-danger {
-        color: var(--accent);
+        color: #ffcdd2; 
         font-size: 12px;
-        margin-top: 4px;
+        margin-top: 6px;
     }
 
-    /* Actions */
+    /* ---------- Action Buttons ---------- */
     .actions {
         display: flex;
         justify-content: center;
-        gap: 12px;
-        margin-top: 18px;
+        gap: 16px;
+        margin-top: 32px;
     }
 
     .btn {
-        height: 38px;
-        padding: 0 16px;
-        border-radius: 999px;
-        font-weight: 800;
+        height: 44px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
         cursor: pointer;
-        border: 0;
-        transition: filter .15s ease, transform .04s ease;
+        border: none;
+        transition: all .2s ease;
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
     }
 
     .btn-primary {
-        background: linear-gradient(135deg,var(--accent-2),var(--accent));
-        color: #fff;
-        box-shadow: 0 6px 14px rgba(0,0,0,.2);
+        background: var(--primary-red);
+        color: var(--text-light);
     }
 
-        .btn-primary:hover {
-            filter: brightness(1.06);
-        }
-
+    .btn-primary:hover {
+        background: var(--hover-red);
+    }
+    
     .btn-secondary {
-        background: #e5e7eb;
-        color: #1f2937;
-        border: 2px solid #d1d5db;
+        background: transparent;
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.4);
     }
-
-    .btn:active {
-        transform: translateY(1px);
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.6);
     }
 </style>
 
 <div class="viewport">
-    <div class="content-wrap">
-        <div class="toolbar">
-            <a class="back-link" href="javascript:history.back()">← Back</a>
-            <div class="title">Customers • Create</div>
+    <div class="form-container">
+        <!-- HEADER SECTION UPDATED -->
+        <div class="form-header-section">
+            <a class="back-link" href="javascript:history.back()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                </svg>
+                Back to List
+            </a>
+            <h2 class="main-title">Create New Customer</h2>
         </div>
 
-        <section class="form-card">
-            <h2 class="form-header">Create New Customer</h2>
+        <form asp-controller="Customer" asp-action="CreateCustomer" method="post" novalidate>
+            @Html.AntiForgeryToken()
 
-            <form asp-controller="Customer" asp-action="CreateCustomer" method="post" novalidate>
-                @Html.AntiForgeryToken()
-
-                <div class="form-grid">
-                    <div class="group">
-                        <label class="label">First Name</label>
-                        <input class="input" type="text" name="FirstName" placeholder="e.g. Jane" />
-                        @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
-                        {
-                            <span class="text-danger">@ViewData.ModelState["FirstName"]?.Errors[0]?.ErrorMessage</span>
-                        }
-                    </div>
-
-                    <div class="group">
-                        <label class="label">Surname</label>
-                        <input class="input" type="text" name="LastName" placeholder="e.g. Doe" />
-                        @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
-                        {
-                            <span class="text-danger">@ViewData.ModelState["LastName"]?.Errors[0]?.ErrorMessage</span>
-                        }
-                    </div>
-
-                    <div class="group">
-                        <label class="label">Phone Number</label>
-                        <input class="input" type="tel" name="PhoneNumber" placeholder="+27 82 555 1234" />
-                        <span class="help">Use country code (e.g. +27 for SA)</span>
-                        @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
-                        {
-                            <span class="text-danger">@ViewData.ModelState["PhoneNumber"]?.Errors[0]?.ErrorMessage</span>
-                        }
-                    </div>
-
-                    <div class="group">
-                        <label class="label">Company (optional)</label>
-                        <input class="input" type="text" name="Company" placeholder="Company name" />
-                        @if (ViewData.ModelState["Company"]?.Errors.Count > 0)
-                        {
-                            <span class="text-danger">@ViewData.ModelState["Company"]?.Errors[0]?.ErrorMessage</span>
-                        }
-                    </div>
-
-                    <div class="group" style="grid-column:1 / -1;">
-                        <label class="label">Email</label>
-                        <input class="input" type="email" name="Email" placeholder="you@company.com" autocomplete="email" />
-                        @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
-                        {
-                            <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
-                        }
-                    </div>
+            <div class="form-grid">
+                <div class="group">
+                    <label class="label">First Name</label>
+                    <input class="input" type="text" name="FirstName" placeholder="e.g. Jane" />
+                    @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["FirstName"]?.Errors[0]?.ErrorMessage</span>
+                    }
                 </div>
 
-                @* General (summary) errors *@
-                @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
-                {
-                    <div class="text-danger" style="text-align:center;margin-top:10px;">
-                        @foreach (var e in ViewData.ModelState[string.Empty].Errors)
-                        {
-                            @e.ErrorMessage
-
-                            <br />
-                        }
-                    </div>
-                }
-
-                <div class="actions">
-                    <button type="submit" class="btn btn-primary">Save Customer</button>
-                    <button type="reset" class="btn btn-secondary">Reset</button>
+                <div class="group">
+                    <label class="label">Surname</label>
+                    <input class="input" type="text" name="LastName" placeholder="e.g. Doe" />
+                    @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["LastName"]?.Errors[0]?.ErrorMessage</span>
+                    }
                 </div>
-            </form>
-        </section>
+
+                <div class="group">
+                    <label class="label">Phone Number</label>
+                    <input class="input" type="tel" name="PhoneNumber" placeholder="+27 82 555 1234" />
+                    <span class="help">Use country code (e.g. +27 for SA)</span>
+                    @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["PhoneNumber"]?.Errors[0]?.ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="group">
+                    <label class="label">Company (optional)</label>
+                    <input class="input" type="text" name="Company" placeholder="Company name" />
+                    @if (ViewData.ModelState["Company"]?.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Company"]?.Errors[0]?.ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="group" style="grid-column:1 / -1;">
+                    <label class="label">Email</label>
+                    <input class="input" type="email" name="Email" placeholder="you@company.com" autocomplete="email" />
+                    @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
+                    }
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+            {
+                <div class="text-danger" style="text-align:center; margin-top:20px;">
+                    @foreach (var e in ViewData.ModelState[string.Empty].Errors)
+                    {
+                        @e.ErrorMessage <br />
+                    }
+                </div>
+            }
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Save Customer</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
     </div>
 </div>
