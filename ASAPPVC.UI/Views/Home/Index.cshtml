@@ -70,16 +70,41 @@
 
     /* ===== cards (white with red outline) ===== */
     .card {
-        background: linear-gradient(135deg,var(--panel1),var(--panel2));
-        box-shadow: var(--shadow);       
-        border: 2px solid var(--accent);
-        border-radius: 12px;
-        padding: 14px;
+        background: linear-gradient(135deg, var(--panel1), var(--panel2));
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0, 0, 0, 0.15);
+        border-radius: 16px;
+        padding: 18px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        position: relative;
+        overflow: hidden;
     }
 
+        /* Subtle light overlay for shine effect */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -85%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.15), transparent);
+            transform: skewX(-20deg);
+            transition: 0.6s;
+        }
+
+        /* Hover effect for interactivity */
+        .card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+        }
+
+            .card:hover::before {
+                left: 135%;
+            }
+
         .card h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
+            margin: 0 0 0 0;
+            font-size: 24px;
             font-weight: 800;
             color: var(--accent2);
             display: flex;
@@ -208,10 +233,12 @@
         <!-- KPIs -->
         <section class="grid" style="margin-bottom:10px;">
             <div class="card kpi">
-                <h3>Customers</h3>
-                <div class="kpi">
-                    <div class="big">780</div>
+                <div style="display: flex; flex-direction: row; gap: 5px">
                     <div class="icon">👥</div>
+                    <h3>Customers</h3>
+                </div>
+                <div class="kpi">
+                    <div class="big">780</div>                    
                 </div>
             </div>
             <div class="card kpi">
