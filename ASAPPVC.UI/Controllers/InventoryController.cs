@@ -72,11 +72,9 @@ namespace ASAPPVC.UI.Controllers
         }
 
         // ─────────── Products: Create ───────────
-        // Use ActionName so view can post to asp-action="AddProduct"
         [HttpGet]
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
-            // Provide real parts to the view so you can populate the <select>
             var parts = await _partsRepo.ListAsync(ct);
             ViewData["Parts"] = parts;
             return View(AddProductPath, new CreateProductViewModel());
@@ -97,44 +95,24 @@ namespace ASAPPVC.UI.Controllers
             }
 
             TempData["AlertMessage"] = $"Product '{vm.ProductName}' created.";
-            // TODO: replace with a real Product detail/inventory action if desired
             return RedirectToAction(nameof(ViewPartInventory));
         }
 
+        //displays a specific product by its ID
         [HttpGet]
         public async Task<IActionResult> ViewProduct(int id, CancellationToken ct)
         {
-            var product = await _productRepo.GetProductWithPartsAsync(id, ct);
+            var product = await _products.GetAsync(id, ct);
             if (product is null) return NotFound();
-
-            
-            string? imgSrc = null;
-            if (product.ImageBytes is { Length: > 0 } && !string.IsNullOrWhiteSpace(product.ImageContentType))
-                imgSrc = $"data:{product.ImageContentType};base64,{Convert.ToBase64String(product.ImageBytes)}";
-
-            var vm = new ProductDetailViewModel
-            {
-                ProductID = product.ProductID,
-                ProductName = product.Name,
-                Price = product.Price,
-                Description = product.Description,
-                ImageSrc = imgSrc,
-                Parts = product.ProductParts
-                                .OrderBy(pp => pp.Part!.Name)
-                                .Select(pp => new ProductDetailPartLine
-                                {
-                                    PartName = pp.Part!.Name,
-                                    Quantity = pp.Quantity,
-                                    UnitPrice = pp.Part.UnitCost
-                                })
-                                .ToList()
-            };
-
-            return View(ViewProductPath, vm);
+            return View(ViewProductPath, product);
         }
 
+        //calls view to display product inventory
         [HttpGet]
-        public IActionResult ViewProductInventory()
-            => View(ProductInventoryPath);
+        public async Task<IActionResult> ViewProductInventory(CancellationToken ct)
+        {
+            var list = await _products.ListAsync(ct);
+            return View(ProductInventoryPath, list);
+        }
     }
 }

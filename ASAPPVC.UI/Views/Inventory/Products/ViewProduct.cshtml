@@ -1,13 +1,12 @@
-﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.ProductDetailViewModel
+﻿@model ASAPPVC.UI.Models.ProductModel
 @{
     ViewData["Title"] = "View Product";
 
-    // Use DB image (data URI) or placeholder
-    var pimg = Model?.ImageSrc ?? Url.Content("~/Assets/Images/placeholder.png");
-    var pname = Model?.ProductName ?? "—";
-    var sku = Model?.Sku ?? "—";
-    var baseP = Model != null ? Model.Price.ToString("0.00") : "—";
-    var desc = Model?.Description ?? "—";
+    string? imgSrc = null;
+    if (Model?.ImageBytes != null && !string.IsNullOrEmpty(Model.ImageContentType))
+    {
+        imgSrc = $"data:{Model.ImageContentType};base64,{Convert.ToBase64String(Model.ImageBytes)}";
+    }
 }
 
 <style>
@@ -155,15 +154,14 @@
     }
 
     .parts-wrap {
-        overflow-x: hidden; /* no horizontal bar */
+        overflow-x: hidden;
         overflow-y: auto;
-        max-height: 420px; /* adjust if needed */
+        max-height: 420px;
     }
 
     table.parts {
         width: 100%;
-        max-width: 100%;
-        table-layout: fixed; /* keep inside the card */
+        table-layout: fixed;
         border-collapse: separate;
         border-spacing: 0;
     }
@@ -231,18 +229,8 @@
         filter: brightness(1.08);
     }
 
-    /* ---------- Responsive ---------- */
-    .media (max-width: 820px) {
-        .viewprod-card
-
-    {
-        grid-template-columns: 1fr;
-    }
-
     .footer {
         grid-column: 1;
-    }
-
     }
 </style>
 
@@ -257,7 +245,14 @@
         <!-- Image Column -->
         <div class="image-col">
             <div class="image-box">
-                <img src="@pimg" alt="Product Image" />
+                @if (!string.IsNullOrEmpty(imgSrc))
+                {
+                    <img src="@imgSrc" alt="Product Image" />
+                }
+                else
+                {
+                    <div>No Image</div>
+                }
             </div>
         </div>
 
@@ -267,19 +262,15 @@
             <div class="details-grid">
                 <div class="pair">
                     <div class="label">Product Name:</div>
-                    <div class="value">@pname</div>
+                    <div class="value">@Model?.Name</div>
                 </div>
                 <div class="pair">
-                    <div class="label">SKU:</div>
-                    <div class="value">@sku</div>
-                </div>
-                <div class="pair">
-                    <div class="label">Base Price:</div>
-                    <div class="value">@baseP</div>
+                    <div class="label">Price:</div>
+                    <div class="value">@Model?.Price.ToString("C")</div>
                 </div>
                 <div class="pair" style="grid-column: span 2;">
                     <div class="label">Description:</div>
-                    <div class="value">@desc</div>
+                    <div class="value">@Model?.Description</div>
                 </div>
             </div>
         </div>
@@ -298,26 +289,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model?.Parts != null && Model.Parts.Any())
+                        @if (Model?.ProductParts != null && Model.ProductParts.Any())
                         {
                             decimal grand = 0m;
-                            foreach (var item in Model.Parts)
+                            foreach (var line in Model.ProductParts)
                             {
-                                var qty = item.Quantity;
-                                decimal? unit = item.UnitPrice;
-                                decimal sub = unit.HasValue ? unit.Value * qty : 0m;
-                                grand += sub;
-
+                                var unit = line.Part?.UnitCost;
+                                decimal? sub = unit.HasValue ? unit.Value * line.Quantity : (decimal?)null;
+                                if (sub.HasValue) { grand += sub.Value; }
                                 <tr>
-                                    <td>@item.PartName</td>
-                                    <td class="num">@qty</td>
-                                    <td class="money">@(unit.HasValue ? unit.Value.ToString("0.00") : "—")</td>
-                                    <td class="money">@(unit.HasValue ? sub.ToString("0.00") : "—")</td>
+                                    <td>@line.Part?.Name</td>
+                                    <td class="num">@line.Quantity</td>
+                                    <td class="money">@(unit.HasValue ? unit.Value.ToString("C") : "—")</td>
+                                    <td class="money">@(sub.HasValue ? sub.Value.ToString("C") : "—")</td>
                                 </tr>
                             }
                             <tr class="tfoot">
-                                <td colspan="3" style="text-align:right;">Grand Total:</td>
-                                <td class="money grand">@grand.ToString("0.00")</td>
+                                <td colspan="3" style="text-align:right;">Grand Total (Parts):</td>
+                                <td class="money grand">@grand.ToString("C")</td>
                             </tr>
                         }
                         else
@@ -333,9 +322,11 @@
 
         <!-- Footer Actions -->
         <div class="footer">
-            <form asp-controller="Products" asp-action="Edit" method="get">
-                @* <input type="hidden" name="id" value="@Model?.Id" /> *@
-                <button type="submit" class="btn btn-edit">Edit</button>
+            <form asp-controller="Inventory" asp-action="EditProduct" method="get">
+                @* Add/Edit action later. Include hidden id when you have the endpoint:
+                   <input type="hidden" name="id" value="@Model?.ProductID" />
+                *@
+                <button type="submit" class="btn btn-edit" disabled>Edit</button>
             </form>
         </div>
     </section>
