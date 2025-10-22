@@ -22,52 +22,9 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
 
 jobs:
-  # ───────────────────────────
-  # Preflight: skip push CI if a PR is open for this branch
-  # ───────────────────────────
-  preflight:
-    name: 🔎 Preflight check
-    runs-on: ubuntu-latest
-    outputs:
-      run_ci: ${{ steps.decide.outputs.run_ci }}
-    steps:
-      - name: 🔁 Decide if CI should run
-        id: decide
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const isPush = context.eventName === 'push';
-            let run = true;
-
-            if (isPush) {
-              const branch = context.ref.replace('refs/heads/', '');
-              const { data: prs } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open',
-                head: `${context.repo.owner}:${branch}`
-              });
-              if (prs.length > 0) {
-                core.info(`Open PR #${prs[0].number} exists for ${branch}. Skipping push CI (PR CI will run).`);
-                run = false;
-              } else {
-                core.info(`No open PR for ${branch}. Running push CI.`);
-              }
-            } else {
-              core.info('Event is pull_request/workflow_dispatch — running CI.');
-            }
-
-            core.setOutput('run_ci', run ? 'true' : 'false');
-
-  # ───────────────────────────
-  # Main CI
-  # ───────────────────────────
   build-and-test:
-    name: 🧪 Build & Run Tests
+    name: Build & Tests
     runs-on: ubuntu-latest
-    needs: preflight
-    if: needs.preflight.outputs.run_ci == 'true'
 
     steps:
       - name: 📥 Checkout repository
@@ -79,12 +36,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          cache: true   # uses packages.lock.json for NuGet caching
 
-      - name: 🧾 .NET info
+      - name: 🧾 Show .NET info
         run: dotnet --info
 
-      - name: 📦 Restore (locked)
+      - name: 📦 Restore NuGet packages
         run: dotnet restore --locked-mode
 
       - name: 🏗️ Build (Release)
