@@ -3,303 +3,305 @@
 }
 
 <style>
+    /* ---------- Root & Variables (Updated to match screenshot) ---------- */
     :root {
-        --bg1: #1b2a66;
-        --bg2: #16235b;
-        --container1: #1e2d72;
-        --container2: #182967;
-        --white: #fff;
-        --ink: #1a1a1a;
-        --muted: #cfd3eb;
-        --accent: #c62929;
-        --accent-2: #ef4723;
-        --radius: 14px;
-        --shadow: 0 16px 40px rgba(0,0,0,.35);
+        --primary-red: #d62828;
+        --primary-blue: #0d47a1;
+        --hover-red: #e03a3a;
+        --text-light: #ffffff;
+        --text-muted: #d0cde1; 
+        --border-color: rgba(224, 224, 242, 0.2);
+        --container-bg: rgba(75, 59, 134, 0.25); 
+        --toolbar-bg: rgba(75, 59, 134, 0.3);
+        --input-bg: rgba(0, 0, 0, 0.15);
+        --table-header-bg: rgba(75, 59, 134, 0.4);
+    }
+
+    /* ---------- Base & Background ---------- */
+    * {
+        box-sizing: border-box;
     }
 
     html, body {
         height: 100%;
         margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-        background: linear-gradient(135deg,var(--bg1),var(--bg2));
+        background-color: #0d47a1;
+        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+        color: var(--text-light);
+        position: relative;
+        overflow-x: hidden;
+        background-attachment: fixed;
     }
 
-    .main {
-        padding: 0 !important;
+    /* ---------- Main Content Container (Glassmorphism) ---------- */
+    .viewport {
+        padding: 40px 24px;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
     }
 
-    .transactions-page {
-        min-height: calc(100vh - 40px);
-        padding: 20px;
-        background: linear-gradient(135deg,var(--bg1),var(--bg2));
-        border-radius: 10px;
-        color: #fff;
+    .view-container {
+        width: 100%;
+        max-width: 1200px;
+        background: var(--container-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 16px;
+        padding: 32px 40px;
     }
 
-    .content-wrap {
-        background: linear-gradient(135deg,var(--container1),var(--container2));
-        border: 2px solid rgba(255,255,255,.28);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 16px;
+    /* ---------- HEADER ---------- */
+    .header-section {
+        margin-bottom: 24px;
     }
 
+    .main-title {
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    /* ---------- Toolbar / Filters (Matched to Screenshot) ---------- */
     .toolbar {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 14px;
+        display: flex;
         align-items: center;
-        padding: 10px 12px;
-        margin-bottom: 14px;
-        background: rgba(0,0,0,.18);
-        border: 1.5px solid rgba(255,255,255,.28);
-        border-radius: var(--radius);
+        gap: 16px;
+        padding: 12px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--toolbar-bg);
     }
 
     .filters {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        flex-grow: 1;
         align-items: center;
+        gap: 12px;
     }
 
-    .search-ico {
-        font-size: 18px;
-        opacity: .95;
-    }
-
-    .input, .select {
-        height: 34px;
+    .input, select.input {
+        height: 40px;
+        font-size: 14px;
+        color: var(--text-light);
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
-        border: 1px solid rgba(255,255,255,.35);
-        background: rgba(255,255,255,.05);
-        color: #fff;
-        padding: 0 10px;
-        outline: 0;
+        padding: 0 12px;
+        outline: none;
+        transition: all 0.2s ease;
     }
 
-        .input::placeholder {
-            color: rgba(255,255,255,.65);
+    select.input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d0cde1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+        select.input option {
+            background-color: #3b2f70;
+            color: var(--text-light);
         }
 
-        .input:focus, .select:focus {
-            border-color: #fff;
-            box-shadow: 0 0 0 2px rgba(255,255,255,.18);
-        }
-
-    .btn-search {
-        height: 36px;
-        min-width: 120px;
-        border: 0;
-        border-radius: 18px;
-        cursor: default;
-        color: #fff;
-        font-weight: 700;
-        letter-spacing: .02em;
-        background: linear-gradient(135deg,var(--accent-2),var(--accent));
-        padding: 0 16px;
-        box-shadow: 0 8px 18px rgba(0,0,0,.35);
-        opacity: .9;
+    .input::placeholder {
+        color: var(--text-muted);
     }
 
-    /* table card */
-    .table-card {
-        background: var(--white);
-        color: var(--ink);
-        border: 2px solid var(--accent);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
+    .input:focus {
+        border-color: var(--text-light);
     }
 
-    .table-wrap {
-        overflow: auto;
-        max-height: calc(100vh - 300px);
+    .date-separator {
+        color: var(--text-muted);
     }
 
-    table.table {
+    /* ---------- Table Section (Matched to Screenshot) ---------- */
+    .table-section {
+        overflow-x: auto;
+    }
+
+    .table {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
+        min-width: 800px;
     }
 
-    thead th {
-        position: sticky;
-        top: 0;
-        background: var(--white);
-        color: #333;
-        text-align: left;
-        font-weight: 800;
-        padding: 12px 14px;
-        border-bottom: 2px solid var(--accent);
-    }
-
-    tbody td {
-        padding: 12px 14px;
-        color: #222;
-        border-bottom: 1px dashed #f0d0d0;
-    }
-
-    tbody tr {
-        transition: background .12s ease;
-    }
-
-        tbody tr:hover {
-            background: #fff6f6;
+        .table th, .table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
 
-            tbody tr:hover td:first-child {
-                box-shadow: inset 4px 0 0 0 var(--accent);
+        .table thead th {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            background-color: var(--table-header-bg);
+        }
+
+        .table td {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+            .table td:first-child, .table td:nth-child(3) {
+                color: var(--text-light);
+                font-weight: 500;
             }
 
-    thead th:first-child {
-        border-top-left-radius: calc(var(--radius)-2px);
-    }
-
-    thead th:last-child {
-        border-top-right-radius: calc(var(--radius)-2px);
-    }
-
-    tbody tr:last-child td:first-child {
-        border-bottom-left-radius: calc(var(--radius)-2px);
-    }
-
-    tbody tr:last-child td:last-child {
-        border-bottom-right-radius: calc(var(--radius)-2px);
-    }
-
-    .num, .money {
+    .align-right {
         text-align: right;
-        font-variant-numeric: tabular-nums;
     }
 
-    .actions {
-        white-space: nowrap;
-    }
-
-    .btn-pill {
+    /* ---------- Buttons (Matched to Screenshot) ---------- */
+    .btn {
+        height: 40px;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        transition: all .2s ease;
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 32px;
-        padding: 0 12px;
-        border-radius: 16px;
-        font-weight: 700;
-        font-size: .9rem;
-        text-decoration: none;
-        margin-right: 8px;
-        border: 2px solid var(--accent);
-        color: var(--accent);
-        background: #fff;
     }
 
-        .btn-pill:hover {
-            background: var(--accent);
-            color: #fff;
+        .btn:active {
+            transform: scale(0.98);
         }
 
-    /* pager (UI only) */
-    .pager {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        padding: 10px 4px;
-        background: #fff;
-        border-top: 2px solid var(--accent);
+    .btn-primary {
+        background: rgba(214, 40, 40, 0.85); 
+        color: var(--text-light);
+        border: 1px solid rgba(255, 100, 100, 0.5);
     }
 
-    .page-btn {
-        height: 32px;
-        min-width: 90px;
-        border-radius: 16px;
-        border: 2px solid var(--accent);
-        background: #fff;
-        color: var(--accent);
-        font-weight: 700;
+        .btn-primary:hover {
+            background: rgba(224, 58, 58, 1);
+        }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 0 16px;
+        height: 34px;
+    }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+    /* ---------- Pagination (Matched to Screenshot) ---------- */
+    .pagination-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .page-info {
+        font-size: 14px;
+        color: var(--text-muted);
     }
 </style>
 
-<div class="transactions-page">
-    <div class="content-wrap">
+<div class="viewport">
+    <div class="view-container">
+        <header class="header-section">
+            <h2 class="main-title">Transactions</h2>
+        </header>
 
-        <!-- Toolbar (UI only) -->
+        <!-- Toolbar / Filters -->
         <div class="toolbar">
             <div class="filters">
-                <span class="search-ico">🔍</span>
-                <input class="input" type="text" placeholder="Search by party, ref…" />
-                <select class="select">
-                    <option>All types</option>
+                <input class="input" type="text" placeholder="Search by party, reference…" style="min-width: 240px;" />
+                <select class="input">
+                    <option>All Types</option>
                     <option>Sale</option>
                     <option>Purchase</option>
                     <option>Return</option>
                     <option>Adjustment</option>
                 </select>
-                <input class="input" type="date" />
-                <span>to</span>
-                <input class="input" type="date" />
+                <input class="input" type="date" placeholder="yyyy/mm/dd" />
+                <span class="date-separator">to</span>
+                <input class="input" type="date" placeholder="yyyy/mm/dd" />
             </div>
-            <button type="button" class="btn-search">Search</button>
+            <button type="button" class="btn btn-primary">Search</button>
         </div>
 
         <!-- Table -->
-        <section class="table-card">
-            <div class="table-wrap">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width:110px;">ID</th>
-                            <th style="width:140px;">Date</th>
-                            <th>Party</th>
-                            <th style="width:130px;">Type</th>
-                            <th style="width:160px;">Reference</th>
-                            <th style="width:140px;" class="money">Amount</th>
-                            <th style="width:120px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- sample rows -->
-                        <tr>
-                            <td>9001</td>
-                            <td>2025-03-04</td>
-                            <td>ABC Builders</td>
-                            <td>Sale</td>
-                            <td>INV-10231</td>
-                            <td class="money">1,780.00</td>
-                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>9002</td>
-                            <td>2025-03-03</td>
-                            <td>PipeWare Ltd.</td>
-                            <td>Purchase</td>
-                            <td>PO-8842</td>
-                            <td class="money">-950.00</td>
-                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>9003</td>
-                            <td>2025-03-01</td>
-                            <td>XYZ Retail</td>
-                            <td>Return</td>
-                            <td>RET-2205</td>
-                            <td class="money">-120.00</td>
-                            <td class="actions"><a href="#" class="btn-pill">View</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pager (UI only) -->
-            <div class="pager">
-                <button type="button" class="page-btn">← Prev</button>
-                <div style="align-self:center; color:#333; background:#fff; padding:0 8px; border-radius:8px;">
-                    Page 1 of 20
-                </div>
-                <button type="button" class="page-btn">Next →</button>
-            </div>
+        <section class="table-section">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width:110px;">ID</th>
+                        <th style="width:140px;">Date</th>
+                        <th>Party</th>
+                        <th style="width:130px;">Type</th>
+                        <th style="width:160px;">Reference</th>
+                        <th style="width:140px;" class="align-right">Amount</th>
+                        <th style="width:120px; text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Sample Rows -->
+                    <tr>
+                        <td>9001</td>
+                        <td>2025-03-04</td>
+                        <td>ABC Builders</td>
+                        <td>Sale</td>
+                        <td>INV-10231</td>
+                        <td class="align-right">R 1,780.00</td>
+                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                    </tr>
+                    <tr>
+                        <td>9002</td>
+                        <td>2025-03-03</td>
+                        <td>PipeWare Ltd.</td>
+                        <td>Purchase</td>
+                        <td>PO-8842</td>
+                        <td class="align-right">- R 950.00</td>
+                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                    </tr>
+                    <tr>
+                        <td>9003</td>
+                        <td>2025-03-01</td>
+                        <td>XYZ Retail</td>
+                        <td>Return</td>
+                        <td>RET-2205</td>
+                        <td class="align-right">- R 120.00</td>
+                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
+        <!-- Pagination -->
+        <div class="pagination-controls">
+            <button type="button" class="btn btn-outline">← Previous</button>
+            <div class="page-info">Page 1 of 20</div>
+            <button type="button" class="btn btn-outline">Next →</button>
+        </div>
     </div>
 </div>

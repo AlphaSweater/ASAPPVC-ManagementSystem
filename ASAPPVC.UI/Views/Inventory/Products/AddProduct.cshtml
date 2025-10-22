@@ -3,56 +3,207 @@
     ViewData["Title"] = "Add New Product";
     var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.PartModel>;
 }
+
 <style>
-    /* ---------- Page Background ---------- */
+    /* ---------- Root & Variables ---------- */
+    :root {
+        --primary-red: #d62828;
+        --primary-blue: #0d47a1;
+        --hover-red: #e03a3a;
+        --text-light: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.8);
+    }
+
+    /* ---------- Base & Background ---------- */
+    * {
+        box-sizing: border-box;
+    }
+
     html, body {
         height: 100%;
         margin: 0;
-        font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        background: linear-gradient(135deg, #215c99 0%, #252d6a 100%);
-        color: #000;
+        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
+    body {
+        background-color: #0d47a1;
+        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+        color: var(--text-light);
+        position: relative;
+        overflow-x: hidden;
+        background-attachment: fixed;
+    }
+
+        /* ---------- Decorative Background Shapes ---------- */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        body::before {
+            background: var(--primary-blue);
+            width: 350px;
+            height: 350px;
+            top: -80px;
+            left: -120px;
+        }
+
+        body::after {
+            background: var(--primary-red);
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -180px;
+        }
+
+    /* ---------- Main Content Layout ---------- */
     .viewport {
-        min-height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 40px;
+        padding: 40px 24px;
+        min-height: 100vh;
     }
 
-    /* ---------- Container Layout ---------- */
-    .addproduct-container {
-        display: grid;
-        grid-template-columns: 2fr 3fr;
-        gap: 20px;
-        background: #f9f9f9;
-        border: 2px solid #c62929;
-        border-radius: 12px;
-        padding: 20px;
+    .form-container {
         max-width: 1100px;
-        width: 100%;
-        box-shadow: 0 16px 40px rgba(0,0,0,.35);
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 16px;
+        padding: 32px 40px;
     }
 
-    /* ---------- Left Column (Image Upload) ---------- */
-    .image-section {
+    /* ---------- HEADER ---------- */
+    .form-header-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+        transition: color 0.2s ease;
+    }
+
+        .back-link:hover {
+            color: var(--text-light);
+        }
+
+    .main-title {
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    /* ---------- Form Grid Layout ---------- */
+    .form-layout-grid {
+        display: grid;
+        grid-template-columns: 2fr 5fr;
+        gap: 40px;
+        align-items: start;
+    }
+
+    .form-fields-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 20px;
+    }
+
+    /* ---------- Form Groups & Inputs ---------- */
+    .group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .group.full-width {
+            grid-column: 1 / -1;
+        }
+
+    .label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-light);
+        margin-bottom: 8px;
+    }
+
+    .input, select.input {
+        height: 44px;
+        font-size: 16px;
+        color: var(--text-light);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 0 12px;
+        outline: none;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    textarea.input {
+        height: 96px;
+        padding: 10px 12px;
+        resize: vertical;
+    }
+
+    .input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input:focus {
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    select.input option {
+        background-color: var(--primary-blue);
+        color: var(--text-light);
+    }
+
+    .text-danger {
+        color: #ffcdd2;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    /* ---------- Image Upload ---------- */
+    .image-upload-section {
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: 16px;
+        margin-top: 10px;
     }
 
     .image-box {
-        width: 200px;
-        height: 200px;
-        border: 2px solid rgba(198, 41, 41, 0.7);
-        border-radius: 10px;
+        width: 100%;
+        max-width: 240px;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        background: #fff;
+        cursor: pointer;
+        transition: background-color 0.2s;
     }
+
+        .image-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
 
         .image-box img {
             width: 100%;
@@ -60,397 +211,238 @@
             object-fit: cover;
         }
 
-    .upload-btn {
-        margin-top: 15px;
-        width: 170px;
-        height: 40px;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
-        font-weight: 600;
-        cursor: pointer;
-        transition: filter .2s ease;
-        display: inline-flex;
-        align-items: center; 
-        justify-content: center; 
-        text-align: center;
-    }
-
-        .upload-btn:hover {
-            filter: brightness(1.1);
-        }
-
-    .hidden-file {
+    .hidden-file-input {
         display: none;
     }
-
-    /* ---------- Right Column (Form Fields) ---------- */
-    .form-section {
-        padding: 10px;
-    }
-
-        .form-section h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #333;
-        }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px 20px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            height: 38px;
-            border: 1px solid rgba(198,41,41,.5);
-            border-radius: 8px;
-            padding: 0 10px;
-            font-size: 14px;
-            outline: none;
-            background: #fff;
-        }
-
-        .form-group textarea {
-            height: 80px;
-            padding: 8px 10px;
-            resize: vertical;
-        }
-
-            .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-                border-color: #c62929;
-                box-shadow: 0 0 0 2px rgba(198,41,41,0.2);
-            }
 
     /* ---------- Parts Collection Card ---------- */
     .parts-card {
         grid-column: 1 / -1;
-        background: #fff;
-        color: #1a1a1a;
-        border: 2px solid #c62929;
+        background: rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
-        box-shadow: 0 16px 40px rgba(0,0,0,.15);
-        padding: 12px;
+        padding: 16px 20px;
         margin-top: 8px;
     }
 
-        .parts-card h3 {
-            margin: 4px 6px 10px;
-            font-size: 18px;
-            font-weight: 800;
-            color: #333;
-            text-align: center;
-        }
-
-    .parts-toolbar {
+    .parts-header {
         display: flex;
-        gap: 10px;
+        justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        margin: 8px 6px 12px;
+        margin-bottom: 16px;
     }
 
-    .btn-addrow {
-        height: 34px;
-        padding: 0 14px;
-        border-radius: 8px;
-        border: 0;
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-        .btn-addrow:hover {
-            filter: brightness(1.06);
+        .parts-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
         }
-
-    .parts-table-wrap {
-        overflow-y: auto;
-        overflow-x: hidden; 
-    }
 
     .parts-table {
         width: 100%;
-        max-width: 100%; 
-        table-layout: fixed; 
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
     }
 
         .parts-table thead th {
-            position: sticky;
-            top: 0;
-            background: #fff;
-            color: #333;
-            border-bottom: 2px solid #c62929;
-            font-weight: 800;
             text-align: left;
-            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 0 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
         }
 
         .parts-table tbody td {
-            padding: 10px 12px;
-            border-bottom: 1px dashed #f0d0d0;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .parts-table th,
-        .parts-table td {
-            word-wrap: break-word;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .parts-table tfoot td {
+            padding: 12px 8px 0;
+            font-weight: 600;
         }
 
-            .parts-table th.remove-cell,
-            .parts-table td.remove-cell {
-                overflow: visible;
-                text-align: right;
-                width: auto; 
-                min-width: 120px;
-            }
-
-        .parts-table select,
-        .parts-table input {
-            max-width: 100%; 
-            width: 100%; 
+        .parts-table .input {
+            height: 38px;
+            font-size: 14px;
+            padding: 0 8px;
         }
 
-        .parts-table th.part-col { 
-            min-width: 0 !important;
+        .parts-table .qty-input {
+            width: 80px;
+            text-align: center;
         }
 
-    .qty {
-        width: 90px;
+    .align-right {
         text-align: right;
     }
 
-    .unit-price, .subtotal {
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-        min-width: 110px;
+    .grand-total {
+        font-size: 18px;
+        color: var(--text-light);
     }
 
-    .remove-cell {
-        width: 80px;
-    }
-
- .btn-remove{
-  display:inline-flex;               
-  align-items:center;             
-  justify-content:center;           
-  white-space:nowrap;             
-  height:30px;
-  padding:0 12px;   
-  border-radius:16px;
-  border:2px solid #c62929;
-  background:#fff;
-  color:#c62929;
-  font-weight:700;
-  cursor:pointer;
-}
-
-        .btn-remove:hover {
-            background: #c62929;
-            color: #fff;
-        }
-
-    tfoot td {
-        padding: 10px 12px;
-        font-weight: 800;
-    }
-
-    .grand {
-        text-align: right;
-        font-size: 16px;
-        font-weight: 900;
-    }
-
-    /* ---------- Footer Buttons ---------- */
-    .actions {
-        grid-column: span 2;
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-    }
-
+    /* ---------- Buttons ---------- */
     .btn {
-        width: 120px;
-        height: 38px;
-        border: none;
+        height: 44px;
+        padding: 0 24px;
         border-radius: 8px;
         font-weight: 600;
+        font-size: 16px;
         cursor: pointer;
-        transition: filter .2s ease;
+        border: none;
+        transition: all .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .btn-save {
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn.btn-sm {
+            height: 36px;
+            padding: 0 16px;
+            font-size: 14px;
+        }
+
+    .btn-primary {
+        background: var(--primary-red);
+        color: var(--text-light);
     }
 
-    .btn-reset {
-        background: #ddd;
-        color: #333;
+        .btn-primary:hover {
+            background: var(--hover-red);
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    .btn:hover {
-        filter: brightness(1.1);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+    .btn-remove {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-muted);
+        border: 1px solid transparent;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
     }
 
-    .media (max-width: 980px) {
-        .addproduct-container
+        .btn-remove:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-light);
+        }
 
-    {
-        grid-template-columns: 1fr;
-    }
-
-    .image-section {
-        order: -1;
-    }
-
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 32px;
+        grid-column: 1 / -1;
     }
 </style>
 
 <div class="viewport">
-    <div class="addproduct-container">
-        <!-- Left: Image Upload -->
-        <div class="image-section">
-            <div class="image-box">
-                <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image" />
-            </div>
-            <label class="upload-btn" for="imageFile">Upload Image</label>
+    <div class="form-container">
+        <div class="form-header-section">
+            <a class="back-link" asp-controller="Inventory" asp-action="ViewProducts">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                </svg>
+                Back to Products
+            </a>
+            <h2 class="main-title">@ViewData["Title"]</h2>
         </div>
 
-        <!-- Right: Form -->
-        <div class="form-section">
-            <h2>Add New Product</h2>
+        <form id="addProductForm" asp-controller="Inventory" asp-action="AddProductPost" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
 
-            <!-- IMPORTANT: point to Inventory/AddProduct and keep multipart -->
-            <form id="addProductForm"
-                  asp-controller="Inventory"
-                  asp-action="AddProductPost"
-                  method="post"
-                  enctype="multipart/form-data">
-                @Html.AntiForgeryToken()
+            <div class="form-layout-grid">
+                <!-- Left: Image Upload -->
+                <div class="image-upload-section">
+                    <div class="image-box" onclick="document.getElementById('imageFile').click();">
+                        <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
+                        Upload Image
+                    </button>
+                    <input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
 
-                <!-- put the actual file input INSIDE the form and bind it -->
-                <input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
-
-                <div class="form-grid">
-                    <!-- Basic product info (bind with asp-for so names match VM) -->
-                    <div class="form-group">
-                        <label asp-for="ProductName">Product Name</label>
-                        <input asp-for="ProductName" placeholder="Enter product name" />
+                <!-- Right: Form -->
+                <div class="form-fields-grid">
+                    <div class="group">
+                        <label asp-for="ProductName" class="label"></label>
+                        <input asp-for="ProductName" class="input" placeholder="Enter product name" />
                         <span asp-validation-for="ProductName" class="text-danger"></span>
                     </div>
-
-                    <!-- Optional: SKU (not in VM; remove if you don't want it) -->
-                    <div class="form-group">
-                        <label>SKU</label>
-                        <input name="Sku" placeholder="Enter SKU" />
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="BasePrice">Base Price</label>
-                        <input asp-for="BasePrice" step="0.01" placeholder="Enter base price" />
+                    <div class="group">
+                        <label asp-for="BasePrice" class="label"></label>
+                        <input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. 299.99" />
                         <span asp-validation-for="BasePrice" class="text-danger"></span>
                     </div>
-
-                    <div class="form-group">
-                        <label asp-for="Description">Description (optional)</label>
-                        <textarea asp-for="Description" placeholder="Short description"></textarea>
+                    <div class="group full-width">
+                        <label asp-for="Description" class="label"></label>
+                        <textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
-                    <!-- Parts collection -->
-                    <div class="parts-card">
-                        <h3>Parts in this Product</h3>
-                        <div class="parts-toolbar">
-                            <button type="button" class="btn-addrow" id="addRowBtn">+ Add Part</button>
+                    <!-- Parts Collection Card -->
+                    <div class="parts-card full-width">
+                        <div class="parts-header">
+                            <h3>Parts in this Product</h3>
+                            <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
                         </div>
-
-                        <div class="parts-table-wrap">
-                            <table class="parts-table" id="partsTable">
-                                <thead>
-                                    <tr>
-                                        <th class="part-col">Part</th>
-                                        <th class="qty">Qty</th>
-                                        <th class="unit-price">Unit Price</th>
-                                        <th class="subtotal">Subtotal</th>
-                                        <th class="remove-cell"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="partsTbody">
-                                    <!-- First row -->
-                                    <tr data-index="0">
-                                        <td>
-                                            <select name="Parts[0].PartId" class="part-select">
-                                                <option value="">-- Select part --</option>
-                                                @if (parts != null)
-                                                {
-                                                    foreach (var p in parts)
-                                                    {
-                                                        <option value="@p.PartID" data-price="@p.UnitCost.ToString("0.##")">
-                                                            @p.Name
-                                                        </option>
-                                                    }
-                                                }
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input class="qty" type="number" name="Parts[0].Quantity" value="1" min="1" />
-                                        </td>
-                                        <td class="unit-price">—</td>
-                                        <td class="subtotal">—</td>
-                                        <td class="remove-cell">
-                                            <button type="button" class="btn-remove">Remove</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" style="text-align:right;">Grand Total:</td>
-                                        <td class="grand" id="grandTotal">0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
+                        <table class="parts-table" id="partsTable">
+                            <thead>
+                                <tr>
+                                    <th>Part</th>
+                                    <th style="width:100px; text-align:center;">Quantity</th>
+                                    <th class="align-right" style="width:120px;">Unit Price</th>
+                                    <th class="align-right" style="width:120px;">Subtotal</th>
+                                    <th style="width:60px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="partsTbody">
+                                <!-- Dynamic rows will be injected here by JS -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="align-right">Grand Total:</td>
+                                    <td class="align-right grand-total" id="grandTotal">R 0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="actions">
-                        <button type="submit" class="btn btn-save">Save Product</button>
-                        <button type="reset" class="btn btn-reset">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Product</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     (function () {
-        /* Image preview */
+        // --- Image preview logic ---
         const fileInput = document.getElementById('imageFile');
-        const preview   = document.getElementById('previewImg');
+        const preview = document.getElementById('previewImg');
         if (fileInput) {
             fileInput.addEventListener('change', function () {
                 const f = this.files && this.files[0];
@@ -459,113 +451,97 @@
                 reader.onload = e => preview.src = e.target.result;
                 reader.readAsDataURL(f);
             });
-
-            // Clicking the image box opens the picker (nice UX)
             const imgBox = document.querySelector('.image-box');
             imgBox?.addEventListener('click', () => fileInput.click());
         }
 
-        /* Parts dynamic rows with unit price (nullable) + subtotals + grand total */
+        // --- Parts dynamic table logic ---
         const tbody = document.getElementById('partsTbody');
         const addRowBtn = document.getElementById('addRowBtn');
         const grandEl = document.getElementById('grandTotal');
 
-        function getUnitPrice(tr) {
-            const sel = tr.querySelector('.part-select');
-            const opt = sel && sel.selectedOptions && sel.selectedOptions[0];
-            if (!opt) return null;
-            const raw = opt.getAttribute('data-price');
-            if (raw === null || raw === '') return null;
-            const num = parseFloat(raw);
-            return Number.isFinite(num) ? num : null;
-        }
+        // **FIXED LINE**: Handle null before the .Select() to ensure type safety.
+        const partsData = @Html.Raw(Json.Serialize((parts ?? new List<PartModel>()).Select(p => new { id = p.PartID, name = p.Name, price = p.UnitCost })));
 
-        function formatMoney(n) { return n.toFixed(2); }
+        const formatMoney = (n) => `R ${n.toFixed(2)}`;
 
-        function recalcRow(tr) {
-            const qtyInput = tr.querySelector('input.qty');
-            const qty = parseFloat(qtyInput?.value || '0');
-            const unit = getUnitPrice(tr);
+        function updateTotals() {
+            let grandTotal = 0;
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const sel = tr.querySelector('.part-select');
+                const qtyInput = tr.querySelector('.qty-input');
+                const unitPriceCell = tr.querySelector('.unit-price');
+                const subtotalCell = tr.querySelector('.subtotal');
 
-            const unitCell = tr.querySelector('.unit-price');
-            unitCell.textContent = (unit == null) ? '—' : formatMoney(unit);
+                const selectedPartId = parseInt(sel.value, 10);
+                const quantity = parseInt(qtyInput.value, 10) || 0;
+                const part = partsData.find(p => p.id === selectedPartId);
 
-            const subCell = tr.querySelector('.subtotal');
-            if (!Number.isFinite(qty) || qty <= 0 || unit == null) {
-                subCell.textContent = '—';
-                return 0;
-            }
-            const subtotal = qty * unit;
-            subCell.textContent = formatMoney(subtotal);
-            return subtotal;
-        }
+                let unitPrice = 0;
+                if (part) {
+                    unitPrice = part.price;
+                }
 
-        function recalcGrand() {
-            let total = 0;
-            tbody.querySelectorAll('tr').forEach(tr => { total += recalcRow(tr); });
-            grandEl.textContent = formatMoney(total);
-        }
+                const subtotal = unitPrice * quantity;
+                grandTotal += subtotal;
 
-        function wireRowEvents(tr) {
-            tr.addEventListener('input', e => {
-                if (e.target.matches('input.qty')) recalcGrand();
+                unitPriceCell.textContent = formatMoney(unitPrice);
+                subtotalCell.textContent = formatMoney(subtotal);
             });
-            const sel = tr.querySelector('.part-select');
-            if (sel) sel.addEventListener('change', recalcGrand);
-
-            const removeBtn = tr.querySelector('.btn-remove');
-            if (removeBtn) removeBtn.addEventListener('click', () => {
-                tr.remove(); renumberIndexes(); recalcGrand();
-            });
-        }
-
-        function createRow(index) {
-            const tr = document.createElement('tr');
-            tr.setAttribute('data-index', index);
-
-            // Build <option>s from the server-provided parts (copy from the first row)
-            const optionsHtml = (function() {
-                const firstSel = tbody.querySelector('tr select.part-select');
-                return firstSel ? firstSel.innerHTML : '<option value="">-- Select part --</option>';
-            })();
-
-            tr.innerHTML = `
-                <td>
-                    <select name="Parts[${index}].PartId" class="part-select">
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td>
-                    <input class="qty" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
-                </td>
-                <td class="unit-price">—</td>
-                <td class="subtotal">—</td>
-                <td class="remove-cell"><button type="button" class="btn-remove">Remove</button></td>
-            `;
-            wireRowEvents(tr);
-            return tr;
+            grandEl.textContent = formatMoney(grandTotal);
         }
 
         function renumberIndexes() {
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            rows.forEach((tr, i) => {
-                tr.setAttribute('data-index', i);
-                tr.querySelectorAll('select, input').forEach(inp => {
-                    if (!inp.name) return;
-                    inp.name = inp.name.replace(/Parts\[\d+\]/, `Parts[${i}]`);
+            tbody.querySelectorAll('tr').forEach((tr, i) => {
+                tr.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace(/\[\d+\]/, `[${i}]`);
                 });
             });
         }
 
-        if (addRowBtn) {
-            addRowBtn.addEventListener('click', () => {
-                const next = tbody.querySelectorAll('tr').length;
-                tbody.appendChild(createRow(next));
-                recalcGrand();
+        function createRow() {
+            const index = tbody.rows.length;
+            const tr = tbody.insertRow();
+
+            const optionsHtml = partsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+            tr.innerHTML = `
+                <td>
+                    <select name="Parts[${index}].PartId" class="input part-select">
+                        <option value="">-- Select part --</option>
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td style="text-align:center;">
+                    <input class="input qty-input" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
+                </td>
+                <td class="align-right unit-price">R 0.00</td>
+                <td class="align-right subtotal">R 0.00</td>
+                <td style="text-align:center;">
+                    <button type="button" class="btn btn-remove">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" /></svg>
+                    </button>
+                </td>
+            `;
+
+            tr.querySelector('.part-select').addEventListener('change', updateTotals);
+            tr.querySelector('.qty-input').addEventListener('input', updateTotals);
+            tr.querySelector('.btn-remove').addEventListener('click', () => {
+                tr.remove();
+                renumberIndexes();
+                updateTotals();
             });
         }
 
-        tbody.querySelectorAll('tr').forEach(wireRowEvents);
-        recalcGrand();
+        addRowBtn.addEventListener('click', () => {
+            createRow();
+            updateTotals();
+        });
+
+        // Add one row to start with when the page loads
+        if (partsData.length > 0) {
+             createRow();
+             updateTotals();
+        }
     })();
 </script>

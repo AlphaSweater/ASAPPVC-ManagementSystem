@@ -4,53 +4,193 @@
 }
 
 <style>
+    /* ---------- Root & Variables ---------- */
+    :root {
+        --primary-red: #d62828;
+        --primary-blue: #0d47a1;
+        --hover-red: #e03a3a;
+        --text-light: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.8);
+        --accent-orange: #ef4723;
+    }
+
+    /* ---------- Base & Background ---------- */
+    * {
+        box-sizing: border-box;
+    }
+
     html, body {
         height: 100%;
         margin: 0;
-        font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-        background: linear-gradient(135deg, #215c99 0%, #252d6a 100%);
-        color: #000;
+        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
+    body {
+        background-color: #0d47a1;
+        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+        color: var(--text-light);
+        position: relative;
+        overflow-x: hidden;
+        background-attachment: fixed;
+    }
+
+        /* ---------- Decorative Background Shapes ---------- */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        body::before {
+            background: var(--primary-blue);
+            width: 350px;
+            height: 350px;
+            top: -80px;
+            left: -120px;
+        }
+
+        body::after {
+            background: var(--primary-red);
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            right: -180px;
+        }
+
+    /* ---------- Main Content Layout ---------- */
     .viewport {
-        min-height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 40px;
+        padding: 40px 24px;
+        min-height: 100vh;
     }
 
-    .addpart-container {
+    .form-container {
+        max-width: 920px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 16px;
+        padding: 32px 40px;
+    }
+
+    /* ---------- HEADER ---------- */
+    .form-header-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 16px;
+        transition: color 0.2s ease;
+    }
+
+        .back-link:hover {
+            color: var(--text-light);
+        }
+
+    .main-title {
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    /* ---------- Form Grid & Elements ---------- */
+    .form-layout-grid {
         display: grid;
-        grid-template-columns: 2fr 3fr;
-        gap: 20px;
-        background: #f9f9f9;
-        border: 2px solid #c62929;
-        border-radius: 12px;
-        padding: 20px;
-        max-width: 960px;
-        width: 100%;
-        box-shadow: 0 16px 40px rgba(0,0,0,.35);
+        grid-template-columns: 1fr 2fr; /* Columns for image and form */
+        gap: 40px;
+        align-items: start;
     }
 
-    .image-section {
+    .form-fields-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 20px;
+    }
+
+    .group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .group.full-width {
+            grid-column: 1 / -1;
+        }
+
+    .label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-light);
+        margin-bottom: 8px;
+    }
+
+    .input {
+        height: 44px;
+        font-size: 16px;
+        color: var(--text-light);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 0 12px;
+        outline: none;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+        .input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input:focus {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+    .text-danger {
+        color: #ffcdd2;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    /* ---------- Image Upload Section ---------- */
+    .image-upload-section {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        gap: 16px;
+        margin-top: 10px;
     }
 
     .image-box {
-        width: 180px;
-        height: 180px;
-        border: 2px solid rgba(255, 0, 0, 0.7);
-        border-radius: 10px;
+        width: 200px;
+        height: 200px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        background: #fff;
+        cursor: pointer;
+        transition: background-color 0.2s;
     }
+
+        .image-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
 
         .image-box img {
             width: 100%;
@@ -58,193 +198,140 @@
             object-fit: cover;
         }
 
-    .upload-btn {
-        margin-top: 15px;
-        width: 150px;
-        height: 40px;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
-        font-weight: 600;
-        cursor: pointer;
-        transition: filter .2s ease;
-    }
-
-        .upload-btn:hover {
-            filter: brightness(1.1);
-        }
-
-    .hidden-file {
+    .hidden-file-input {
         display: none;
     }
-    /* you referenced this class — now defined */
 
-    .form-section {
-        padding: 10px;
-    }
-
-        .form-section h2 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #333;
-        }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px 20px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-        .form-group label {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .form-group input {
-            height: 38px;
-            border: 1px solid rgba(198, 41, 41, 0.5);
-            border-radius: 8px;
-            padding: 0 10px;
-            font-size: 14px;
-            outline: none;
-        }
-
-            .form-group input:focus {
-                border-color: #c62929;
-                box-shadow: 0 0 0 2px rgba(198,41,41,0.2);
-            }
-
-    .text-danger {
-        color: #c62929;
-        font-size: 13px;
-    }
-
+    /* ---------- Action Buttons ---------- */
     .actions {
-        grid-column: span 2;
-        margin-top: 20px;
         display: flex;
         justify-content: center;
-        gap: 15px;
+        gap: 16px;
+        margin-top: 32px;
+        grid-column: 1 / -1;
     }
 
     .btn {
-        width: 100px;
-        height: 38px;
-        border: none;
+        height: 44px;
+        padding: 0 24px;
         border-radius: 8px;
         font-weight: 600;
+        font-size: 16px;
         cursor: pointer;
-        transition: filter .2s ease;
+        border: none;
+        transition: all .2s ease;
+        text-decoration: none;
     }
 
-    .btn-save {
-        background: linear-gradient(135deg, #ef4723, #c62929);
-        color: #fff;
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+    .btn-primary {
+        background: var(--primary-red);
+        color: var(--text-light);
     }
 
-    .btn-reset {
-        background: #ddd;
-        color: #333;
+        .btn-primary:hover {
+            background: var(--hover-red);
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    .btn:hover {
-        filter: brightness(1.1);
-    }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
 </style>
 
 <div class="viewport">
-    <div class="addpart-container">
-        <!-- Left: Image Upload -->
-        <div class="image-section">
-            <div class="image-box">
-                <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Part Image" />
-            </div>
-            <label class="upload-btn" for="imageFile">Upload Image</label>
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header-section">
+            <a class="back-link" asp-controller="Inventory" asp-action="ViewPartInventory">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                </svg>
+                Back to Inventory
+            </a>
+            <h2 class="main-title">@ViewData["Title"]</h2>
         </div>
 
-        <!-- Right: Form -->
-        <div class="form-section">
-            <h2>Add New Part</h2>
+        <form id="addPartForm"
+              asp-controller="Inventory"
+              asp-action="AddPart"
+              method="post"
+              enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
 
-            <form id="addPartForm"
-                  asp-controller="Inventory"
-                  asp-action="AddPart"
-                  method="post"
-                  enctype="multipart/form-data">
+            <div class="form-layout-grid">
+                <!-- Left: Image Upload -->
+                <div class="image-upload-section">
+                    <div class="image-box" onclick="document.getElementById('imageFile').click();">
+                        <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Part Image Preview" />
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
+                        Upload Image
+                    </button>
+                    <input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
 
-                @Html.AntiForgeryToken()
-
-                <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px;"></div>
-
-                <input id="imageFile"
-                       asp-for="ImageFile"
-                       type="file"
-                       accept="image/*"
-                       class="hidden-file" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label asp-for="Name"></label>
-                        <input asp-for="Name" placeholder="Enter part name" />
+                <!-- Right: Form -->
+                <div class="form-fields-grid">
+                    <div class="group">
+                        <label asp-for="Name" class="label"></label>
+                        <input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="StorageLocation"></label>
-                        <input asp-for="StorageLocation" placeholder="Enter storage location" />
+                    <div class="group">
+                        <label asp-for="StorageLocation" class="label"></label>
+                        <input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" />
                         <span asp-validation-for="StorageLocation" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="UnitCost"></label>
-                        <input asp-for="UnitCost" step="0.01" inputmode="decimal" placeholder="Enter cost per unit" />
+                    <div class="group">
+                        <label asp-for="UnitCost" class="label"></label>
+                        <input asp-for="UnitCost" class="input" step="0.01" inputmode="decimal" placeholder="e.g. 15.50" />
                         <span asp-validation-for="UnitCost" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="CurrentAmount"></label>
-                        <input asp-for="CurrentAmount" placeholder="Enter stock amount" />
+                    <div class="group">
+                        <label asp-for="CurrentAmount" class="label"></label>
+                        <input asp-for="CurrentAmount" class="input" type="number" placeholder="e.g. 100" />
                         <span asp-validation-for="CurrentAmount" class="text-danger"></span>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="actions">
-                        <button type="submit" class="btn btn-save">Save</button>
-                        <button type="reset" class="btn btn-reset">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Part</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     (() => {
-      const input = document.getElementById('imageFile');
-      const img   = document.getElementById('previewImg');
+        const input = document.getElementById('imageFile');
+        const img = document.getElementById('previewImg');
 
-      if (input && img) {
-        input.addEventListener('change', () => {
-          const f = input.files && input.files[0];
-          if (!f) return;
+        if (input && img) {
+            input.addEventListener('change', () => {
+                const f = input.files && input.files[0];
+                if (!f) return;
 
-          const reader = new FileReader();
-          reader.onload = e => { img.src = e.target.result; };
-          reader.readAsDataURL(f);
-        });
-        const box = document.querySelector('.image-box');
-        box?.addEventListener('click', () => input.click());
-      }
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; };
+                reader.readAsDataURL(f);
+            });
+        }
     })();
 </script>
