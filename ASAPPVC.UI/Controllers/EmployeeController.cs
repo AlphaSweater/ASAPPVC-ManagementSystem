@@ -6,6 +6,7 @@ namespace ASAPPVC.UI.Controllers
     [Authorize]
     public class EmployeeController : Controller
     {
+        //constructor
         public IActionResult Index()
         {
             return View();

@@ -12,6 +12,7 @@ namespace ASAPPVC.UI.Controllers
         private readonly IPartService _parts;
         private readonly IProductService _products;
 
+        //constructor
         public InventoryController(IPartService parts, IProductService products)
         {
             _parts = parts;
