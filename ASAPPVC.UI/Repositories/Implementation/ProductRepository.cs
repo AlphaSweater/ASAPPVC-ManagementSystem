@@ -33,8 +33,10 @@ namespace ASAPPVC.UI.Repositories.Implementation
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves parts by their IDs
-        public Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
-            => _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
+        public async Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
+        {
+            return await _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
+        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a product along with its associated parts
@@ -62,4 +64,5 @@ namespace ASAPPVC.UI.Repositories.Implementation
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

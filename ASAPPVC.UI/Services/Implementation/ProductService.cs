@@ -21,6 +21,7 @@ namespace ASAPPVC.UI.Services.Implementation
         // creates a new product based on the provided view model
         public async Task<(bool Ok, string? Error, int? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default)
         {
+            //validates input and returns an error message if invalid
             if (string.IsNullOrWhiteSpace(vm.ProductName))
                 return (false, "Product name is required.", null);
             if (string.IsNullOrWhiteSpace(vm.Description))

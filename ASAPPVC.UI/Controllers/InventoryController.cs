@@ -102,7 +102,7 @@ namespace ASAPPVC.UI.Controllers
             }
 
             TempData["AlertMessage"] = $"Product '{vm.ProductName}' created.";
-            return RedirectToAction(nameof(ViewPartInventory));
+            return RedirectToAction(nameof(ViewProductInventory));
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
