@@ -33,26 +33,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🔎 Verify lock file present
-        shell: bash
-        run: |
-          echo "Listing project directory: ASAPPVC.UI"
-          ls -la ASAPPVC.UI || true
-          if [ -f "ASAPPVC.UI/packages.lock.json" ]; then
-            echo "Found ASAPPVC.UI/packages.lock.json"
-          else
-            echo "::error::ASAPPVC.UI/packages.lock.json not found. Generate and commit the lock file and push the branch. Example:"
-            echo "   dotnet restore ./ASAPPVC.UI/ASAPPVC.UI.csproj"
-            echo "   git add ASAPPVC.UI/packages.lock.json && git commit -m 'Add packages.lock.json'"
-            git ls-files '*packages.lock.json' || true
-            exit 1
-          fi
-
       - name: 🧰 Setup .NET SDK ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          cache: true
 
       - name: 🧾 Show .NET info
         run: dotnet --info
