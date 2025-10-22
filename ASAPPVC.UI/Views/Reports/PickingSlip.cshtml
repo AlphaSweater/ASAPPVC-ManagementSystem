@@ -36,14 +36,14 @@
 		@@page {
 			size: A4;
 			margin: 12mm;
-			/* Print footer with page numbers on every page (Chromium supports counters in margin boxes) */
+
 			@@bottom-center {
 				content: "Picking Slip • PS-000123 — Page " counter(page) " of " counter(pages);
 				font-size: 11px;
 				color: var(--muted);
 			}
 		}
-		/* Mirrored margins for duplex printing and stapling (extra inner gutter) */
+
 		@@page:left {
 			margin-left: 16mm;
 			margin-right: 10mm;
@@ -62,9 +62,9 @@
 
 			.card {
 				box-shadow: none;
-				border: none; /* keep inner borders; outer card border removed to avoid awkward multi-page edges */
+				border: none;
 				margin: 0;
-				padding-bottom: 0; /* margin box footer handles page number, no overlay space needed */
+				padding-bottom: 0;
 			}
 
 			.no-print {
@@ -78,7 +78,6 @@
 			tfoot {
 				display: table-footer-group;
 			}
-			/* repeat header/footer across pages */
 
 			.avoid-break {
 				break-inside: avoid;
@@ -88,7 +87,7 @@
 			.page-break {
 				break-after: page;
 			}
-			/* Reduce risk of row splits */
+
 			table {
 				page-break-inside: auto;
 			}
@@ -104,7 +103,7 @@
 			border: 1px solid var(--line);
 			border-radius: 12px;
 			padding: 18px;
-			max-width: 182mm; /* safe width <= tightest duplex margins */
+			max-width: 182mm;
 			margin: 10px auto;
 		}
 
@@ -138,16 +137,22 @@
 		}
 
 		.logo {
-			width: 46mm;
 			height: 18mm;
-			border: 2px dashed var(--line);
 			border-radius: 8px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			font-weight: 700;
-			color: var(--muted);
+			padding: 2px;
+			overflow: hidden;
 		}
+
+			.logo img {
+				display: block;
+				max-width: 100%;
+				max-height: 100%;
+				object-fit: contain;
+			}
 
 		.id-block {
 			text-align: right;
@@ -155,35 +160,36 @@
 
 		.badge {
 			display: inline-block;
-			padding: 2px8px;
+			padding: 4px8px;
 			border-radius: 999px;
 			font-weight: 600;
-			border: 1px solid var(--brand); /* ink-friendly: outline instead of filled */
+			border: 1px solid var(--brand);
 			background: transparent;
 			color: var(--brand);
 			font-size: 11px;
 		}
 
 		.title {
-			margin: 4px02px;
+			margin: 4px02px0;
 			font-size: 22px;
 			line-height: 1.1;
 		}
 
 		.sub {
 			color: var(--muted);
+			font-size: 12px;
 		}
 
 		/* Info cards */
 		.ibox {
 			border: 1px solid var(--line);
 			border-radius: 10px;
-			padding: 10px;
-			background: #fff; /* ink-friendly */
+			padding: 12px;
+			background: #fff;
 		}
 
 			.ibox h3 {
-				margin: 006px;
+				margin: 006px0;
 				font-size: 12px;
 				text-transform: uppercase;
 				letter-spacing: .05em;
@@ -193,7 +199,7 @@
 		.kv {
 			display: grid;
 			grid-template-columns: 28mm1fr;
-			gap: 4px10px;
+			gap: 6px10px;
 		}
 
 			.kv .k {
@@ -204,11 +210,17 @@
 			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 		}
 
-		/* Table */
+		/* Table improvements: spacing, alignment, wrapping */
 		table {
 			width: 100%;
 			border-collapse: collapse;
+			table-layout: fixed;
 		}
+
+			table td, table th {
+				overflow-wrap: break-word;
+				word-break: break-word;
+			}
 
 		colgroup col.numcol {
 			width: 18mm;
@@ -232,38 +244,40 @@
 
 		th, td {
 			border: 1px solid var(--line);
-			padding: 6px8px;
-			vertical-align: top;
+			padding: 8px10px;
+			vertical-align: middle;
 		}
 
 		th {
-			background: #eef7ff; /* allowed surface for header */
+			background: #eef7ff;
 			color: #0b3b57;
 			font-weight: 700;
 			font-size: 11px;
+			text-align: left;
 		}
 
 		td {
-			word-break: break-word;
+			font-size: 12px;
 		}
 
 			td.mono {
-				word-break: normal;
 				white-space: nowrap;
 			}
 
-		/* Remove zebra fill to save ink; rely on borders */
+			td.num, td.num * {
+				text-align: right;
+			}
+
+			td.center, th.center {
+				text-align: center;
+			}
+
+			col.unitcol, td.unitcol, th.unitcol {
+				text-align: center;
+			}
+
 		tbody tr:nth-child(even) {
 			background: transparent;
-		}
-
-		.num {
-			text-align: right;
-			white-space: nowrap;
-		}
-
-		.center {
-			text-align: center;
 		}
 
 		.checkbox {
@@ -274,30 +288,34 @@
 			border-radius: 3px;
 		}
 
-		/* Group rows for Products */
 		.group-row td {
-			/* background removed for ink saving */
 			background: transparent;
 			font-weight: 700;
 			border-top: 2px solid var(--line);
+			padding-top: 12px;
+			padding-bottom: 12px;
 		}
 
 		.group-row .prod {
 			display: flex;
 			gap: 8px;
 			align-items: center;
+			width: 100%;
 		}
+
+			.group-row .prod .mono {
+				margin-left: 6px;
+			}
 
 		.pill {
 			display: inline-block;
 			border: 1px solid var(--brand);
 			color: var(--brand);
 			border-radius: 999px;
-			padding: 2px8px;
+			padding: 4px8px;
 			font-size: 11px;
 		}
 
-		/* Footer/signoff */
 		.footer {
 			margin-top: 12px;
 			display: grid;
@@ -308,12 +326,12 @@
 		.sign {
 			border: 1px solid var(--line);
 			border-radius: 10px;
-			padding: 8px;
+			padding: 10px;
 			height: 48mm;
 		}
 
 			.sign h4 {
-				margin: 006px;
+				margin: 006px0;
 				font-size: 12px;
 				color: var(--muted);
 				text-transform: uppercase;
@@ -326,7 +344,6 @@
 			margin-bottom: 6px;
 		}
 
-		/* Small helpers */
 		.qr {
 			width: 24mm;
 			height: 24mm;
@@ -340,7 +357,7 @@
 
 		.note {
 			font-size: 11px;
-			color: var("--muted");
+			color: var(--muted);
 		}
 
 		.hint {
@@ -348,16 +365,15 @@
 			font-size: 11px;
 		}
 
-		/* Location Summary */
 		.summary {
 			border: 1px solid var(--line);
 			border-radius: 10px;
 			padding: 10px;
-			background: #fff; /* ink-friendly */
+			background: #fff;
 		}
 
 			.summary h3 {
-				margin: 006px;
+				margin: 006px0;
 				font-size: 12px;
 				text-transform: uppercase;
 				letter-spacing: .05em;
@@ -374,7 +390,7 @@
 			border: 1px solid var(--line);
 			background: white;
 			border-radius: 999px;
-			padding: 2px8px;
+			padding: 4px8px;
 			font-size: 11px;
 		}
 	</style>
@@ -384,7 +400,7 @@
 
 		<!-- Header -->
 		<div class="header avoid-break">
-			<div class="logo">Company Logo</div>
+			<div class="logo"><img src="~/Assets/Images/Logos/asap-pvc-logo.png" alt="ASAPPVC" /></div>
 			<div class="id-block">
 				<div><span class="badge">Picking Slip</span></div>
 				<div class="title mono">PS-000123</div>
@@ -397,10 +413,10 @@
 			<div class="ibox">
 				<h3>From</h3>
 				<div class="kv">
-					<div class="k">Company</div><div>Acme Supplies (Pty) Ltd</div>
-					<div class="k">Warehouse</div><div>JHB Main DC</div>
-					<div class="k">Address</div><div>12 Apex Park, Jet Park, Johannesburg,1459</div>
-					<div class="k">Contact</div><div>+27115550123 • warehouse&#64;acme.co.za</div>
+					<div class="k">Company</div><div>ASAPPVC (Pty) Ltd</div>
+					<div class="k">Warehouse</div><div>Killarney Gardens Warehouse</div>
+					<div class="k">Address</div><div>43 Mansell Avenue, Killarney Gardens, Cape Town,7441, South Africa</div>
+					<div class="k">Contact</div><div>info@asappvc.co.za</div>
 				</div>
 			</div>
 			<div class="ibox">
@@ -455,10 +471,10 @@
 					<tr>
 						<th style="width:30mm;">Product / Part</th>
 						<th>Description</th>
-						<th>Unit</th>
-						<th>Qty</th>
-						<th>Location</th>
-						<th>Picked</th>
+						<th class="center">Unit</th>
+						<th class="num">Qty</th>
+						<th class="center">Location</th>
+						<th class="center">Picked</th>
 						<th>Notes</th>
 					</tr>
 				</thead>
