@@ -1,438 +1,68 @@
 ﻿@{
-    ViewData["Title"] = "Add Order";
-    var customers = ViewData["Customers"] as List<ASAPPVC.UI.Models.CustomerModel> ?? new();
-    var products = ViewData["Products"] as List<ASAPPVC.UI.Models.ProductModel> ?? new();
+	ViewData["Title"] = "Add Order";
+	var customers = ViewData["Customers"] as List<ASAPPVC.UI.Models.CustomerModel> ?? new();
+	var products = ViewData["Products"] as List<ASAPPVC.UI.Models.ProductModel> ?? new();
 }
 
-<style>
-    /* CSS remains the same - no changes needed here */
-    :root {
-        --primary-red: #c81e2b;
-        --primary-purple: #2e2454;
-        --text-light: #ffffff;
-        --text-muted: #b3acc1;
-        --border-color: rgba(138, 122, 191, 0.25);
-        --container-bg: rgba(46, 36, 82, 0.45);
-        --input-bg: rgba(26, 18, 56, 0.5);
-        --table-header-bg: rgba(26, 18, 56, 0.7);
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    html, body {
-        height: 100%;
-        margin: 0;
-        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-        background-color: var(--primary-purple);
-        background-image: linear-gradient(145deg, var(--primary-purple) 0%, var(--primary-red) 100%);
-        color: var(--text-light);
-        background-attachment: fixed;
-    }
-
-    .viewport {
-        padding: 40px 24px;
-        min-height: 100vh;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    .view-container {
-        width: 100%;
-        max-width: 800px;
-        background: var(--container-bg);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border-radius: 16px;
-        padding: 32px 40px;
-    }
-
-    .header-section {
-        margin-bottom: 32px;
-    }
-
-    .main-title {
-        font-weight: 600;
-        font-size: 28px;
-        color: var(--text-light);
-        margin: 0;
-    }
-
-    .form-group {
-        margin-bottom: 24px;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 500;
-        color: var(--text-muted);
-        margin-bottom: 10px;
-        font-size: 15px;
-    }
-
-    .input, select.input {
-        height: 48px;
-        font-size: 15px;
-        color: var(--text-light);
-        background-color: var(--input-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0 16px;
-        outline: none;
-        transition: all 0.2s ease;
-        width: 100%;
-    }
-
-    select.input {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d0cde1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.9rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-        padding-right: 3rem;
-    }
-
-        select.input option {
-            background-color: #3b2f70;
-            color: var(--text-light);
-        }
-
-    .input:focus {
-        border-color: rgba(138, 122, 191, 0.7);
-        box-shadow: 0 0 0 3px rgba(46, 36, 82, 0.5);
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border-color);
-    }
-
-    .btn {
-        height: 44px;
-        padding: 0 24px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 15px;
-        cursor: pointer;
-        border: none;
-        transition: all .2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-    .btn-primary {
-        background-color: var(--primary-red);
-        color: var(--text-light);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-
-        .btn-primary:hover {
-            background-color: #e03a3a;
-        }
-
-    .btn-secondary {
-        background-color: rgba(0, 0, 0, 0.2);
-        color: var(--text-muted);
-        border: 1px solid var(--border-color);
-    }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-    .add-product-section {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 12px;
-        align-items: flex-end;
-        background-color: rgba(0,0,0,0.15);
-        padding: 16px;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        margin-bottom: 24px;
-    }
-
-        .add-product-section .form-group {
-            margin: 0;
-        }
-
-    .input.quantity-input {
-        width: 100px;
-        text-align: center;
-    }
-
-    .btn-add {
-        background-color: #1a73e8;
-        color: white;
-        height: 48px;
-    }
-
-        .btn-add:hover {
-            background-color: #287ff1;
-        }
-
-    .order-items-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
-    }
-
-        .order-items-table th, .order-items-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .order-items-table thead th {
-            font-size: 14px;
-            font-weight: 600;
-            background-color: var(--table-header-bg);
-            color: var(--text-light);
-        }
-
-        .order-items-table tbody td {
-            color: var(--text-muted);
-        }
-
-            .order-items-table tbody td:first-child {
-                color: var(--text-light);
-                font-weight: 500;
-            }
-
-    .align-right {
-        text-align: right;
-    }
-
-    .align-center {
-        text-align: center;
-    }
-
-    .btn-remove {
-        background: transparent;
-        color: #ff8a80;
-        border: 1px solid #ff8a80;
-        padding: 4px 10px;
-        height: auto;
-        font-size: 13px;
-        border-radius: 4px;
-    }
-
-        .btn-remove:hover {
-            background: rgba(255, 138, 128, 0.1);
-            color: #ff5252;
-        }
-
-    #order-items-container:not(:empty) {
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border-color);
-    }
-</style>
+<link rel="stylesheet" href="~/Views/Order/AddOrder.css" />
 
 <div class="viewport">
-    <div class="view-container">
-        <header class="header-section">
-            <h2 class="main-title">Add Order</h2>
-        </header>
+	<div class="view-container">
+		<header class="header-section">
+			<h2 class="main-title">Add Order</h2>
+		</header>
 
-        <form id="add-order-form" asp-action="AddOrder" method="post">
-            @Html.AntiForgeryToken()
+		<form id="add-order-form" asp-action="AddOrder" method="post">
+			@Html.AntiForgeryToken()
 
-            <div class="form-group">
-                <label class="form-label" for="customer-select">Customer</label>
-                <select id="customer-select" name="customerId" class="input" required>
-                    <option value="">-- Choose a customer --</option>
-                    @foreach (var c in customers)
-                    {
-                        <option value="@c.CustomerID">@c.Name @c.Surname (@c.Email)</option>
-                    }
-                </select>
-            </div>
+			<div class="form-group">
+				<label class="form-label" for="customer-select">Customer</label>
+				<select id="customer-select" name="customerId" class="input" required>
+					<option value="">-- Choose a customer --</option>
+					@foreach ( var c in customers ) {
+						<option value="@c.CustomerID">@c.Name @c.Surname (@c.Email)</option>
+					}
+				</select>
+			</div>
 
-            <div class="form-group">
-                <label class="form-label">Add Products to Order</label>
-                <div class="add-product-section">
-                    <div class="form-group">
-                        <select id="product-select" class="input">
-                            <option value="">-- Select a product --</option>
-                            @foreach (var p in products)
-                            {
-                                <option value="@p.ProductID" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <input id="quantity-input" type="number" class="input quantity-input" value="1" min="1" aria-label="Quantity">
-                    </div>
-                    <button type="button" id="add-product-btn" class="btn btn-add">Add</button>
-                </div>
-            </div>
+			<div class="form-group">
+				<label class="form-label">Add Products to Order</label>
+				<div class="add-product-section">
+					<div class="form-group">
+						<select id="product-select" class="input">
+							<option value="">-- Select a product --</option>
+							@foreach ( var p in products ) {
+								<option value="@p.ProductID" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
+							}
+						</select>
+					</div>
+					<div class="form-group">
+						<input id="quantity-input" type="number" class="input quantity-input" value="1" min="1" aria-label="Quantity">
+					</div>
+					<button type="button" id="add-product-btn" class="btn btn-add">Add</button>
+				</div>
+			</div>
 
-            <div id="order-items-hidden-inputs"></div>
-            <div id="order-items-container"></div>
+			<div id="order-items-hidden-inputs"></div>
+			<div id="order-items-container"></div>
 
-            <div class="form-group">
-                <label class="form-label" for="status-select">Status</label>
-                <select id="status-select" name="orderStatus" class="input">
-                    <option>Pending</option>
-                    <option>Processing</option>
-                    <option>Completed</option>
-                    <option>Cancelled</option>
-                </select>
-            </div>
+			<div class="form-group">
+				<label class="form-label" for="status-select">Status</label>
+				<select id="status-select" name="orderStatus" class="input">
+					<option>Pending</option>
+					<option>Processing</option>
+					<option>Completed</option>
+					<option>Cancelled</option>
+				</select>
+			</div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Create Order</button>
-                <a asp-action="ViewOrders" class="btn btn-secondary">Back to List</a>
-            </div>
-        </form>
-    </div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">Create Order</button>
+				<a asp-action="ViewOrders" class="btn btn-secondary">Back to List</a>
+			</div>
+		</form>
+	</div>
 </div>
 
 <!-- SCRIPT SECTION -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addProductBtn = document.getElementById('add-product-btn');
-        const productSelect = document.getElementById('product-select');
-        const quantityInput = document.getElementById('quantity-input');
-        const orderItemsContainer = document.getElementById('order-items-container');
-        const hiddenInputsContainer = document.getElementById('order-items-hidden-inputs');
-
-        const orderItems = {};
-
-        addProductBtn.addEventListener('click', handleAddProduct);
-
-        orderItemsContainer.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('btn-remove')) {
-                const productId = e.target.closest('tr').dataset.productId;
-                handleRemoveProduct(productId);
-            }
-        });
-
-        function handleAddProduct() {
-            const selectedOption = productSelect.options[productSelect.selectedIndex];
-            if (!selectedOption.value) {
-                alert('Please select a product.');
-                return;
-            }
-
-            const productId = selectedOption.value;
-            const quantity = parseInt(quantityInput.value, 10);
-
-            if (isNaN(quantity) || quantity < 1) {
-                alert('Please enter a valid quantity.');
-                return;
-            }
-
-            if (orderItems[productId]) {
-                orderItems[productId].quantity += quantity;
-            } else {
-                orderItems[productId] = {
-                    name: selectedOption.dataset.name,
-                    price: parseFloat(selectedOption.dataset.price),
-                    quantity: quantity
-                };
-            }
-
-            updateOrderUI();
-            productSelect.selectedIndex = 0;
-            quantityInput.value = 1;
-        }
-
-        function handleRemoveProduct(productId) {
-            if (orderItems[productId]) {
-                delete orderItems[productId];
-                updateOrderUI();
-            }
-        }
-
-        function updateOrderUI() {
-            renderOrderTable();
-            updateHiddenInputs();
-        }
-
-        function renderOrderTable() {
-            if (Object.keys(orderItems).length === 0) {
-                orderItemsContainer.innerHTML = '';
-                return;
-            }
-
-            let total = 0;
-            let tableRowsHtml = '';
-
-            for (const id in orderItems) {
-                const item = orderItems[id];
-                const subtotal = item.quantity * item.price;
-                total += subtotal;
-
-                tableRowsHtml += `
-                    <tr data-product-id="${id}">
-                        <td>${item.name}</td>
-                        <td class="align-center">${item.quantity}</td>
-                        <td class="align-right">${item.price.toFixed(2)}</td>
-                        <td class="align-right">${subtotal.toFixed(2)}</td>
-                        <td class="align-center">
-                            <button type="button" class="btn btn-remove">Remove</button>
-                        </td>
-                    </tr>`;
-            }
-
-            orderItemsContainer.innerHTML = `
-                <label class="form-label">Order Items</label>
-                <table class="order-items-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th class="align-center">Quantity</th>
-                            <th class="align-right">Unit Price</th>
-                            <th class="align-right">Subtotal</th>
-                            <th class="align-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRowsHtml}</tbody>
-                    <tfoot>
-                        <tr>
-                           <td colspan="3" class="align-right" style="font-weight: 600; color: var(--text-light);">Total</td>
-                           <td class="align-right" style="font-weight: 600; color: var(--text-light);">${total.toFixed(2)}</td>
-                           <td></td>
-                        </tr>
-                    </tfoot>
-                </table>`;
-        }
-
-        function updateHiddenInputs() {
-            hiddenInputsContainer.innerHTML = '';
-            let index = 0;
-            for (const id in orderItems) {
-                const item = orderItems[id];
-                // --- THIS IS THE FIX ---
-                // The backticks (`) create a template literal. Variables are inserted with ${...}
-                // The previous version had an incorrect character that broke this.
-                hiddenInputsContainer.innerHTML +=
-                   `<input type="hidden" name="OrderItems[${index}].ProductId" value="${id}" />
-                    <input type="hidden" name="OrderItems[${index}].Quantity" value="${item.quantity}" />`;
-                index++;
-            }
-        }
-    });
-</script>
+<script src="~/Views/Order/AddOrder.js"></script>
