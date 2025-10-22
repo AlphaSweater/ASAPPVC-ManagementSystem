@@ -8,7 +8,7 @@ namespace ASAPPVC.UI.Controllers
     [Authorize]
     public class InventoryController : Controller
     {
-        // ─────────── Dependencies ───────────
+        //─────────── Dependencies ───────────\\
         private readonly IPartService _parts;
         private readonly IProductService _products;
 
@@ -18,7 +18,6 @@ namespace ASAPPVC.UI.Controllers
             _products = products;
         }
 
-        // ─────────── View Paths ───────────
         // Parts
         private const string AddPartPath = "~/Views/Inventory/Parts/AddPart.cshtml";
         private const string ViewPartPath = "~/Views/Inventory/Parts/ViewPart.cshtml";
@@ -29,11 +28,15 @@ namespace ASAPPVC.UI.Controllers
         private const string ViewProductPath = "~/Views/Inventory/Products/ViewProduct.cshtml";
         private const string ProductInventoryPath = "~/Views/Inventory/Products/ViewProductInventory.cshtml";
 
-        // ─────────── Parts: Create ───────────
+        //─────────── Parts ───────────\\
+        //displays the add part view
         [HttpGet]
         public IActionResult AddPart() => View(AddPartPath);
 
-        [HttpPost, ValidateAntiForgeryToken]
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //handles the submission of the add part form
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPart(CreatePartViewModel vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
@@ -50,23 +53,29 @@ namespace ASAPPVC.UI.Controllers
             return RedirectToAction(nameof(ViewPart), new { id = part.PartID });
         }
 
-        // ─────────── Parts: Read/List ───────────
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays a specific part by its ID
         [HttpGet]
         public async Task<IActionResult> ViewPart(int id, CancellationToken ct)
         {
             var part = await _parts.GetAsync(id, ct);
             if (part is null) return NotFound();
+            //Returns the view with the part view path and the part details
             return View(ViewPartPath, part);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //calls view to display part inventory
         [HttpGet]
         public async Task<IActionResult> ViewPartInventory(CancellationToken ct)
         {
             var list = await _parts.ListAsync(ct);
+            //returns the view with the part inventory path and the list of parts
             return View(PartInventoryPath, list);
         }
 
-        // ─────────── Products: Create ───────────
+        //─────────── Products ───────────\\
+        //displays the add product view
         [HttpGet]
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
@@ -75,6 +84,8 @@ namespace ASAPPVC.UI.Controllers
             return View(AddProductPath, new CreateProductViewModel());
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //handles the submission of the add product form
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProductPost(CreateProductViewModel vm, CancellationToken ct)
@@ -93,6 +104,7 @@ namespace ASAPPVC.UI.Controllers
             return RedirectToAction(nameof(ViewPartInventory));
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //displays a specific product by its ID
         [HttpGet]
         public async Task<IActionResult> ViewProduct(int id, CancellationToken ct)
@@ -102,6 +114,7 @@ namespace ASAPPVC.UI.Controllers
             return View(ViewProductPath, product);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //calls view to display product inventory
         [HttpGet]
         public async Task<IActionResult> ViewProductInventory(CancellationToken ct)
@@ -111,3 +124,4 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

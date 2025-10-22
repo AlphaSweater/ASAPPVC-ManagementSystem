@@ -7,6 +7,7 @@ namespace ASAPPVC.UI.Repositories.Implementation
 {
     public class CustomerRepository : ICustomerRepository
     {
+        //─────────── Dependencies ───────────\\
         private readonly AppDbContext _db;
 
         public CustomerRepository(AppDbContext db)
@@ -14,21 +15,27 @@ namespace ASAPPVC.UI.Repositories.Implementation
             _db = db;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // adds a new customer to the database
         public async Task<CustomerModel> AddAsync(CustomerModel customer, CancellationToken ct = default)
         {
             var entry = await _db.Customer.AddAsync(customer, ct);
             return entry.Entity;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // retrieves a list of customers ordered by name
         public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
         {
             return await _db.Customer.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // saves changes to the database
         public async Task SaveAsync(CancellationToken ct = default)
         {
             await _db.SaveChangesAsync(ct);
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

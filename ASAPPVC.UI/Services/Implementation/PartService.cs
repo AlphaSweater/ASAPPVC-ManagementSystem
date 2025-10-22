@@ -7,10 +7,16 @@ namespace ASAPPVC.UI.Services.Implementation
 {
     public class PartService : IPartService
     {
+        //─────────── Dependencies ───────────\\
         private readonly IPartRepository _repo;
 
-        public PartService(IPartRepository repo) => _repo = repo;
+        public PartService(IPartRepository repo)
+        {
+            _repo = repo;
+        }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //creates a new part in the database
         public async Task<(bool Ok, string? Error, PartModel? Part)> CreateAsync(CreatePartViewModel vm, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(vm.Name) || string.IsNullOrWhiteSpace(vm.StorageLocation))
@@ -38,14 +44,19 @@ namespace ASAPPVC.UI.Services.Implementation
             return (true, null, part);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //retrieves a single part by ID
         public async Task<PartModel?> GetAsync(int id, CancellationToken ct = default)
         {
             return await _repo.GetByIdAsync(id, ct);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //retrieves a list of parts from the database
         public async Task<List<PartModel>> ListAsync(CancellationToken ct = default)
         {
             return await _repo.ListAsync(ct);
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
