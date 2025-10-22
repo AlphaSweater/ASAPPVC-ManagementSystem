@@ -1,0 +1,4 @@
+# Ignore any .css and .js files inside the Views directory and all its subfolders
+# This prevents platform-specific symlinked compiled assets from being checked in
+Views/**/*.css
+Views/**/*.js
