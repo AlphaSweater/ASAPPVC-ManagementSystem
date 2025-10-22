@@ -2,6 +2,7 @@
 using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Repositories.Interfaces;
 using ASAPPVC.UI.Services.Interfaces;
+using System.Linq;
 
 namespace ASAPPVC.UI.Services.Implementation
 {
@@ -19,10 +20,13 @@ namespace ASAPPVC.UI.Services.Implementation
         //creates a new order with associated products
         public async Task<(bool Ok, string? Error, OrderModel? Order)> CreateAsync(CreateOrderViewModel vm, CancellationToken ct = default)
         {
-            if (vm.CustomerID <= 0)
+            if (vm == null)
+                return (false, "Request body is required.", null);
+
+            if (vm.CustomerId <= 0)
                 return (false, "Customer selection is required.", null);
 
-            if (vm.ProductIDs == null || vm.ProductIDs.Count == 0)
+            if (vm.ProductQuantities == null || vm.ProductQuantities.Count == 0)
                 return (false, "Please select at least one product.", null);
 
             if (string.IsNullOrWhiteSpace(vm.OrderStatus))
@@ -31,28 +35,36 @@ namespace ASAPPVC.UI.Services.Implementation
             //Create main order
             var order = new OrderModel
             {
-                CustomerID = vm.CustomerID,
+                CustomerID = vm.CustomerId,
                 OrderStatus = vm.OrderStatus.Trim(),
                 OrderDate = vm.OrderDate ?? DateTime.UtcNow
             };
 
-            await _repo.AddOrderAsync(order, ct);
+            // Add order to repository and ensure we have the persisted OrderID
+            var addedOrder = await _repo.AddOrderAsync(order, ct);
             await _repo.SaveAsync(ct);
 
-            //Add order products
-            var orderLines = vm.ProductIDs
-                .Distinct()
-                .Select(id => new OrderProductModel
+            // Build order lines: group by product id and sum quantities in case duplicates were submitted
+            var orderLines = vm.ProductQuantities
+                .Where(pq => pq != null && pq.ProductId > 0 && pq.Quantity > 0)
+                .GroupBy(pq => pq.ProductId)
+                .Select(g => new OrderProductModel
                 {
-                    OrderID = order.OrderID,
-                    ProductID = id
+                    OrderID = addedOrder.OrderID,
+                    ProductID = g.Key,
+                    Quantity = g.Sum(x => x.Quantity)
                 })
                 .ToList();
+
+            if (orderLines.Count == 0)
+            {
+                return (false, "No valid products provided.", addedOrder);
+            }
 
             await _repo.AddOrderProductsAsync(orderLines, ct);
             await _repo.SaveAsync(ct);
 
-            return (true, null, order);
+            return (true, null, addedOrder);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
