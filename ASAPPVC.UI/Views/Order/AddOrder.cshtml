@@ -101,10 +101,10 @@
         padding-right: 3rem;
     }
 
-        select.input option {
-            background-color: #3b2f70;
-            color: var(--text-light);
-        }
+    select.input option {
+        background-color: #3b2f70;
+        color: var(--text-light);
+    }
 
     .input:focus {
         border-color: rgba(138, 122, 191, 0.7);
@@ -134,9 +134,9 @@
         justify-content: center;
     }
 
-        .btn:active {
-            transform: translateY(1px);
-        }
+    .btn:active {
+        transform: translateY(1px);
+    }
 
     .btn-primary {
         background-color: var(--primary-red);
@@ -144,9 +144,9 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-        .btn-primary:hover {
-            background-color: #e03a3a;
-        }
+    .btn-primary:hover {
+        background-color: #e03a3a;
+    }
 
     .btn-secondary {
         background-color: rgba(0, 0, 0, 0.2);
@@ -154,11 +154,11 @@
         border: 1px solid var(--border-color);
     }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
 
     .add-product-section {
         display: grid;
@@ -260,7 +260,7 @@
 
             <div class="form-group">
                 <label class="form-label" for="customer-select">Customer</label>
-                <select id="customer-select" name="customerId" class="input" required>
+                <select id="customer-select" name="CustomerId" class="input" required>
                     <option value="">-- Choose a customer --</option>
                     @foreach (var c in customers)
                     {
@@ -293,7 +293,7 @@
 
             <div class="form-group">
                 <label class="form-label" for="status-select">Status</label>
-                <select id="status-select" name="orderStatus" class="input">
+                <select id="status-select" name="OrderStatus" class="input">
                     <option>Pending</option>
                     <option>Processing</option>
                     <option>Completed</option>
@@ -425,12 +425,9 @@
             let index = 0;
             for (const id in orderItems) {
                 const item = orderItems[id];
-                // --- THIS IS THE FIX ---
-                // The backticks (`) create a template literal. Variables are inserted with ${...}
-                // The previous version had an incorrect character that broke this.
                 hiddenInputsContainer.innerHTML +=
-                   `<input type="hidden" name="OrderItems[${index}].ProductId" value="${id}" />
-                    <input type="hidden" name="OrderItems[${index}].Quantity" value="${item.quantity}" />`;
+                   `<input type="hidden" name="ProductQuantities[${index}].ProductId" value="${id}" />
+                    <input type="hidden" name="ProductQuantities[${index}].Quantity" value="${item.quantity}" />`;
                 index++;
             }
         }
