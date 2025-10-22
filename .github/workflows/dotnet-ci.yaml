@@ -16,7 +16,7 @@ jobs:
   # Main CI
   # ───────────────────────────
   build-and-test:
-    name: Build & Tests
+    name: 🧪 Build & Run Tests
     runs-on: ubuntu-latest
 
     steps:
