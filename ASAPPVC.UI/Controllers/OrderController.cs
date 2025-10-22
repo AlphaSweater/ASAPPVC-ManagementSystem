@@ -6,6 +6,7 @@ namespace ASAPPVC.UI.Controllers
 {
     public class OrderController : Controller
     {
+        //─────────── Dependencies ───────────\\
         private readonly IOrderService _orders;
         private readonly ICustomerService _customers;
         private readonly IProductService _products;
@@ -18,6 +19,8 @@ namespace ASAPPVC.UI.Controllers
             _products = products;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the add order view with customer and product selections
         [HttpGet]
         public async Task<IActionResult> AddOrder(CancellationToken ct)
         {
@@ -26,6 +29,8 @@ namespace ASAPPVC.UI.Controllers
             return View();
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //handles the submission of the add order form
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrder(CreateOrderViewModel vm, CancellationToken ct)
@@ -43,6 +48,8 @@ namespace ASAPPVC.UI.Controllers
             return RedirectToAction(nameof(ViewOrders));
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the list of orders
         [HttpGet]
         public async Task<IActionResult> ViewOrders(CancellationToken ct)
         {
@@ -50,6 +57,8 @@ namespace ASAPPVC.UI.Controllers
             return View(list);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays a specific order by its ID
         [HttpGet]
         public async Task<IActionResult> ViewOrder(int id, CancellationToken ct)
         {

@@ -19,6 +19,7 @@ namespace ASAPPVC.UI.Services.Implementation
         //creates a new part in the database
         public async Task<(bool Ok, string? Error, PartModel? Part)> CreateAsync(CreatePartViewModel vm, CancellationToken ct = default)
         {
+            //validates input and returns an error message if invalid
             if (string.IsNullOrWhiteSpace(vm.Name) || string.IsNullOrWhiteSpace(vm.StorageLocation))
                 return (false, "Name and storage location are required.", null);
 
