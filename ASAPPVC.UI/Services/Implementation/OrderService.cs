@@ -20,6 +20,7 @@ namespace ASAPPVC.UI.Services.Implementation
         //creates a new order with associated products
         public async Task<(bool Ok, string? Error, OrderModel? Order)> CreateAsync(CreateOrderViewModel vm, CancellationToken ct = default)
         {
+            //validates input and returns an error message if invalid
             if (vm == null)
                 return (false, "Request body is required.", null);
 

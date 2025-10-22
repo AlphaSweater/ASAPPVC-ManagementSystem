@@ -165,14 +165,11 @@
                 <a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
                     <span class="sb-icon">👥</span><span class="sb-label">Customers</span>
                 </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Customer" asp-action="CreateCustomer">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">add customer</span>
-                </a>
-                <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Orders" asp-action="Index">
+                <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
                     <span class="sb-icon">🚚</span><span class="sb-label">Order</span>
                 </a>
                 <a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
-                    <span class="sb-icon">🧾</span><span class="sb-label">Product inventory</span>
+                    <span class="sb-icon">📦</span><span class="sb-label">Product inventory</span>
                 </a>
                 <a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
                     <span class="sb-icon">📦</span><span class="sb-label">Part Inventory</span>
@@ -185,9 +182,6 @@
                 </a>
                 <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="AddOrder">
                     <span class="sb-icon">🛠️</span><span class="sb-label">order add</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">order view</span>
                 </a>
             </nav>
         </aside>

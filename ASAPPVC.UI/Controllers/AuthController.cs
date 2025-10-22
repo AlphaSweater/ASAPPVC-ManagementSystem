@@ -10,6 +10,8 @@ namespace ASAPPVC.UI.Controllers
     {
         //─────────── Dependencies ───────────\\
         private readonly IAuthService _auth;
+
+        //constructor
         public AuthController(IAuthService auth)
         {
             _auth = auth;
