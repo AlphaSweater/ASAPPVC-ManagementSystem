@@ -1,0 +1,612 @@
+﻿@{
+	Layout = null; // render as a standalone HTML fragment so PuppeteerSharp doesn't get the site layout wrapped around it
+}
+@* Picking Slip – HTML/CSS only, print-ready (A4) *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Picking Slip • PS-000123</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+		/* ============ Base ============ */
+		:root {
+			--ink: #0f172a; /* slate-900 */
+			--muted: #475569; /* slate-600 */
+			--line: #e5e7eb; /* gray-200 */
+			--soft: #f8fafc; /* slate-50 */
+			--brand: #0ea5e9; /* sky-500 */
+			--accent: #22c55e; /* green-500 */
+			--warn: #f59e0b; /* amber-500 */
+		}
+		/* Ensure consistent page sizing for A4 when rendered by headless Chromium */
+		html, body {
+			margin: 0;
+			padding: 0;
+			color: var(--ink);
+			font: 12px/1.45 "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+			background: #fff;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		/* Page & print */
+		@@page {
+			size: A4;
+			margin: 12mm;
+			/* Print footer with page numbers on every page (Chromium supports counters in margin boxes) */
+			@@bottom-center {
+				content: "Picking Slip • PS-000123 — Page " counter(page) " of " counter(pages);
+				font-size: 11px;
+				color: var(--muted);
+			}
+		}
+		/* Mirrored margins for duplex printing and stapling (extra inner gutter) */
+		@@page:left {
+			margin-left: 16mm;
+			margin-right: 10mm;
+		}
+
+		@@page:right {
+			margin-left: 10mm;
+			margin-right: 16mm;
+		}
+
+		@@media print {
+			body {
+				-webkit-print-color-adjust: exact;
+				print-color-adjust: exact;
+			}
+
+			.card {
+				box-shadow: none;
+				border: none; /* keep inner borders; outer card border removed to avoid awkward multi-page edges */
+				margin: 0;
+				padding-bottom: 0; /* margin box footer handles page number, no overlay space needed */
+			}
+
+			.no-print {
+				display: none !important;
+			}
+
+			thead {
+				display: table-header-group;
+			}
+
+			tfoot {
+				display: table-footer-group;
+			}
+			/* repeat header/footer across pages */
+
+			.avoid-break {
+				break-inside: avoid;
+				page-break-inside: avoid;
+			}
+
+			.page-break {
+				break-after: page;
+			}
+			/* Reduce risk of row splits */
+			table {
+				page-break-inside: auto;
+			}
+
+			tr, td, th {
+				page-break-inside: avoid;
+			}
+		}
+
+		/* Layout wrappers */
+		.card {
+			background: #fff;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 18px;
+			max-width: 182mm; /* safe width <= tightest duplex margins */
+			margin: 10px auto;
+		}
+
+		.row {
+			display: grid;
+			gap: 10px;
+		}
+
+			.row.cols-2 {
+				grid-template-columns: 1fr1fr;
+			}
+
+			.row.cols-3 {
+				grid-template-columns: 1.2fr1fr1fr;
+			}
+
+		.stack {
+			display: flex;
+			gap: 10px;
+			align-items: flex-start;
+		}
+
+		/* Header */
+		.header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-bottom: 10px;
+			border-bottom: 2px solid var(--line);
+			margin-bottom: 12px;
+		}
+
+		.logo {
+			width: 46mm;
+			height: 18mm;
+			border: 2px dashed var(--line);
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			color: var(--muted);
+		}
+
+		.id-block {
+			text-align: right;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 2px8px;
+			border-radius: 999px;
+			font-weight: 600;
+			border: 1px solid var(--brand); /* ink-friendly: outline instead of filled */
+			background: transparent;
+			color: var(--brand);
+			font-size: 11px;
+		}
+
+		.title {
+			margin: 4px02px;
+			font-size: 22px;
+			line-height: 1.1;
+		}
+
+		.sub {
+			color: var(--muted);
+		}
+
+		/* Info cards */
+		.ibox {
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			padding: 10px;
+			background: #fff; /* ink-friendly */
+		}
+
+			.ibox h3 {
+				margin: 006px;
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: .05em;
+				color: var(--muted);
+			}
+
+		.kv {
+			display: grid;
+			grid-template-columns: 28mm1fr;
+			gap: 4px10px;
+		}
+
+			.kv .k {
+				color: var(--muted);
+			}
+
+		.mono {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+		}
+
+		/* Table */
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		colgroup col.numcol {
+			width: 18mm;
+		}
+
+		colgroup col.unitcol {
+			width: 16mm;
+		}
+
+		colgroup col.loccol {
+			width: 26mm;
+		}
+
+		colgroup col.pickcol {
+			width: 24mm;
+		}
+
+		colgroup col.notecol {
+			width: 28mm;
+		}
+
+		th, td {
+			border: 1px solid var(--line);
+			padding: 6px8px;
+			vertical-align: top;
+		}
+
+		th {
+			background: #eef7ff; /* allowed surface for header */
+			color: #0b3b57;
+			font-weight: 700;
+			font-size: 11px;
+		}
+
+		td {
+			word-break: break-word;
+		}
+
+			td.mono {
+				word-break: normal;
+				white-space: nowrap;
+			}
+
+		/* Remove zebra fill to save ink; rely on borders */
+		tbody tr:nth-child(even) {
+			background: transparent;
+		}
+
+		.num {
+			text-align: right;
+			white-space: nowrap;
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		.checkbox {
+			width: 16px;
+			height: 16px;
+			border: 2px solid var(--ink);
+			display: inline-block;
+			border-radius: 3px;
+		}
+
+		/* Group rows for Products */
+		.group-row td {
+			/* background removed for ink saving */
+			background: transparent;
+			font-weight: 700;
+			border-top: 2px solid var(--line);
+		}
+
+		.group-row .prod {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+		}
+
+		.pill {
+			display: inline-block;
+			border: 1px solid var(--brand);
+			color: var(--brand);
+			border-radius: 999px;
+			padding: 2px8px;
+			font-size: 11px;
+		}
+
+		/* Footer/signoff */
+		.footer {
+			margin-top: 12px;
+			display: grid;
+			grid-template-columns: 1fr1fr1fr;
+			gap: 10px;
+		}
+
+		.sign {
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			padding: 8px;
+			height: 48mm;
+		}
+
+			.sign h4 {
+				margin: 006px;
+				font-size: 12px;
+				color: var(--muted);
+				text-transform: uppercase;
+				letter-spacing: .05em;
+			}
+
+		.line {
+			border-bottom: 1px dashed var(--line);
+			height: 22px;
+			margin-bottom: 6px;
+		}
+
+		/* Small helpers */
+		.qr {
+			width: 24mm;
+			height: 24mm;
+			border: 1px solid var(--line);
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--muted);
+		}
+
+		.note {
+			font-size: 11px;
+			color: var("--muted");
+		}
+
+		.hint {
+			color: var(--muted);
+			font-size: 11px;
+		}
+
+		/* Location Summary */
+		.summary {
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			padding: 10px;
+			background: #fff; /* ink-friendly */
+		}
+
+			.summary h3 {
+				margin: 006px;
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: .05em;
+				color: var(--muted);
+			}
+
+		.chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
+
+		.chip {
+			border: 1px solid var(--line);
+			background: white;
+			border-radius: 999px;
+			padding: 2px8px;
+			font-size: 11px;
+		}
+	</style>
+</head>
+<body>
+	<div class="card">
+
+		<!-- Header -->
+		<div class="header avoid-break">
+			<div class="logo">Company Logo</div>
+			<div class="id-block">
+				<div><span class="badge">Picking Slip</span></div>
+				<div class="title mono">PS-000123</div>
+				<div class="sub">Order <strong>#ORD-45782</strong> • Created2025-10-2214:06 • Priority <span class="pill">Standard</span></div>
+			</div>
+		</div>
+
+		<!-- Top info -->
+		<div class="row cols-3 avoid-break">
+			<div class="ibox">
+				<h3>From</h3>
+				<div class="kv">
+					<div class="k">Company</div><div>Acme Supplies (Pty) Ltd</div>
+					<div class="k">Warehouse</div><div>JHB Main DC</div>
+					<div class="k">Address</div><div>12 Apex Park, Jet Park, Johannesburg,1459</div>
+					<div class="k">Contact</div><div>+27115550123 • warehouse&#64;acme.co.za</div>
+				</div>
+			</div>
+			<div class="ibox">
+				<h3>Ship To</h3>
+				<div class="kv">
+					<div class="k">Customer</div><div>GreenTech Projects</div>
+					<div class="k">Site</div><div>Midrand Solar Farm</div>
+					<div class="k">Address</div><div>45 Kyalami Blvd, Midrand,1684</div>
+					<div class="k">Contact</div><div>Sipho Ndlovu • +27825550199</div>
+				</div>
+			</div>
+			<div class="ibox">
+				<h3>Order Details</h3>
+				<div class="kv">
+					<div class="k">Order #</div><div class="mono">ORD-45782</div>
+					<div class="k">Pick By</div><div>2025-10-2310:00</div>
+					<div class="k">Created</div><div>2025-10-2213:52</div>
+					<div class="k">Picker</div><div>________________________</div>
+				</div>
+				<div class="stack" style="margin-top:8px; justify-content: space-between;">
+					<div class="hint">Scan to open order</div>
+					<div class="qr">QR</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Location Summary (fast route planning) -->
+		<div class="summary avoid-break" style="margin-top:10px;">
+			<h3>Location Summary (Aisle → Bin)</h3>
+			<div class="chips">
+				<span class="chip">A1 / B04 ×5</span>
+				<span class="chip">A1 / B08 ×2</span>
+				<span class="chip">A3 / B02 ×4</span>
+				<span class="chip">B2 / B12 ×6</span>
+				<span class="chip">C1 / B01 ×3</span>
+			</div>
+		</div>
+
+		<!-- Parts table -->
+		<div style="margin-top:10px;">
+			<table>
+				<colgroup>
+					<col />
+					<col />
+					<col class="unitcol" />
+					<col class="numcol" />
+					<col class="loccol" />
+					<col class="pickcol" />
+					<col class="notecol" />
+				</colgroup>
+				<thead>
+					<tr>
+						<th style="width:30mm;">Product / Part</th>
+						<th>Description</th>
+						<th>Unit</th>
+						<th>Qty</th>
+						<th>Location</th>
+						<th>Picked</th>
+						<th>Notes</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- Product group -->
+					<tr class="group-row">
+						<td colspan="7">
+							<div class="prod">
+								<span class="pill">Product</span>
+								<span class="mono">SOL-KIT-2000</span> •2kW Solar Starter Kit
+								<span class="sub" style="margin-left: auto;">Required Kits: <strong>2</strong></span>
+							</div>
+						</td>
+					</tr>
+					<!-- Part lines for product -->
+					<tr>
+						<td class="mono">PV-PANEL-330</td>
+						<td>Photovoltaic Panel330W (Mono)</td>
+						<td class="center">ea</td>
+						<td class="num">4</td>
+						<td class="mono center">A1 / B04</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td class="note">Handle carefully</td>
+					</tr>
+					<tr>
+						<td class="mono">INV-2000-HYB</td>
+						<td>Hybrid Inverter2kW</td>
+						<td class="center">ea</td>
+						<td class="num">2</td>
+						<td class="mono center">A3 / B02</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="mono">CAB-PV-10M</td>
+						<td>PV Cable6mm² –10m</td>
+						<td class="center">roll</td>
+						<td class="num">2</td>
+						<td class="mono center">C1 / B01</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="mono">MC4-SET</td>
+						<td>Connector Set (MC4 male + female)</td>
+						<td class="center">set</td>
+						<td class="num">2</td>
+						<td class="mono center">A1 / B08</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+
+					<!-- Next product group -->
+					<tr class="group-row">
+						<td colspan="7">
+							<div class="prod">
+								<span class="pill">Product</span>
+								<span class="mono">MNT-KIT-UNIV</span> • Universal Roof Mount Kit
+								<span class="sub" style="margin-left: auto;">Required Kits: <strong>2</strong></span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="mono">RAIL-1.8M</td>
+						<td>Aluminium Rail1.8m</td>
+						<td class="center">ea</td>
+						<td class="num">8</td>
+						<td class="mono center">B2 / B12</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="mono">CLAMP-MID</td>
+						<td>Mid Clamp Set</td>
+						<td class="center">set</td>
+						<td class="num">6</td>
+						<td class="mono center">B2 / B12</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="mono">CLAMP-END</td>
+						<td>End Clamp Set</td>
+						<td class="center">set</td>
+						<td class="num">4</td>
+						<td class="mono center">B2 / B12</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+
+					<!-- Loose items -->
+					<tr class="group-row">
+						<td colspan="7">
+							<div class="prod">
+								<span class="pill" style="border-color: var(--warn); color: var(--warn);">Loose</span>
+								Additional Items (Not part of kit)
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="mono">TAPE-INS</td>
+						<td>Insulation Tape (Black)</td>
+						<td class="center">roll</td>
+						<td class="num">3</td>
+						<td class="mono center">C1 / B01</td>
+						<td class="center"><span class="checkbox"></span></td>
+						<td></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="7">
+							<div class="stack" style="justify-content: space-between;">
+								<div class="note">Auto-generated on2025-10-2214:06 by system • All quantities shown are required to fulfill the order.</div>
+								<div class="mono">Total Lines: <strong>9</strong> • Total Units: <strong>31</strong></div>
+							</div>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+
+		<!-- Notes -->
+		<div class="ibox avoid-break" style="margin-top:10px;">
+			<h3>Special Instructions</h3>
+			<div>Check inverter firmware version ≥1.12. Ensure panels are palletized. Separate clamps by type in tote.</div>
+		</div>
+
+		<!-- Footer / Sign-off -->
+		<div class="footer avoid-break">
+			<div class="sign">
+				<h4>Picked By</h4>
+				<div class="line"></div>
+				<div>Date & Time: ____________________</div>
+			</div>
+			<div class="sign">
+				<h4>Checked By</h4>
+				<div class="line"></div>
+				<div>Date & Time: ____________________</div>
+			</div>
+			<div class="sign">
+				<h4>Dispatch</h4>
+				<div>Courier: ________________________</div>
+				<div class="line"></div>
+				<div>Pallets / Parcels: ______________</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
