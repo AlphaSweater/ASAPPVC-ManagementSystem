@@ -7,6 +7,7 @@ namespace ASAPPVC.UI.Services.Implementation
 {
     public class ProductService : IProductService
     {
+        //─────────── Dependencies ───────────\\
         private readonly IProductRepository _productRepository;
         private readonly IPartRepository _partsRepository;
 
@@ -16,6 +17,7 @@ namespace ASAPPVC.UI.Services.Implementation
             _partsRepository = partsRepo;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // creates a new product based on the provided view model
         public async Task<(bool Ok, string? Error, int? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default)
         {
@@ -75,12 +77,14 @@ namespace ASAPPVC.UI.Services.Implementation
             return (true, null, product.ProductID);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // retrieves a product by its ID, including its associated parts
         public async Task<ProductModel?> GetAsync(int id, CancellationToken ct = default)
         {
             return await _productRepository.GetProductWithPartsAsync(id, ct);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // lists all products
         public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
         {
@@ -88,3 +92,4 @@ namespace ASAPPVC.UI.Services.Implementation
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

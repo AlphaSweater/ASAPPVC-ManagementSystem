@@ -8,18 +8,23 @@ namespace ASAPPVC.UI.Controllers
     [Authorize]
     public class CustomerController : Controller
     {
+        //─────────── Dependencies ───────────\\
         private readonly ICustomerService _customers;
         public CustomerController(ICustomerService customers)
         {
             _customers = customers;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the create customer view
         [HttpGet]
         public IActionResult CreateCustomer()
         {
             return View();
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //handles the submission of the create customer form
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCustomer(CreateCustomerViewModel vm, CancellationToken ct)
@@ -38,6 +43,8 @@ namespace ASAPPVC.UI.Controllers
             return RedirectToAction(nameof(ViewCustomer), new { id = customer.CustomerID });
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the list of customers
         [HttpGet]
         public async Task<IActionResult> ViewCustomer(CancellationToken ct)
         {
@@ -46,3 +53,4 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

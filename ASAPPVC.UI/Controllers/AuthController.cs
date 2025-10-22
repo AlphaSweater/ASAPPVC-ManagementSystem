@@ -8,12 +8,15 @@ namespace ASAPPVC.UI.Controllers
 {
     public class AuthController : Controller
     {
+        //─────────── Dependencies ───────────\\
         private readonly IAuthService _auth;
         public AuthController(IAuthService auth)
         {
             _auth = auth;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the login view
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
@@ -22,6 +25,7 @@ namespace ASAPPVC.UI.Controllers
             return View(); 
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //method that allows users to log in
         [AllowAnonymous]
         [HttpPost]
@@ -45,6 +49,8 @@ namespace ASAPPVC.UI.Controllers
             return View(vm);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //displays the register view
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Register()
@@ -53,6 +59,7 @@ namespace ASAPPVC.UI.Controllers
             return View(); 
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //method that allows users to register
         [AllowAnonymous]
         [HttpPost]
@@ -73,6 +80,8 @@ namespace ASAPPVC.UI.Controllers
             return View(vm);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //method that allows users to log out
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -83,3 +92,4 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

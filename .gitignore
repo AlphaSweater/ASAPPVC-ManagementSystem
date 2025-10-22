@@ -361,3 +361,25 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+# Database weird stuff
+
+# Keep database files but ignore SQLite shared-memory and write-ahead-log
+# (these are runtime files created alongside .sqlite and should not be tracked)
+*.sqlite-shm
+*.sqlite-wal
+
+# Ignore common editor/OS lock, swap and lock files that cause weird tracking
+# VSCode/Editor swap and lock files
+*.swp
+*.swo
+*.swn
+.#*
+# Windows lock/temp files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Keep actual .sqlite database files (explicit negation example)
+!*.sqlite

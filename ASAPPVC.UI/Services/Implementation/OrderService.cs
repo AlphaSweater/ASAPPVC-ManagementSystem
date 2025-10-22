@@ -7,6 +7,7 @@ namespace ASAPPVC.UI.Services.Implementation
 {
     public class OrderService : IOrderService
     {
+        //─────────── Dependencies ───────────\\
         private readonly IOrderRepository _repo;
 
         public OrderService(IOrderRepository repo)
@@ -14,6 +15,8 @@ namespace ASAPPVC.UI.Services.Implementation
             _repo = repo;
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //creates a new order with associated products
         public async Task<(bool Ok, string? Error, OrderModel? Order)> CreateAsync(CreateOrderViewModel vm, CancellationToken ct = default)
         {
             if (vm.CustomerID <= 0)
@@ -52,14 +55,19 @@ namespace ASAPPVC.UI.Services.Implementation
             return (true, null, order);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //retrieves a single order with details by ID
         public async Task<OrderModel?> GetAsync(int id, CancellationToken ct = default)
         {
             return await _repo.GetWithDetailsAsync(id, ct);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        //retrieves a list of orders with customer and products
         public async Task<List<OrderModel>> ListAsync(CancellationToken ct = default)
         {
             return await _repo.ListAsync(ct);
         }
     }
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
