@@ -1,5 +1,4 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Order;
-using ASAPPVC.UI.Repositories.Interfaces;
 using ASAPPVC.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +7,11 @@ namespace ASAPPVC.UI.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orders;
-        private readonly ICustomerRepository _customers;
-        private readonly IProductRepository _products;
+        private readonly ICustomerService _customers;
+        private readonly IProductService _products;
 
         //constructor
-        public OrderController(IOrderService orders, ICustomerRepository customers, IProductRepository products)
+        public OrderController(IOrderService orders, ICustomerService customers, IProductService products)
         {
             _orders = orders;
             _customers = customers;
