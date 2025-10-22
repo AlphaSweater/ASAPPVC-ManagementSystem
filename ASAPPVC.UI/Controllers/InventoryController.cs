@@ -1,5 +1,4 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Inventory;
-using ASAPPVC.UI.Repositories.Interfaces;
 using ASAPPVC.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +11,11 @@ namespace ASAPPVC.UI.Controllers
         // ─────────── Dependencies ───────────
         private readonly IPartService _parts;
         private readonly IProductService _products;
-        private readonly IPartRepository _partsRepo;
-        private readonly IProductRepository _productRepo;
 
-        public InventoryController(IPartService parts, IProductService products, IPartRepository partsRepo, IProductRepository productRepo)
+        public InventoryController(IPartService parts, IProductService products)
         {
             _parts = parts;
             _products = products;
-            _partsRepo = partsRepo;
-            _productRepo = productRepo;
         }
 
         // ─────────── View Paths ───────────
@@ -75,7 +70,7 @@ namespace ASAPPVC.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
-            var parts = await _partsRepo.ListAsync(ct);
+            var parts = await _parts.ListAsync(ct);
             ViewData["Parts"] = parts;
             return View(AddProductPath, new CreateProductViewModel());
         }
