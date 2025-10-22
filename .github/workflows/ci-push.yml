@@ -2,7 +2,7 @@
 
 on:
   push:
-    branches: [ feature/**, bugfix/** ]
+    branches: [ production, development, feature/**, bugfix/** ]
 
 concurrency:
   group: ci-push-${{ github.ref }}
