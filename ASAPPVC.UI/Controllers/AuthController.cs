@@ -1,6 +1,7 @@
 ﻿// Controllers/AuthController.cs
 using ASAPPVC.UI.Models.ViewModels.Auth;
 using ASAPPVC.UI.Services.Interfaces;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,10 +22,9 @@ namespace ASAPPVC.UI.Controllers
         //displays the login view
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult Login()
-        {
+        public IActionResult Login() {
             ViewData["HideNavbar"] = true;
-            return View(); 
+            return View();
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -32,16 +32,14 @@ namespace ASAPPVC.UI.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
-        {
-            if (!ModelState.IsValid)
-            {
+        public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null) {
+            if ( !ModelState.IsValid ) {
                 ViewData["HideNavbar"] = true;
                 return View(vm);
             }
 
             var result = await _auth.LoginAsync(vm);
-            if (result.Succeeded)
+            if ( result.Succeeded )
                 return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
                     ? Redirect(returnUrl)
                     : RedirectToAction("Index", "Home");
@@ -55,10 +53,9 @@ namespace ASAPPVC.UI.Controllers
         //displays the register view
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult Register()
-        {
+        public IActionResult Register() {
             ViewData["HideNavbar"] = true;
-            return View(); 
+            return View();
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -66,18 +63,18 @@ namespace ASAPPVC.UI.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel vm)
-        {
-            if (!ModelState.IsValid)
-            {
+        public async Task<IActionResult> Register(RegisterViewModel vm) {
+            if ( !ModelState.IsValid ) {
                 ViewData["HideNavbar"] = true;
                 return View(vm);
             }
 
             var result = await _auth.RegisterAsync(vm);
-            if (result.Succeeded) return RedirectToAction(nameof(Login));
+            if ( result.Succeeded )
+                return RedirectToAction(nameof(Login));
 
-            foreach (var e in result.Errors) ModelState.AddModelError(string.Empty, e.Description);
+            foreach ( var e in result.Errors )
+                ModelState.AddModelError(string.Empty, e.Description);
             ViewData["HideNavbar"] = true;
             return View(vm);
         }
@@ -87,11 +84,11 @@ namespace ASAPPVC.UI.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
-        {
+        public async Task<IActionResult> Logout() {
             await _auth.LogoutAsync();
             return RedirectToAction(nameof(Login));
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
