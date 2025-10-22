@@ -1,21 +1,11 @@
 ﻿name: CI • Build & Verify (.NET)
 
 on:
-  push:
-    branches: [ feature/**, bugfix/** ]
-  pull_request:
-    branches: [ production, development ]
-    types: [ opened, synchronize, reopened ]
+  workflow_call: {}
   workflow_dispatch:
-
-# One active run per PR/branch; newest cancels older
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: read
-  pull-requests: read
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -23,51 +13,11 @@ env:
 
 jobs:
   # ───────────────────────────
-  # Preflight: skip push CI if a PR is open for this branch
-  # ───────────────────────────
-  preflight:
-    name: 🔎 Preflight (dedupe)
-    runs-on: ubuntu-latest
-    outputs:
-      run_ci: ${{ steps.decide.outputs.run_ci }}
-    steps:
-      - name: 🔁 Decide if CI should run
-        id: decide
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const isPush = context.eventName === 'push';
-            let run = true;
-
-            if (isPush) {
-              const branch = context.ref.replace('refs/heads/', '');
-              const { data: prs } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open',
-                head: `${context.repo.owner}:${branch}`
-              });
-              if (prs.length > 0) {
-                core.info(`Open PR #${prs[0].number} exists for ${branch}. Skipping push CI (PR CI will run).`);
-                run = false;
-              } else {
-                core.info(`No open PR for ${branch}. Running push CI.`);
-              }
-            } else {
-              core.info('Event is pull_request/workflow_dispatch — running CI.');
-            }
-
-            core.setOutput('run_ci', run ? 'true' : 'false');
-
-  # ───────────────────────────
   # Main CI
   # ───────────────────────────
   build-and-test:
     name: Build & Tests
     runs-on: ubuntu-latest
-    needs: preflight
-    if: needs.preflight.outputs.run_ci == 'true'
 
     steps:
       - name: 📥 Checkout repository
