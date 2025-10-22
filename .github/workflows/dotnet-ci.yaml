@@ -37,7 +37,7 @@ jobs:
         run: dotnet --info
 
       - name: 📦 Restore NuGet packages
-        run: dotnet restore
+        run: dotnet restore --locked-mode
 
       - name: 🏗️ Build (Release)
         run: dotnet build --no-restore -c Release
