@@ -15,6 +15,11 @@ namespace ASAPPVC.UI.Models
         [Required, ForeignKey("ProductModel")]
         public int ProductID { get; set; }
 
+        // Quantity of the product in the order. Default to 1.
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
+        public int Quantity { get; set; } = 1;
+
         public OrderModel? Order { get; set; }
         public ProductModel? Product { get; set; }
     }
