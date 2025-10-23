@@ -8,20 +8,23 @@
     <title>Picking Slip • PS-000123</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        /* ================= Base / Tokens ================= */
+        /* ================= CSS Variables ================= */
         :root {
-            --ink: #111827; /* Gray-900 */
-            --muted: #6b7280; /* Gray-500 */
-            --line: #e5e7eb; /* Gray-200 */
-            --soft: #f9fafb; /* Gray-50 */
-            --brand: #0ea5e9; /* Sky-500 (used subtly) */
-            --warn: #f59e0b; /* Amber-500 */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --background-light: #f9fafb;
+            --brand-color: #0ea5e9;
+            --accent-color: #f59e0b;
+            --table-header-bg: #f2f8ff;
+            --table-header-text: #0b3b57;
         }
 
+        /* ================= Base Styles ================= */
         html, body {
             margin: 0;
             padding: 0;
-            color: var(--ink);
+            color: var(--text-primary);
             font: 12px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             background: #fff;
         }
@@ -30,18 +33,14 @@
             box-sizing: border-box;
         }
 
-        /*
-              IMPORTANT (Razor): use page in .cshtml so Razor outputs a literal page for the browser
-              Adjust margins here rather than from the PDF engine when possible for consistency.
-            */
+        /* ================= Print Page Setup ================= */
         @@page {
             size: A4; /* 210mm × 297mm */
-            margin: 12mm; /* printable margin */
-            /* Optional footer – Chromium supports margin boxes in newer versions */
+            margin: 12mm;
             @@bottom-center {
                 content: "Picking Slip • PS-000123 — Page " counter(page) " of " counter(pages);
                 font-size: 11px;
-                color: var(--muted);
+                color: var(--text-secondary);
             }
         }
 
@@ -61,12 +60,6 @@
                 print-color-adjust: exact;
             }
 
-            .card {
-                border: none;
-                box-shadow: none;
-                margin: 0;
-            }
-
             .no-print {
                 display: none !important;
             }
@@ -79,12 +72,12 @@
                 display: table-footer-group;
             }
 
-            .avoid-break {
+            .avoid-page-break {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
 
-            .page-break {
+            .force-page-break {
                 break-after: page;
             }
 
@@ -95,521 +88,581 @@
             tr, td, th {
                 page-break-inside: avoid;
             }
+
+            .product-group {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .product-group.break-before {
+                break-before: page;
+                page-break-before: always;
+            }
         }
 
-        /* ================= Layout ================= */
-        .card {
-            max-width: 186mm; /* fit nicely inside 12mm margins */
-            margin: 8px auto 16px;
+        /* ================= Page Container ================= */
+        .page-container {
+            max-width: 186mm;
+            margin: 0 auto;
             padding: 16px;
-            border: 1px solid var(--line);
-            border-radius: 10px;
             background: #fff;
         }
 
-        .row {
+        /* ================= Grid Layouts ================= */
+        .grid-two-columns {
             display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-            .row.cols-2 {
-                grid-template-columns: 1fr 1fr;
-            }
+        .grid-three-columns {
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr 0.9fr;
+            gap: 10px;
+        }
 
-            .row.cols-3 {
-                grid-template-columns: 1.1fr 1.1fr 0.9fr;
-            }
-
-        .stack {
+        .flex-row {
             display: flex;
             gap: 10px;
             align-items: center;
         }
 
-        /* ================= Header ================= */
-        .header {
+        /* ================= Header Section ================= */
+        .report-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding-bottom: 10px;
-            border-bottom: 2px solid var(--line);
+            border-bottom: 2px solid var(--border-color);
             margin-bottom: 12px;
         }
 
-        .logo {
+        .company-logo {
             height: 18mm;
             display: flex;
             align-items: center;
             justify-content: flex-start;
         }
 
-            .logo img {
-                display: block;
-                max-height: 100%;
-                max-width: 100%;
-                object-fit: contain;
-            }
+        .company-logo img {
+            display: block;
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
 
-        .id-block {
+        .report-identity {
             text-align: right;
         }
 
-        .badge {
+        .report-type-badge {
             display: inline-block;
             padding: 3px 8px;
             border-radius: 999px;
             font-weight: 600;
-            border: 1px solid var(--brand);
-            color: var(--brand);
+            border: 1px solid var(--brand-color);
+            color: var(--brand-color);
             font-size: 11px;
         }
 
-        .title {
+        .report-number {
             margin: 4px 0 2px;
             font-size: 22px;
             line-height: 1.1;
             font-variant-numeric: tabular-nums;
         }
 
-        .sub {
-            color: var(--muted);
+        .report-metadata {
+            color: var(--text-secondary);
             font-size: 12px;
         }
 
-        /* ================= Info boxes ================= */
-        .ibox {
-            border: 1px solid var(--line);
+        /* ================= Information Boxes ================= */
+        .info-box {
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px;
             background: #fff;
         }
 
-            .ibox h3 {
-                margin: 0 0 6px;
-                font-size: 12px;
-                text-transform: uppercase;
-                letter-spacing: .05em;
-                color: var(--muted);
-            }
+        .info-box-title {
+            margin: 0 0 6px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-secondary);
+        }
 
-        .kv.kv-vert {
+        .info-fields {
+            display: grid;
             grid-template-columns: 1fr;
             gap: 8px 0;
         }
 
-        .kv.kv-vert .field {
+        .info-field {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
 
-        .kv.kv-vert .k {
+        .field-label {
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: .04em;
-            color: var(--muted);
+            color: var(--text-secondary);
         }
 
-        .kv.kv-vert .v {
+        .field-value {
             font-size: 12px;
         }
 
-        .kv .k {
-            color: var(--muted);
-        }
-
-        .mono {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* ================= Summary chips ================= */
-        .summary {
-            border: 1px solid var(--line);
+        /* ================= Summary Section ================= */
+        .location-summary {
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px;
             background: #fff;
+            margin-top: 10px;
         }
 
-            .summary h3 {
-                margin: 0 0 6px;
-                font-size: 12px;
-                text-transform: uppercase;
-                letter-spacing: .05em;
-                color: var(--muted);
-            }
+        .summary-title {
+            margin: 0 0 6px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-secondary);
+        }
 
-        .chips {
+        .location-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
 
-        .chip {
-            border: 1px solid var(--line);
+        .location-chip {
+            border: 1px solid var(--border-color);
             background: #fff;
             border-radius: 999px;
             padding: 3px 8px;
             font-size: 11px;
         }
 
-        /* ================= Table ================= */
-        table {
+        /* ================= Table Styles ================= */
+        .parts-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
+            margin-top: 10px;
         }
 
-            table td, table th {
-                overflow-wrap: break-word;
-                word-break: break-word;
-            }
+        .parts-table td,
+        .parts-table th {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
 
-        col.numcol {
+        /* Table Column Widths */
+        .column-number {
             width: 18mm;
         }
 
-        col.unitcol {
+        .column-unit {
             width: 16mm;
         }
 
-        col.loccol {
+        .column-location {
             width: 26mm;
         }
 
-        col.pickcol {
+        .column-picked {
             width: 20mm;
         }
 
-        col.notecol {
+        .column-notes {
             width: 30mm;
         }
 
-        th, td {
-            border: 1px solid var(--line);
+        .parts-table th,
+        .parts-table td {
+            border: 1px solid var(--border-color);
             padding: 8px 10px;
             vertical-align: middle;
         }
 
-        thead th {
-            background: #f2f8ff;
-            color: #0b3b57;
+        .parts-table thead th {
+            background: var(--table-header-bg);
+            color: var(--table-header-text);
             font-weight: 700;
             font-size: 11px;
             text-align: left;
         }
 
-        td {
+        .parts-table td {
             font-size: 12px;
         }
 
-            td.num, td.num * {
-                text-align: right;
-            }
+        .text-right {
+            text-align: right;
+        }
 
-            td.center, th.center {
-                text-align: center;
-            }
+        .text-center {
+            text-align: center;
+        }
 
-            .unitcol, td.unitcol, th.unitcol {
-                text-align: center;
-            }
-
-        .group-row td {
+        /* Product Group Rows */
+        .product-group-header td {
             background: #fff;
             font-weight: 700;
-            border-top: 2px solid var(--line);
+            border-top: 2px solid var(--border-color);
             padding-top: 10px;
             padding-bottom: 10px;
         }
 
-        .prod {
+        .product-info {
             display: flex;
             gap: 8px;
             align-items: center;
             width: 100%;
         }
 
-        .pill {
+        .product-type-badge {
             display: inline-block;
-            border: 1px solid var(--brand);
-            color: var(--brand);
+            border: 1px solid var(--brand-color);
+            color: var(--brand-color);
             border-radius: 999px;
             padding: 3px 8px;
             font-size: 11px;
         }
 
-        /* ================= Footer / Sign-off ================= */
-        .footer {
+        .product-type-badge.loose-item {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* ================= Footer / Sign-off Section ================= */
+        .signature-section {
             margin-top: 12px;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
         }
 
-        .sign {
-            border: 1px solid var(--line);
+        .signature-box {
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px;
             min-height: 46mm;
         }
 
-            .sign h4 {
-                margin: 0 0 6px;
-                font-size: 12px;
-                color: var(--muted);
-                text-transform: uppercase;
-                letter-spacing: .05em;
-            }
+        .signature-box-title {
+            margin: 0 0 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
 
-        .line {
-            border-bottom: 1px dashed var(--line);
+        .signature-line {
+            border-bottom: 1px dashed var(--border-color);
             height: 22px;
             margin-bottom: 6px;
         }
 
-        .qr {
+        /* ================= Utility Classes ================= */
+        .qr-code-placeholder {
             width: 22mm;
             height: 22mm;
-            border: 1px solid var(--line);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--muted);
+            color: var(--text-secondary);
             font-size: 11px;
         }
 
-        .note {
+        .small-text {
             font-size: 11px;
-            color: var(--muted);
+            color: var(--text-secondary);
+        }
+
+        .monospace {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 600;
+            border: 1px solid var(--brand-color);
+            color: var(--brand-color);
+            font-size: 11px;
         }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="page-container">
         <!-- ===== Header ===== -->
-        <div class="header avoid-break">
-            <div class="logo"><img src="~/Assets/Images/Logos/asap-pvc-logo.png" alt="ASAPPVC" /></div>
-            <div class="id-block">
-                <div><span class="badge">Picking Slip</span></div>
-                <div class="title mono">PS-000123</div>
-                <div class="sub">Order <strong>#ORD-45782</strong> • Created <span class="mono">2025-10-22 14:06</span> • Priority <span class="pill">Standard</span></div>
+        <div class="report-header avoid-page-break">
+            <div class="company-logo">
+                <img src="~/Assets/Images/Logos/asap-pvc-logo.png" alt="ASAPPVC" />
+            </div>
+            <div class="report-identity">
+                <div><span class="report-type-badge">Picking Slip</span></div>
+                <div class="report-number monospace">PS-000123</div>
+                <div class="report-metadata">
+                    Order <strong>#ORD-45782</strong> • Created <span class="monospace">2025-10-22 14:06</span> • Priority <span class="status-pill">Standard</span>
+                </div>
             </div>
         </div>
 
         <!-- ===== Top Info ===== -->
-        <div class="row cols-3 avoid-break">
-            <!-- From (simplified) -->
-            <div class="ibox">
-                <h3>From</h3>
-                <div class="kv kv-vert">
-                    <div class="field"><div class="k">Company</div><div class="v">ASAPPVC (Pty) Ltd</div></div>
-                    <div class="field"><div class="k">Warehouse</div><div class="v">Killarney Gardens</div></div>
-                    <div class="field"><div class="k">Contact</div><div class="v">info@asappvc.co.za</div></div>
+        <div class="grid-three-columns avoid-page-break">
+            <!-- From -->
+            <div class="info-box">
+                <h3 class="info-box-title">From</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Company</div>
+                        <div class="field-value">ASAPPVC (Pty) Ltd</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Warehouse</div>
+                        <div class="field-value">Killarney Gardens</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Contact</div>
+                        <div class="field-value">info@asappvc.co.za</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- For (was Ship To) -->
-            <div class="ibox">
-                <h3>For</h3>
-                <div class="kv kv-vert">
-                    <div class="field"><div class="k">Client</div><div class="v">GreenTech Projects</div></div>
-                    <div class="field"><div class="k">Project / Site</div><div class="v">Midrand Solar Farm</div></div>
-                    <div class="field"><div class="k">Contact</div><div class="v">Sipho Ndlovu • +27 82 555 0199</div></div>
+            <!-- For -->
+            <div class="info-box">
+                <h3 class="info-box-title">For</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Client</div>
+                        <div class="field-value">GreenTech Projects</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Project / Site</div>
+                        <div class="field-value">Midrand Solar Farm</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Contact</div>
+                        <div class="field-value">Sipho Ndlovu • +27 82 555 0199</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Order (condensed) -->
-            <div class="ibox">
-                <h3>Order</h3>
-                <div class="kv kv-vert">
-                    <div class="field"><div class="k">Order #</div><div class="v mono">ORD-45782</div></div>
-                    <div class="field"><div class="k">Created</div><div class="v mono">2025-10-22 13:52</div></div>
-                    <div class="field"><div class="k">Pick By</div><div class="v mono">2025-10-23 10:00</div></div>
+            <!-- Order -->
+            <div class="info-box">
+                <h3 class="info-box-title">Order</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Order #</div>
+                        <div class="field-value monospace">ORD-45782</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Created</div>
+                        <div class="field-value monospace">2025-10-22 13:52</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Pick By</div>
+                        <div class="field-value monospace">2025-10-23 10:00</div>
+                    </div>
                 </div>
-                <div class="stack" style="margin-top:8px; justify-content: space-between;">
-                    <div class="note">Scan to open order</div>
-                    <div class="qr">QR</div>
+                <div class="flex-row" style="margin-top:8px; justify-content: space-between;">
+                    <div class="small-text">Scan to open order</div>
+                    <div class="qr-code-placeholder">QR</div>
                 </div>
             </div>
         </div>
 
         <!-- ===== Location Summary ===== -->
-        <div class="summary avoid-break" style="margin-top:10px;">
-            <h3>Location Summary (Aisle → Bin)</h3>
-            <div class="chips">
-                <span class="chip">A1 / B04 ×5</span>
-                <span class="chip">A1 / B08 ×2</span>
-                <span class="chip">A3 / B02 ×4</span>
-                <span class="chip">B2 / B12 ×6</span>
-                <span class="chip">C1 / B01 ×3</span>
+        <div class="location-summary avoid-page-break">
+            <h3 class="summary-title">Location Summary (Aisle → Bin)</h3>
+            <div class="location-chips">
+                <span class="location-chip">A1 / B04 ×5</span>
+                <span class="location-chip">A1 / B08 ×2</span>
+                <span class="location-chip">A3 / B02 ×4</span>
+                <span class="location-chip">B2 / B12 ×6</span>
+                <span class="location-chip">C1 / B01 ×3</span>
             </div>
         </div>
 
         <!-- ===== Parts Table ===== -->
-        <div style="margin-top:10px;">
-            <table>
-                <colgroup>
-                    <col />
-                    <col />
-                    <col class="unitcol" />
-                    <col class="numcol" />
-                    <col class="loccol" />
-                    <col class="pickcol" />
-                    <col class="notecol" />
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th style="width:30mm;">Product / Part</th>
-                        <th>Description</th>
-                        <th class="center">Unit</th>
-                        <th class="num">Qty</th>
-                        <th class="center">Location</th>
-                        <th class="center">Picked</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Product group -->
-                    <tr class="group-row">
-                        <td colspan="7">
-                            <div class="prod">
-                                <span class="pill">Product</span>
-                                <span class="mono">SOL-KIT-2000</span> • 2kW Solar Starter Kit
-                                <span class="sub" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="mono">PV-PANEL-330</td>
-                        <td>Photovoltaic Panel 330W (Mono)</td>
-                        <td class="center">ea</td>
-                        <td class="num">4</td>
-                        <td class="mono center">A1 / B04</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td class="note">Handle carefully</td>
-                    </tr>
-                    <tr>
-                        <td class="mono">INV-2000-HYB</td>
-                        <td>Hybrid Inverter 2kW</td>
-                        <td class="center">ea</td>
-                        <td class="num">2</td>
-                        <td class="mono center">A3 / B02</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="mono">CAB-PV-10M</td>
-                        <td>PV Cable 6mm² – 10m</td>
-                        <td class="center">roll</td>
-                        <td class="num">2</td>
-                        <td class="mono center">C1 / B01</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="mono">MC4-SET</td>
-                        <td>Connector Set (MC4 male + female)</td>
-                        <td class="center">set</td>
-                        <td class="num">2</td>
-                        <td class="mono center">A1 / B08</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
+        <table class="parts-table">
+            <colgroup>
+                <col />
+                <col />
+                <col class="column-unit" />
+                <col class="column-number" />
+                <col class="column-location" />
+                <col class="column-picked" />
+                <col class="column-notes" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th style="width:30mm;">Product / Part</th>
+                    <th>Description</th>
+                    <th class="text-center">Unit</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-center">Location</th>
+                    <th class="text-center">Picked</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
 
-                    <!-- Next product group -->
-                    <tr class="group-row">
-                        <td colspan="7">
-                            <div class="prod">
-                                <span class="pill">Product</span>
-                                <span class="mono">MNT-KIT-UNIV</span> • Universal Roof Mount Kit
-                                <span class="sub" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="mono">RAIL-1.8M</td>
-                        <td>Aluminium Rail 1.8m</td>
-                        <td class="center">ea</td>
-                        <td class="num">8</td>
-                        <td class="mono center">B2 / B12</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="mono">CLAMP-MID</td>
-                        <td>Mid Clamp Set</td>
-                        <td class="center">set</td>
-                        <td class="num">6</td>
-                        <td class="mono center">B2 / B12</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="mono">CLAMP-END</td>
-                        <td>End Clamp Set</td>
-                        <td class="center">set</td>
-                        <td class="num">4</td>
-                        <td class="mono center">B2 / B12</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
+            <!-- Group 1: SOL-KIT-2000 -->
+            <tbody class="product-group">
+                <tr class="product-group-header">
+                    <td colspan="7">
+                        <div class="product-info">
+                            <span class="product-type-badge">Product</span>
+                            <span class="monospace">SOL-KIT-2000</span> • 2kW Solar Starter Kit
+                            <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="monospace">PV-PANEL-330</td>
+                    <td>Photovoltaic Panel 330W (Mono)</td>
+                    <td class="text-center">ea</td>
+                    <td class="text-right">4</td>
+                    <td class="monospace text-center">A1 / B04</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td class="small-text">Handle carefully</td>
+                </tr>
+                <tr>
+                    <td class="monospace">INV-2000-HYB</td>
+                    <td>Hybrid Inverter 2kW</td>
+                    <td class="text-center">ea</td>
+                    <td class="text-right">2</td>
+                    <td class="monospace text-center">A3 / B02</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="monospace">CAB-PV-10M</td>
+                    <td>PV Cable 6mm² – 10m</td>
+                    <td class="text-center">roll</td>
+                    <td class="text-right">2</td>
+                    <td class="monospace text-center">C1 / B01</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="monospace">MC4-SET</td>
+                    <td>Connector Set (MC4 male + female)</td>
+                    <td class="text-center">set</td>
+                    <td class="text-right">2</td>
+                    <td class="monospace text-center">A1 / B08</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+            </tbody>
 
-                    <!-- Loose items -->
-                    <tr class="group-row">
-                        <td colspan="7">
-                            <div class="prod">
-                                <span class="pill" style="border-color: var(--warn); color: var(--warn);">Loose</span>
-                                Additional Items (Not part of kit)
+            <!-- Group 2: MNT-KIT-UNIV -->
+            <tbody class="product-group">
+                <tr class="product-group-header">
+                    <td colspan="7">
+                        <div class="product-info">
+                            <span class="product-type-badge">Product</span>
+                            <span class="monospace">MNT-KIT-UNIV</span> • Universal Roof Mount Kit
+                            <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="monospace">RAIL-1.8M</td>
+                    <td>Aluminium Rail 1.8m</td>
+                    <td class="text-center">ea</td>
+                    <td class="text-right">8</td>
+                    <td class="monospace text-center">B2 / B12</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="monospace">CLAMP-MID</td>
+                    <td>Mid Clamp Set</td>
+                    <td class="text-center">set</td>
+                    <td class="text-right">6</td>
+                    <td class="monospace text-center">B2 / B12</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="monospace">CLAMP-END</td>
+                    <td>End Clamp Set</td>
+                    <td class="text-center">set</td>
+                    <td class="text-right">4</td>
+                    <td class="monospace text-center">B2 / B12</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+            </tbody>
+
+            <!-- Group 3: Loose items -->
+            <tbody class="product-group">
+                <tr class="product-group-header">
+                    <td colspan="7">
+                        <div class="product-info">
+                            <span class="product-type-badge loose-item">Loose</span>
+                            Additional Items (Not part of kit)
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="monospace">TAPE-INS</td>
+                    <td>Insulation Tape (Black)</td>
+                    <td class="text-center">roll</td>
+                    <td class="text-right">3</td>
+                    <td class="monospace text-center">C1 / B01</td>
+                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                    <td></td>
+                </tr>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="7">
+                        <div class="flex-row" style="justify-content: space-between;">
+                            <div class="small-text">
+                                Auto-generated on <span class="monospace">2025-10-22 14:06</span> • All quantities shown are required to fulfill the order.
                             </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="mono">TAPE-INS</td>
-                        <td>Insulation Tape (Black)</td>
-                        <td class="center">roll</td>
-                        <td class="num">3</td>
-                        <td class="mono center">C1 / B01</td>
-                        <td class="center"><input type="checkbox" aria-label="Picked" /></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="7">
-                            <div class="stack" style="justify-content: space-between;">
-                                <div class="note">Auto-generated on <span class="mono">2025-10-22 14:06</span> • All quantities shown are required to fulfill the order.</div>
-                                <div class="mono">Total Lines: <strong>9</strong> • Total Units: <strong>31</strong></div>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+                            <div class="monospace">Total Lines: <strong>9</strong> • Total Units: <strong>31</strong></div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
 
         <!-- ===== Special Instructions ===== -->
-        <div class="ibox avoid-break" style="margin-top:10px;">
-            <h3>Special Instructions</h3>
+        <div class="info-box avoid-page-break" style="margin-top:10px;">
+            <h3 class="info-box-title">Special Instructions</h3>
             <div>Check inverter firmware version ≥ 1.12. Ensure panels are palletized. Separate clamps by type in tote.</div>
         </div>
 
         <!-- ===== Footer / Sign-off ===== -->
-        <div class="footer avoid-break">
-            <div class="sign">
-                <h4>Picked By</h4>
-                <div class="line"></div>
+        <div class="signature-section avoid-page-break">
+            <div class="signature-box">
+                <h4 class="signature-box-title">Picked By</h4>
+                <div class="signature-line"></div>
                 <div>Date &amp; Time: ____________________</div>
             </div>
-            <div class="sign">
-                <h4>Checked By</h4>
-                <div class="line"></div>
+            <div class="signature-box">
+                <h4 class="signature-box-title">Checked By</h4>
+                <div class="signature-line"></div>
                 <div>Date &amp; Time: ____________________</div>
             </div>
-            <div class="sign">
-                <h4>Dispatch</h4>
+            <div class="signature-box">
+                <h4 class="signature-box-title">Dispatch</h4>
                 <div>Courier: ________________________</div>
-                <div class="line"></div>
+                <div class="signature-line"></div>
                 <div>Pallets / Parcels: ______________</div>
             </div>
         </div>
