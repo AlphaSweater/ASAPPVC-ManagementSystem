@@ -1,11 +1,12 @@
-﻿@{
+﻿@model ASAPPVC.UI.Models.ViewModels.Reports.PickingSlipViewModel
+@{
     Layout = null;
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Picking Slip • PS-000123</title>
+    <title>Picking Slip • @Model.PickingSlipNumber</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         /* ================= CSS Variables ================= */
@@ -37,13 +38,14 @@
         @@page {
             size: A4; /* 210mm × 297mm */
             margin: 12mm;
-            @@top-center {
-                content: "";
-            }
-            @@bottom-center {
-                content: "Picking Slip • PS-000123 - Page " counter(page) " of " counter(pages);
+
+            @@top-right {
+                content: "Page " counter(page) " of " counter(pages);
                 font-size: 11px;
                 color: var(--text-secondary);
+            }
+            @@bottom-center {
+                content: "";
             }
         }
 
@@ -410,13 +412,13 @@
         <!-- ===== Header ===== -->
         <div class="report-header avoid-page-break">
             <div class="company-logo">
-                <img src="~/Assets/Images/Logos/asap-pvc-logo.png" alt="ASAPPVC" />
+                <img src="@Model.LogoPath" alt="ASAPPVC" />
             </div>
             <div class="report-identity">
                 <div><span class="report-type-badge">Picking Slip</span></div>
-                <div class="report-number monospace">PS-000123</div>
+                <div class="report-number monospace">@Model.PickingSlipNumber</div>
                 <div class="report-metadata">
-                    Order <strong>#ORD-45782</strong> • Created <span class="monospace">2025-10-22 14:06</span> • Priority <span class="status-pill">Standard</span>
+                    Order <strong>#@Model.OrderNumber</strong> • Created <span class="monospace">@Model.CreatedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • Priority <span class="status-pill">@Model.Priority</span>
                 </div>
             </div>
         </div>
@@ -429,15 +431,15 @@
                 <div class="info-fields">
                     <div class="info-field">
                         <div class="field-label">Company</div>
-                        <div class="field-value">ASAPPVC (Pty) Ltd</div>
+                        <div class="field-value">@Model.From.Company</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Warehouse</div>
-                        <div class="field-value">Killarney Gardens</div>
+                        <div class="field-value">@Model.From.Warehouse</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Contact</div>
-                        <div class="field-value">info@asappvc.co.za</div>
+                        <div class="field-value">@Model.From.Contact</div>
                     </div>
                 </div>
             </div>
@@ -448,15 +450,15 @@
                 <div class="info-fields">
                     <div class="info-field">
                         <div class="field-label">Client</div>
-                        <div class="field-value">GreenTech Projects</div>
+                        <div class="field-value">@Model.For.Client</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Project / Site</div>
-                        <div class="field-value">Midrand Solar Farm</div>
+                        <div class="field-value">@Model.For.ProjectSite</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Contact</div>
-                        <div class="field-value">Sipho Ndlovu • +27 82 555 0199</div>
+                        <div class="field-value">@Model.For.Contact</div>
                     </div>
                 </div>
             </div>
@@ -467,15 +469,15 @@
                 <div class="info-fields">
                     <div class="info-field">
                         <div class="field-label">Order #</div>
-                        <div class="field-value monospace">ORD-45782</div>
+                        <div class="field-value monospace">@Model.Order.OrderNumber</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Created</div>
-                        <div class="field-value monospace">2025-10-22 13:52</div>
+                        <div class="field-value monospace">@Model.Order.Created.ToString("yyyy-MM-dd HH:mm")</div>
                     </div>
                     <div class="info-field">
                         <div class="field-label">Pick By</div>
-                        <div class="field-value monospace">2025-10-23 10:00</div>
+                        <div class="field-value monospace">@Model.Order.PickBy.ToString("yyyy-MM-dd HH:mm")</div>
                     </div>
                 </div>
                 <div class="flex-row" style="margin-top:8px; justify-content: space-between;">
@@ -489,11 +491,10 @@
         <div class="location-summary avoid-page-break">
             <h3 class="summary-title">Location Summary (Aisle → Bin)</h3>
             <div class="location-chips">
-                <span class="location-chip">A1 / B04 ×5</span>
-                <span class="location-chip">A1 / B08 ×2</span>
-                <span class="location-chip">A3 / B02 ×4</span>
-                <span class="location-chip">B2 / B12 ×6</span>
-                <span class="location-chip">C1 / B01 ×3</span>
+                @foreach (var location in Model.LocationSummary)
+                {
+                    <span class="location-chip">@location</span>
+                }
             </div>
         </div>
 
@@ -520,124 +521,50 @@
                 </tr>
             </thead>
 
-            <!-- Group 1: SOL-KIT-2000 -->
-            <tbody class="product-group">
-                <tr class="product-group-header">
-                    <td colspan="7">
-                        <div class="product-info">
-                            <span class="product-type-badge">Product</span>
-                            <span class="monospace">SOL-KIT-2000</span> • 2kW Solar Starter Kit
-                            <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="monospace">PV-PANEL-330</td>
-                    <td>Photovoltaic Panel 330W (Mono)</td>
-                    <td class="text-center">ea</td>
-                    <td class="text-right">4</td>
-                    <td class="monospace text-center">A1 / B04</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td class="small-text">Handle carefully</td>
-                </tr>
-                <tr>
-                    <td class="monospace">INV-2000-HYB</td>
-                    <td>Hybrid Inverter 2kW</td>
-                    <td class="text-center">ea</td>
-                    <td class="text-right">2</td>
-                    <td class="monospace text-center">A3 / B02</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="monospace">CAB-PV-10M</td>
-                    <td>PV Cable 6mm² – 10m</td>
-                    <td class="text-center">roll</td>
-                    <td class="text-right">2</td>
-                    <td class="monospace text-center">C1 / B01</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="monospace">MC4-SET</td>
-                    <td>Connector Set (MC4 male + female)</td>
-                    <td class="text-center">set</td>
-                    <td class="text-right">2</td>
-                    <td class="monospace text-center">A1 / B08</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-            </tbody>
-
-            <!-- Group 2: MNT-KIT-UNIV -->
-            <tbody class="product-group">
-                <tr class="product-group-header">
-                    <td colspan="7">
-                        <div class="product-info">
-                            <span class="product-type-badge">Product</span>
-                            <span class="monospace">MNT-KIT-UNIV</span> • Universal Roof Mount Kit
-                            <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>2</strong></span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="monospace">RAIL-1.8M</td>
-                    <td>Aluminium Rail 1.8m</td>
-                    <td class="text-center">ea</td>
-                    <td class="text-right">8</td>
-                    <td class="monospace text-center">B2 / B12</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="monospace">CLAMP-MID</td>
-                    <td>Mid Clamp Set</td>
-                    <td class="text-center">set</td>
-                    <td class="text-right">6</td>
-                    <td class="monospace text-center">B2 / B12</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="monospace">CLAMP-END</td>
-                    <td>End Clamp Set</td>
-                    <td class="text-center">set</td>
-                    <td class="text-right">4</td>
-                    <td class="monospace text-center">B2 / B12</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-            </tbody>
-
-            <!-- Group 3: Loose items -->
-            <tbody class="product-group">
-                <tr class="product-group-header">
-                    <td colspan="7">
-                        <div class="product-info">
-                            <span class="product-type-badge loose-item">Loose</span>
-                            Additional Items (Not part of kit)
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="monospace">TAPE-INS</td>
-                    <td>Insulation Tape (Black)</td>
-                    <td class="text-center">roll</td>
-                    <td class="text-right">3</td>
-                    <td class="monospace text-center">C1 / B01</td>
-                    <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                    <td></td>
-                </tr>
-            </tbody>
+            @foreach (var group in Model.ProductGroups)
+            {
+                <!-- Product Group -->
+                <tbody class="product-group">
+                    <tr class="product-group-header">
+                        <td colspan="7">
+                            <div class="product-info">
+                                <span class="product-type-badge @(group.IsProduct ? "" : "loose-item")">@(group.IsProduct ? "Product" : "Loose")</span>
+                                @if (!string.IsNullOrEmpty(group.ProductCode))
+                                {
+                                    <span class="monospace">@group.ProductCode</span>
+                                    <text> • </text>
+                                }
+                                @group.ProductDescription
+                                @if (group.RequiredKits.HasValue)
+                                {
+                                    <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>@group.RequiredKits</strong></span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    @foreach (var item in group.Items)
+                    {
+                        <tr>
+                            <td class="monospace">@item.PartNumber</td>
+                            <td>@item.Description</td>
+                            <td class="text-center">@item.Unit</td>
+                            <td class="text-right">@item.Quantity</td>
+                            <td class="monospace text-center">@item.Location</td>
+                            <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                            <td class="small-text">@item.Notes</td>
+                        </tr>
+                    }
+                </tbody>
+            }
 
             <tfoot>
                 <tr>
                     <td colspan="7">
                         <div class="flex-row" style="justify-content: space-between;">
                             <div class="small-text">
-                                Auto-generated on <span class="monospace">2025-10-22 14:06</span> • All quantities shown are required to fulfill the order.
+                                Auto-generated on <span class="monospace">@Model.GeneratedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • All quantities shown are required to fulfill the order.
                             </div>
-                            <div class="monospace">Total Lines: <strong>9</strong> • Total Units: <strong>31</strong></div>
+                            <div class="monospace">Total Lines: <strong>@Model.TotalLines</strong> • Total Units: <strong>@Model.TotalUnits</strong></div>
                         </div>
                     </td>
                 </tr>
@@ -645,10 +572,13 @@
         </table>
 
         <!-- ===== Special Instructions ===== -->
-        <div class="info-box avoid-page-break" style="margin-top:10px;">
-            <h3 class="info-box-title">Special Instructions</h3>
-            <div>Check inverter firmware version ≥ 1.12. Ensure panels are palletized. Separate clamps by type in tote.</div>
-        </div>
+        @if (!string.IsNullOrEmpty(Model.SpecialInstructions))
+        {
+            <div class="info-box avoid-page-break" style="margin-top:10px;">
+                <h3 class="info-box-title">Special Instructions</h3>
+                <div>@Model.SpecialInstructions</div>
+            </div>
+        }
 
         <!-- ===== Footer / Sign-off ===== -->
         <div class="signature-section avoid-page-break">
