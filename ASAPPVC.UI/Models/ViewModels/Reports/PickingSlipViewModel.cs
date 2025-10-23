@@ -63,7 +63,7 @@
                     IsProduct = true,
                     ProductCode = "SOL-KIT-2000",
                     ProductDescription = "2kW Solar Starter Kit",
-                    RequiredKits = 2,
+                    RequiredSets = 2,
                     Items = new List<PickingItem>
                     {
                         new PickingItem
@@ -106,7 +106,7 @@
                     IsProduct = true,
                     ProductCode = "MNT-KIT-UNIV",
                     ProductDescription = "Universal Roof Mount Kit",
-                    RequiredKits = 2,
+                    RequiredSets = 2,
                     Items = new List<PickingItem>
                     {
                         new PickingItem
@@ -187,7 +187,7 @@
         public bool IsProduct { get; set; }
         public string? ProductCode { get; set; }
         public string ProductDescription { get; set; } = string.Empty;
-        public int? RequiredKits { get; set; }
+        public int? RequiredSets { get; set; }
         public List<PickingItem> Items { get; set; } = new();
     }
 

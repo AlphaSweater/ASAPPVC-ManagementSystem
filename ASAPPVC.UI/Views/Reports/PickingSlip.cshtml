@@ -171,6 +171,8 @@
         }
 
         .report-number {
+            display: flex;
+            justify-content: end;
             margin: 4px 0 2px;
             font-size: 22px;
             line-height: 1.1;
@@ -415,8 +417,8 @@
                 <img src="@Model.LogoPath" alt="ASAPPVC" />
             </div>
             <div class="report-identity">
-                <div><span class="report-type-badge">Picking Slip</span></div>
-                <div class="report-number monospace">@Model.PickingSlipNumber</div>
+
+                <div class="report-number monospace">@Model.PickingSlipNumber <span class="report-type-badge">Picking Slip</span></div>
                 <div class="report-metadata">
                     Order <strong>#@Model.OrderNumber</strong> • Created <span class="monospace">@Model.CreatedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • Priority <span class="status-pill">@Model.Priority</span>
                 </div>
@@ -535,9 +537,9 @@
                                     <text> • </text>
                                 }
                                 @group.ProductDescription
-                                @if (group.RequiredKits.HasValue)
+                                @if (group.RequiredSets.HasValue)
                                 {
-                                    <span class="report-metadata" style="margin-left:auto;">Required Kits: <strong>@group.RequiredKits</strong></span>
+                                    <span class="report-metadata" style="margin-left:auto;">Required Sets: <strong>@group.RequiredSets</strong></span>
                                 }
                             </div>
                         </td>
