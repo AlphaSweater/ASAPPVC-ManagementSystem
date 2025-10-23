@@ -1,32 +1,79 @@
 ﻿@model ASAPPVC.UI.Models.OrderModel
 @{
-    ViewData["Title"] = $"Order #{Model.OrderID}";
+	ViewData["Title"] = $"Order #{Model.OrderID}";
 }
-<h2>Order #@Model.OrderID</h2>
-<p>
-    <strong>Customer:</strong> @Model.Customer?.Name @Model.Customer?.Surname<br />
-    <strong>Date:</strong> @Model.OrderDate.ToLocalTime()<br />
-    <strong>Status:</strong> @Model.OrderStatus
-</p>
 
-<h4>Products</h4>
-@if (Model.OrderProducts == null || !Model.OrderProducts.Any())
-{
-        <p class="text-muted">No products in this order.</p>
-}
-else
-{
-        <table class="table table-sm">
-            <thead><tr><th>Product</th><th class="text-end" style="width:140px;">Price</th></tr></thead>
-            <tbody>
-            @foreach (var line in Model.OrderProducts)
-            {
-                    <tr>
-                        <td>@line.Product?.Name</td>
-                        <td class="text-end">@line.Product?.Price.ToString("C")</td>
-                    </tr>
-            }
-            </tbody>
-        </table>
-}
-<a asp-action="ViewOrders" class="btn btn-secondary">Back</a>
+<link rel="stylesheet" href="~/css/views/order/ViewOrder.css" asp-append-version="true" />
+
+<div class="viewport">
+	<div class="view-container">
+		<div class="header-section">
+			<a class="back-link" asp-action="ViewOrders">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd"></path>
+				</svg>
+				Back to Orders
+			</a>
+
+			<div class="header-row">
+					<h2 class="main-title">Order #@Model.OrderID</h2>
+				<div class="right-actions">
+					<a asp-action="PickingSlip" asp-route-id="@Model.OrderID" class="btn btn-primary">Create Picking Slip</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Order Details Cards -->
+		<div class="order-details-grid">
+			<div class="info-card">
+				<div class="label">Customer</div>
+				<div class="value">@Model.Customer?.Name @Model.Customer?.Surname</div>
+			</div>
+			<div class="info-card">
+				<div class="label">Order Date</div>
+				<div class="value">@Model.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+			</div>
+			<div class="info-card">
+				<div class="label">Status</div>
+				<div class="value">@Model.OrderStatus</div>
+			</div>
+		</div>
+
+		<!-- Products in this Order -->
+		<section class="products-section">
+			<h3>Products</h3>
+			@if ( Model.OrderProducts == null || !Model.OrderProducts.Any() ) {
+				<p style="text-align:center; padding:40px; color: var(--text-muted);">
+					No products in this order.
+				</p>
+			}
+			else {
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Product</th>
+							<th class="text-end" style="width:140px;">Price</th>
+						</tr>
+					</thead>
+					<tbody>
+						@{
+							decimal total = 0;
+							foreach ( var line in Model.OrderProducts ) {
+								var price = line.Product?.Price ?? 0;
+								total += price;
+								<tr>
+									<td>@line.Product?.Name</td>
+									<td class="text-end">@price.ToString("C")</td>
+								</tr>
+							}
+						}
+						<tr class="total-row">
+							<td class="text-end">Order Total:</td>
+							<td class="text-end">@total.ToString("C")</td>
+						</tr>
+					</tbody>
+				</table>
+			}
+		</section>
+	</div>
+</div>

@@ -31,6 +31,15 @@
           "Microsoft.EntityFrameworkCore.Design": "8.0.10"
         }
       },
+      "PuppeteerSharp": {
+        "type": "Direct",
+        "requested": "[20.2.4, )",
+        "resolved": "20.2.4",
+        "contentHash": "EIZEsXiFkzh1oftndcLwwFuiSoWGQ0s8/W7s78nszZZ97dP8Hv5n/37uQL/qW7rYs2xA/Upj1dsG9SRzYqySmA==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "8.0.0"
+        }
+      },
       "Humanizer.Core": {
         "type": "Transitive",
         "resolved": "2.14.1",

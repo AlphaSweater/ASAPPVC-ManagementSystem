@@ -1,0 +1,527 @@
+/* ================= CSS Variables ================= */
+:root {
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --background-light: #f9fafb;
+    --brand-color: #0ea5e9;
+    --accent-color: #f59e0b;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --table-header-bg: #f2f8ff;
+    --table-header-text: #0b3b57;
+}
+
+/* ================= Base Styles ================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    color: var(--text-primary);
+    font: 12px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ================= Print Page Setup ================= */
+@page {
+    size: A4; /* 210mm × 297mm */
+    margin: 12mm;
+}
+
+@page:top-right {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+@page:bottom-center {
+    content: "";
+}
+
+@page:left {
+    margin-left: 16mm;
+    margin-right: 10mm;
+}
+
+@page:right {
+    margin-left: 10mm;
+    margin-right: 16mm;
+}
+
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+
+    .avoid-page-break {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .force-page-break {
+        break-after: page;
+        page-break-before: always;
+    }
+
+    table {
+        page-break-inside: auto;
+    }
+
+    tr, td, th {
+        page-break-inside: avoid;
+    }
+}
+
+/* ================= Page Container ================= */
+.page-container {
+    max-width: 186mm;
+    margin: 0 auto;
+    padding: 16px;
+    background: #fff;
+}
+
+/* ================= Grid Layouts ================= */
+.grid-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.grid-three-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.grid-four-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+/* ================= Flex Layouts ================= */
+.flex-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.flex-row-space-between {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ================= Report Header Section ================= */
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 12px;
+}
+
+.company-logo {
+    height: 18mm;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.company-logo img {
+    display: block;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.report-identity {
+    text-align: right;
+}
+
+.report-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid var(--brand-color);
+    color: var(--brand-color);
+    font-size: 11px;
+}
+
+.report-number {
+    display: flex;
+    justify-content: end;
+    margin: 4px 0 2px;
+    font-size: 22px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.report-metadata {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* ================= Information Boxes ================= */
+.info-box {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+}
+
+.info-box-title {
+    margin: 0 0 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-secondary);
+}
+
+.info-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px 0;
+}
+
+.info-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-secondary);
+}
+
+.field-value {
+    font-size: 12px;
+}
+
+/* ================= Table Styles ================= */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 10px;
+}
+
+.report-table td,
+.report-table th {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+.report-table thead th {
+    background: var(--table-header-bg);
+    color: var(--table-header-text);
+    font-weight: 700;
+    font-size: 11px;
+    text-align: left;
+}
+
+.report-table td {
+    font-size: 12px;
+}
+
+.report-table tfoot td {
+    background: var(--background-light);
+    font-weight: 600;
+}
+
+/* ================= Summary Section ================= */
+.summary-section {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+    margin-top: 10px;
+}
+
+.summary-title {
+    margin: 0 0 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-secondary);
+}
+
+/* ================= Signature Section ================= */
+.signature-section {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50mm, 1fr));
+    gap: 10px;
+}
+
+.signature-box {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    min-height: 46mm;
+}
+
+.signature-box-title {
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.signature-line {
+    border-bottom: 1px dashed var(--border-color);
+    height: 22px;
+    margin-bottom: 6px;
+}
+
+/* ================= Badges & Pills ================= */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.badge-primary {
+    border: 1px solid var(--brand-color);
+    color: var(--brand-color);
+    background: transparent;
+}
+
+.badge-success {
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+    background: transparent;
+}
+
+.badge-warning {
+    border: 1px solid var(--warning-color);
+    color: var(--warning-color);
+    background: transparent;
+}
+
+.badge-danger {
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    background: transparent;
+}
+
+.badge-accent {
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    background: transparent;
+}
+
+/* ================= Chips ================= */
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chip {
+    border: 1px solid var(--border-color);
+    background: #fff;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+/* ================= Utility - Text Alignment ================= */
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* ================= Utility - Typography ================= */
+.small-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.monospace {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.semibold {
+    font-weight: 600;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+/* ================= Utility - Spacing ================= */
+.mt-5 {
+    margin-top: 5px;
+}
+
+.mt-8 {
+    margin-top: 8px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-12 {
+    margin-top: 12px;
+}
+
+.mb-5 {
+    margin-bottom: 5px;
+}
+
+.mb-8 {
+    margin-bottom: 8px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-12 {
+    margin-bottom: 12px;
+}
+
+.ml-auto {
+    margin-left: auto;
+}
+
+.mr-auto {
+    margin-right: auto;
+}
+
+/* ================= Utility - Display ================= */
+.block {
+    display: block;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.flex {
+    display: flex;
+}
+
+.grid {
+    display: grid;
+}
+
+/* ================= Utility - QR Code Placeholder ================= */
+.qr-code-placeholder {
+    width: 22mm;
+    height: 22mm;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* ================= Utility - Borders ================= */
+.border {
+    border: 1px solid var(--border-color);
+}
+
+.border-top {
+    border-top: 1px solid var(--border-color);
+}
+
+.border-bottom {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.border-left {
+    border-left: 1px solid var(--border-color);
+}
+
+.border-right {
+    border-right: 1px solid var(--border-color);
+}
+
+.rounded {
+    border-radius: 10px;
+}
+
+.rounded-sm {
+    border-radius: 6px;
+}
+
+.rounded-full {
+    border-radius: 999px;
+}
+
+/* ================= Utility - Colors ================= */
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-brand {
+    color: var(--brand-color);
+}
+
+.bg-light {
+    background-color: var(--background-light);
+}
+
+.bg-white {
+    background-color: #fff;
+}
