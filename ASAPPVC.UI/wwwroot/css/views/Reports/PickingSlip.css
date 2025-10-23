@@ -1,0 +1,155 @@
+/* Import Base Report Styles */
+@import url('./BaseReport.css');
+
+/* ================= Picking Slip Specific Overrides ================= */
+/* Override grid-three-columns for picking slip layout */
+.grid-three-columns {
+    grid-template-columns: 1.1fr 1.1fr 0.9fr;
+}
+
+/* ================= Picking Slip Specific Styles ================= */
+
+/* QR Section in Order Info Box */
+.qr-section {
+    margin-top: 8px;
+}
+
+/* Location Summary Specific */
+.location-summary {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+    margin-top: 10px;
+}
+
+.location-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.location-chip {
+    border: 1px solid var(--border-color);
+    background: #fff;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+/* ================= Parts Table Specific Styles ================= */
+.parts-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 10px;
+}
+
+.parts-table td,
+.parts-table th {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Picking Slip Table Column Widths */
+.column-number {
+    width: 18mm;
+}
+
+.column-unit {
+    width: 16mm;
+}
+
+.column-location {
+    width: 26mm;
+}
+
+.column-picked {
+    width: 20mm;
+}
+
+.column-notes {
+    width: 30mm;
+}
+
+.column-product-part {
+    width: 30mm;
+}
+
+.parts-table th,
+.parts-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+.parts-table thead th {
+    background: var(--table-header-bg);
+    color: var(--table-header-text);
+    font-weight: 700;
+    font-size: 11px;
+    text-align: left;
+}
+
+.parts-table td {
+    font-size: 12px;
+}
+
+/* Product Group Rows */
+.product-group {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.product-group.break-before {
+    break-before: page;
+    page-break-before: always;
+}
+
+.product-group-header td {
+    background: #fff;
+    font-weight: 700;
+    border-top: 2px solid var(--border-color);
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.product-info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.product-type-badge {
+    display: inline-block;
+    border: 1px solid var(--brand-color);
+    color: var(--brand-color);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+.product-type-badge.loose-item {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* ================= Picking Slip Signature Section ================= */
+.signature-section {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+/* Picking Slip specific status pill */
+.status-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid var(--brand-color);
+    color: var(--brand-color);
+    font-size: 11px;
+}

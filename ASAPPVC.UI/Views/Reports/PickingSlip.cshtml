@@ -2,51 +2,28 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>Picking Slip • @Model.PickingSlipNumber</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="~/css/views/Reports/PickingSlip.css" />
     <style>
-        /* ================= CSS Variables ================= */
-        :root {
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --background-light: #f9fafb;
-            --brand-color: #0ea5e9;
-            --accent-color: #f59e0b;
-            --table-header-bg: #f2f8ff;
-            --table-header-text: #0b3b57;
-        }
-
-        /* ================= Base Styles ================= */
-        html, body {
-            margin: 0;
-            padding: 0;
-            color: var(--text-primary);
-            font: 12px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background: #fff;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        /* ================= Print Page Setup ================= */
         @@page {
             size: A4; /* 210mm × 297mm */
             margin: 12mm;
+        }
 
-            @@top-right {
-                content: "Page " counter(page) " of " counter(pages);
-                font-size: 11px;
-                color: var(--text-secondary);
-            }
-            @@bottom-center {
-                content: "";
-            }
+        @@top-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        @@bottom-center {
+            content: "";
         }
 
         @@page:left {
@@ -84,6 +61,7 @@
 
             .force-page-break {
                 break-after: page;
+                page-break-before: always;
             }
 
             table {
@@ -93,322 +71,10 @@
             tr, td, th {
                 page-break-inside: avoid;
             }
-
-            .product-group {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .product-group.break-before {
-                break-before: page;
-                page-break-before: always;
-            }
-        }
-
-        /* ================= Page Container ================= */
-        .page-container {
-            max-width: 186mm;
-            margin: 0 auto;
-            padding: 16px;
-            background: #fff;
-        }
-
-        /* ================= Grid Layouts ================= */
-        .grid-two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .grid-three-columns {
-            display: grid;
-            grid-template-columns: 1.1fr 1.1fr 0.9fr;
-            gap: 10px;
-        }
-
-        .flex-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* ================= Header Section ================= */
-        .report-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 12px;
-        }
-
-        .company-logo {
-            height: 18mm;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .company-logo img {
-            display: block;
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
-        }
-
-        .report-identity {
-            text-align: right;
-        }
-
-        .report-type-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-weight: 600;
-            border: 1px solid var(--brand-color);
-            color: var(--brand-color);
-            font-size: 11px;
-        }
-
-        .report-number {
-            display: flex;
-            justify-content: end;
-            margin: 4px 0 2px;
-            font-size: 22px;
-            line-height: 1.1;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .report-metadata {
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        /* ================= Information Boxes ================= */
-        .info-box {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            background: #fff;
-        }
-
-        .info-box-title {
-            margin: 0 0 6px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: var(--text-secondary);
-        }
-
-        .info-fields {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px 0;
-        }
-
-        .info-field {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .field-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-            color: var(--text-secondary);
-        }
-
-        .field-value {
-            font-size: 12px;
-        }
-
-        /* ================= Summary Section ================= */
-        .location-summary {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            background: #fff;
-            margin-top: 10px;
-        }
-
-        .summary-title {
-            margin: 0 0 6px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: var(--text-secondary);
-        }
-
-        .location-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .location-chip {
-            border: 1px solid var(--border-color);
-            background: #fff;
-            border-radius: 999px;
-            padding: 3px 8px;
-            font-size: 11px;
-        }
-
-        /* ================= Table Styles ================= */
-        .parts-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin-top: 10px;
-        }
-
-        .parts-table td,
-        .parts-table th {
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-        /* Table Column Widths */
-        .column-number {
-            width: 18mm;
-        }
-
-        .column-unit {
-            width: 16mm;
-        }
-
-        .column-location {
-            width: 26mm;
-        }
-
-        .column-picked {
-            width: 20mm;
-        }
-
-        .column-notes {
-            width: 30mm;
-        }
-
-        .parts-table th,
-        .parts-table td {
-            border: 1px solid var(--border-color);
-            padding: 8px 10px;
-            vertical-align: middle;
-        }
-
-        .parts-table thead th {
-            background: var(--table-header-bg);
-            color: var(--table-header-text);
-            font-weight: 700;
-            font-size: 11px;
-            text-align: left;
-        }
-
-        .parts-table td {
-            font-size: 12px;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        /* Product Group Rows */
-        .product-group-header td {
-            background: #fff;
-            font-weight: 700;
-            border-top: 2px solid var(--border-color);
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-
-        .product-info {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            width: 100%;
-        }
-
-        .product-type-badge {
-            display: inline-block;
-            border: 1px solid var(--brand-color);
-            color: var(--brand-color);
-            border-radius: 999px;
-            padding: 3px 8px;
-            font-size: 11px;
-        }
-
-        .product-type-badge.loose-item {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-        }
-
-        /* ================= Footer / Sign-off Section ================= */
-        .signature-section {
-            margin-top: 12px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-        }
-
-        .signature-box {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            min-height: 46mm;
-        }
-
-        .signature-box-title {
-            margin: 0 0 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-        }
-
-        .signature-line {
-            border-bottom: 1px dashed var(--border-color);
-            height: 22px;
-            margin-bottom: 6px;
-        }
-
-        /* ================= Utility Classes ================= */
-        .qr-code-placeholder {
-            width: 22mm;
-            height: 22mm;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 11px;
-        }
-
-        .small-text {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .monospace {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .status-pill {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-weight: 600;
-            border: 1px solid var(--brand-color);
-            color: var(--brand-color);
-            font-size: 11px;
         }
     </style>
 </head>
+
 <body>
     <div class="page-container">
         <!-- ===== Header ===== -->
@@ -482,7 +148,7 @@
                         <div class="field-value monospace">@Model.Order.PickBy.ToString("yyyy-MM-dd HH:mm")</div>
                     </div>
                 </div>
-                <div class="flex-row" style="margin-top:8px; justify-content: space-between;">
+                <div class="flex-row-space-between qr-section">
                     <div class="small-text">Scan to open order</div>
                     <div class="qr-code-placeholder">QR</div>
                 </div>
@@ -513,7 +179,7 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th style="width:30mm;">Product / Part</th>
+                    <th class="column-product-part">Product / Part</th>
                     <th>Description</th>
                     <th class="text-center">Unit</th>
                     <th class="text-right">Qty</th>
@@ -539,7 +205,7 @@
                                 @group.ProductDescription
                                 @if (group.RequiredSets.HasValue)
                                 {
-                                    <span class="report-metadata" style="margin-left:auto;">Required Sets: <strong>@group.RequiredSets</strong></span>
+                                    <span class="report-metadata ml-auto">Required Sets: <strong>@group.RequiredSets</strong></span>
                                 }
                             </div>
                         </td>
@@ -562,7 +228,7 @@
             <tfoot>
                 <tr>
                     <td colspan="7">
-                        <div class="flex-row" style="justify-content: space-between;">
+                        <div class="flex-row-space-between">
                             <div class="small-text">
                                 Auto-generated on <span class="monospace">@Model.GeneratedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • All quantities shown are required to fulfill the order.
                             </div>
@@ -576,7 +242,7 @@
         <!-- ===== Special Instructions ===== -->
         @if (!string.IsNullOrEmpty(Model.SpecialInstructions))
         {
-            <div class="info-box avoid-page-break" style="margin-top:10px;">
+            <div class="info-box avoid-page-break mt-10">
                 <h3 class="info-box-title">Special Instructions</h3>
                 <div>@Model.SpecialInstructions</div>
             </div>
