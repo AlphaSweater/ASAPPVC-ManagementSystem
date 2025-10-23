@@ -37,8 +37,11 @@
         @@page {
             size: A4; /* 210mm × 297mm */
             margin: 12mm;
+            @@top-center {
+                content: "";
+            }
             @@bottom-center {
-                content: "Picking Slip • PS-000123 — Page " counter(page) " of " counter(pages);
+                content: "Picking Slip • PS-000123 - Page " counter(page) " of " counter(pages);
                 font-size: 11px;
                 color: var(--text-secondary);
             }

@@ -15,4 +15,8 @@
 		</PackageReference>
 		<PackageReference Include="PuppeteerSharp" Version="20.2.4" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Models\ViewModels\Reports\" />
+	</ItemGroup>
 </Project>
