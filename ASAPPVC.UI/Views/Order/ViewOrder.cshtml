@@ -73,7 +73,7 @@
         border: 1px solid var(--line);
         border-radius: 16px;
         padding: 32px 40px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        box-shadow: 0 8px 32px 0 rgba(0,0,0,.37);
     }
 
     /* ---------- Header ---------- */
@@ -92,7 +92,7 @@
         font-weight: 600;
         font-size: 14px;
         margin-bottom: 16px;
-        transition: color 0.2s ease;
+        transition: color .2s ease;
     }
 
         .back-link:hover {
@@ -128,7 +128,7 @@
     }
 
     .info-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255,255,255,.05);
         border: 1px solid var(--line);
         border-radius: 12px;
         padding: 16px 20px;
@@ -171,7 +171,7 @@
             font-size: 14px;
             font-weight: 700;
             color: var(--text-light);
-            background-color: rgba(0, 0, 0, 0.15);
+            background-color: rgba(0,0,0,.15);
         }
 
         .table td {
@@ -208,11 +208,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
+        transition: all .2s ease;
     }
 
         .btn:active {
-            transform: scale(0.98);
+            transform: scale(.98);
         }
 
     .btn-sm {
@@ -233,12 +233,12 @@
     .btn-secondary {
         background: transparent;
         color: var(--text-light);
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255,255,255,.4);
     }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.6);
         }
 
     .actions {
@@ -299,34 +299,49 @@
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th class="text-end" style="width:140px;">Price</th>
+                            <th class="text-end" style="width:90px;">Qty</th>
+                            <th class="text-end" style="width:140px;">Unit Price</th>
+                            <th class="text-end" style="width:160px;">Line Total</th>
                             <th style="width:160px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @{
-                            decimal total = 0;
+                            decimal grandTotal = 0;
                             foreach (var line in Model.OrderProducts)
                             {
-                                var price = line.Product?.Price ?? 0;
-                                total += price;
-                                <tr>
-                                    <td>@line.Product?.Name</td>
-                                    <td class="text-end">@price.ToString("C")</td>
-                                    <td>
-                                        <div class="actions">
-                                            <a class="btn btn-secondary btn-sm" asp-controller="Inventory" asp-action="ViewProduct" asp-route-id="@(line.ProductID)">
-                                                View
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                ;
+                                var qty = line.Quantity;
+                                var unit = line.Product?.Price ?? 0m;
+                                var lineTotal = unit * qty;
+                                grandTotal += lineTotal;
                             }
                         }
+                        @foreach (var line in Model.OrderProducts)
+                        {
+                            var qty = line.Quantity;
+                            var unit = line.Product?.Price ?? 0m;
+                            var lineTotal = unit * qty;
+                            <tr>
+                                <td>@line.Product?.Name</td>
+                                <td class="text-end">@qty</td>
+                                <td class="text-end">@unit.ToString("C")</td>
+                                <td class="text-end">@lineTotal.ToString("C")</td>
+                                <td>
+                                    <div class="actions">
+                                        <a class="btn btn-secondary btn-sm"
+                                           asp-controller="Inventory"
+                                           asp-action="ViewProduct"
+                                           asp-route-id="@(line.ProductID)">
+                                            View
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                         <tr class="total-row">
-                            <td class="text-end" colspan="2">Order Total:</td>
-                            <td class="text-end">@total.ToString("C")</td>
+                            <td colspan="3" class="text-end">Order Total:</td>
+                            <td class="text-end">@((Model.OrderProducts?.Sum(op => (op.Product?.Price ?? 0m) * op.Quantity) ?? 0m).ToString("C"))</td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
