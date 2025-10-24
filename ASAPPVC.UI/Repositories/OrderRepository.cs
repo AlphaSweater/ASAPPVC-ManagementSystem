@@ -1,40 +1,36 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories.Implementation
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : BaseRepository<OrderModel>, IOrderRepository
     {
-        //─────────── Dependencies ───────────\\
-        private readonly AppDbContext _db;
-
-        public OrderRepository(AppDbContext db)
+        public OrderRepository(AppDbContext db) : base(db)
         {
-            _db = db;
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // adds a new order to the database
         public async Task<OrderModel> AddOrderAsync(OrderModel order, CancellationToken ct = default)
         {
-            var entry = await _db.Order.AddAsync(order, ct);
-            return entry.Entity;
+            // delegate to base AddAsync (keeps behavior consistent)
+            var entry = await base.AddAsync(order, ct);
+            return entry;
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // adds order products to the database
         public Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default)
         {
+            // AppDbContext.OrderProduct is accessible via base protected _db
             _db.OrderProduct.AddRange(lines);
             return Task.CompletedTask;
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // retrieves a list of orders with customer and products
         public async Task<List<OrderModel>> ListAsync(CancellationToken ct = default)
         {
-            return await _db.Order
+            return await _set
                 .AsNoTracking()
                 .Include(o => o.Customer)
                 .Include(o => o.OrderProducts)
@@ -42,11 +38,9 @@ namespace ASAPPVC.UI.Repositories.Interfaces
                 .ToListAsync(ct);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // retrieves a single order with customer and products by ID
         public async Task<OrderModel?> GetWithDetailsAsync(int id, CancellationToken ct = default)
         {
-            return await _db.Order
+            return await _set
                 .AsNoTracking()
                 .Include(o => o.Customer)
                 .Include(o => o.OrderProducts)
@@ -54,11 +48,9 @@ namespace ASAPPVC.UI.Repositories.Interfaces
                 .FirstOrDefaultAsync(o => o.OrderID == id, ct);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // saves changes to the database
-        public async Task SaveAsync(CancellationToken ct = default)
+        public new Task<int> SaveAsync(CancellationToken ct = default)
         {
-            await _db.SaveChangesAsync(ct);
+            return base.SaveAsync(ct);
         }
     }
 }

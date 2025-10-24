@@ -1,27 +1,56 @@
 ﻿{
-  "dependentFileProviders": {
-    "add": {
-      "extensionToExtension": {
-        "add": {
-          ".css": [".cshtml"],
-          ".js": [".cshtml"]
-        }
-      },
-      "fileToFile": {
-        "add": {
-          "UserProfileRepository.cs": ["IUserProfileRepository.cs"],
-          "CustomerRepository.cs": ["ICustomerRepository.cs"],
-          "PartRepository.cs": ["IPartRepository.cs"],
-          "OrderRepository.cs": ["IOrderRepository.cs"],
-          "AuthService.cs": ["IAuthService.cs"],
-          "ProductService.cs": ["IProductService.cs"],
-          "CustomerService.cs": ["ICustomerService.cs"],
-          "OrderService.cs": ["IOrderService.cs"],
-          "ProductRepository.cs": ["IProductRepository.cs"],
-          "PartService.cs": ["IPartService.cs"],
-          "UserService.cs": ["IUserService.cs"]
-        }
-      }
-    }
-  }
+    "dependentFileProviders":  {
+                                   "add":  {
+                                               "extensionToExtension":  {
+                                                                            "add":  {
+                                                                                        ".css":  [
+                                                                                                     ".cshtml"
+                                                                                                 ],
+                                                                                        ".js":  [
+                                                                                                    ".cshtml"
+                                                                                                ]
+                                                                                    }
+                                                                        },
+                                               "fileToFile":  {
+                                                                  "add":  {
+                                                                              "UserProfileRepository.cs":  [
+                                                                                                               "IUserProfileRepository.cs"
+                                                                                                           ],
+                                                                              "PartService.cs":  [
+                                                                                                     "IPartService.cs"
+                                                                                                 ],
+                                                                              "PartRepository.cs":  [
+                                                                                                        "IPartRepository.cs"
+                                                                                                    ],
+                                                                              "OrderService.cs":  [
+                                                                                                      "IOrderService.cs"
+                                                                                                  ],
+                                                                              "OrderRepository.cs":  [
+                                                                                                         "IOrderRepository.cs"
+                                                                                                     ],
+                                                                              "UserService.cs":  [
+                                                                                                     "IUserService.cs"
+                                                                                                 ],
+                                                                              "ProductService.cs":  [
+                                                                                                        "IProductService.cs"
+                                                                                                    ],
+                                                                              "AuthService.cs":  [
+                                                                                                     "IAuthService.cs"
+                                                                                                 ],
+                                                                              "CustomerService.cs":  [
+                                                                                                         "ICustomerService.cs"
+                                                                                                     ],
+                                                                              "CustomerRepository.cs":  [
+                                                                                                            "ICustomerRepository.cs"
+                                                                                                        ],
+                                                                              "BaseRepository.cs":  [
+                                                                                                        "IBaseRepository.cs"
+                                                                                                    ],
+                                                                              "ProductRepository.cs":  [
+                                                                                                           "IProductRepository.cs"
+                                                                                                       ]
+                                                                          }
+                                                              }
+                                           }
+                               }
 }

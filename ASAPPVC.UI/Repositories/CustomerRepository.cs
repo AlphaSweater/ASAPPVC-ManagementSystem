@@ -2,39 +2,22 @@
 using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ASAPPVC.UI.Repositories.Implementation
 {
-    public class CustomerRepository : ICustomerRepository
+    public class CustomerRepository : BaseRepository<CustomerModel>, ICustomerRepository
     {
-        //─────────── Dependencies ───────────\\
-        private readonly AppDbContext _db;
-
-        public CustomerRepository(AppDbContext db)
+        public CustomerRepository(AppDbContext db) : base(db)
         {
-            _db = db;
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // adds a new customer to the database
-        public async Task<CustomerModel> AddAsync(CustomerModel customer, CancellationToken ct = default)
-        {
-            var entry = await _db.Customer.AddAsync(customer, ct);
-            return entry.Entity;
-        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // retrieves a list of customers ordered by name
+        // keeps an ordered list specific to customers
         public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
         {
-            return await _db.Customer.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
-        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // saves changes to the database
-        public async Task SaveAsync(CancellationToken ct = default)
-        {
-            await _db.SaveChangesAsync(ct);
+            return await _set.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
         }
     }
 }

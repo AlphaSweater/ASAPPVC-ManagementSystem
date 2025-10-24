@@ -1,11 +1,13 @@
 ﻿using ASAPPVC.UI.Models;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ASAPPVC.UI.Repositories.Interfaces
 {
-    public interface ICustomerRepository
+    public interface ICustomerRepository : IBaseRepository<CustomerModel>
     {
-        Task<CustomerModel> AddAsync(CustomerModel customer, CancellationToken ct = default);
+        // Returns all customers ordered by name (separate from GetAllAsync which is unordered)
         Task<List<CustomerModel>> ListAsync(CancellationToken ct = default);
-        Task SaveAsync(CancellationToken ct = default);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public abstract class BaseRepository<T> where T : class
+    public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         protected readonly AppDbContext _db;
         protected readonly DbSet<T> _set;
@@ -45,7 +45,8 @@ namespace ASAPPVC.UI.Repositories
         {
             ArgumentNullException.ThrowIfNull(id);
 
-            var entity = await _set.FindAsync([id], ct);
+            // DbSet.FindAsync expects an object[] of key values
+            var entity = await _set.FindAsync(new object[] { id }, ct);
             return entity;
         }
 
