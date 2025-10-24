@@ -1,9 +1,8 @@
 ﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using ASAPPVC.UI.Models;
 
-namespace ASAPPVC.UI.Repositories.Implementation
+namespace ASAPPVC.UI.Repositories.Interfaces
 {
     public class UserProfileRepository : IUserProfileRepository
     {

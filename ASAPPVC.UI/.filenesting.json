@@ -1,13 +1,35 @@
 ﻿{
-	"help": "https://go.microsoft.com/fwlink/?linkid=866610",
-	"dependentFileProviders": {
-		"add": {
-			"extensionToExtension": {
-				"add": {
-					".css": [ ".cshtml" ],
-					".js": [ ".cshtml" ]
-				}
-			}
-		}
-	}
+    "dependentFileProviders":  {
+                                   "add":  {
+                                               "extensionToExtension":  {
+                                                                            "add":  {
+                                                                                        ".css":  [
+                                                                                                     ".cshtml"
+                                                                                                 ],
+                                                                                        ".js":  [
+                                                                                                    ".cshtml"
+                                                                                                ]
+                                                                                    }
+                                                                        },
+                                               "fileToFile":  {
+                                                                  "add":  {
+                                                                              "IUserProfileRepository.cs":  [
+                                                                                                                "UserProfileRepository.cs"
+                                                                                                            ],
+                                                                              "ICustomerRepository.cs":  [
+                                                                                                             "CustomerRepository.cs"
+                                                                                                         ],
+                                                                              "IOrderRepository.cs":  [
+                                                                                                          "OrderRepository.cs"
+                                                                                                      ],
+                                                                              "IProductRepository.cs":  [
+                                                                                                            "ProductRepository.cs"
+                                                                                                        ],
+                                                                              "IPartRepository.cs":  [
+                                                                                                         "PartRepository.cs"
+                                                                                                     ]
+                                                                          }
+                                                              }
+                                           }
+                               }
 }

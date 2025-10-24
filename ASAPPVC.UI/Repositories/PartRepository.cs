@@ -1,9 +1,8 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI.Repositories.Implementation
+namespace ASAPPVC.UI.Repositories.Interfaces
 {
     public class PartRepository : IPartRepository
     {
