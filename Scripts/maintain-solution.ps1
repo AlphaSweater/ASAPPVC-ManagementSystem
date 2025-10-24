@@ -150,14 +150,16 @@ function Update-ProjectFilenesting([string]$projDir) {
   $json.dependentFileProviders.add.fileToFile.add = As-Hashtable $json.dependentFileProviders.add.fileToFile.add
   $fileMap = $json.dependentFileProviders.add.fileToFile.add
 
-  # Build fresh interface -> implementations map (same folder as interface)
-  $pairs = @{}
+  # Build fresh implementation -> interface map (so interface appears on top)
+  # Visual Studio's fileToFile map uses: "childFile": ["parentFile"]
+  $pairs = @{}   # key = child (implementation), value = array of parents (its interface)
+
   $interfaces = Get-ChildItem -Path $projDir -Recurse -Filter "I*.cs" -File |
                 Where-Object { -not (Is-ExcludedPath $_.DirectoryName) }
 
   foreach ($iface in $interfaces) {
     if ($iface.BaseName.Length -lt 2) { continue }
-    $dir = $iface.DirectoryName
+    $dir  = $iface.DirectoryName
     if (Is-ExcludedPath $dir) { continue }
 
     $base = $iface.BaseName.Substring(1)  # drop leading 'I'
@@ -165,8 +167,9 @@ function Update-ProjectFilenesting([string]$projDir) {
              Where-Object { $_.Name -ne $iface.Name -and -not (Is-GeneratedName $_.Name) } |
              Select-Object -ExpandProperty Name
 
-    if ($impls -and $impls.Count -gt 0) {
-      $pairs[$iface.Name] = ($impls | Sort-Object -Unique)
+    foreach ($impl in $impls) {
+      if (-not $pairs.ContainsKey($impl)) { $pairs[$impl] = @() }
+      $pairs[$impl] = (@($pairs[$impl]) + $iface.Name) | Sort-Object -Unique
     }
   }
 
