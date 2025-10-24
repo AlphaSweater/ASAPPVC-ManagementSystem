@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using ASAPPVC.UI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
@@ -16,16 +10,20 @@ namespace ASAPPVC.UI.Repositories
 
         protected BaseRepository(AppDbContext db)
         {
-            if (db == null) throw new ArgumentNullException(nameof(db));
+            ArgumentNullException.ThrowIfNull(db);
             _db = db;
             _set = _db.Set<T>();
         }
 
         // ============== Create ==============
-        /// <summary>Add a single entity (does NOT save).</summary>
+        /// <summary>
+        /// Adds a single entity to the context (does NOT call SaveChanges).
+        /// Returns the added entity instance (useful if EF populated identity values).
+        /// </summary>
+        /// <remarks>Does not persist to the database until <see cref="SaveAsync"/> is called.</remarks>
         public virtual async Task<T> AddAsync(T entity, CancellationToken ct = default)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
             var entry = await _set.AddAsync(entity, ct);
             return entry.Entity;
         }
@@ -33,15 +31,22 @@ namespace ASAPPVC.UI.Repositories
         /// <summary>Add multiple entities (does NOT save).</summary>
         public virtual Task AddRangeAsync(IEnumerable<T> entities, CancellationToken ct = default)
         {
-            if (entities == null) throw new ArgumentNullException(nameof(entities));
+            ArgumentNullException.ThrowIfNull(entities);
             return _set.AddRangeAsync(entities, ct);
         }
 
         // ============== Read ==============
-        /// <summary>Find by primary key (single key). Returns null if not found.</summary>
-        public virtual Task<T?> FindAsync(object id, CancellationToken ct = default)
+        /// <summary>
+        /// Find an entity by its primary key (single key).
+        /// Returns null if no matching entity is tracked or exists in the database.
+        /// </summary>
+        /// <param name="id">The primary key value. Must not be null.</param>
+        public virtual async Task<T?> FindAsync(object id, CancellationToken ct = default)
         {
-            return _set.FindAsync([id], ct).AsTask();
+            ArgumentNullException.ThrowIfNull(id);
+
+            var entity = await _set.FindAsync([id], ct);
+            return entity;
         }
 
         /// <summary>Get all items. AsNoTracking by default.</summary>
@@ -72,32 +77,36 @@ namespace ASAPPVC.UI.Repositories
         /// <summary>Marks an entity as modified (does NOT save).</summary>
         public virtual void Update(T entity)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
+
             _set.Update(entity);
         }
 
         // ============== Delete ==============
-        /// <summary>Remove an entity (does NOT save).</summary>
-        public virtual void Remove(T entity)
+        /// <summary>delete an entity (does NOT save).</summary>
+        public virtual void Delete(T entity)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
+
             _set.Remove(entity);
         }
 
-        /// <summary>Remove multiple entities (does NOT save).</summary>
-        public virtual void RemoveRange(IEnumerable<T> entities)
-        {
-            if (entities == null) throw new ArgumentNullException(nameof(entities));
-            _set.RemoveRange(entities);
-        }
-
-        /// <summary>Find by id and remove if found (does NOT save). Returns true if removed.</summary>
-        public virtual async Task<bool> RemoveByIdAsync(object id, CancellationToken ct = default)
+        /// <summary>Find by id and delete if found (does NOT save). Returns true if deleted.</summary>
+        public virtual async Task<bool> DeleteByIdAsync(object id, CancellationToken ct = default)
         {
             var entity = await FindAsync(id, ct);
-            if (entity == null) return false;
+            if (entity == null)
+                return false;
             _set.Remove(entity);
             return true;
+        }
+
+        /// <summary>delete multiple entities (does NOT save).</summary>
+        public virtual void DeleteRange(IEnumerable<T> entities)
+        {
+            ArgumentNullException.ThrowIfNull(entities);
+
+            _set.RemoveRange(entities);
         }
 
         // ============== Save ==============
