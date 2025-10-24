@@ -1,7 +1,7 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 
-namespace ASAPPVC.UI.Services.Interfaces
+namespace ASAPPVC.UI.Services
 {
     public interface IAuthService
     {

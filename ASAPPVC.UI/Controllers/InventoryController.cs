@@ -1,5 +1,5 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Inventory;
-using ASAPPVC.UI.Services.Interfaces;
+using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

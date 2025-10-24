@@ -13,6 +13,21 @@
                                                                         },
                                                "fileToFile":  {
                                                                   "add":  {
+                                                                              "IPartService.cs":  [
+                                                                                                      "PartService.cs"
+                                                                                                  ],
+                                                                              "IAuthService.cs":  [
+                                                                                                      "AuthService.cs"
+                                                                                                  ],
+                                                                              "ICustomerService.cs":  [
+                                                                                                          "CustomerService.cs"
+                                                                                                      ],
+                                                                              "IOrderService.cs":  [
+                                                                                                       "OrderService.cs"
+                                                                                                   ],
+                                                                              "IProductService.cs":  [
+                                                                                                         "ProductService.cs"
+                                                                                                     ],
                                                                               "IUserProfileRepository.cs":  [
                                                                                                                 "UserProfileRepository.cs"
                                                                                                             ],
@@ -22,6 +37,9 @@
                                                                               "IOrderRepository.cs":  [
                                                                                                           "OrderRepository.cs"
                                                                                                       ],
+                                                                              "IUserService.cs":  [
+                                                                                                      "UserService.cs"
+                                                                                                  ],
                                                                               "IProductRepository.cs":  [
                                                                                                             "ProductRepository.cs"
                                                                                                         ],

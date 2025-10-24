@@ -1,7 +1,7 @@
 ﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Models.ViewModels.Inventory;
 
-namespace ASAPPVC.UI.Services.Interfaces
+namespace ASAPPVC.UI.Services
 {
     public interface IProductService
     {

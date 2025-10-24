@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Services.Interfaces
+﻿namespace ASAPPVC.UI.Services
 {
     public interface IUserService
     {

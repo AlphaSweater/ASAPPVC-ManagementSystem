@@ -1,7 +1,6 @@
 ﻿// Controllers/AuthController.cs
 using ASAPPVC.UI.Models.ViewModels.Auth;
-using ASAPPVC.UI.Services.Interfaces;
-
+using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,8 +1,7 @@
 using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Repositories.Implementation;
 using ASAPPVC.UI.Repositories.Interfaces;
-using ASAPPVC.UI.Services.Implementation;
-using ASAPPVC.UI.Services.Interfaces;
+using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
