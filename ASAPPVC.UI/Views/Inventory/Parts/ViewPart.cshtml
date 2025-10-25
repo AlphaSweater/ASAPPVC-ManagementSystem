@@ -1,249 +1,249 @@
 ﻿@model ASAPPVC.UI.Models.PartModel
 @{
-    ViewData["Title"] = "View Part";
+	ViewData["Title"] = "View Part";
 
-    // Determine the image source, using a placeholder if no image exists.
-    var imgSrc = (Model?.ImageBytes != null && Model.ImageBytes.Length > 0 && !string.IsNullOrWhiteSpace(Model.ImageContentType))
-        ? $"data:{Model.ImageContentType};base64,{Convert.ToBase64String(Model.ImageBytes)}"
-        : "/Assets/Images/placeholder.png";
+	// Determine the image source, using a placeholder if no image exists.
+	var imgSrc = (Model?.ImageBytes != null && Model.ImageBytes.Length > 0 && !string.IsNullOrWhiteSpace(Model.ImageContentType))
+		? $"data:{Model.ImageContentType};base64,{Convert.ToBase64String(Model.ImageBytes)}"
+		: "/Assets/Images/placeholder.png";
 }
 
 <style>
-    /* ---------- Root & Variables ---------- */
-    :root {
-        --primary-red: #d62828;
-        --primary-blue: #0d47a1;
-        --hover-red: #e03a3a;
-        --text-light: #ffffff;
-        --text-muted: rgba(255, 255, 255, 0.8);
-    }
+	/* ---------- Root & Variables ---------- */
+	:root {
+		--primary-red: #d62828;
+		--primary-blue: #0d47a1;
+		--hover-red: #e03a3a;
+		--text-light: #ffffff;
+		--text-muted: rgba(255, 255, 255, 0.8);
+	}
 
-    /* ---------- Base & Background ---------- */
-    * {
-        box-sizing: border-box;
-    }
+	/* ---------- Base & Background ---------- */
+	* {
+		box-sizing: border-box;
+	}
 
-    html, body {
-        height: 100%;
-        margin: 0;
-        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
+	html, body {
+		height: 100%;
+		margin: 0;
+		font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+	}
 
-    body {
-        background-color: #0d47a1;
-        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-        color: var(--text-light);
-        position: relative;
-        overflow-x: hidden;
-        background-attachment: fixed;
-    }
+	body {
+		background-color: #0d47a1;
+		background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+		color: var(--text-light);
+		position: relative;
+		overflow-x: hidden;
+		background-attachment: fixed;
+	}
 
-        /* ---------- Decorative Background Shapes ---------- */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.6;
-            z-index: -1;
-        }
+		/* ---------- Decorative Background Shapes ---------- */
+		body::before, body::after {
+			content: '';
+			position: absolute;
+			border-radius: 50%;
+			filter: blur(150px);
+			opacity: 0.6;
+			z-index: -1;
+		}
 
-        body::before {
-            background: var(--primary-blue);
-            width: 350px;
-            height: 350px;
-            top: -80px;
-            left: -120px;
-        }
+		body::before {
+			background: var(--primary-blue);
+			width: 350px;
+			height: 350px;
+			top: -80px;
+			left: -120px;
+		}
 
-        body::after {
-            background: var(--primary-red);
-            width: 400px;
-            height: 400px;
-            bottom: -150px;
-            right: -180px;
-        }
+		body::after {
+			background: var(--primary-red);
+			width: 400px;
+			height: 400px;
+			bottom: -150px;
+			right: -180px;
+		}
 
-    /* ---------- Main Content Layout ---------- */
-    .viewport {
-        padding: 40px 24px;
-        min-height: 100vh;
-    }
+	/* ---------- Main Content Layout ---------- */
+	.viewport {
+		padding: 40px 24px;
+		min-height: 100vh;
+	}
 
-    .view-container {
-        max-width: 960px;
-        margin: 0 auto;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border-radius: 16px;
-        padding: 32px 40px;
-    }
+	.view-container {
+		max-width: 960px;
+		margin: 0 auto;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+		border-radius: 16px;
+		padding: 32px 40px;
+	}
 
-    /* ---------- HEADER ---------- */
-    .header-section {
-        margin-bottom: 32px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
+	/* ---------- HEADER ---------- */
+	.header-section {
+		margin-bottom: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-muted);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 16px;
-        transition: color 0.2s ease;
-    }
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--text-muted);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 14px;
+		margin-bottom: 16px;
+		transition: color 0.2s ease;
+	}
 
-        .back-link:hover {
-            color: var(--text-light);
-        }
+		.back-link:hover {
+			color: var(--text-light);
+		}
 
-    .main-title {
-        font-weight: 700;
-        font-size: 28px;
-        color: var(--text-light);
-        margin: 0;
-    }
+	.main-title {
+		font-weight: 700;
+		font-size: 28px;
+		color: var(--text-light);
+		margin: 0;
+	}
 
-    /* ---------- Details Layout ---------- */
-    .details-layout-grid {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 40px;
-        align-items: center;
-    }
+	/* ---------- Details Layout ---------- */
+	.details-layout-grid {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+		gap: 40px;
+		align-items: center;
+	}
 
-    /* Image Column */
-    .image-col .image-box {
-        width: 100%;
-        max-width: 220px;
-        aspect-ratio: 1 / 1;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
+	/* Image Column */
+	.image-col .image-box {
+		width: 100%;
+		max-width: 220px;
+		aspect-ratio: 1 / 1;
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		background: rgba(0, 0, 0, 0.1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
 
-    .image-col img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+	.image-col img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
 
-    /* Info Column */
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px 32px;
-    }
+	/* Info Column */
+	.info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px 32px;
+	}
 
-    .info-pair .label {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-    }
+	.info-pair .label {
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-muted);
+		margin-bottom: 6px;
+	}
 
-    .info-pair .value {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text-light);
-    }
+	.info-pair .value {
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--text-light);
+	}
 
-    /* ---------- Action Buttons ---------- */
-    .actions {
-        display: flex;
-        justify-content: center;
-        gap: 16px;
-        margin-top: 40px;
-        padding-top: 24px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
+	/* ---------- Action Buttons ---------- */
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+		margin-top: 40px;
+		padding-top: 24px;
+		border-top: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-    .btn {
-        height: 44px;
-        padding: 0 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        transition: all .2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+	.btn {
+		height: 44px;
+		padding: 0 24px;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 16px;
+		cursor: pointer;
+		border: none;
+		transition: all .2s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+		.btn:active {
+			transform: scale(0.98);
+		}
 
-    .btn-primary {
-        background: var(--primary-red);
-        color: var(--text-light);
-    }
+	.btn-primary {
+		background: var(--primary-red);
+		color: var(--text-light);
+	}
 
-        .btn-primary:hover {
-            background: var(--hover-red);
-        }
+		.btn-primary:hover {
+			background: var(--hover-red);
+		}
 
 </style>
 
 <div class="viewport">
-    <div class="view-container">
-        <div class="header-section">
-            <a class="back-link" asp-controller="Inventory" asp-action="ViewPartInventory">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
-                </svg>
-                Back to Inventory
-            </a>
-            <h2 class="main-title">@Model.Name</h2>
-        </div>
+	<div class="view-container">
+		<div class="header-section">
+			<a class="back-link" asp-controller="Inventory" asp-action="ViewPartInventory">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+				</svg>
+				Back to Inventory
+			</a>
+			<h2 class="main-title">@Model.Name</h2>
+		</div>
 
-        <div class="details-layout-grid">
-            <!-- Image Column -->
-            <div class="image-col">
-                <div class="image-box">
-                    <img src="@imgSrc" alt="Part Image" />
-                </div>
-            </div>
+		<div class="details-layout-grid">
+			<!-- Image Column -->
+			<div class="image-col">
+				<div class="image-box">
+					<img src="@imgSrc" alt="Part Image" />
+				</div>
+			</div>
 
-            <!-- Details Column -->
-            <div class="info-grid">
-                <div class="info-pair">
-                    <div class="label">Storage Location</div>
-                    <div class="value">@Model.StorageLocation</div>
-                </div>
-                <div class="info-pair">
-                    <div class="label">Current Stock</div>
-                    <div class="value">@Model.CurrentAmount</div>
-                </div>
-                <div class="info-pair">
-                    <div class="label">Cost Per Unit</div>
-                    <div class="value">@Model.UnitCost.ToString("C")</div>
-                </div>
-                <div class="info-pair">
-                    <div class="label">Total Stock Value</div>
-                    <div class="value">@((Model.UnitCost * Model.CurrentAmount).ToString("C"))</div>
-                </div>
-            </div>
-        </div>
+			<!-- Details Column -->
+			<div class="info-grid">
+				<div class="info-pair">
+					<div class="label">Storage Location</div>
+					<div class="value">@Model.StorageLocation</div>
+				</div>
+				<div class="info-pair">
+					<div class="label">Current Stock</div>
+					<div class="value">@Model.CurrentAmount</div>
+				</div>
+				<div class="info-pair">
+					<div class="label">Cost Per Unit</div>
+					<div class="value">@Model.UnitCost.ToString("C")</div>
+				</div>
+				<div class="info-pair">
+					<div class="label">Total Stock Value</div>
+					<div class="value">@((Model.UnitCost * Model.CurrentAmount).ToString("C"))</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- Footer Actions -->
-        <div class="actions">
-            <a class="btn btn-primary" asp-controller="Inventory" asp-action="AddPart" asp-route-id="@Model.PartID">Edit Part</a>
-        </div>
-    </div>
+		<!-- Footer Actions -->
+		<div class="actions">
+			<a class="btn btn-primary" asp-controller="Inventory" asp-action="AddPart" asp-route-id="@Model.Id">Edit Part</a>
+		</div>
+	</div>
 </div>

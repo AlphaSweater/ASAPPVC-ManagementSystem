@@ -1,6 +1,5 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Order;
-using ASAPPVC.UI.Models;
-using System.Linq;
+﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.ViewModels.Order;
 using ASAPPVC.UI.Repositories;
 
 namespace ASAPPVC.UI.Services
@@ -23,35 +22,28 @@ namespace ASAPPVC.UI.Services
             if (vm == null)
                 return (false, "Request body is required.", null);
 
-            if (vm.CustomerId <= 0)
-                return (false, "Customer selection is required.", null);
-
             if (vm.ProductQuantities == null || vm.ProductQuantities.Count == 0)
                 return (false, "Please select at least one product.", null);
-
-            if (string.IsNullOrWhiteSpace(vm.OrderStatus))
-                vm.OrderStatus = "Pending";
 
             //Create main order
             var order = new OrderModel
             {
-                CustomerID = vm.CustomerId,
-                OrderStatus = vm.OrderStatus.Trim(),
+                CustomerId = vm.CustomerId,
                 OrderDate = vm.OrderDate ?? DateTime.UtcNow
             };
 
-            // Add order to repository and ensure we have the persisted OrderID
+            // Add order to repository and ensure we have the persisted Id (GUID)
             var addedOrder = await _repo.AddAsync(order, ct);
             await _repo.SaveAsync(ct);
 
             // Build order lines: group by product id and sum quantities in case duplicates were submitted
             var orderLines = vm.ProductQuantities
-                .Where(pq => pq != null && pq.ProductId > 0 && pq.Quantity > 0)
+                .Where(pq => pq != null && pq.ProductId != Guid.Empty && pq.Quantity > 0)
                 .GroupBy(pq => pq.ProductId)
                 .Select(g => new OrderProductModel
                 {
-                    OrderID = addedOrder.OrderID,
-                    ProductID = g.Key,
+                    OrderId = addedOrder.Id,
+                    ProductId = g.Key,
                     Quantity = g.Sum(x => x.Quantity)
                 })
                 .ToList();
@@ -69,7 +61,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a single order with details by ID
-        public async Task<OrderModel?> GetAsync(int id, CancellationToken ct = default)
+        public async Task<OrderModel?> GetAsync(Guid id, CancellationToken ct = default)
         {
             return await _repo.GetWithDetailsAsync(id, ct);
         }
@@ -82,4 +74,5 @@ namespace ASAPPVC.UI.Services
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

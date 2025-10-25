@@ -2,11 +2,18 @@
 
 namespace ASAPPVC.UI.Repositories
 {
-    // Inherit the common CRUD contract from IBaseRepository<T> and
-    // expose only part-specific convenience methods.
     public interface IPartRepository : IBaseRepository<PartModel>
     {
-        // part-specific ordered list
-        Task<List<PartModel>> ListAsync(CancellationToken ct = default);
+        Task<PartModel> AddPartAsync(PartModel part, CancellationToken ct = default);
+
+        Task<bool> UpdatePartAsync(PartModel part, CancellationToken ct = default);
+
+        Task<bool> DeletePartAsync(int id, CancellationToken ct = default);
+
+        Task<List<PartModel>> ListOrderedByNameAsync(CancellationToken ct = default);
+
+        Task<PartModel?> GetByPartCodeAsync(string sku, CancellationToken ct = default);
+
+        Task<List<PartModel>> SearchAsync(string term, CancellationToken ct = default);
     }
 }

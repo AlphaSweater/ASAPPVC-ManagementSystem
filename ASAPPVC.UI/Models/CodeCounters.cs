@@ -1,26 +1,30 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models
 {
-    [Table("CodeCounters")]
     [Index(nameof(CodeType), nameof(PeriodKey))]
     public class CodeCounters
     {
+        // Internal GUID primary key for safe relations
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
+        // Type of code (Product, Component, Order, PickingSlip)
         [Required]
-        [MaxLength(50)]
-        public string CodeType { get; set; } = default!;
+        public string CodeType { get; set; } = string.Empty;
 
+        // Optional period key (e.g., YYYYMM for monthly resets)
         [MaxLength(10)]
         public string? PeriodKey { get; set; }
 
-        public int LastNumber { get; set; }
-
+        // Last used number for this code type / period
         [Required]
-        public DateTime UpdatedAt { get; set; }
+        [Range(0, int.MaxValue)]
+        public int LastNumber { get; set; } = 0;
+
+        // Last updated timestamp
+        [Required]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

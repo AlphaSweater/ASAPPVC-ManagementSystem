@@ -19,8 +19,9 @@
 				<label class="form-label" for="customer-select">Customer</label>
 				<select id="customer-select" name="customerId" class="input" required>
 					<option value="">-- Choose a customer --</option>
-					@foreach ( var c in customers ) {
-						<option value="@c.CustomerID">@c.Name @c.Surname (@c.Email)</option>
+					@foreach (var c in customers)
+					{
+						<option value="@c.Id">@c.Name @c.Surname (@c.Email)</option>
 					}
 				</select>
 			</div>
@@ -31,8 +32,9 @@
 					<div class="form-group">
 						<select id="product-select" class="input">
 							<option value="">-- Select a product --</option>
-							@foreach ( var p in products ) {
-								<option value="@p.ProductID" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
+							@foreach (var p in products)
+							{
+								<option value="@p.Id" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
 							}
 						</select>
 					</div>

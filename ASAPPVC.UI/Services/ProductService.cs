@@ -8,6 +8,7 @@ namespace ASAPPVC.UI.Services
     {
         //─────────── Dependencies ───────────\\
         private readonly IProductRepository _productRepository;
+
         private readonly IPartRepository _partsRepository;
 
         public ProductService(IProductRepository repo, IPartRepository partsRepo)
@@ -18,7 +19,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // creates a new product based on the provided view model
-        public async Task<(bool Ok, string? Error, int? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default)
+        public async Task<(bool Ok, string? Error, Guid? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default)
         {
             //validates input and returns an error message if invalid
             if (string.IsNullOrWhiteSpace(vm.ProductName))
@@ -27,7 +28,7 @@ namespace ASAPPVC.UI.Services
                 return (false, "Description is required.", null);
 
             var lines = vm.Parts
-                .Where(l => l.PartId.HasValue && l.PartId.Value > 0 && l.Quantity > 0)
+                .Where(l => l.PartId.HasValue && l.PartId.Value != Guid.Empty && l.Quantity > 0)
                 .ToList();
 
             var partIds = lines.Select(l => l.PartId!.Value).Distinct().ToList();
@@ -38,8 +39,9 @@ namespace ASAPPVC.UI.Services
             decimal partsTotal = 0m;
             foreach (var l in lines)
             {
-                var part = parts.FirstOrDefault(p => p.PartID == l.PartId);
-                if (part != null) partsTotal += (part.UnitCost * l.Quantity);
+                var part = parts.FirstOrDefault(p => p.Id == l.PartId);
+                if (part != null)
+                    partsTotal += (part.UnitCost * l.Quantity);
             }
             var finalPrice = vm.BasePrice + partsTotal;
 
@@ -63,8 +65,8 @@ namespace ASAPPVC.UI.Services
 
             var ppLines = lines.Select(l => new ProductPartModel
             {
-                ProductID = product.ProductID,
-                PartID = l.PartId!.Value,
+                ProductId = product.Id,
+                PartId = l.PartId!.Value,
                 Quantity = l.Quantity
             }).ToList();
 
@@ -74,12 +76,12 @@ namespace ASAPPVC.UI.Services
                 await _productRepository.SaveAsync(ct);
             }
 
-            return (true, null, product.ProductID);
+            return (true, null, product.Id);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // retrieves a product by its ID, including its associated parts
-        public async Task<ProductModel?> GetAsync(int id, CancellationToken ct = default)
+        public async Task<ProductModel?> GetAsync(Guid id, CancellationToken ct = default)
         {
             return await _productRepository.GetProductWithPartsAsync(id, ct);
         }
@@ -92,4 +94,5 @@ namespace ASAPPVC.UI.Services
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

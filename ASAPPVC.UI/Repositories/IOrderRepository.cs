@@ -8,6 +8,6 @@ namespace ASAPPVC.UI.Repositories
 
         Task<List<OrderModel>> ListAsync(CancellationToken ct = default);
 
-        Task<OrderModel?> GetWithDetailsAsync(int id, CancellationToken ct = default);
+        Task<OrderModel?> GetWithDetailsAsync(Guid id, CancellationToken ct = default);
     }
 }

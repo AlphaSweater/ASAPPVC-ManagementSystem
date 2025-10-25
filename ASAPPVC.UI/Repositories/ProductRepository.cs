@@ -15,20 +15,20 @@ namespace ASAPPVC.UI.Repositories
         }
 
         // retrieves parts by their IDs
-        public async Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
+        public async Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(ids);
-            return await _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
+            return await _db.Part.Where(p => ids.Contains(p.Id)).ToListAsync(ct);
         }
 
         // retrieves a product along with its associated parts
-        public async Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default)
+        public async Task<ProductModel?> GetProductWithPartsAsync(Guid id, CancellationToken ct = default)
         {
             return await _set
                   .AsNoTracking()
                   .Include(p => p.ProductParts)
                     .ThenInclude(pp => pp.Part)
-                  .FirstOrDefaultAsync(p => p.ProductID == id, ct);
+                  .FirstOrDefaultAsync(p => p.Id == id, ct);
         }
 
         // lists all products ordered by name

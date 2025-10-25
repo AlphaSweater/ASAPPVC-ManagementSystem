@@ -28,12 +28,15 @@
                                                                               "OrderRepository.cs":  [
                                                                                                          "IOrderRepository.cs"
                                                                                                      ],
-                                                                              "UserService.cs":  [
-                                                                                                     "IUserService.cs"
-                                                                                                 ],
                                                                               "ProductService.cs":  [
                                                                                                         "IProductService.cs"
                                                                                                     ],
+                                                                              "CodeCountersRepository.cs":  [
+                                                                                                                "ICodeCountersRepository.cs"
+                                                                                                            ],
+                                                                              "UserService.cs":  [
+                                                                                                     "IUserService.cs"
+                                                                                                 ],
                                                                               "AuthService.cs":  [
                                                                                                      "IAuthService.cs"
                                                                                                  ],

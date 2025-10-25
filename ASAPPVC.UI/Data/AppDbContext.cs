@@ -22,31 +22,31 @@ namespace ASAPPVC.UI.Data
             modelBuilder.Entity<ProductPartModel>()
                 .HasOne(pp => pp.Product)
                 .WithMany(p => p.ProductParts)
-                .HasForeignKey(pp => pp.ProductID)
+                .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ProductPartModel>()
                 .HasOne(pp => pp.Part)
                 .WithMany()
-                .HasForeignKey(pp => pp.PartID)
+                .HasForeignKey(pp => pp.PartId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OrderModel>()
                 .HasOne(o => o.Customer)
                 .WithMany()
-                .HasForeignKey(o => o.CustomerID)
+                .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OrderProductModel>()
                 .HasOne(op => op.Order)
                 .WithMany(o => o.OrderProducts)
-                .HasForeignKey(op => op.OrderID)
+                .HasForeignKey(op => op.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<OrderProductModel>()
                 .HasOne(op => op.Product)
                 .WithMany()
-                .HasForeignKey(op => op.ProductID)
+                .HasForeignKey(op => op.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

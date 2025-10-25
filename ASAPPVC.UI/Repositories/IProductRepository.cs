@@ -7,10 +7,10 @@ namespace ASAPPVC.UI.Repositories
     {
         Task AddProductPartsAsync(IEnumerable<ProductPartModel> lines, CancellationToken ct = default);
 
-        Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
+        Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
 
         Task<List<ProductModel>> ListAsync(CancellationToken ct = default);
 
-        Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default);
+        Task<ProductModel?> GetProductWithPartsAsync(Guid id, CancellationToken ct = default);
     }
 }

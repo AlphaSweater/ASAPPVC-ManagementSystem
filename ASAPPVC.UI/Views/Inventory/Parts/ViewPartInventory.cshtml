@@ -2,291 +2,291 @@
 @model IEnumerable<ASAPPVC.UI.Models.PartModel>
 
 @{
-    ViewData["Title"] = "Inventory";
+	ViewData["Title"] = "Inventory";
 }
 
 <style>
-    /* ---------- Root & Variables ---------- */
-    :root {
-        --primary-red: #d62828;
-        --primary-blue: #0d47a1;
-        --hover-red: #e03a3a;
-        --text-light: #ffffff;
-        --text-muted: rgba(255, 255, 255, 0.8);
-        --accent-orange: #ef4723;
-    }
+	/* ---------- Root & Variables ---------- */
+	:root {
+		--primary-red: #d62828;
+		--primary-blue: #0d47a1;
+		--hover-red: #e03a3a;
+		--text-light: #ffffff;
+		--text-muted: rgba(255, 255, 255, 0.8);
+		--accent-orange: #ef4723;
+	}
 
-    /* ---------- Base & Background ---------- */
-    * {
-        box-sizing: border-box;
-    }
+	/* ---------- Base & Background ---------- */
+	* {
+		box-sizing: border-box;
+	}
 
-    html, body {
-        height: 100%;
-        margin: 0;
-        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
+	html, body {
+		height: 100%;
+		margin: 0;
+		font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+	}
 
-    body {
-        background-color: #0d47a1;
-        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-        color: var(--text-light);
-        position: relative;
-        overflow-x: hidden;
-        background-attachment: fixed;
-    }
+	body {
+		background-color: #0d47a1;
+		background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+		color: var(--text-light);
+		position: relative;
+		overflow-x: hidden;
+		background-attachment: fixed;
+	}
 
-        /* ---------- Decorative Background Shapes ---------- */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.6;
-            z-index: -1;
-        }
+		/* ---------- Decorative Background Shapes ---------- */
+		body::before, body::after {
+			content: '';
+			position: absolute;
+			border-radius: 50%;
+			filter: blur(150px);
+			opacity: 0.6;
+			z-index: -1;
+		}
 
-        body::before {
-            background: var(--primary-blue);
-            width: 350px;
-            height: 350px;
-            top: -80px;
-            left: -120px;
-        }
+		body::before {
+			background: var(--primary-blue);
+			width: 350px;
+			height: 350px;
+			top: -80px;
+			left: -120px;
+		}
 
-        body::after {
-            background: var(--primary-red);
-            width: 400px;
-            height: 400px;
-            bottom: -150px;
-            right: -180px;
-        }
+		body::after {
+			background: var(--primary-red);
+			width: 400px;
+			height: 400px;
+			bottom: -150px;
+			right: -180px;
+		}
 
-    /* ---------- Main Content Layout ---------- */
-    .viewport {
-        padding: 40px 24px;
-        min-height: 100vh;
-    }
+	/* ---------- Main Content Layout ---------- */
+	.viewport {
+		padding: 40px 24px;
+		min-height: 100vh;
+	}
 
-    .content-container {
-        max-width: 1100px; /* Wider for tables */
-        margin: 0 auto;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border-radius: 16px;
-        padding: 32px 40px;
-    }
+	.content-container {
+		max-width: 1100px; /* Wider for tables */
+		margin: 0 auto;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+		border-radius: 16px;
+		padding: 32px 40px;
+	}
 
-    /* ---------- Header & Toolbar ---------- */
-    .page-header {
-        margin-bottom: 32px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
+	/* ---------- Header & Toolbar ---------- */
+	.page-header {
+		margin-bottom: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-    .main-title {
-        font-weight: 700;
-        font-size: 28px;
-        color: var(--text-light);
-        margin: 0;
-    }
+	.main-title {
+		font-weight: 700;
+		font-size: 28px;
+		color: var(--text-light);
+		margin: 0;
+	}
 
-    .toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
-    }
+	.toolbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
 
-    .search-form {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-grow: 1;
-    }
+	.search-form {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-grow: 1;
+	}
 
-    /* --- INPUT REDESIGN (reused from customer form) --- */
-    .input {
-        height: 44px;
-        font-size: 16px;
-        color: var(--text-light);
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        padding: 0 12px;
-        outline: none;
-        transition: border-color 0.3s ease, background-color 0.3s ease;
-        width: 100%;
-        max-width: 400px; /* Limit search input width */
-    }
+	/* --- INPUT REDESIGN (reused from customer form) --- */
+	.input {
+		height: 44px;
+		font-size: 16px;
+		color: var(--text-light);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-radius: 8px;
+		padding: 0 12px;
+		outline: none;
+		transition: border-color 0.3s ease, background-color 0.3s ease;
+		width: 100%;
+		max-width: 400px; /* Limit search input width */
+	}
 
-        .input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
+		.input::placeholder {
+			color: rgba(255, 255, 255, 0.5);
+		}
 
-        .input:focus {
-            border-color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.1);
-        }
+		.input:focus {
+			border-color: rgba(255, 255, 255, 0.7);
+			background: rgba(255, 255, 255, 0.1);
+		}
 
-    /* ---------- Action Buttons (reused from customer form) ---------- */
-    .actions {
-        display: flex;
-        justify-content: center;
-        gap: 8px; /* Reduced gap for table actions */
-        white-space: nowrap;
-    }
+	/* ---------- Action Buttons (reused from customer form) ---------- */
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 8px; /* Reduced gap for table actions */
+		white-space: nowrap;
+	}
 
-    .btn {
-        height: 44px;
-        padding: 0 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        transition: all .2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+	.btn {
+		height: 44px;
+		padding: 0 24px;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 16px;
+		cursor: pointer;
+		border: none;
+		transition: all .2s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+		.btn:active {
+			transform: scale(0.98);
+		}
 
-        /* Specific sizes for table buttons */
-        .btn.btn-sm {
-            height: 36px;
-            padding: 0 16px;
-            font-size: 14px;
-        }
+		/* Specific sizes for table buttons */
+		.btn.btn-sm {
+			height: 36px;
+			padding: 0 16px;
+			font-size: 14px;
+		}
 
-    .btn-primary {
-        background: var(--primary-red);
-        color: var(--text-light);
-    }
+	.btn-primary {
+		background: var(--primary-red);
+		color: var(--text-light);
+	}
 
-        .btn-primary:hover {
-            background: var(--hover-red);
-        }
+		.btn-primary:hover {
+			background: var(--hover-red);
+		}
 
-    .btn-secondary {
-        background: transparent;
-        color: var(--text-light);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-    }
+	.btn-secondary {
+		background: transparent;
+		color: var(--text-light);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+	}
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
+		.btn-secondary:hover {
+			background: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.6);
+		}
 
-    /* ---------- Table Styling ---------- */
-    .table-section {
-        overflow-x: auto;
-    }
+	/* ---------- Table Styling ---------- */
+	.table-section {
+		overflow-x: auto;
+	}
 
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+	.table {
+		width: 100%;
+		border-collapse: collapse;
+	}
 
-        .table th, .table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
+		.table th, .table td {
+			padding: 14px 16px;
+			text-align: left;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		}
 
-        .table thead th {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-light);
-            background-color: rgba(0, 0, 0, 0.15);
-        }
+		.table thead th {
+			font-size: 14px;
+			font-weight: 700;
+			color: var(--text-light);
+			background-color: rgba(0, 0, 0, 0.15);
+		}
 
-        .table tbody tr {
-            transition: background-color 0.2s ease;
-        }
+		.table tbody tr {
+			transition: background-color 0.2s ease;
+		}
 
-            .table tbody tr:hover {
-                background-color: rgba(255, 255, 255, 0.08);
-            }
+			.table tbody tr:hover {
+				background-color: rgba(255, 255, 255, 0.08);
+			}
 
-        .table td {
-            font-size: 15px;
-            color: var(--text-muted);
-        }
+		.table td {
+			font-size: 15px;
+			color: var(--text-muted);
+		}
 
-            .table td:first-child {
-                color: var(--text-light);
-                font-weight: 600;
-            }
+			.table td:first-child {
+				color: var(--text-light);
+				font-weight: 600;
+			}
 </style>
 
 <div class="viewport">
-    <div class="content-container">
-        <div class="page-header">
-            <h2 class="main-title">Inventory</h2>
-        </div>
+	<div class="content-container">
+		<div class="page-header">
+			<h2 class="main-title">Inventory</h2>
+		</div>
 
-        <div class="toolbar">
-            <form class="search-form" asp-controller="Inventory" asp-action="ViewPartInventory" method="get">
-                <input class="input" type="text" name="q" placeholder="Search by part name or location..." value="@Context.Request.Query["q"]" />
-                <button type="submit" class="btn btn-secondary">Search</button>
-            </form>
-            <a class="btn btn-primary" asp-controller="Inventory" asp-action="AddPart">+ Add New Part</a>
-        </div>
+		<div class="toolbar">
+			<form class="search-form" asp-controller="Inventory" asp-action="ViewPartInventory" method="get">
+				<input class="input" type="text" name="q" placeholder="Search by part name or location..." value="@Context.Request.Query["q"]" />
+				<button type="submit" class="btn btn-secondary">Search</button>
+			</form>
+			<a class="btn btn-primary" asp-controller="Inventory" asp-action="AddPart">+ Add New Part</a>
+		</div>
 
-        <section class="table-section">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width:110px;">ID</th>
-                        <th>Part Name</th>
-                        <th>Location</th>
-                        <th>Unit Price</th>
-                        <th>Stock</th>
-                        <th style="width:200px; text-align:center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var p in Model)
-                        {
-                            <tr>
-                                <td>@p.PartID</td>
-                                <td>@p.Name</td>
-                                <td>@p.StorageLocation</td>
-                                <td>@($"R {p.UnitCost:0.00}")</td>
-                                <td>@p.CurrentAmount</td>
-                                <td>
-                                    <div class="actions">
-                                        <a class="btn btn-secondary btn-sm"
-                                           asp-controller="Inventory" asp-action="ViewPart" asp-route-id="@p.PartID">View</a>
-                                        <a class="btn btn-primary btn-sm"
-                                           asp-controller="Inventory" asp-action="AddPart" asp-route-id="@p.PartID">Edit</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">
-                                No parts found.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </section>
-    </div>
+		<section class="table-section">
+			<table class="table">
+				<thead>
+					<tr>
+						<th style="width:110px;">ID</th>
+						<th>Part Name</th>
+						<th>Location</th>
+						<th>Unit Price</th>
+						<th>Stock</th>
+						<th style="width:200px; text-align:center;">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model != null && Model.Any())
+					{
+						foreach (var p in Model)
+						{
+							<tr>
+								<td>@p.Id</td>
+								<td>@p.Name</td>
+								<td>@p.StorageLocation</td>
+								<td>@($"R {p.UnitCost:0.00}")</td>
+								<td>@p.CurrentAmount</td>
+								<td>
+									<div class="actions">
+										<a class="btn btn-secondary btn-sm"
+										   asp-controller="Inventory" asp-action="ViewPart" asp-route-id="@p.Id">View</a>
+										<a class="btn btn-primary btn-sm"
+										   asp-controller="Inventory" asp-action="AddPart" asp-route-id="@p.Id">Edit</a>
+									</div>
+								</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">
+								No parts found.
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</section>
+	</div>
 </div>

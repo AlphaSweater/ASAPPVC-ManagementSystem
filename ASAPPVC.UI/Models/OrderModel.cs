@@ -1,24 +1,38 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.UI.Models
 {
+    [Index(nameof(OrderCode), IsUnique = true)]
     public class OrderModel
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int OrderID { get; set; }
-
-        [Required, ForeignKey("CustomerModel")]
-        public int CustomerID { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public DateTime OrderDate { get; set; }
+        [MaxLength(64)]
+        public string OrderCode { get; set; } = string.Empty;
+
+        [Required, ForeignKey(nameof(Customer))]
+        public Guid CustomerId { get; set; }
 
         [Required]
-        public string OrderStatus { get; set; }
+        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
         public CustomerModel? Customer { get; set; }
         public List<OrderProductModel> OrderProducts { get; set; } = new();
+    }
+
+    public enum OrderStatus
+    {
+        Pending,
+        Processing,
+        Shipped,
+        Completed,
+        Cancelled
     }
 }

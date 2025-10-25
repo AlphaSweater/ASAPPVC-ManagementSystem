@@ -8,6 +8,7 @@ namespace ASAPPVC.UI.Controllers
     {
         //─────────── Dependencies ───────────\\
         private readonly IOrderService _orders;
+
         private readonly ICustomerService _customers;
         private readonly IProductService _products;
 
@@ -44,7 +45,7 @@ namespace ASAPPVC.UI.Controllers
                 return View(vm);
             }
 
-            TempData["AlertMessage"] = $"Order #{order.OrderID} created.";
+            TempData["AlertMessage"] = $"Order #{order.Id} created.";
             return RedirectToAction(nameof(ViewOrders));
         }
 
@@ -60,10 +61,11 @@ namespace ASAPPVC.UI.Controllers
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //displays a specific order by its ID
         [HttpGet]
-        public async Task<IActionResult> ViewOrder(int id, CancellationToken ct)
+        public async Task<IActionResult> ViewOrder(Guid id, CancellationToken ct)
         {
             var order = await _orders.GetAsync(id, ct);
-            if (order is null) return NotFound();
+            if (order is null)
+                return NotFound();
             return View(order);
         }
     }

@@ -23,14 +23,14 @@ namespace ASAPPVC.UI.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<OrderModel?> GetWithDetailsAsync(int id, CancellationToken ct = default)
+        public async Task<OrderModel?> GetWithDetailsAsync(Guid id, CancellationToken ct = default)
         {
             return await _set
                 .AsNoTracking()
                 .Include(o => o.Customer)
                 .Include(o => o.OrderProducts)
                     .ThenInclude(op => op.Product)
-                .FirstOrDefaultAsync(o => o.OrderID == id, ct);
+                .FirstOrDefaultAsync(o => o.Id == id, ct);
         }
     }
 }

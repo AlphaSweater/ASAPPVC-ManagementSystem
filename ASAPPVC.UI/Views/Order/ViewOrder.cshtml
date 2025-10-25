@@ -1,6 +1,6 @@
 ﻿@model ASAPPVC.UI.Models.OrderModel
 @{
-	ViewData["Title"] = $"Order #{Model.OrderID}";
+	ViewData["Title"] = $"Order #{Model.OrderCode}";
 }
 
 <link rel="stylesheet" href="~/css/views/order/ViewOrder.css" asp-append-version="true" />
@@ -16,9 +16,9 @@
 			</a>
 
 			<div class="header-row">
-					<h2 class="main-title">Order #@Model.OrderID</h2>
+				<h2 class="main-title">Order #@Model.OrderCode</h2>
 				<div class="right-actions">
-					<a asp-action="PickingSlip" asp-route-id="@Model.OrderID" class="btn btn-primary">Create Picking Slip</a>
+					<a asp-action="PickingSlip" asp-route-id="@Model.Id" class="btn btn-primary">Create Picking Slip</a>
 				</div>
 			</div>
 		</div>
@@ -42,12 +42,14 @@
 		<!-- Products in this Order -->
 		<section class="products-section">
 			<h3>Products</h3>
-			@if ( Model.OrderProducts == null || !Model.OrderProducts.Any() ) {
+			@if (Model.OrderProducts == null || !Model.OrderProducts.Any())
+			{
 				<p style="text-align:center; padding:40px; color: var(--text-muted);">
 					No products in this order.
 				</p>
 			}
-			else {
+			else
+			{
 				<table class="table">
 					<thead>
 						<tr>
@@ -58,7 +60,8 @@
 					<tbody>
 						@{
 							decimal total = 0;
-							foreach ( var line in Model.OrderProducts ) {
+							foreach (var line in Model.OrderProducts)
+							{
 								var price = line.Product?.Price ?? 0;
 								total += price;
 								<tr>

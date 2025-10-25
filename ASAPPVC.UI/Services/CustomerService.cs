@@ -1,18 +1,12 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
+﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Models.ViewModels.Customer;
 using ASAPPVC.UI.Repositories;
 
 namespace ASAPPVC.UI.Services
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService(ICustomerRepository repo) : ICustomerService
     {
-        //─────────── Dependencies ───────────\\
-        private readonly ICustomerRepository _repo;
-        public CustomerService(ICustomerRepository repo)
-        {
-            _repo = repo;
-        }
+        private readonly ICustomerRepository _repo = repo;
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //creates a new customer in the database
@@ -41,4 +35,5 @@ namespace ASAPPVC.UI.Services
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

@@ -1,27 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models
 {
     public class CustomerModel
     {
+        // Internal GUID primary key for safe relations
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustomerID { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public string Name { get; set; }
+        [MaxLength(50)]
+        public string Name { get; set; } = string.Empty;
 
         [Required]
-        public string Surname { get; set; }
+        [MaxLength(50)]
+        public string Surname { get; set; } = string.Empty;
 
         [Required]
-        public string PhoneNumber { get; set; }
+        [Phone]
+        [MaxLength(20)]
+        public string PhoneNumber { get; set; } = string.Empty;
 
-        public string Company { get; set; }
+        [MaxLength(100)]
+        public string? Company { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        [MaxLength(100)]
+        public string Email { get; set; } = string.Empty;
     }
 }

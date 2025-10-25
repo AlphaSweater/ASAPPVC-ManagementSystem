@@ -1,18 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
 
 namespace ASAPPVC.UI.Models.ViewModels.Order
 {
     public class CreateOrderViewModel : IValidatableObject
     {
         [Required]
-        public int CustomerId { get; set; }
+        public Guid CustomerId { get; set; }
 
         [Required]
         public List<ProductQuantityViewModel> ProductQuantities { get; set; } = new();
 
         [Required]
-        public string OrderStatus { get; set; } = string.Empty;
+        public OrderStatus OrderStatus { get; set; } = default;
 
         public DateTime? OrderDate { get; set; } = DateTime.UtcNow;
 
@@ -26,7 +25,7 @@ namespace ASAPPVC.UI.Models.ViewModels.Order
             for (int i = 0; i < ProductQuantities.Count; i++)
             {
                 var pq = ProductQuantities[i];
-                if (pq.ProductId <= 0)
+                if (pq.ProductId != Guid.Empty)
                 {
                     yield return new ValidationResult($"ProductId must be a positive integer.", new[] { $"ProductQuantities[{i}].ProductId" });
                 }

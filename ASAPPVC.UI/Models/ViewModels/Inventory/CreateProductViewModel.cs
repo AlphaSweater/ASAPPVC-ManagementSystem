@@ -19,7 +19,7 @@ namespace ASAPPVC.UI.Models.ViewModels.Inventory
     }
     public class ProductPartLine
     {
-        public int? PartId { get; set; }        
+        public Guid? PartId { get; set; }        
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; } = 1;
     }
