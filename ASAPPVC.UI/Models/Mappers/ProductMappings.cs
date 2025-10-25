@@ -16,7 +16,7 @@ namespace ASAPPVC.UI.Models.Mappers
             if (vm.ImageFile is not null)
             {
                 using var ms = new MemoryStream();
-                vm.ImageFile.CopyTo(ms);
+                vm.ImageFile.CopyToAsync(ms);
                 product.ImageBytes = ms.ToArray();
                 product.ImageContentType = vm.ImageFile.ContentType;
             }
