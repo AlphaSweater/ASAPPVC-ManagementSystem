@@ -25,9 +25,9 @@ namespace ASAPPVC.UI.Models.ViewModels.Order
             for (int i = 0; i < ProductQuantities.Count; i++)
             {
                 var pq = ProductQuantities[i];
-                if (pq.ProductId != Guid.Empty)
+                if (pq.ProductId == Guid.Empty)
                 {
-                    yield return new ValidationResult($"ProductId must be a positive integer.", new[] { $"ProductQuantities[{i}].ProductId" });
+                    yield return new ValidationResult($"ProductId must not be empty.", new[] { $"ProductQuantities[{i}].ProductId" });
                 }
                 if (pq.Quantity < 1)
                 {
