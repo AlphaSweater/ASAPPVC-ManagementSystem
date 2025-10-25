@@ -53,7 +53,7 @@ namespace ASAPPVC.UI.Repositories.Implementation
         //lists all products ordered by name
         public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
         {
-            return await _db.Product.AsNoTracking().OrderBy(p => p.Name).ToListAsync(ct);
+            return await _db.Product.AsNoTracking().Include(p => p.ProductParts).OrderBy(p => p.Name).ToListAsync(ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
