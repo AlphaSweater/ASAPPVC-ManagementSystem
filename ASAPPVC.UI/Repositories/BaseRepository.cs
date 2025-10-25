@@ -73,11 +73,14 @@ namespace ASAPPVC.UI.Repositories
                 .SingleOrDefaultAsync(e => EF.Property<string>(e, CodePropertyName) == code, ct);
         }
 
-        public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids, bool asNoTracking = true, CancellationToken ct = default)
+        public virtual async Task<List<T>> GetByIdsAsync(
+            IEnumerable<Guid> ids,
+            bool asNoTracking = true,
+            CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(ids);
 
-            var idSet = (ids as ISet<Guid>) ?? ids.Where(g => g != Guid.Empty).ToHashSet();
+            var idSet = ids.Where(g => g != Guid.Empty).ToHashSet();
             if (idSet.Count == 0)
                 return new List<T>(0);
 
@@ -86,19 +89,24 @@ namespace ASAPPVC.UI.Repositories
                 .ToListAsync(ct);
         }
 
-        public virtual async Task<List<T>> GetByCodesAsync(IEnumerable<string> codes, bool asNoTracking = true, CancellationToken ct = default)
+        public virtual async Task<List<T>> GetByCodesAsync(
+            IEnumerable<string> codes,
+            bool asNoTracking = true,
+            CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(codes);
             if (CodePropertyName is null)
                 throw new NotSupportedException($"{typeof(T).Name} does not support code lookups.");
 
-            var codeList = codes.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
-            if (codeList.Count == 0)
+            var codeSet = codes
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            if (codeSet.Count == 0)
                 return new List<T>(0);
 
-            // Note: collation/case-sensitivity is provider-dependent.
             return await ApplyTracking(_set, asNoTracking)
-                .Where(e => codeList.Contains(EF.Property<string>(e, CodePropertyName)))
+                .Where(e => codeSet.Contains(EF.Property<string>(e, CodePropertyName)))
                 .ToListAsync(ct);
         }
 
