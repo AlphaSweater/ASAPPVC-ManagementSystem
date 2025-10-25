@@ -1,7 +1,7 @@
 ﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.CreateProductViewModel
 @using ASAPPVC.UI.Models
 @{
-    var parts = (ViewData["Parts"] as List<PartModel>) ?? new();
+    var parts = (ViewData["Parts"] as List<ComponentModel>) ?? new();
 }
 
 <div class="add-product-partial">
@@ -208,7 +208,7 @@
                                         <option value="">-- Select part --</option>
                                         @foreach (var p in parts)
                                         {
-                                            <option value="@p.PartID">@p.Name</option>
+                                            <option value="@p.Id">@p.Name</option>
                                         }
                                     </select>
                                 </td>

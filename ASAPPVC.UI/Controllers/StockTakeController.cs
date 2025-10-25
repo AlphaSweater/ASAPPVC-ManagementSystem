@@ -4,7 +4,7 @@ namespace ASAPPVC.UI.Controllers
 {
     public class StockTakeController : Controller
     {
-        public IActionResult Index()
+        public IActionResult StockTake()
         {
             return View();
         }
