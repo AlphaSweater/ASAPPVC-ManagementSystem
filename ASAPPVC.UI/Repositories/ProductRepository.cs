@@ -9,6 +9,7 @@ namespace ASAPPVC.UI.Repositories
         // adds product parts to the database (bulk, does not save)
         public Task AddProductPartsAsync(IEnumerable<ProductPartModel> lines, CancellationToken ct = default)
         {
+            ArgumentNullException.ThrowIfNull(lines);
             _db.ProductPart.AddRange(lines);
             return Task.CompletedTask;
         }
@@ -16,6 +17,7 @@ namespace ASAPPVC.UI.Repositories
         // retrieves parts by their IDs
         public async Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
         {
+            ArgumentNullException.ThrowIfNull(ids);
             return await _db.Part.Where(p => ids.Contains(p.PartID)).ToListAsync(ct);
         }
 

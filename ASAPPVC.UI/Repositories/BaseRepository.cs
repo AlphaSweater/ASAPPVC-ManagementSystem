@@ -1,5 +1,6 @@
 using ASAPPVC.UI.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace ASAPPVC.UI.Repositories
 {
@@ -50,10 +51,28 @@ namespace ASAPPVC.UI.Repositories
             return entity;
         }
 
+        /// <summary>
+        /// Get first entity matching predicate or null.
+        /// </summary>
+        public virtual Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+            var query = asNoTracking ? _set.AsNoTracking() : _set;
+            return query.FirstOrDefaultAsync(predicate, ct);
+        }
+
         /// <summary>Get all items. AsNoTracking by default.</summary>
         public virtual Task<List<T>> GetAllAsync(bool asNoTracking = true, CancellationToken ct = default)
         {
             return (asNoTracking ? _set.AsNoTracking() : _set).ToListAsync(ct);
+        }
+
+        /// <summary>Get all items matching predicate. AsNoTracking by default.</summary>
+        public virtual Task<List<T>> GetWhereAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+            var query = asNoTracking ? _set.AsNoTracking() : _set;
+            return query.Where(predicate).ToListAsync(ct);
         }
 
         /// <summary>Returns true if the set contains any rows.</summary>
@@ -62,10 +81,24 @@ namespace ASAPPVC.UI.Repositories
             return _set.AsNoTracking().AnyAsync(ct);
         }
 
+        /// <summary>Returns true if any entity matches the predicate.</summary>
+        public virtual Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+            return _set.AsNoTracking().AnyAsync(predicate, ct);
+        }
+
         /// <summary>Total row count.</summary>
         public virtual Task<int> CountAsync(CancellationToken ct = default)
         {
             return _set.CountAsync(ct);
+        }
+
+        /// <summary>Count entities matching predicate.</summary>
+        public virtual Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+            return _set.CountAsync(predicate, ct);
         }
 
         /// <summary>Check if an item exists by id (single key).</summary>
@@ -81,6 +114,13 @@ namespace ASAPPVC.UI.Repositories
             ArgumentNullException.ThrowIfNull(entity);
 
             _set.Update(entity);
+        }
+
+        /// <summary>Marks multiple entities as modified (does NOT save).</summary>
+        public virtual void UpdateRange(IEnumerable<T> entities)
+        {
+            ArgumentNullException.ThrowIfNull(entities);
+            _set.UpdateRange(entities);
         }
 
         // ============== Delete ==============

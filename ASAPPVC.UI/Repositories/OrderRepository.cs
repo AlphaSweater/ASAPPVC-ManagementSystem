@@ -6,16 +6,9 @@ namespace ASAPPVC.UI.Repositories
 {
     public class OrderRepository(AppDbContext db) : BaseRepository<OrderModel>(db), IOrderRepository
     {
-        public async Task<OrderModel> AddOrderAsync(OrderModel order, CancellationToken ct = default)
-        {
-            // delegate to base AddAsync (keeps behavior consistent)
-            var entry = await base.AddAsync(order, ct);
-            return entry;
-        }
-
         public Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default)
         {
-            // AppDbContext.OrderProduct is accessible via base protected _db
+            ArgumentNullException.ThrowIfNull(lines);
             _db.OrderProduct.AddRange(lines);
             return Task.CompletedTask;
         }

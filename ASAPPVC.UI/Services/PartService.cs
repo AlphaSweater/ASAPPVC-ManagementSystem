@@ -48,7 +48,7 @@ namespace ASAPPVC.UI.Services
         //retrieves a single part by ID
         public async Task<PartModel?> GetAsync(int id, CancellationToken ct = default)
         {
-            return await _repo.GetByIdAsync(id, ct);
+            return await _repo.FirstOrDefaultAsync(p => p.PartID == id, ct: ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

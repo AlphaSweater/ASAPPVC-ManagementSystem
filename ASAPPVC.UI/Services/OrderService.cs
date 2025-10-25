@@ -41,7 +41,7 @@ namespace ASAPPVC.UI.Services
             };
 
             // Add order to repository and ensure we have the persisted OrderID
-            var addedOrder = await _repo.AddOrderAsync(order, ct);
+            var addedOrder = await _repo.AddAsync(order, ct);
             await _repo.SaveAsync(ct);
 
             // Build order lines: group by product id and sum quantities in case duplicates were submitted
