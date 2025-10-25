@@ -33,12 +33,36 @@ namespace ASAPPVC.UI.Repositories
             return _set.AddRangeAsync(entities, ct);
         }
 
+        // Add a range to an arbitrary bridge/other DbSet. Useful for adding related entities
+        // (e.g. ProductComponentModel entries) from a repository that targets a different entity type.
+        public virtual Task AddRangeToBridgeAsync<U>(DbSet<U> bridgeSet, IEnumerable<U> entities, CancellationToken ct = default)
+        where U : class
+        {
+            ArgumentNullException.ThrowIfNull(entities);
+            ArgumentNullException.ThrowIfNull(bridgeSet);
+
+            return bridgeSet.AddRangeAsync(entities, ct);
+        }
+
         // ---------- Read ----------
         public virtual async Task<T?> GetByIdAsync(object id, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(id);
 
-            return await _set.FindAsync(new object[] { id }, ct);
+            return await _set.FindAsync(new[] { id }, ct);
+        }
+
+        public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(ids);
+
+            var keySet = ids as ISet<Guid> ?? new HashSet<Guid>(ids);
+            if (keySet.Count == 0)
+                return new List<T>(0);
+
+            return await _set.AsNoTracking()
+                             .Where(e => keySet.Contains(EF.Property<Guid>(e, "Id")))
+                             .ToListAsync(ct);
         }
 
         public virtual Task<List<T>> ListAsync(bool asNoTracking = true, CancellationToken ct = default)
