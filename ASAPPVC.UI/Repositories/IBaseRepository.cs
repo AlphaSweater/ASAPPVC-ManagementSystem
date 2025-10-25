@@ -93,7 +93,7 @@ namespace ASAPPVC.UI.Repositories
         /// Removes an entity by its identifier. Returns true if the entity was found and removed, false otherwise.<br/>
         /// Note: You must call <see cref="SaveAsync(CancellationToken)"/> to persist this deletion to the database.
         /// </summary>
-        Task<bool> RemoveByIdAsync(object id, CancellationToken ct = default);
+        Task<bool> RemoveByIdAsync(Guid id, CancellationToken ct = default);
 
         /// <summary>
         /// Persists all pending changes to the database.<br/>

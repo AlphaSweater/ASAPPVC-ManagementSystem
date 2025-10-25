@@ -6,44 +6,63 @@ namespace ASAPPVC.UI.Repositories
 {
     public class ComponentRepository(AppDbContext db) : BaseRepository<ComponentModel>(db), IComponentRepository
     {
-        // ---------- Domain-flavoured CRUD (compose + Save) ----------
-        public async Task<ComponentModel> AddComponentAsync(ComponentModel part, CancellationToken ct = default)
+        protected override string? CodePropertyName => "ComponentCode";
+
+        // ---------- Reads ----------
+
+        public async Task<ComponentModel?> GetByIdOrCodeAsync(
+            Guid? id = null,
+            string? code = null,
+            CancellationToken ct = default)
         {
-            // Compose base Add + Save
-            var added = await AddAsync(part, ct);
-            await SaveAsync(ct);
-            return added;
+            // Prefer Id lookups if any valid Guid provided
+            if (id.HasValue && id.Value != Guid.Empty)
+                return await GetByIdAsync(id.Value, asNoTracking: true, ct);
+
+            // Fallback to Code lookups if any non-blank string provided
+            if (!string.IsNullOrWhiteSpace(code))
+                return await GetByCodeAsync(code!, asNoTracking: true, ct);
+
+            // Neither provided => nothing to fetch
+            return null;
         }
 
-        public async Task<bool> UpdateComponentAsync(ComponentModel part, CancellationToken ct = default)
+        public async Task<List<ComponentModel>> GetListByIdOrCodeAsync(
+            IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+            CancellationToken ct = default)
         {
-            Update(part);
-            return await SaveAsync(ct) > 0;
+            // Prefer IDs when any valid Guid is present
+            var hasValidIds = ids?.Any(g => g != Guid.Empty) == true;
+            if (hasValidIds)
+                return await GetByIdsAsync(ids!, asNoTracking: true, ct);
+
+            // Fallback to codes when any non-blank code is present
+            var hasValidCodes = codes?.Any(s => !string.IsNullOrWhiteSpace(s)) == true;
+            if (hasValidCodes)
+                return await GetByCodesAsync(codes!, asNoTracking: true, ct);
+
+            // Neither provided => empty
+            return new List<ComponentModel>(0);
         }
 
-        public async Task<bool> DeleteComponentAsync(Guid id, CancellationToken ct = default)
+        public Task<List<ComponentModel>> GetListAsync(CancellationToken ct = default)
         {
-            if (!await RemoveByIdAsync(id, ct))
-                return false;
-            return await SaveAsync(ct) > 0;
+            return _set.AsNoTracking()
+                       .OrderBy(c => c.ComponentCode)
+                       .ToListAsync(ct);
         }
 
-        // ---------- Reads with slight interpretation ----------
-        public Task<List<ComponentModel>> ListOrderedByNameAsync(CancellationToken ct = default)
-        {
-            return _set.AsNoTracking().OrderBy(p => p.Name).ToListAsync(ct);
-        }
-
-        public Task<ComponentModel?> GetByComponentCodeAsync(string partCode, CancellationToken ct = default)
-        {
-            return FirstOrDefaultAsync(p => p.ComponentCode == partCode, asNoTracking: true, ct);
-        }
+        // ---------- Search ----------
 
         public Task<List<ComponentModel>> SearchAsync(string term, CancellationToken ct = default)
         {
             term = (term ?? string.Empty).Trim();
             if (term.Length == 0)
-                return ListOrderedByNameAsync(ct);
+            {
+                // When no term, return full list ordered by ComponentCode (align with new default list behavior)
+                return GetListAsync(ct);
+            }
 
             // Simple contains search on Name/ComponentCode; push to DB with AsNoTracking
             return _set.AsNoTracking()

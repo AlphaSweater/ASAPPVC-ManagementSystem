@@ -1,18 +1,29 @@
 ﻿using ASAPPVC.UI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Data
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
     {
-        public DbSet<UserProfileModel> UserProfiles { get; set; }
-        public DbSet<ComponentModel> Part { get; set; }
-        public DbSet<ProductModel> Product { get; set; }
-        public DbSet<ProductComponentModel> ProductPart { get; set; }
-        public DbSet<CustomerModel> Customer { get; set; }
-        public DbSet<OrderModel> Order { get; set; }
-        public DbSet<OrderProductModel> OrderProduct { get; set; }
+        // Customers Table
+        public DbSet<CustomerModel> Customers { get; set; }
+
+        // Components Table
+        public DbSet<ComponentModel> Components { get; set; }
+
+        // Products and ProductComponents Bridge Tables
+        public DbSet<ProductModel> Products { get; set; }
+
+        public DbSet<ProductComponentModel> ProductComponents { get; set; }
+
+        // Orders and OrderProducts Bridge Tables
+        public DbSet<OrderModel> Orders { get; set; }
+
+        public DbSet<OrderProductModel> OrderProducts { get; set; }
+
+        // CodeCounters Table for generating sequential codes
         public DbSet<CodeCounters> CodeCounters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,7 +32,7 @@ namespace ASAPPVC.UI.Data
 
             modelBuilder.Entity<ProductComponentModel>()
                 .HasOne(pp => pp.Product)
-                .WithMany(p => p.ProductParts)
+                .WithMany(p => p.ProductComponents)
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 

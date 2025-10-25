@@ -266,7 +266,7 @@
 					{
 						foreach (var p in Model)
 						{
-							var partsCount = p.ProductParts?.Count ?? 0;
+							var partsCount = p.ProductComponents?.Count ?? 0;
 							<tr>
 								<td>@p.Name</td>
 								<td>@p.Description</td>

@@ -305,10 +305,10 @@
 					</tr>
 				</thead>
 				<tbody>
-					@if (Model?.ProductParts != null && Model.ProductParts.Any())
+					@if (Model?.ProductComponents != null && Model.ProductComponents.Any())
 					{
 						decimal grandTotal = 0;
-						foreach (var line in Model.ProductParts)
+						foreach (var line in Model.ProductComponents)
 						{
 							var unitCost = line.Component?.UnitCost ?? 0;
 							var subtotal = unitCost * line.Quantity;

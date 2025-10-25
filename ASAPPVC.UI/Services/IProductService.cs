@@ -1,5 +1,5 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Inventory;
+using ASAPPVC.UI.Models.ViewModels.Inventory.Product;
 
 namespace ASAPPVC.UI.Services
 {

@@ -160,7 +160,7 @@ namespace ASAPPVC.UI.Repositories
             _set.Remove(entity);
         }
 
-        public virtual async Task<bool> RemoveByIdAsync(object id, CancellationToken ct = default)
+        public virtual async Task<bool> RemoveByIdAsync(Guid id, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(id);
 

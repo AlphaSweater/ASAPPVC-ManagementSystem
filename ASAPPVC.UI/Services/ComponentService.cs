@@ -1,60 +1,152 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Inventory;
+using ASAPPVC.UI.Models.ViewModels.Inventory.Component;
 using ASAPPVC.UI.Repositories;
+using ASAPPVC.UI.Utils;
 
 namespace ASAPPVC.UI.Services
 {
-    public class ComponentService : IComponentService
+    public class ComponentService(IComponentRepository componentRepository) : IComponentService
     {
-        private readonly IComponentRepository _repo;
+        private readonly IComponentRepository _components = componentRepository;
 
-        public ComponentService(IComponentRepository repo)
+        // ---------- Input validation + normalization helpers ----------
+
+        private static (bool ok, string? error) ValidateCreateVm(CreateComponentViewModel? vm)
         {
-            _repo = repo;
+            if (vm is null)
+                return (false, "Create view model is required.");
+            if (string.IsNullOrWhiteSpace(vm.Name))
+                return (false, "Component name is required.");
+            if (string.IsNullOrWhiteSpace(vm.StorageLocation))
+                return (false, "Storage location is required.");
+            return (true, null);
+        }
+
+        private static void Normalize(CreateComponentViewModel vm)
+        {
+            vm.Name = vm.Name.Trim();
+            vm.StorageLocation = vm.StorageLocation.Trim();
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //creates a new part in the database
-        public async Task<(bool Ok, string? Error, ComponentModel? Part)> CreateAsync(CreateComponentViewModel vm, CancellationToken ct = default)
+        // Creates a new component (reads image once, defers Save to repo)
+        public async Task<Result<ComponentModel>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default)
         {
-            //validates input and returns an error message if invalid
-            if (string.IsNullOrWhiteSpace(vm.Name) || string.IsNullOrWhiteSpace(vm.StorageLocation))
-                return (false, "Name and storage location are required.", null);
+            var (ok, error) = ValidateCreateVm(vm);
+            if (!ok)
+                return Result<ComponentModel>.Fail(error!);
 
-            var part = new ComponentModel
+            Normalize(vm);
+
+            var component = new ComponentModel
             {
-                Name = vm.Name.Trim(),
-                StorageLocation = vm.StorageLocation.Trim(),
+                Name = vm.Name,
+                StorageLocation = vm.StorageLocation,
                 UnitCost = vm.UnitCost,
                 CurrentAmount = vm.CurrentAmount
             };
 
             if (vm.ImageFile is { Length: > 0 })
             {
-                using var ms = new MemoryStream();
-                await vm.ImageFile.CopyToAsync(ms, ct);
-                part.ImageBytes = ms.ToArray();
-                part.ImageContentType = vm.ImageFile.ContentType;
+                try
+                {
+                    using var ms = new MemoryStream();
+                    await vm.ImageFile.CopyToAsync(ms, ct);
+                    component.ImageBytes = ms.ToArray();
+                    component.ImageContentType = vm.ImageFile.ContentType;
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    return Result<ComponentModel>.Fail("Operation was canceled.");
+                }
+                catch (Exception ex)
+                {
+                    return Result<ComponentModel>.Fail($"Failed to read image file: {ex.Message}");
+                }
             }
 
-            await _repo.AddAsync(part, ct);
-            await _repo.SaveAsync(ct);
-
-            return (true, null, part);
+            try
+            {
+                var added = await _components.AddAsync(component, ct);
+                await _components.SaveAsync(ct);
+                return Result<ComponentModel>.Success(added);
+            }
+            catch (Exception ex)
+            {
+                return Result<ComponentModel>.Fail($"Failed to create component: {ex.Message}");
+            }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //retrieves a single part by ID
-        public async Task<ComponentModel?> GetAsync(Guid id, CancellationToken ct = default)
+        // Retrieves a single component by Id OR Code (repo decides precedence)
+        public async Task<Result<ComponentModel>> GetComponentByIdOrCodeAsync(
+            Guid? id = null,
+            string? code = null,
+            CancellationToken ct = default)
         {
-            return await _repo.FirstOrDefaultAsync(p => p.Id == id, ct: ct);
+            try
+            {
+                var component = await _components.GetByIdOrCodeAsync(id, code, ct);
+                if (component is null)
+                    return Result<ComponentModel>.Fail("Component not found.");
+                return Result<ComponentModel>.Success(component);
+            }
+            catch (Exception ex)
+            {
+                return Result<ComponentModel>.Fail($"Failed to retrieve component: {ex.Message}");
+            }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //retrieves a list of parts from the database
-        public async Task<List<ComponentModel>> ListAsync(CancellationToken ct = default)
+        // Retrieves multiple components by Ids OR Codes (repo decides precedence)
+        public async Task<Result<List<ComponentModel>>> GetComponentsListByIdOrCodeAsync(
+            IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+            CancellationToken ct = default)
         {
-            return await _repo.ListAsync(ct: ct);
+            try
+            {
+                var filteredIds = ids?.Where(g => g != Guid.Empty);
+                var filteredCodes = codes?.Where(s => !string.IsNullOrWhiteSpace(s));
+
+                var list = await _components.GetListByIdOrCodeAsync(filteredIds, filteredCodes, ct);
+                return Result<List<ComponentModel>>.Success(list);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ComponentModel>>.Fail($"Failed to retrieve components: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves full components list
+        public async Task<Result<List<ComponentModel>>> GetComponentsListAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var list = await _components.GetListAsync(ct);
+                return Result<List<ComponentModel>>.Success(list);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ComponentModel>>.Fail($"Failed to list components: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Searches components by term (name/code contains, case-insensitive)
+        public async Task<Result<List<ComponentModel>>> SearchComponentsAsync(string? term, CancellationToken ct = default)
+        {
+            try
+            {
+                term ??= string.Empty;
+                var list = await _components.SearchAsync(term, ct);
+                return Result<List<ComponentModel>>.Success(list);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ComponentModel>>.Fail($"Failed to search components: {ex.Message}");
+            }
         }
     }
 }

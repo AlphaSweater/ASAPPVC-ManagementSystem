@@ -2,15 +2,33 @@
 
 namespace ASAPPVC.UI.Repositories
 {
-    // Inherit common CRUD from IBaseRepository<T> and expose only product-specific APIs
     public interface IProductRepository : IBaseRepository<ProductModel>
     {
-        Task AddProductPartsAsync(IEnumerable<ProductComponentModel> lines, CancellationToken ct = default);
+        // Domain-flavoured CRUD (compose base ops + Save)
+        Task<ProductModel> AddProductAsync(ProductModel product, CancellationToken ct = default);
 
-        Task<List<ComponentModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
+        Task<ProductModel> AddProductWithComponentsAsync(
+            ProductModel product,
+            IEnumerable<ProductComponentModel> components,
+            CancellationToken ct = default);
 
-        Task<List<ProductModel>> ListAsync(CancellationToken ct = default);
+        Task<bool> UpdateProductAsync(ProductModel product, CancellationToken ct = default);
 
-        Task<ProductModel?> GetProductWithPartsAsync(Guid id, CancellationToken ct = default);
+        Task<bool> DeleteProductAsync(Guid id, CancellationToken ct = default);
+
+        // Components (bridge) helpers
+        Task<bool> ReplaceComponentsAsync(Guid productId, IEnumerable<ProductComponentModel> components, CancellationToken ct = default);
+
+        // Reads with small interpretations
+        Task<ProductModel?> GetWithComponentsAsync(Guid id, CancellationToken ct = default);
+
+        Task<List<ProductModel>> ListOrderedByNameAsync(CancellationToken ct = default);
+
+        Task<ProductModel?> GetByProductCodeAsync(string productCode, CancellationToken ct = default);
+
+        Task<List<ProductModel>> SearchAsync(string term, CancellationToken ct = default);
+
+        // Utility (optional)
+        Task<List<ComponentModel>> GetComponentsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     }
 }
