@@ -162,7 +162,8 @@ namespace ASAPPVC.UI.Repositories
 
         public virtual async Task<bool> RemoveByIdAsync(Guid id, CancellationToken ct = default)
         {
-            ArgumentNullException.ThrowIfNull(id);
+            if (id == Guid.Empty)
+                throw new ArgumentException("Parameter 'id' must not be Guid.Empty.", nameof(id));
 
             var entity = await GetByIdAsync(id, false, ct);
             if (entity is null)
