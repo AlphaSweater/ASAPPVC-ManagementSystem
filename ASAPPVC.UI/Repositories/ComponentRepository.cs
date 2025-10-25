@@ -45,7 +45,7 @@ namespace ASAPPVC.UI.Repositories
             if (term.Length == 0)
                 return ListOrderedByNameAsync(ct);
 
-            // Simple contains search on Name/PartCode; push to DB with AsNoTracking
+            // Simple contains search on Name/ComponentCode; push to DB with AsNoTracking
             return _set.AsNoTracking()
                        .Where(p => EF.Functions.Like(p.Name, $"%{term}%")
                                 || EF.Functions.Like(p.ComponentCode, $"%{term}%"))
