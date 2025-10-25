@@ -25,17 +25,27 @@ namespace ASAPPVC.UI.Repositories
             where U : class;
 
         /// <summary>
-        /// Gets a single entity by ID. Tracking ON by default - suitable for edits.<br/>
+        /// Gets a single entity by ID (Guid). Tracking ON by default - suitable for edits.<br/>
         /// If <paramref name="asNoTracking"/> is true, the entity will be returned as no-tracking.<br/>
-        /// Note: This is a read operation; no call to <see cref="SaveAsync(CancellationToken)"/> is required.
         /// </summary>
-        Task<T?> GetByIdAsync(object id, bool asNoTracking = false, CancellationToken ct = default);
+        Task<T?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken ct = default);
+
+        /// <summary>
+        /// Gets a single entity by its human-friendly code (if supported). No-tracking by default - suitable for lookups.<br/>
+        /// Note: Not all repositories support code lookups; calling this on an unsupported repository may throw <see cref="NotSupportedException"/>.
+        /// </summary>
+        Task<T?> GetByCodeAsync(string code, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Gets multiple entities by ID. No-tracking by default - used mostly for display or lookups.<br/>
-        /// Note: This is a read operation; no call to <see cref="SaveAsync(CancellationToken)"/> is required.
         /// </summary>
         Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids, bool asNoTracking = true, CancellationToken ct = default);
+
+        /// <summary>
+        /// Gets multiple entities by their codes. No-tracking by default - used mostly for display or lookups.<br/>
+        /// Note: Not all repositories support code lookups; calling this on an unsupported repository may throw <see cref="NotSupportedException"/>.
+        /// </summary>
+        Task<List<T>> GetByCodesAsync(IEnumerable<string> codes, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Lists all entities. No-tracking by default - intended for read-only operations.<br/>
@@ -50,7 +60,7 @@ namespace ASAPPVC.UI.Repositories
         Task<List<T>> WhereAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
-        /// Gets the first entity matching a predicate. No-tracking by default — safe for lookups.<br/>
+        /// Gets the first entity matching a predicate. No-tracking by default – safe for lookups.<br/>
         /// Note: This is a read operation; no call to <see cref="SaveAsync(CancellationToken)"/> is required.
         /// </summary>
         Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, bool asNoTracking = true, CancellationToken ct = default);

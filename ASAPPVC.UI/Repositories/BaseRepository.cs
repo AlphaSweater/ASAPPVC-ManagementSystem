@@ -9,8 +9,11 @@ namespace ASAPPVC.UI.Repositories
         protected readonly AppDbContext _db;
         protected readonly DbSet<T> _set;
 
-        // For consistent EF.Property lookups on "Id"
-        private const string KeyPropertyName = "Id";
+        // Property names (override in derived repos if needed)
+        protected virtual string IdPropertyName => "Id";
+
+        // Return null by default -> "this entity has no code"
+        protected virtual string? CodePropertyName => null;
 
         protected BaseRepository(AppDbContext db)
         {
@@ -47,27 +50,55 @@ namespace ASAPPVC.UI.Repositories
 
         // ---------- Read ----------
 
-        public virtual async Task<T?> GetByIdAsync(object id, bool asNoTracking = false, CancellationToken ct = default)
+        public virtual async Task<T?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken ct = default)
         {
-            ArgumentNullException.ThrowIfNull(id);
+            if (id == Guid.Empty)
+                return null;
 
             if (!asNoTracking)
-                return await _set.FindAsync(new[] { id }, ct);
+                return await _set.FindAsync(new object[] { id }, ct);
 
             return await ApplyTracking(_set, asNoTracking)
-                .SingleOrDefaultAsync(e => EF.Property<object>(e, KeyPropertyName)!.Equals(id), ct);
+                .SingleOrDefaultAsync(e => EF.Property<Guid>(e, IdPropertyName) == id, ct);
+        }
+
+        public virtual async Task<T?> GetByCodeAsync(string code, bool asNoTracking = true, CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return null;
+            if (CodePropertyName is null)
+                throw new NotSupportedException($"{typeof(T).Name} does not support code lookups.");
+
+            return await ApplyTracking(_set, asNoTracking)
+                .SingleOrDefaultAsync(e => EF.Property<string>(e, CodePropertyName) == code, ct);
         }
 
         public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids, bool asNoTracking = true, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(ids);
 
-            var keySet = ids as ISet<Guid> ?? new HashSet<Guid>(ids);
-            if (keySet.Count == 0)
+            var idSet = (ids as ISet<Guid>) ?? ids.Where(g => g != Guid.Empty).ToHashSet();
+            if (idSet.Count == 0)
                 return new List<T>(0);
 
             return await ApplyTracking(_set, asNoTracking)
-                .Where(e => keySet.Contains(EF.Property<Guid>(e, KeyPropertyName)))
+                .Where(e => idSet.Contains(EF.Property<Guid>(e, IdPropertyName)))
+                .ToListAsync(ct);
+        }
+
+        public virtual async Task<List<T>> GetByCodesAsync(IEnumerable<string> codes, bool asNoTracking = true, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(codes);
+            if (CodePropertyName is null)
+                throw new NotSupportedException($"{typeof(T).Name} does not support code lookups.");
+
+            var codeList = codes.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+            if (codeList.Count == 0)
+                return new List<T>(0);
+
+            // Note: collation/case-sensitivity is provider-dependent.
+            return await ApplyTracking(_set, asNoTracking)
+                .Where(e => codeList.Contains(EF.Property<string>(e, CodePropertyName)))
                 .ToListAsync(ct);
         }
 
