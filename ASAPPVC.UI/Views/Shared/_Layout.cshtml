@@ -1,201 +1,198 @@
 ﻿@{
-    var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").Trim();
-    var action = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").Trim();
-    var routeKey = $"{controller}/{action}";
-    var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        "Auth/Login"
-    };
-    var explicitHide = ViewData["HideNavbar"] is bool b && b;
-    var hideSidebar = explicitHide || excludedRoutes.Contains(routeKey);
-    var current = routeKey.ToLowerInvariant();
+	var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").Trim();
+	var action = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").Trim();
+	var routeKey = $"{controller}/{action}";
+	var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+	{
+		"Auth/Login"
+	};
+	var explicitHide = ViewData["HideNavbar"] is bool b && b;
+	var hideSidebar = explicitHide || excludedRoutes.Contains(routeKey);
+	var current = routeKey.ToLowerInvariant();
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ASAPPVC.UI</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ASAPPVC.UI.styles.css" asp-append-version="true" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - ASAPPVC.UI</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/ASAPPVC.UI.styles.css" asp-append-version="true" />
 
-    <style>
-        :root {
-            --sb-w: 240px;
-        }
+	<style>
+		:root {
+			--sb-w: 240px;
+		}
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            font-family: "Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-        }
+		html, body {
+			height: 100%;
+			margin: 0;
+			font-family: "Montserrat",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+		}
 
-        .sidebar {
-            position: fixed;
-            inset: 0 auto 0 0;
-            width: var(--sb-w);
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(180deg, #d63a3a 0%, #b52e2e 50%, #8f2424 100%);
-            box-shadow: 6px 0 24px rgba(0,0,0,.18);
-            z-index: 1000;
-        }
+		.sidebar {
+			position: fixed;
+			inset: 0 auto 0 0;
+			width: var(--sb-w);
+			display: flex;
+			flex-direction: column;
+			background: linear-gradient(180deg, #d63a3a 0%, #b52e2e 50%, #8f2424 100%);
+			box-shadow: 6px 0 24px rgba(0,0,0,.18);
+			z-index: 1000;
+		}
 
-        .sb-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px;
-        }
+		.sb-brand {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 16px;
+		}
 
-            .sb-brand img {
-                width: 34px;
-                height: 34px;
-                object-fit: contain;
-                border-radius: 8px;
-            }
+			.sb-brand img {
+				width: 34px;
+				height: 34px;
+				object-fit: contain;
+				border-radius: 8px;
+			}
 
-            .sb-brand .name {
-                color: #fff;
-                font-weight: 800;
-                letter-spacing: .02em;
-            }
+			.sb-brand .name {
+				color: #fff;
+				font-weight: 800;
+				letter-spacing: .02em;
+			}
 
-        .sb-nav {
-            display: flex;
-            flex-direction: column;
-            padding: 8px;
-            overflow-y: auto;
-        }
+		.sb-nav {
+			display: flex;
+			flex-direction: column;
+			padding: 8px;
+			overflow-y: auto;
+		}
 
-        .sb-item {
-            position: relative;
-            display: grid;
-            grid-template-columns: 28px 1fr;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            margin: 4px 6px;
-            color: #ffffffcc;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: background .15s ease, color .15s ease;
-        }
+		.sb-item {
+			position: relative;
+			display: grid;
+			grid-template-columns: 28px 1fr;
+			align-items: center;
+			gap: 12px;
+			padding: 10px 12px;
+			margin: 4px 6px;
+			color: #ffffffcc;
+			text-decoration: none;
+			border-radius: 10px;
+			transition: background .15s ease, color .15s ease;
+		}
 
-            .sb-item .sb-icon {
-                font-size: 18px;
-            }
+			.sb-item .sb-icon {
+				font-size: 18px;
+			}
 
-            .sb-item .sb-label {
-                font-weight: 600;
-                letter-spacing: .01em;
-            }
+			.sb-item .sb-label {
+				font-weight: 600;
+				letter-spacing: .01em;
+			}
 
-            .sb-item:hover {
-                background: rgba(255,255,255,0.12);
-                color: #fff;
-            }
+			.sb-item:hover {
+				background: rgba(255,255,255,0.12);
+				color: #fff;
+			}
 
-            .sb-item.active {
-                background: rgba(255,255,255,0.18);
-                color: #fff;
-            }
+			.sb-item.active {
+				background: rgba(255,255,255,0.18);
+				color: #fff;
+			}
 
-                .sb-item.active::before {
-                    content: "";
-                    position: absolute;
-                    left: 0;
-                    top: 8px;
-                    bottom: 8px;
-                    width: 4px;
-                    border-radius: 2px;
-                    background: #fff;
-                }
+				.sb-item.active::before {
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 8px;
+					bottom: 8px;
+					width: 4px;
+					border-radius: 2px;
+					background: #fff;
+				}
 
-        /* Main content */
-        .main {
-            min-height: 100%;
-            padding: 20px;
-            transition: margin-left .2s ease;
-        }
+		/* Main content */
+		.main {
+			min-height: 100%;
+			padding: 20px;
+			transition: margin-left .2s ease;
+		}
 
-        .has-sidebar .main {
-            margin-left: var(--sb-w);
-        }
+		.has-sidebar .main {
+			margin-left: var(--sb-w);
+		}
 
-        .no-sidebar .main {
-            margin-left: 0;
-        }
+		.no-sidebar .main {
+			margin-left: 0;
+		}
 
-        /* Responsive collapse */
-        .media (max-width: 900px) {
-            : root
+		/* Responsive collapse */
+		.media (max-width: 900px) {
+			: root {
+				--sb-w: 78px;
+			}
 
-        {
-            --sb-w: 78px;
-        }
+			.sb-item {
+				grid-template-columns: 1fr;
+				justify-items: center;
+			}
 
-        .sb-item {
-            grid-template-columns: 1fr;
-            justify-items: center;
-        }
-
-        .sb-label {
-            display: none;
-        }
-
-        }
-    </style>
+			.sb-label {
+				display: none;
+			}
+		}
+	</style>
 </head>
 <body class="@(hideSidebar ? "no-sidebar" : "has-sidebar")">
 
-    @if (!hideSidebar)
-    {
-        <aside class="sidebar">
-            <div class="sb-brand">
-                <img src="~/Assets/Images/Logos/asap-pvc-logo-dark.png" alt="ASAPPVC" />
-                <span class="name">ASAPPVC</span>
-            </div>
+	@if (!hideSidebar)
+	{
+		<aside class="sidebar">
+			<div class="sb-brand">
+				<img src="~/Assets/Images/Logos/asap-pvc-logo-dark.png" alt="ASAPPVC" />
+				<span class="name">ASAPPVC</span>
+			</div>
 
-            <nav class="sb-nav">
-                <a class="sb-item @(current == "home/index" ? "active" : "")" asp-controller="Home" asp-action="Index">
-                    <span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
-                </a>
-                <a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
-                    <span class="sb-icon">👥</span><span class="sb-label">Customers</span>
-                </a>
-                <a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
-                    <span class="sb-icon">🚚</span><span class="sb-label">Order</span>
-                </a>
-                <a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
-                    <span class="sb-icon">📦</span><span class="sb-label">Product inventory</span>
-                </a>
-                <a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewPartInventory">
-                    <span class="sb-icon">📦</span><span class="sb-label">Part Inventory</span>
-                </a>
-                <a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
-                    <span class="sb-icon">💼</span><span class="sb-label">Financial</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>
-                </a>
-                <a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="AddOrder">
-                    <span class="sb-icon">🛠️</span><span class="sb-label">order add</span>
-                </a>
-            </nav>
-        </aside>
-    }
+			<nav class="sb-nav">
+				<a class="sb-item @(current == "home/index" ? "active" : "")" asp-controller="Home" asp-action="Index">
+					<span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
+				</a>
+				<a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
+					<span class="sb-icon">👥</span><span class="sb-label">Customers</span>
+				</a>
+				<a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
+					<span class="sb-icon">🚚</span><span class="sb-label">Order</span>
+				</a>
+				<a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
+					<span class="sb-icon">📦</span><span class="sb-label">Product inventory</span>
+				</a>
+				<a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewComponentInventory">
+					<span class="sb-icon">📦</span><span class="sb-label">Component Inventory</span>
+				</a>
+				<a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
+					<span class="sb-icon">💼</span><span class="sb-label">Financial</span>
+				</a>
+				<a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
+					<span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>
+				</a>
+				<a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="AddOrder">
+					<span class="sb-icon">🛠️</span><span class="sb-label">order add</span>
+				</a>
+			</nav>
+		</aside>
+	}
 
-    <div class="main">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+	<div class="main">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -310,11 +310,11 @@
 						decimal grandTotal = 0;
 						foreach (var line in Model.ProductParts)
 						{
-							var unitCost = line.Part?.UnitCost ?? 0;
+							var unitCost = line.Component?.UnitCost ?? 0;
 							var subtotal = unitCost * line.Quantity;
 							grandTotal += subtotal;
 							<tr>
-								<td>@line.Part?.Name</td>
+								<td>@line.Component?.Name</td>
 								<td class="align-right">@line.Quantity</td>
 								<td class="align-right">@unitCost.ToString("C")</td>
 								<td class="align-right">@subtotal.ToString("C")</td>

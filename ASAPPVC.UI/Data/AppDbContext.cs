@@ -7,9 +7,9 @@ namespace ASAPPVC.UI.Data
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
     {
         public DbSet<UserProfileModel> UserProfiles { get; set; }
-        public DbSet<PartModel> Part { get; set; }
+        public DbSet<ComponentModel> Part { get; set; }
         public DbSet<ProductModel> Product { get; set; }
-        public DbSet<ProductPartModel> ProductPart { get; set; }
+        public DbSet<ProductComponentModel> ProductPart { get; set; }
         public DbSet<CustomerModel> Customer { get; set; }
         public DbSet<OrderModel> Order { get; set; }
         public DbSet<OrderProductModel> OrderProduct { get; set; }
@@ -19,16 +19,16 @@ namespace ASAPPVC.UI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProductPartModel>()
+            modelBuilder.Entity<ProductComponentModel>()
                 .HasOne(pp => pp.Product)
                 .WithMany(p => p.ProductParts)
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ProductPartModel>()
-                .HasOne(pp => pp.Part)
+            modelBuilder.Entity<ProductComponentModel>()
+                .HasOne(pp => pp.Component)
                 .WithMany()
-                .HasForeignKey(pp => pp.PartId)
+                .HasForeignKey(pp => pp.ComponentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OrderModel>()

@@ -2,7 +2,7 @@
 
 namespace ASAPPVC.UI.Models.ViewModels.Inventory
 {
-    public class CreatePartViewModel
+    public class CreateComponentViewModel
     {
         [Required, MaxLength(200)]
         public string Name { get; set; }
@@ -18,6 +18,5 @@ namespace ASAPPVC.UI.Models.ViewModels.Inventory
 
         // Optional image
         public IFormFile? ImageFile { get; set; }
-
     }
 }

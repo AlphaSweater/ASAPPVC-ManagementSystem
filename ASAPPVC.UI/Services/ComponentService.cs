@@ -4,25 +4,24 @@ using ASAPPVC.UI.Repositories;
 
 namespace ASAPPVC.UI.Services
 {
-    public class PartService : IPartService
+    public class ComponentService : IComponentService
     {
-        //─────────── Dependencies ───────────\\
-        private readonly IPartRepository _repo;
+        private readonly IComponentRepository _repo;
 
-        public PartService(IPartRepository repo)
+        public ComponentService(IComponentRepository repo)
         {
             _repo = repo;
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //creates a new part in the database
-        public async Task<(bool Ok, string? Error, PartModel? Part)> CreateAsync(CreatePartViewModel vm, CancellationToken ct = default)
+        public async Task<(bool Ok, string? Error, ComponentModel? Part)> CreateAsync(CreateComponentViewModel vm, CancellationToken ct = default)
         {
             //validates input and returns an error message if invalid
             if (string.IsNullOrWhiteSpace(vm.Name) || string.IsNullOrWhiteSpace(vm.StorageLocation))
                 return (false, "Name and storage location are required.", null);
 
-            var part = new PartModel
+            var part = new ComponentModel
             {
                 Name = vm.Name.Trim(),
                 StorageLocation = vm.StorageLocation.Trim(),
@@ -46,14 +45,14 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a single part by ID
-        public async Task<PartModel?> GetAsync(Guid id, CancellationToken ct = default)
+        public async Task<ComponentModel?> GetAsync(Guid id, CancellationToken ct = default)
         {
             return await _repo.FirstOrDefaultAsync(p => p.Id == id, ct: ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a list of parts from the database
-        public async Task<List<PartModel>> ListAsync(CancellationToken ct = default)
+        public async Task<List<ComponentModel>> ListAsync(CancellationToken ct = default)
         {
             return await _repo.ListAsync(ct: ct);
         }

@@ -84,7 +84,7 @@ namespace ASAPPVC.UI.Repositories
         public virtual void Remove(T entity)
         {
             ArgumentNullException.ThrowIfNull(entity);
-            
+
             _set.Remove(entity);
         }
 

@@ -1,6 +1,6 @@
-﻿@model ASAPPVC.UI.Models.PartModel
+﻿@model ASAPPVC.UI.Models.ComponentModel
 @{
-	ViewData["Title"] = "View Part";
+	ViewData["Title"] = "View Component";
 
 	// Determine the image source, using a placeholder if no image exists.
 	var imgSrc = (Model?.ImageBytes != null && Model.ImageBytes.Length > 0 && !string.IsNullOrWhiteSpace(Model.ImageContentType))
@@ -203,7 +203,7 @@
 <div class="viewport">
 	<div class="view-container">
 		<div class="header-section">
-			<a class="back-link" asp-controller="Inventory" asp-action="ViewPartInventory">
+			<a class="back-link" asp-controller="Inventory" asp-action="ViewComponentInventory">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
 					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
 				</svg>
@@ -216,7 +216,7 @@
 			<!-- Image Column -->
 			<div class="image-col">
 				<div class="image-box">
-					<img src="@imgSrc" alt="Part Image" />
+					<img src="@imgSrc" alt="Component Image" />
 				</div>
 			</div>
 
@@ -243,7 +243,7 @@
 
 		<!-- Footer Actions -->
 		<div class="actions">
-			<a class="btn btn-primary" asp-controller="Inventory" asp-action="AddPart" asp-route-id="@Model.Id">Edit Part</a>
+			<a class="btn btn-primary" asp-controller="Inventory" asp-action="AddComponent" asp-route-id="@Model.Id">Edit Component</a>
 		</div>
 	</div>
 </div>

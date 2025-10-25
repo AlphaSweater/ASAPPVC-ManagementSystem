@@ -9,9 +9,9 @@ namespace ASAPPVC.UI.Services
         //─────────── Dependencies ───────────\\
         private readonly IProductRepository _productRepository;
 
-        private readonly IPartRepository _partsRepository;
+        private readonly IComponentRepository _partsRepository;
 
-        public ProductService(IProductRepository repo, IPartRepository partsRepo)
+        public ProductService(IProductRepository repo, IComponentRepository partsRepo)
         {
             _productRepository = repo;
             _partsRepository = partsRepo;
@@ -34,7 +34,7 @@ namespace ASAPPVC.UI.Services
             var partIds = lines.Select(l => l.PartId!.Value).Distinct().ToList();
             var parts = partIds.Count > 0
                 ? await _productRepository.GetPartsByIdsAsync(partIds, ct)
-                : new List<PartModel>();
+                : new List<ComponentModel>();
 
             decimal partsTotal = 0m;
             foreach (var l in lines)
@@ -63,10 +63,10 @@ namespace ASAPPVC.UI.Services
             product = await _productRepository.AddAsync(product, ct);
             await _productRepository.SaveAsync(ct);
 
-            var ppLines = lines.Select(l => new ProductPartModel
+            var ppLines = lines.Select(l => new ProductComponentModel
             {
                 ProductId = product.Id,
-                PartId = l.PartId!.Value,
+                ComponentId = l.PartId!.Value,
                 Quantity = l.Quantity
             }).ToList();
 

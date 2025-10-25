@@ -7,7 +7,7 @@ namespace ASAPPVC.UI.Repositories
     public class ProductRepository(AppDbContext db) : BaseRepository<ProductModel>(db), IProductRepository
     {
         // adds product parts to the database (bulk, does not save)
-        public Task AddProductPartsAsync(IEnumerable<ProductPartModel> lines, CancellationToken ct = default)
+        public Task AddProductPartsAsync(IEnumerable<ProductComponentModel> lines, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(lines);
             _db.ProductPart.AddRange(lines);
@@ -15,7 +15,7 @@ namespace ASAPPVC.UI.Repositories
         }
 
         // retrieves parts by their IDs
-        public async Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        public async Task<List<ComponentModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(ids);
             return await _db.Part.Where(p => ids.Contains(p.Id)).ToListAsync(ct);
@@ -27,7 +27,7 @@ namespace ASAPPVC.UI.Repositories
             return await _set
                   .AsNoTracking()
                   .Include(p => p.ProductParts)
-                    .ThenInclude(pp => pp.Part)
+                    .ThenInclude(pp => pp.Component)
                   .FirstOrDefaultAsync(p => p.Id == id, ct);
         }
 

@@ -1,7 +1,7 @@
 ﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.CreateProductViewModel
 @{
 	ViewData["Title"] = "Add New Product";
-	var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.PartModel>;
+	var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.ComponentModel>;
 }
 
 <style>
@@ -461,7 +461,7 @@
 		const grandEl = document.getElementById('grandTotal');
 
 		// **FIXED LINE**: Handle null before the .Select() to ensure type safety.
-		const partsData = @Html.Raw(Json.Serialize((parts ?? new List<PartModel>()).Select(p => new { id = p.Id, name = p.Name, price = p.UnitCost })));
+		const partsData = @Html.Raw(Json.Serialize((parts ?? new List<ComponentModel>()).Select(p => new { id = p.Id, name = p.Name, price = p.UnitCost })));
 
 		const formatMoney = (n) => `R ${n.toFixed(2)}`;
 
