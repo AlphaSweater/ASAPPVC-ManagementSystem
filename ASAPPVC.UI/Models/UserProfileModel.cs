@@ -1,44 +1,34 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.UI.Models
 {
     public class UserProfileModel
     {
+        // Primary key and foreign key to AspNetUsers
         [Key, ForeignKey(nameof(User))]
         [Required]
-        public string UserID { get; set; } // PK and FK to AspNetUsers
+        public string UserId { get; set; } = string.Empty;
 
         [Required]
-        public IdentityUser User { get; set; }
+        public IdentityUser User { get; set; } = null!;
+
+        // Personal info
+        [MaxLength(100)]
+        public string FirstName { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string FirstName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
-        [MaxLength(100)]
-        public string LastName { get; set; }
-
+        // Computed property, not stored in DB
         [NotMapped]
         public string FullName => $"{FirstName} {LastName}";
 
+        // Active flag
         public bool IsActive { get; set; } = true;
 
-        // Preferences (JSON for extensibility)
-        public string PreferencesJson { get; set; }
-
-        // Constructor for mapping RegisterViewModel
-        //public UserProfileModel(RegisterViewModel model, IdentityUser user)
-        //{
-        //    UserID = user.Id;
-        //    User = user;
-        //    FirstName = model.FirstName;
-        //    LastName = model.LastName;
-        //    PreferencesJson = "{}";
-        //}
-
-        // Parameterless constructor for EF Core
-        public UserProfileModel()
-        { }
+        // Preferences stored as JSON for flexibility
+        public string PreferencesJson { get; set; } = "{}";
     }
 }

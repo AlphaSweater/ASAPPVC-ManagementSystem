@@ -1,547 +1,547 @@
 ﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.CreateProductViewModel
 @{
-    ViewData["Title"] = "Add New Product";
-    var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.PartModel>;
+	ViewData["Title"] = "Add New Product";
+	var parts = ViewData["Parts"] as List<ASAPPVC.UI.Models.ComponentModel>;
 }
 
 <style>
-    /* ---------- Root & Variables ---------- */
-    :root {
-        --primary-red: #d62828;
-        --primary-blue: #0d47a1;
-        --hover-red: #e03a3a;
-        --text-light: #ffffff;
-        --text-muted: rgba(255, 255, 255, 0.8);
-    }
+	/* ---------- Root & Variables ---------- */
+	:root {
+		--primary-red: #d62828;
+		--primary-blue: #0d47a1;
+		--hover-red: #e03a3a;
+		--text-light: #ffffff;
+		--text-muted: rgba(255, 255, 255, 0.8);
+	}
 
-    /* ---------- Base & Background ---------- */
-    * {
-        box-sizing: border-box;
-    }
+	/* ---------- Base & Background ---------- */
+	* {
+		box-sizing: border-box;
+	}
 
-    html, body {
-        height: 100%;
-        margin: 0;
-        font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
+	html, body {
+		height: 100%;
+		margin: 0;
+		font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+	}
 
-    body {
-        background-color: #0d47a1;
-        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-        color: var(--text-light);
-        position: relative;
-        overflow-x: hidden;
-        background-attachment: fixed;
-    }
+	body {
+		background-color: #0d47a1;
+		background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
+		color: var(--text-light);
+		position: relative;
+		overflow-x: hidden;
+		background-attachment: fixed;
+	}
 
-        /* ---------- Decorative Background Shapes ---------- */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.6;
-            z-index: -1;
-        }
+		/* ---------- Decorative Background Shapes ---------- */
+		body::before, body::after {
+			content: '';
+			position: absolute;
+			border-radius: 50%;
+			filter: blur(150px);
+			opacity: 0.6;
+			z-index: -1;
+		}
 
-        body::before {
-            background: var(--primary-blue);
-            width: 350px;
-            height: 350px;
-            top: -80px;
-            left: -120px;
-        }
+		body::before {
+			background: var(--primary-blue);
+			width: 350px;
+			height: 350px;
+			top: -80px;
+			left: -120px;
+		}
 
-        body::after {
-            background: var(--primary-red);
-            width: 400px;
-            height: 400px;
-            bottom: -150px;
-            right: -180px;
-        }
+		body::after {
+			background: var(--primary-red);
+			width: 400px;
+			height: 400px;
+			bottom: -150px;
+			right: -180px;
+		}
 
-    /* ---------- Main Content Layout ---------- */
-    .viewport {
-        padding: 40px 24px;
-        min-height: 100vh;
-    }
+	/* ---------- Main Content Layout ---------- */
+	.viewport {
+		padding: 40px 24px;
+		min-height: 100vh;
+	}
 
-    .form-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border-radius: 16px;
-        padding: 32px 40px;
-    }
+	.form-container {
+		max-width: 1100px;
+		margin: 0 auto;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+		border-radius: 16px;
+		padding: 32px 40px;
+	}
 
-    /* ---------- HEADER ---------- */
-    .form-header-section {
-        margin-bottom: 32px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
+	/* ---------- HEADER ---------- */
+	.form-header-section {
+		margin-bottom: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-muted);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 16px;
-        transition: color 0.2s ease;
-    }
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--text-muted);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 14px;
+		margin-bottom: 16px;
+		transition: color 0.2s ease;
+	}
 
-        .back-link:hover {
-            color: var(--text-light);
-        }
+		.back-link:hover {
+			color: var(--text-light);
+		}
 
-    .main-title {
-        font-weight: 700;
-        font-size: 28px;
-        color: var(--text-light);
-        margin: 0;
-    }
+	.main-title {
+		font-weight: 700;
+		font-size: 28px;
+		color: var(--text-light);
+		margin: 0;
+	}
 
-    /* ---------- Form Grid Layout ---------- */
-    .form-layout-grid {
-        display: grid;
-        grid-template-columns: 2fr 5fr;
-        gap: 40px;
-        align-items: start;
-    }
+	/* ---------- Form Grid Layout ---------- */
+	.form-layout-grid {
+		display: grid;
+		grid-template-columns: 2fr 5fr;
+		gap: 40px;
+		align-items: start;
+	}
 
-    .form-fields-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px 20px;
-    }
+	.form-fields-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px 20px;
+	}
 
-    /* ---------- Form Groups & Inputs ---------- */
-    .group {
-        display: flex;
-        flex-direction: column;
-    }
+	/* ---------- Form Groups & Inputs ---------- */
+	.group {
+		display: flex;
+		flex-direction: column;
+	}
 
-        .group.full-width {
-            grid-column: 1 / -1;
-        }
+		.group.full-width {
+			grid-column: 1 / -1;
+		}
 
-    .label {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-light);
-        margin-bottom: 8px;
-    }
+	.label {
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-light);
+		margin-bottom: 8px;
+	}
 
-    .input, select.input {
-        height: 44px;
-        font-size: 16px;
-        color: var(--text-light);
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        padding: 0 12px;
-        outline: none;
-        transition: border-color 0.3s ease, background-color 0.3s ease;
-    }
+	.input, select.input {
+		height: 44px;
+		font-size: 16px;
+		color: var(--text-light);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-radius: 8px;
+		padding: 0 12px;
+		outline: none;
+		transition: border-color 0.3s ease, background-color 0.3s ease;
+	}
 
-    textarea.input {
-        height: 96px;
-        padding: 10px 12px;
-        resize: vertical;
-    }
+	textarea.input {
+		height: 96px;
+		padding: 10px 12px;
+		resize: vertical;
+	}
 
-    .input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-    }
+	.input::placeholder {
+		color: rgba(255, 255, 255, 0.5);
+	}
 
-    .input:focus {
-        border-color: rgba(255, 255, 255, 0.7);
-        background: rgba(255, 255, 255, 0.1);
-    }
+	.input:focus {
+		border-color: rgba(255, 255, 255, 0.7);
+		background: rgba(255, 255, 255, 0.1);
+	}
 
-    select.input option {
-        background-color: var(--primary-blue);
-        color: var(--text-light);
-    }
+	select.input option {
+		background-color: var(--primary-blue);
+		color: var(--text-light);
+	}
 
-    .text-danger {
-        color: #ffcdd2;
-        font-size: 12px;
-        margin-top: 6px;
-    }
+	.text-danger {
+		color: #ffcdd2;
+		font-size: 12px;
+		margin-top: 6px;
+	}
 
-    /* ---------- Image Upload ---------- */
-    .image-upload-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        margin-top: 10px;
-    }
+	/* ---------- Image Upload ---------- */
+	.image-upload-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+		margin-top: 10px;
+	}
 
-    .image-box {
-        width: 100%;
-        max-width: 240px;
-        aspect-ratio: 1 / 1;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
+	.image-box {
+		width: 100%;
+		max-width: 240px;
+		aspect-ratio: 1 / 1;
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		background: rgba(255, 255, 255, 0.05);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
 
-        .image-box:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+		.image-box:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
 
-        .image-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+		.image-box img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
 
-    .hidden-file-input {
-        display: none;
-    }
+	.hidden-file-input {
+		display: none;
+	}
 
-    /* ---------- Parts Collection Card ---------- */
-    .parts-card {
-        grid-column: 1 / -1;
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-top: 8px;
-    }
+	/* ---------- Parts Collection Card ---------- */
+	.parts-card {
+		grid-column: 1 / -1;
+		background: rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 12px;
+		padding: 16px 20px;
+		margin-top: 8px;
+	}
 
-    .parts-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-    }
+	.parts-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16px;
+	}
 
-        .parts-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-        }
+		.parts-header h3 {
+			font-size: 18px;
+			font-weight: 600;
+			margin: 0;
+		}
 
-    .parts-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+	.parts-table {
+		width: 100%;
+		border-collapse: collapse;
+	}
 
-        .parts-table thead th {
-            text-align: left;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 0 8px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            color: var(--text-muted);
-        }
+		.parts-table thead th {
+			text-align: left;
+			font-size: 13px;
+			font-weight: 600;
+			padding: 0 8px 10px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+			color: var(--text-muted);
+		}
 
-        .parts-table tbody td {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-        }
+		.parts-table tbody td {
+			padding: 8px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+		}
 
-        .parts-table tfoot td {
-            padding: 12px 8px 0;
-            font-weight: 600;
-        }
+		.parts-table tfoot td {
+			padding: 12px 8px 0;
+			font-weight: 600;
+		}
 
-        .parts-table .input {
-            height: 38px;
-            font-size: 14px;
-            padding: 0 8px;
-        }
+		.parts-table .input {
+			height: 38px;
+			font-size: 14px;
+			padding: 0 8px;
+		}
 
-        .parts-table .qty-input {
-            width: 80px;
-            text-align: center;
-        }
+		.parts-table .qty-input {
+			width: 80px;
+			text-align: center;
+		}
 
-    .align-right {
-        text-align: right;
-    }
+	.align-right {
+		text-align: right;
+	}
 
-    .grand-total {
-        font-size: 18px;
-        color: var(--text-light);
-    }
+	.grand-total {
+		font-size: 18px;
+		color: var(--text-light);
+	}
 
-    /* ---------- Buttons ---------- */
-    .btn {
-        height: 44px;
-        padding: 0 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        transition: all .2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+	/* ---------- Buttons ---------- */
+	.btn {
+		height: 44px;
+		padding: 0 24px;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 16px;
+		cursor: pointer;
+		border: none;
+		transition: all .2s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+		.btn:active {
+			transform: scale(0.98);
+		}
 
-        .btn.btn-sm {
-            height: 36px;
-            padding: 0 16px;
-            font-size: 14px;
-        }
+		.btn.btn-sm {
+			height: 36px;
+			padding: 0 16px;
+			font-size: 14px;
+		}
 
-    .btn-primary {
-        background: var(--primary-red);
-        color: var(--text-light);
-    }
+	.btn-primary {
+		background: var(--primary-red);
+		color: var(--text-light);
+	}
 
-        .btn-primary:hover {
-            background: var(--hover-red);
-        }
+		.btn-primary:hover {
+			background: var(--hover-red);
+		}
 
-    .btn-secondary {
-        background: transparent;
-        color: var(--text-light);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-    }
+	.btn-secondary {
+		background: transparent;
+		color: var(--text-light);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+	}
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
+		.btn-secondary:hover {
+			background: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.6);
+		}
 
-    .btn-remove {
-        background: rgba(255, 255, 255, 0.08);
-        color: var(--text-muted);
-        border: 1px solid transparent;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-    }
+	.btn-remove {
+		background: rgba(255, 255, 255, 0.08);
+		color: var(--text-muted);
+		border: 1px solid transparent;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		border-radius: 50%;
+	}
 
-        .btn-remove:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-light);
-        }
+		.btn-remove:hover {
+			background: rgba(255, 255, 255, 0.15);
+			color: var(--text-light);
+		}
 
-    .actions {
-        display: flex;
-        justify-content: center;
-        gap: 16px;
-        margin-top: 32px;
-        grid-column: 1 / -1;
-    }
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+		margin-top: 32px;
+		grid-column: 1 / -1;
+	}
 </style>
 
 <div class="viewport">
-    <div class="form-container">
-        <div class="form-header-section">
-            <a class="back-link" asp-controller="Inventory" asp-action="ViewProducts">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
-                </svg>
-                Back to Products
-            </a>
-            <h2 class="main-title">@ViewData["Title"]</h2>
-        </div>
+	<div class="form-container">
+		<div class="form-header-section">
+			<a class="back-link" asp-controller="Inventory" asp-action="ViewProducts">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
+					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+				</svg>
+				Back to Products
+			</a>
+			<h2 class="main-title">@ViewData["Title"]</h2>
+		</div>
 
-        <form id="addProductForm" asp-controller="Inventory" asp-action="AddProductPost" method="post" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
+		<form id="addProductForm" asp-controller="Inventory" asp-action="AddProductPost" method="post" enctype="multipart/form-data">
+			@Html.AntiForgeryToken()
+			<div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
 
-            <div class="form-layout-grid">
-                <!-- Left: Image Upload -->
-                <div class="image-upload-section">
-                    <div class="image-box" onclick="document.getElementById('imageFile').click();">
-                        <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
-                        Upload Image
-                    </button>
-                    <input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
-                    <span asp-validation-for="ImageFile" class="text-danger"></span>
-                </div>
+			<div class="form-layout-grid">
+				<!-- Left: Image Upload -->
+				<div class="image-upload-section">
+					<div class="image-box" onclick="document.getElementById('imageFile').click();">
+						<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
+					</div>
+					<button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
+						Upload Image
+					</button>
+					<input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+					<span asp-validation-for="ImageFile" class="text-danger"></span>
+				</div>
 
-                <!-- Right: Form -->
-                <div class="form-fields-grid">
-                    <div class="group">
-                        <label asp-for="ProductName" class="label"></label>
-                        <input asp-for="ProductName" class="input" placeholder="Enter product name" />
-                        <span asp-validation-for="ProductName" class="text-danger"></span>
-                    </div>
-                    <div class="group">
-                        <label asp-for="BasePrice" class="label"></label>
-                        <input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. 299.99" />
-                        <span asp-validation-for="BasePrice" class="text-danger"></span>
-                    </div>
-                    <div class="group full-width">
-                        <label asp-for="Description" class="label"></label>
-                        <textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
+				<!-- Right: Form -->
+				<div class="form-fields-grid">
+					<div class="group">
+						<label asp-for="ProductName" class="label"></label>
+						<input asp-for="ProductName" class="input" placeholder="Enter product name" />
+						<span asp-validation-for="ProductName" class="text-danger"></span>
+					</div>
+					<div class="group">
+						<label asp-for="BasePrice" class="label"></label>
+						<input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. 299.99" />
+						<span asp-validation-for="BasePrice" class="text-danger"></span>
+					</div>
+					<div class="group full-width">
+						<label asp-for="Description" class="label"></label>
+						<textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
 
-                    <!-- Parts Collection Card -->
-                    <div class="parts-card full-width">
-                        <div class="parts-header">
-                            <h3>Parts in this Product</h3>
-                            <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
-                        </div>
-                        <table class="parts-table" id="partsTable">
-                            <thead>
-                                <tr>
-                                    <th>Part</th>
-                                    <th style="width:100px; text-align:center;">Quantity</th>
-                                    <th class="align-right" style="width:120px;">Unit Price</th>
-                                    <th class="align-right" style="width:120px;">Subtotal</th>
-                                    <th style="width:60px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="partsTbody">
-                                <!-- Dynamic rows will be injected here by JS -->
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="align-right">Grand Total:</td>
-                                    <td class="align-right grand-total" id="grandTotal">R 0.00</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+					<!-- Parts Collection Card -->
+					<div class="parts-card full-width">
+						<div class="parts-header">
+							<h3>Parts in this Product</h3>
+							<button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
+						</div>
+						<table class="parts-table" id="partsTable">
+							<thead>
+								<tr>
+									<th>Part</th>
+									<th style="width:100px; text-align:center;">Quantity</th>
+									<th class="align-right" style="width:120px;">Unit Price</th>
+									<th class="align-right" style="width:120px;">Subtotal</th>
+									<th style="width:60px;"></th>
+								</tr>
+							</thead>
+							<tbody id="partsTbody">
+								<!-- Dynamic rows will be injected here by JS -->
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="3" class="align-right">Grand Total:</td>
+									<td class="align-right grand-total" id="grandTotal">R 0.00</td>
+									<td></td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
 
-                    <div class="actions">
-                        <button type="submit" class="btn btn-primary">Save Product</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+					<div class="actions">
+						<button type="submit" class="btn btn-primary">Save Product</button>
+						<button type="reset" class="btn btn-secondary">Reset</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 
 <script>
-    (function () {
-        // --- Image preview logic ---
-        const fileInput = document.getElementById('imageFile');
-        const preview = document.getElementById('previewImg');
-        if (fileInput) {
-            fileInput.addEventListener('change', function () {
-                const f = this.files && this.files[0];
-                if (!f) return;
-                const reader = new FileReader();
-                reader.onload = e => preview.src = e.target.result;
-                reader.readAsDataURL(f);
-            });
-            const imgBox = document.querySelector('.image-box');
-            imgBox?.addEventListener('click', () => fileInput.click());
-        }
+	(function () {
+		// --- Image preview logic ---
+		const fileInput = document.getElementById('imageFile');
+		const preview = document.getElementById('previewImg');
+		if (fileInput) {
+			fileInput.addEventListener('change', function () {
+				const f = this.files && this.files[0];
+				if (!f) return;
+				const reader = new FileReader();
+				reader.onload = e => preview.src = e.target.result;
+				reader.readAsDataURL(f);
+			});
+			const imgBox = document.querySelector('.image-box');
+			imgBox?.addEventListener('click', () => fileInput.click());
+		}
 
-        // --- Parts dynamic table logic ---
-        const tbody = document.getElementById('partsTbody');
-        const addRowBtn = document.getElementById('addRowBtn');
-        const grandEl = document.getElementById('grandTotal');
+		// --- Parts dynamic table logic ---
+		const tbody = document.getElementById('partsTbody');
+		const addRowBtn = document.getElementById('addRowBtn');
+		const grandEl = document.getElementById('grandTotal');
 
-        // **FIXED LINE**: Handle null before the .Select() to ensure type safety.
-        const partsData = @Html.Raw(Json.Serialize((parts ?? new List<PartModel>()).Select(p => new { id = p.PartID, name = p.Name, price = p.UnitCost })));
+		// **FIXED LINE**: Handle null before the .Select() to ensure type safety.
+		const partsData = @Html.Raw(Json.Serialize((parts ?? new List<ComponentModel>()).Select(p => new { id = p.Id, name = p.Name, price = p.UnitCost })));
 
-        const formatMoney = (n) => `R ${n.toFixed(2)}`;
+		const formatMoney = (n) => `R ${n.toFixed(2)}`;
 
-        function updateTotals() {
-            let grandTotal = 0;
-            tbody.querySelectorAll('tr').forEach(tr => {
-                const sel = tr.querySelector('.part-select');
-                const qtyInput = tr.querySelector('.qty-input');
-                const unitPriceCell = tr.querySelector('.unit-price');
-                const subtotalCell = tr.querySelector('.subtotal');
+		function updateTotals() {
+			let grandTotal = 0;
+			tbody.querySelectorAll('tr').forEach(tr => {
+				const sel = tr.querySelector('.part-select');
+				const qtyInput = tr.querySelector('.qty-input');
+				const unitPriceCell = tr.querySelector('.unit-price');
+				const subtotalCell = tr.querySelector('.subtotal');
 
-                const selectedPartId = parseInt(sel.value, 10);
-                const quantity = parseInt(qtyInput.value, 10) || 0;
-                const part = partsData.find(p => p.id === selectedPartId);
+				const selectedPartId = parseInt(sel.value, 10);
+				const quantity = parseInt(qtyInput.value, 10) || 0;
+				const part = partsData.find(p => p.id === selectedPartId);
 
-                let unitPrice = 0;
-                if (part) {
-                    unitPrice = part.price;
-                }
+				let unitPrice = 0;
+				if (part) {
+					unitPrice = part.price;
+				}
 
-                const subtotal = unitPrice * quantity;
-                grandTotal += subtotal;
+				const subtotal = unitPrice * quantity;
+				grandTotal += subtotal;
 
-                unitPriceCell.textContent = formatMoney(unitPrice);
-                subtotalCell.textContent = formatMoney(subtotal);
-            });
-            grandEl.textContent = formatMoney(grandTotal);
-        }
+				unitPriceCell.textContent = formatMoney(unitPrice);
+				subtotalCell.textContent = formatMoney(subtotal);
+			});
+			grandEl.textContent = formatMoney(grandTotal);
+		}
 
-        function renumberIndexes() {
-            tbody.querySelectorAll('tr').forEach((tr, i) => {
-                tr.querySelectorAll('[name]').forEach(input => {
-                    input.name = input.name.replace(/\[\d+\]/, `[${i}]`);
-                });
-            });
-        }
+		function renumberIndexes() {
+			tbody.querySelectorAll('tr').forEach((tr, i) => {
+				tr.querySelectorAll('[name]').forEach(input => {
+					input.name = input.name.replace(/\[\d+\]/, `[${i}]`);
+				});
+			});
+		}
 
-        function createRow() {
-            const index = tbody.rows.length;
-            const tr = tbody.insertRow();
+		function createRow() {
+			const index = tbody.rows.length;
+			const tr = tbody.insertRow();
 
-            const optionsHtml = partsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+			const optionsHtml = partsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
 
-            tr.innerHTML = `
-                <td>
-                    <select name="Parts[${index}].PartId" class="input part-select">
-                        <option value="">-- Select part --</option>
-                        ${optionsHtml}
-                    </select>
-                </td>
-                <td style="text-align:center;">
-                    <input class="input qty-input" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
-                </td>
-                <td class="align-right unit-price">R 0.00</td>
-                <td class="align-right subtotal">R 0.00</td>
-                <td style="text-align:center;">
-                    <button type="button" class="btn btn-remove">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" /></svg>
-                    </button>
-                </td>
-            `;
+			tr.innerHTML = `
+				<td>
+					<select name="Parts[${index}].PartId" class="input part-select">
+						<option value="">-- Select part --</option>
+						${optionsHtml}
+					</select>
+				</td>
+				<td style="text-align:center;">
+					<input class="input qty-input" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
+				</td>
+				<td class="align-right unit-price">R 0.00</td>
+				<td class="align-right subtotal">R 0.00</td>
+				<td style="text-align:center;">
+					<button type="button" class="btn btn-remove">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" /></svg>
+					</button>
+				</td>
+			`;
 
-            tr.querySelector('.part-select').addEventListener('change', updateTotals);
-            tr.querySelector('.qty-input').addEventListener('input', updateTotals);
-            tr.querySelector('.btn-remove').addEventListener('click', () => {
-                tr.remove();
-                renumberIndexes();
-                updateTotals();
-            });
-        }
+			tr.querySelector('.part-select').addEventListener('change', updateTotals);
+			tr.querySelector('.qty-input').addEventListener('input', updateTotals);
+			tr.querySelector('.btn-remove').addEventListener('click', () => {
+				tr.remove();
+				renumberIndexes();
+				updateTotals();
+			});
+		}
 
-        addRowBtn.addEventListener('click', () => {
-            createRow();
-            updateTotals();
-        });
+		addRowBtn.addEventListener('click', () => {
+			createRow();
+			updateTotals();
+		});
 
-        // Add one row to start with when the page loads
-        if (partsData.length > 0) {
-             createRow();
-             updateTotals();
-        }
-    })();
+		// Add one row to start with when the page loads
+		if (partsData.length > 0) {
+			 createRow();
+			 updateTotals();
+		}
+	})();
 </script>

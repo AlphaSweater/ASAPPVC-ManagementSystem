@@ -1,5 +1,5 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Inventory;
-using ASAPPVC.UI.Services.Interfaces;
+using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,70 +9,77 @@ namespace ASAPPVC.UI.Controllers
     public class InventoryController : Controller
     {
         //─────────── Dependencies ───────────\\
-        private readonly IPartService _parts;
+        private readonly IComponentService _components;
+
         private readonly IProductService _products;
 
         //constructor
-        public InventoryController(IPartService parts, IProductService products)
+        public InventoryController(IComponentService components, IProductService products)
         {
-            _parts = parts;
+            _components = components;
             _products = products;
         }
 
         // Parts
-        private const string AddPartPath = "~/Views/Inventory/Parts/AddPart.cshtml";
-        private const string ViewPartPath = "~/Views/Inventory/Parts/ViewPart.cshtml";
-        private const string PartInventoryPath = "~/Views/Inventory/Parts/ViewPartInventory.cshtml";
+        private const string AddComponentPath = "~/Views/Inventory/Components/AddComponent.cshtml";
+
+        private const string ViewComponentPath = "~/Views/Inventory/Components/ViewComponent.cshtml";
+        private const string ComponentInventoryPath = "~/Views/Inventory/Components/ViewComponentInventory.cshtml";
 
         // Products
         private const string AddProductPath = "~/Views/Inventory/Products/AddProduct.cshtml";
+
         private const string ViewProductPath = "~/Views/Inventory/Products/ViewProduct.cshtml";
         private const string ProductInventoryPath = "~/Views/Inventory/Products/ViewProductInventory.cshtml";
 
         //─────────── Parts ───────────\\
         //displays the add part view
         [HttpGet]
-        public IActionResult AddPart() => View(AddPartPath);
+        public IActionResult AddComponent()
+        {
+            return View(AddComponentPath);
+        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //handles the submission of the add part form
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddPart(CreatePartViewModel vm, CancellationToken ct)
+        public async Task<IActionResult> AddComponent(CreateComponentViewModel vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
-                return View(AddPartPath, vm);
+                return View(AddComponentPath, vm);
 
-            var (ok, error, part) = await _parts.CreateAsync(vm, ct);
-            if (!ok || part is null)
+            var (ok, error, component) = await _components.CreateAsync(vm, ct);
+            if (!ok || component is null)
             {
-                ModelState.AddModelError(string.Empty, error ?? "Unable to create part.");
-                return View(AddPartPath, vm);
+                ModelState.AddModelError(string.Empty, error ?? "Unable to create component.");
+                return View(AddComponentPath, vm);
             }
 
-            TempData["AlertMessage"] = $"Part '{part.Name}' created.";
-            return RedirectToAction(nameof(ViewPart), new { id = part.PartID });
+            TempData["AlertMessage"] = $"Component '{component.Name}' created.";
+            return RedirectToAction(nameof(ViewComponent), new { id = component.Id });
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //displays a specific part by its ID
         [HttpGet]
-        public async Task<IActionResult> ViewPart(int id, CancellationToken ct)
+        public async Task<IActionResult> ViewComponent(Guid id, CancellationToken ct)
         {
-            var part = await _parts.GetAsync(id, ct);
-            if (part is null) return NotFound();
+            var component = await _components.GetAsync(id, ct);
+            if (component is null)
+                return NotFound();
             //Returns the view with the part view path and the part details
-            return View(ViewPartPath, part);
+            return View(ViewComponentPath, component);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //calls view to display part inventory
         [HttpGet]
-        public async Task<IActionResult> ViewPartInventory(CancellationToken ct)
+        public async Task<IActionResult> ViewComponentInventory(CancellationToken ct)
         {
-            var list = await _parts.ListAsync(ct);
+            var list = await _components.ListAsync(ct);
             //returns the view with the part inventory path and the list of parts
-            return View(PartInventoryPath, list);
+            return View(ComponentInventoryPath, list);
         }
 
         //─────────── Products ───────────\\
@@ -80,7 +87,7 @@ namespace ASAPPVC.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
-            var parts = await _parts.ListAsync(ct);
+            var parts = await _components.ListAsync(ct);
             ViewData["Parts"] = parts;
             return View(AddProductPath, new CreateProductViewModel());
         }
@@ -108,10 +115,11 @@ namespace ASAPPVC.UI.Controllers
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //displays a specific product by its ID
         [HttpGet]
-        public async Task<IActionResult> ViewProduct(int id, CancellationToken ct)
+        public async Task<IActionResult> ViewProduct(Guid id, CancellationToken ct)
         {
             var product = await _products.GetAsync(id, ct);
-            if (product is null) return NotFound();
+            if (product is null)
+                return NotFound();
             return View(ViewProductPath, product);
         }
 
@@ -125,4 +133,5 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
