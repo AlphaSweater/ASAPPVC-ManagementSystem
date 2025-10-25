@@ -17,89 +17,43 @@ namespace ASAPPVC.UI.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
-            modelBuilder.Entity("ASAPPVC.UI.Models.CustomerModel", b =>
+            modelBuilder.Entity("ASAPPVC.UI.Models.CodeCounters", b =>
                 {
-                    b.Property<int>("CustomerID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CodeType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("LastNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Company")
-                        .IsRequired()
+                    b.Property<string>("PeriodKey")
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasKey("Id");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasIndex("CodeType", "PeriodKey");
 
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CustomerID");
-
-                    b.ToTable("Customer");
+                    b.ToTable("CodeCounters");
                 });
 
-            modelBuilder.Entity("ASAPPVC.UI.Models.OrderModel", b =>
+            modelBuilder.Entity("ASAPPVC.UI.Models.ComponentModel", b =>
                 {
-                    b.Property<int>("OrderID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("OrderDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OrderStatus")
+                    b.Property<string>("ComponentCode")
                         .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
-
-                    b.HasKey("OrderID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("ASAPPVC.UI.Models.OrderProductModel", b =>
-                {
-                    b.Property<int>("OrderProductID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("OrderID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("OrderProductID");
-
-                    b.HasIndex("OrderID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("OrderProduct");
-                });
-
-            modelBuilder.Entity("ASAPPVC.UI.Models.PartModel", b =>
-                {
-                    b.Property<int>("PartID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CurrentAmount")
                         .HasColumnType("INTEGER");
@@ -112,28 +66,147 @@ namespace ASAPPVC.UI.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StorageLocation")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("UnitCost")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("PartID");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComponentCode")
+                        .IsUnique();
 
                     b.ToTable("Part");
                 });
 
+            modelBuilder.Entity("ASAPPVC.UI.Models.CustomerModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Company")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("ASAPPVC.UI.Models.OrderModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrderCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderCode")
+                        .IsUnique();
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("ASAPPVC.UI.Models.OrderProductModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProduct");
+                });
+
+            modelBuilder.Entity("ASAPPVC.UI.Models.ProductComponentModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ComponentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComponentId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductPart");
+                });
+
             modelBuilder.Entity("ASAPPVC.UI.Models.ProductModel", b =>
                 {
-                    b.Property<int>("ProductID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("ImageBytes")
@@ -142,47 +215,33 @@ namespace ASAPPVC.UI.Migrations
 
                     b.Property<string>("ImageContentType")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ProductID");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductCode")
+                        .IsUnique();
 
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("ASAPPVC.UI.Models.ProductPartModel", b =>
-                {
-                    b.Property<int>("ProductPartID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PartID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ProductPartID");
-
-                    b.HasIndex("PartID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("ProductPart");
-                });
-
             modelBuilder.Entity("ASAPPVC.UI.Models.UserProfileModel", b =>
                 {
-                    b.Property<string>("UserID")
+                    b.Property<string>("UserId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
@@ -202,7 +261,7 @@ namespace ASAPPVC.UI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("UserID");
+                    b.HasKey("UserId");
 
                     b.ToTable("UserProfiles");
                 });
@@ -403,7 +462,7 @@ namespace ASAPPVC.UI.Migrations
                 {
                     b.HasOne("ASAPPVC.UI.Models.CustomerModel", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerID")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -414,13 +473,13 @@ namespace ASAPPVC.UI.Migrations
                 {
                     b.HasOne("ASAPPVC.UI.Models.OrderModel", "Order")
                         .WithMany("OrderProducts")
-                        .HasForeignKey("OrderID")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ASAPPVC.UI.Models.ProductModel", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductID")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -429,21 +488,21 @@ namespace ASAPPVC.UI.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ASAPPVC.UI.Models.ProductPartModel", b =>
+            modelBuilder.Entity("ASAPPVC.UI.Models.ProductComponentModel", b =>
                 {
-                    b.HasOne("ASAPPVC.UI.Models.PartModel", "Part")
+                    b.HasOne("ASAPPVC.UI.Models.ComponentModel", "Component")
                         .WithMany()
-                        .HasForeignKey("PartID")
+                        .HasForeignKey("ComponentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ASAPPVC.UI.Models.ProductModel", "Product")
                         .WithMany("ProductParts")
-                        .HasForeignKey("ProductID")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Part");
+                    b.Navigation("Component");
 
                     b.Navigation("Product");
                 });
@@ -452,7 +511,7 @@ namespace ASAPPVC.UI.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

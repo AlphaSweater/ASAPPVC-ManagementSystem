@@ -1,5 +1,5 @@
 ﻿using ASAPPVC.UI.Models.ViewModels.Customer;
-using ASAPPVC.UI.Services.Interfaces;
+using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +42,7 @@ namespace ASAPPVC.UI.Controllers
             }
 
             TempData["AlertMessage"] = $"Customer '{customer!.Name} {customer.Name}' created.";
-            return RedirectToAction(nameof(ViewCustomer), new { id = customer.CustomerID });
+            return RedirectToAction(nameof(ViewCustomer), new { id = customer.Id });
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -55,4 +55,5 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

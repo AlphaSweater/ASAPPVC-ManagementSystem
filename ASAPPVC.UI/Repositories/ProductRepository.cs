@@ -1,0 +1,42 @@
+﻿using ASAPPVC.UI.Data;
+using ASAPPVC.UI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ASAPPVC.UI.Repositories
+{
+    public class ProductRepository(AppDbContext db) : BaseRepository<ProductModel>(db), IProductRepository
+    {
+        // adds product parts to the database (bulk, does not save)
+        public Task AddProductPartsAsync(IEnumerable<ProductComponentModel> lines, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(lines);
+            _db.ProductPart.AddRange(lines);
+            return Task.CompletedTask;
+        }
+
+        // retrieves parts by their IDs
+        public async Task<List<ComponentModel>> GetPartsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(ids);
+            return await _db.Part.Where(p => ids.Contains(p.Id)).ToListAsync(ct);
+        }
+
+        // retrieves a product along with its associated parts
+        public async Task<ProductModel?> GetProductWithPartsAsync(Guid id, CancellationToken ct = default)
+        {
+            return await _set
+                  .AsNoTracking()
+                  .Include(p => p.ProductParts)
+                    .ThenInclude(pp => pp.Component)
+                  .FirstOrDefaultAsync(p => p.Id == id, ct);
+        }
+
+        // lists all products ordered by name
+        public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
+        {
+            return await _set.AsNoTracking().OrderBy(p => p.Name).ToListAsync(ct);
+        }
+    }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
