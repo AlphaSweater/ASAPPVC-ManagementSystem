@@ -1,6 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Models.ViewModels.Inventory;
-using ASAPPVC.UI.Repositories.Interfaces;
+using ASAPPVC.UI.Repositories;
 
 namespace ASAPPVC.UI.Services
 {
@@ -58,7 +58,7 @@ namespace ASAPPVC.UI.Services
                 product.ImageContentType = vm.ImageFile.ContentType;
             }
 
-            product = await _productRepository.AddProductAsync(product, ct);
+            product = await _productRepository.AddAsync(product, ct);
             await _productRepository.SaveAsync(ct);
 
             var ppLines = lines.Select(l => new ProductPartModel

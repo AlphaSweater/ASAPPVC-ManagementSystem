@@ -1,6 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Models.ViewModels.Inventory;
-using ASAPPVC.UI.Repositories.Interfaces;
+using ASAPPVC.UI.Repositories;
 
 namespace ASAPPVC.UI.Services
 {
