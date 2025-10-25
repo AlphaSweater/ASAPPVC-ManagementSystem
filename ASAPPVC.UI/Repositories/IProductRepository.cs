@@ -1,10 +1,10 @@
 ﻿using ASAPPVC.UI.Models;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories
 {
-    public interface IProductRepository
+    // Inherit common CRUD from IBaseRepository<T> and expose only product-specific APIs
+    public interface IProductRepository : IBaseRepository<ProductModel>
     {
-        Task<ProductModel> AddProductAsync(ProductModel product, CancellationToken ct = default);
         Task AddProductPartsAsync(IEnumerable<ProductPartModel> lines, CancellationToken ct = default);
 
         Task<List<PartModel>> GetPartsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
@@ -12,6 +12,5 @@ namespace ASAPPVC.UI.Repositories.Interfaces
         Task<List<ProductModel>> ListAsync(CancellationToken ct = default);
 
         Task<ProductModel?> GetProductWithPartsAsync(int id, CancellationToken ct = default);
-        Task SaveAsync(CancellationToken ct = default);
     }
 }

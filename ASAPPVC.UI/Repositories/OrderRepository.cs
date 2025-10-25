@@ -1,19 +1,11 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace ASAPPVC.UI.Repositories.Implementation
+namespace ASAPPVC.UI.Repositories
 {
-    public class OrderRepository : BaseRepository<OrderModel>, IOrderRepository
+    public class OrderRepository(AppDbContext db) : BaseRepository<OrderModel>(db), IOrderRepository
     {
-        public OrderRepository(AppDbContext db) : base(db)
-        {
-        }
-
         public async Task<OrderModel> AddOrderAsync(OrderModel order, CancellationToken ct = default)
         {
             // delegate to base AddAsync (keeps behavior consistent)
@@ -47,11 +39,7 @@ namespace ASAPPVC.UI.Repositories.Implementation
                     .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(o => o.OrderID == id, ct);
         }
-
-        public new Task<int> SaveAsync(CancellationToken ct = default)
-        {
-            return base.SaveAsync(ct);
-        }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

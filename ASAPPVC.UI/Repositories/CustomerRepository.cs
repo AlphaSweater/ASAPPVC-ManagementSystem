@@ -1,19 +1,11 @@
 ﻿using ASAPPVC.UI.Data;
 using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace ASAPPVC.UI.Repositories.Implementation
+namespace ASAPPVC.UI.Repositories
 {
-    public class CustomerRepository : BaseRepository<CustomerModel>, ICustomerRepository
+    public class CustomerRepository(AppDbContext db) : BaseRepository<CustomerModel>(db), ICustomerRepository
     {
-        public CustomerRepository(AppDbContext db) : base(db)
-        {
-        }
-
         // keeps an ordered list specific to customers
         public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
         {
@@ -21,4 +13,5 @@ namespace ASAPPVC.UI.Repositories.Implementation
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

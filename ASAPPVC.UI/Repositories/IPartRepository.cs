@@ -1,12 +1,15 @@
 ﻿using ASAPPVC.UI.Models;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories
 {
-    public interface IPartRepository
+    // Inherit the common CRUD contract from IBaseRepository<T> and
+    // expose only part-specific convenience methods.
+    public interface IPartRepository : IBaseRepository<PartModel>
     {
-        Task<PartModel> AddAsync(PartModel part, CancellationToken ct = default);
+        // convenience: strongly-typed lookup by int id (FindAsync exists on base)
         Task<PartModel?> GetByIdAsync(int id, CancellationToken ct = default);
+
+        // part-specific ordered list
         Task<List<PartModel>> ListAsync(CancellationToken ct = default);
-        Task SaveAsync(CancellationToken ct = default);
     }
 }

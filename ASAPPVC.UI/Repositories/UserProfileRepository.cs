@@ -1,15 +1,9 @@
 ﻿using ASAPPVC.UI.Data;
-using Microsoft.AspNetCore.Identity;
 using ASAPPVC.UI.Models;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories
 {
-    public class UserProfileRepository : IUserProfileRepository
+    public class UserProfileRepository(AppDbContext context) : BaseRepository<UserProfileModel>(context), IUserProfileRepository
     {
-        private readonly AppDbContext _context;
-        public UserProfileRepository(AppDbContext context)
-        {
-            _context = context;
-        }
     }
 }

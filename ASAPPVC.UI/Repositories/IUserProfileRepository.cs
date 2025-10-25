@@ -1,9 +1,9 @@
 ﻿using ASAPPVC.UI.Models;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories
 {
-    public interface IUserProfileRepository
+    // Inherit common CRUD and Save contract from IBaseRepository<T>
+    public interface IUserProfileRepository : IBaseRepository<UserProfileModel>
     {
-
     }
 }

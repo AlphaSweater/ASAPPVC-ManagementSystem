@@ -1,9 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace ASAPPVC.UI.Repositories.Interfaces
+namespace ASAPPVC.UI.Repositories
 {
     public interface ICustomerRepository : IBaseRepository<CustomerModel>
     {
