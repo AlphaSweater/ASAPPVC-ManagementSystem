@@ -2,9 +2,15 @@
 
 namespace ASAPPVC.UI.Repositories
 {
+    /// <summary>
+    /// Repository interface for customer-related operations.
+    /// Extends <see cref="IBaseRepository{CustomerModel}"/>.
+    /// </summary>
     public interface ICustomerRepository : IBaseRepository<CustomerModel>
     {
-        // Returns all customers ordered by name (separate from GetAllAsync which is unordered)
+        /// <summary>
+        /// Lists all customers. No-tracking by default - intended for read-only operations.
+        /// </summary>
         Task<List<CustomerModel>> ListAsync(CancellationToken ct = default);
     }
 }

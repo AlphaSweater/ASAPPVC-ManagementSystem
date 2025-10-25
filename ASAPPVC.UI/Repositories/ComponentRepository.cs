@@ -46,11 +46,10 @@ namespace ASAPPVC.UI.Repositories
             return new List<ComponentModel>(0);
         }
 
-        public Task<List<ComponentModel>> GetListAsync(CancellationToken ct = default)
+        public async Task<List<ComponentModel>> GetListAsync(CancellationToken ct = default)
         {
-            return _set.AsNoTracking()
-                       .OrderBy(c => c.ComponentCode)
-                       .ToListAsync(ct);
+            var list = await ListAsync(asNoTracking: true, ct);
+            return list.OrderBy(c => c.ComponentCode).ToList();
         }
 
         // ---------- Search ----------
