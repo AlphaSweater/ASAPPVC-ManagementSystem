@@ -1,0 +1,199 @@
+﻿:root {
+    --primary-red: #d62828;
+    --primary-blue: #1a4e95;
+    --hover-red: #e03a3a;
+    --text-color: #ffffff;
+    --placeholder-color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- Universal Reset for Better Layout Control --- */
+* {
+    box-sizing: border-box;
+}
+
+/* ---------- Base & Background ---------- */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+    /* The robust centering solution */
+    display: grid;
+    place-items: center;
+}
+
+body {
+    background-color: #1c3d72; /* Fallback color */
+    background-image: linear-gradient(120deg, var(--primary-red) 0%, var(--primary-blue) 100%);
+}
+
+    /* ---------- Decorative Background Shapes ---------- */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(150px);
+        opacity: 0.6;
+        /* z-index removed from here to fix layering */
+    }
+
+    body::before {
+        background: var(--primary-red);
+        width: 350px;
+        height: 350px;
+        top: -80px;
+        left: -120px;
+    }
+
+    body::after {
+        background: var(--primary-blue);
+        width: 400px;
+        height: 400px;
+        bottom: -150px;
+        right: -180px;
+    }
+
+/* ---------- Glassmorphism Card ---------- */
+.login-card {
+    width: min(400px, 95vw);
+    /* --- FIX #1: Increased horizontal padding --- */
+    padding: 40px 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    /* --- FIX #2: Correct stacking context to prevent gradient glitches --- */
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Logo & Brand ---------- */
+.logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.brand-name {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+/* ---------- Input Fields ---------- */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-field {
+    width: 100%;
+    height: 50px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-left: 40px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+    .input-field::placeholder {
+        color: var(--placeholder-color);
+        font-weight: 400;
+    }
+
+    .input-field:focus {
+        border-bottom-color: var(--text-color);
+    }
+
+    /* FIX for Browser Autofill Style Override */
+    .input-field:-webkit-autofill,
+    .input-field:-webkit-autofill:hover,
+    .input-field:-webkit-autofill:focus,
+    .input-field:-webkit-autofill:active {
+        -webkit-text-fill-color: var(--text-color) !important;
+        transition: background-color 5000s ease-in-out 0s;
+        background-color: transparent !important;
+    }
+
+.input-group .icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    fill: var(--placeholder-color);
+}
+
+/* ---------- Options (Remember Me & Forgot) ---------- */
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -10px;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--placeholder-color);
+}
+
+.options a {
+    color: var(--placeholder-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .options a:hover {
+        color: var(--text-color);
+        text-decoration: underline;
+    }
+
+input[type="checkbox"] {
+    accent-color: var(--primary-red);
+}
+
+/* ---------- Button ---------- */
+.btn-login {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--primary-red);
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-bottom: 20px;
+}
+
+    .btn-login:hover {
+        background: var(--hover-red);
+    }
+
+    .btn-login:active {
+        transform: scale(0.98);
+    }
+
+/* ---------- Validation Messages ---------- */
+.text-danger {
+    color: #ffcdd2;
+    font-size: 14px;
+    text-align: left;
+    display: block;
+    margin-top: 6px;
+}
