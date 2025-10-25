@@ -13,9 +13,6 @@
                                                                         },
                                                "fileToFile":  {
                                                                   "add":  {
-                                                                              "UserProfileRepository.cs":  [
-                                                                                                               "IUserProfileRepository.cs"
-                                                                                                           ],
                                                                               "OrderService.cs":  [
                                                                                                       "IOrderService.cs"
                                                                                                   ],
@@ -28,6 +25,9 @@
                                                                               "OrderRepository.cs":  [
                                                                                                          "IOrderRepository.cs"
                                                                                                      ],
+                                                                              "UserRepository.cs":  [
+                                                                                                        "IUserRepository.cs"
+                                                                                                    ],
                                                                               "CodeCountersRepository.cs":  [
                                                                                                                 "ICodeCountersRepository.cs"
                                                                                                             ],
