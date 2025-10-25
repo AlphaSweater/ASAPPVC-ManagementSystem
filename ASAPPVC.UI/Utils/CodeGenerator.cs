@@ -34,7 +34,7 @@ namespace ASAPPVC.UI.Utils
             {
                 case CodeType.Product:
                 case CodeType.Component:
-                    var nameCode = GenerateNameCode(name ?? "Item", 8);
+                    var nameCode = GenerateNameCode(name ?? "Item", 4);
                     baseCode += $"_{nameCode}_{nextNumber:000}";
                     break;
 
