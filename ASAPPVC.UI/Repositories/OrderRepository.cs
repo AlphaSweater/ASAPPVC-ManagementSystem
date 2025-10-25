@@ -9,7 +9,7 @@ namespace ASAPPVC.UI.Repositories
         public Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(lines);
-            _db.OrderProduct.AddRange(lines);
+            _db.OrderProducts.AddRange(lines);
             return Task.CompletedTask;
         }
 

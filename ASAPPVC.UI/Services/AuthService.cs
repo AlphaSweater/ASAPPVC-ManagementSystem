@@ -1,4 +1,6 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Auth;
+﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.ViewModels.Auth;
+using ASAPPVC.UI.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace ASAPPVC.UI.Services
@@ -6,14 +8,17 @@ namespace ASAPPVC.UI.Services
     public class AuthService : IAuthService
     {
         //─────────── Dependencies ───────────\\
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly IUserRepository _userRepository;
+
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserRepository userRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _userRepository = userRepository;
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -25,11 +30,30 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //Adds user to database
-        public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
+        public async Task<IdentityResult> RegisterAsync(RegisterViewModel viewModel)
         {
-            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded) return result;
+            var newUser = ApplicationUser.Create(viewModel);
+
+            var result = await _userManager.CreateAsync(newUser, viewModel.Password);
+            if (!result.Succeeded)
+                return result;
+
+            try
+            {
+                // Only assign role after creation succeeds
+                await _userManager.AddToRoleAsync(newUser, viewModel.Role.ToString());
+            }
+            catch
+            {
+                // Rollback user creation if profile creation fails
+                await _userManager.DeleteAsync(newUser);
+                var profileError = new IdentityError
+                {
+                    Code = "ProfileCreationFailed",
+                    Description = "User account was created, but profile creation failed. The account has been removed."
+                };
+                return IdentityResult.Failed(profileError);
+            }
 
             return result;
         }
@@ -42,4 +66,5 @@ namespace ASAPPVC.UI.Services
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

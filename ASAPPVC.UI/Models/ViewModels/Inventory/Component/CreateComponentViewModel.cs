@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models.ViewModels.Inventory
+namespace ASAPPVC.UI.Models.ViewModels.Inventory.Component
 {
     public class CreateComponentViewModel
     {

@@ -35,6 +35,6 @@ namespace ASAPPVC.UI.Models
         public string ImageContentType { get; set; } = string.Empty;
 
         // Navigation property for parts
-        public List<ProductComponentModel> ProductParts { get; set; } = new();
+        public List<ProductComponentModel> ProductComponents { get; set; } = new();
     }
 }

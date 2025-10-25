@@ -1,4 +1,6 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Inventory;
+﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.ViewModels.Inventory.Component;
+using ASAPPVC.UI.Models.ViewModels.Inventory.Product;
 using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,13 +51,14 @@ namespace ASAPPVC.UI.Controllers
             if (!ModelState.IsValid)
                 return View(AddComponentPath, vm);
 
-            var (ok, error, component) = await _components.CreateAsync(vm, ct);
-            if (!ok || component is null)
+            var result = await _components.CreateComponentAsync(vm, ct);
+            if (!result.Ok || result.Value is null)
             {
-                ModelState.AddModelError(string.Empty, error ?? "Unable to create component.");
+                ModelState.AddModelError(string.Empty, result.Error ?? "Unable to create component.");
                 return View(AddComponentPath, vm);
             }
 
+            var component = result.Value;
             TempData["AlertMessage"] = $"Component '{component.Name}' created.";
             return RedirectToAction(nameof(ViewComponent), new { id = component.Id });
         }
@@ -65,11 +68,11 @@ namespace ASAPPVC.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewComponent(Guid id, CancellationToken ct)
         {
-            var component = await _components.GetAsync(id, ct);
-            if (component is null)
+            var result = await _components.GetComponentByIdOrCodeAsync(id, null, ct);
+            if (!result.Ok || result.Value is null)
                 return NotFound();
             //Returns the view with the part view path and the part details
-            return View(ViewComponentPath, component);
+            return View(ViewComponentPath, result.Value);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -77,7 +80,8 @@ namespace ASAPPVC.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewComponentInventory(CancellationToken ct)
         {
-            var list = await _components.ListAsync(ct);
+            var result = await _components.GetComponentsListAsync(ct);
+            var list = result.Ok && result.Value is not null ? result.Value : new List<ComponentModel>();
             //returns the view with the part inventory path and the list of parts
             return View(ComponentInventoryPath, list);
         }
@@ -87,8 +91,9 @@ namespace ASAPPVC.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
-            var parts = await _components.ListAsync(ct);
-            ViewData["Parts"] = parts;
+            var result = await _components.GetComponentsListAsync(ct);
+            var components = result.Ok && result.Value is not null ? result.Value : new List<ComponentModel>();
+            ViewData["Components"] = components;
             return View(AddProductPath, new CreateProductViewModel());
         }
 

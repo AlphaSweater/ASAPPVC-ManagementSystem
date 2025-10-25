@@ -27,5 +27,7 @@ namespace ASAPPVC.UI.Models.ViewModels.Auth
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
+
+        public RoleType Role { get; set; } = RoleType.Unassigned;
     }
 }
