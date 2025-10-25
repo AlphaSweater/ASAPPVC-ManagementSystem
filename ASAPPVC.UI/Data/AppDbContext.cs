@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Data
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
         public DbSet<UserProfileModel> UserProfiles { get; set; }
         public DbSet<PartModel> Part { get; set; }
         public DbSet<ProductModel> Product { get; set; }
@@ -15,6 +13,7 @@ namespace ASAPPVC.UI.Data
         public DbSet<CustomerModel> Customer { get; set; }
         public DbSet<OrderModel> Order { get; set; }
         public DbSet<OrderProductModel> OrderProduct { get; set; }
+        public DbSet<CodeCounters> CodeCounters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
