@@ -1,59 +1,59 @@
 ﻿{
-    "dependentFileProviders": {
-        "add": {
-            "extensionToExtension": {
-                "add": {
-                    ".css": [
-                        ".cshtml"
-                    ],
-                    ".js": [
-                        ".cshtml"
-                    ]
-                }
-            },
-            "fileToFile": {
-                "add": {
-                    "UserProfileRepository.cs": [
-                        "IUserProfileRepository.cs"
-                    ],
-                    "OrderService.cs": [
-                        "IOrderService.cs"
-                    ],
-                    "ComponentRepository.cs": [
-                        "IComponentRepository.cs"
-                    ],
-                    "AuthService.cs": [
-                        "IAuthService.cs"
-                    ],
-                    "OrderRepository.cs": [
-                        "IOrderRepository.cs"
-                    ],
-                    "CodeCountersRepository.cs": [
-                        "ICodeCountersRepository.cs"
-                    ],
-                    "UserService.cs": [
-                        "IUserService.cs"
-                    ],
-                    "ProductService.cs": [
-                        "IProductService.cs"
-                    ],
-                    "ComponentService.cs": [
-                        "IComponentService.cs"
-                    ],
-                    "CustomerService.cs": [
-                        "ICustomerService.cs"
-                    ],
-                    "CustomerRepository.cs": [
-                        "ICustomerRepository.cs"
-                    ],
-                    "BaseRepository.cs": [
-                        "IBaseRepository.cs"
-                    ],
-                    "ProductRepository.cs": [
-                        "IProductRepository.cs"
-                    ]
-                }
-            }
-        }
-    }
+    "dependentFileProviders":  {
+                                   "add":  {
+                                               "extensionToExtension":  {
+                                                                            "add":  {
+                                                                                        ".css":  [
+                                                                                                     ".cshtml"
+                                                                                                 ],
+                                                                                        ".js":  [
+                                                                                                    ".cshtml"
+                                                                                                ]
+                                                                                    }
+                                                                        },
+                                               "fileToFile":  {
+                                                                  "add":  {
+                                                                              "UserProfileRepository.cs":  [
+                                                                                                               "IUserProfileRepository.cs"
+                                                                                                           ],
+                                                                              "OrderService.cs":  [
+                                                                                                      "IOrderService.cs"
+                                                                                                  ],
+                                                                              "ComponentRepository.cs":  [
+                                                                                                             "IComponentRepository.cs"
+                                                                                                         ],
+                                                                              "AuthService.cs":  [
+                                                                                                     "IAuthService.cs"
+                                                                                                 ],
+                                                                              "OrderRepository.cs":  [
+                                                                                                         "IOrderRepository.cs"
+                                                                                                     ],
+                                                                              "CodeCountersRepository.cs":  [
+                                                                                                                "ICodeCountersRepository.cs"
+                                                                                                            ],
+                                                                              "UserService.cs":  [
+                                                                                                     "IUserService.cs"
+                                                                                                 ],
+                                                                              "ProductService.cs":  [
+                                                                                                        "IProductService.cs"
+                                                                                                    ],
+                                                                              "ComponentService.cs":  [
+                                                                                                          "IComponentService.cs"
+                                                                                                      ],
+                                                                              "CustomerService.cs":  [
+                                                                                                         "ICustomerService.cs"
+                                                                                                     ],
+                                                                              "CustomerRepository.cs":  [
+                                                                                                            "ICustomerRepository.cs"
+                                                                                                        ],
+                                                                              "BaseRepository.cs":  [
+                                                                                                        "IBaseRepository.cs"
+                                                                                                    ],
+                                                                              "ProductRepository.cs":  [
+                                                                                                           "IProductRepository.cs"
+                                                                                                       ]
+                                                                          }
+                                                              }
+                                           }
+                               }
 }
