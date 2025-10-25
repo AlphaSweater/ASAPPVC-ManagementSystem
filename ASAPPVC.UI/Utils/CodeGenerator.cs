@@ -1,7 +1,5 @@
-﻿using ASAPPVC.UI.Data;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Repositories;
 using System.Text.RegularExpressions;
 
 namespace ASAPPVC.UI.Utils
@@ -17,15 +15,9 @@ namespace ASAPPVC.UI.Utils
 
     #region Implementation
 
-    // Implement the CodeGenerator interface (was previously inheriting from itself)
-    public class CodeGenerator : ICodeGenerator
+    public class CodeGenerator(ICodeCountersRepository countersRepo) : ICodeGenerator
     {
-        private readonly AppDbContext _context;
-
-        public CodeGenerator(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ICodeCountersRepository _countersRepo = countersRepo;
 
         public async Task<string> GenerateAsync(CodeType type, string? name = null, string? relatedId = null)
         {
@@ -57,14 +49,17 @@ namespace ASAPPVC.UI.Utils
                     break;
             }
 
-            return baseCode.ToUpperInvariant();
+            var code = baseCode.ToUpperInvariant();
+
+            // append a simple mod-10 checksum to help detect typos
+            var checksum = ChecksumUtils.ComputeChecksum(code);
+            return $"{code}-{checksum}";
         }
 
         private async Task<int> GetNextCounterAsync(CodeType type, string? periodKey)
         {
             // Use periodKey for date-based resets (e.g., orders reset monthly)
-            var counter = await _context.CodeCounters
-                .FirstOrDefaultAsync(c => c.CodeType == type.ToString() && c.PeriodKey == periodKey);
+            var counter = await _countersRepo.GetByTypeAndPeriodAsync(type.ToString(), periodKey);
 
             if (counter == null)
             {
@@ -75,7 +70,9 @@ namespace ASAPPVC.UI.Utils
                     LastNumber = 1,
                     UpdatedAt = DateTime.UtcNow
                 };
-                _context.CodeCounters.Add(counter);
+
+                counter = await _countersRepo.AddAndSaveAsync(counter);
+                return counter.LastNumber;
             }
             else
             {
@@ -83,7 +80,7 @@ namespace ASAPPVC.UI.Utils
                 counter.UpdatedAt = DateTime.UtcNow;
             }
 
-            await _context.SaveChangesAsync();
+            await _countersRepo.SaveAsync();
             return counter.LastNumber;
         }
 
@@ -109,30 +106,6 @@ namespace ASAPPVC.UI.Utils
     }
 
     #endregion Implementation
-
-    #region Model
-
-    [Table("CodeCounters")]
-    [Index(nameof(CodeType), nameof(PeriodKey))]
-    public class CodeCounters
-    {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string CodeType { get; set; } = default!;
-
-        [MaxLength(10)]
-        public string? PeriodKey { get; set; }
-
-        public int LastNumber { get; set; }
-
-        [Required]
-        public DateTime UpdatedAt { get; set; }
-    }
-
-    #endregion Model
 
     #region Enums
 
