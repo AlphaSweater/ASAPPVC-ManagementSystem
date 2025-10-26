@@ -34,6 +34,12 @@ namespace ASAPPVC.UI.Controllers
         private const string ViewProductPath = "~/Views/Inventory/Products/ViewProduct.cshtml";
         private const string ProductInventoryPath = "~/Views/Inventory/Products/ViewProductInventory.cshtml";
 
+        [HttpGet]
+        public IActionResult WarehouseDashboard()
+        {
+            return View();
+        }
+
         //─────────── Parts ───────────\\
         //displays the add part view
         [HttpGet]
