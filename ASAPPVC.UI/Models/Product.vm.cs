@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ASAPPVC.UI.Models.Enums;
 
 namespace ASAPPVC.UI.Models
 {
@@ -29,6 +30,11 @@ namespace ASAPPVC.UI.Models
         // Distinct number of components linked to this product
         public int ComponentCount { get; init; }
 
+        // Enum modifiers (typed)
+        public Category Category { get; init; } = Category.None;
+        public Material Material { get; init; } = Material.None;
+        public Colour Colour { get; init; } = Colour.None;
+
         // Optional computed fields for UI display
         public string DisplayPrice => Price.ToString("C"); // UI currency format
 
@@ -54,6 +60,11 @@ namespace ASAPPVC.UI.Models
 
         // Optional image display (converted to base64 in controller/service)
         public string? ImageBase64DataUrl { get; init; }
+
+        // Enum modifiers
+        public Category Category { get; init; } = Category.None;
+        public Material Material { get; init; } = Material.None;
+        public Colour Colour { get; init; } = Colour.None;
 
         // Linked components
         public List<ProductComponentVm> Components { get; init; } = new();
@@ -93,6 +104,16 @@ namespace ASAPPVC.UI.Models
         public byte[]? ImageData { get; set; }
 
         public string? ImageType { get; set; }
+
+        // Modifier selections
+        [Display(Name = "Category")]
+        public Category Category { get; set; } = Category.None;
+
+        [Display(Name = "Material")]
+        public Material Material { get; set; } = Material.None;
+
+        [Display(Name = "Colour")]
+        public Colour Colour { get; set; } = Colour.None;
 
         [Display(Name = "Components")]
         [MinLength(1, ErrorMessage = "A Product requires at least 1 Component")]
@@ -137,6 +158,16 @@ namespace ASAPPVC.UI.Models
         public byte[]? ImageData { get; set; }
 
         public string? ImageType { get; set; }
+
+        // Modifier selections
+        [Display(Name = "Category")]
+        public Category Category { get; set; } = Category.None;
+
+        [Display(Name = "Material")]
+        public Material Material { get; set; } = Material.None;
+
+        [Display(Name = "Colour")]
+        public Colour Colour { get; set; } = Colour.None;
 
         [Display(Name = "Components")]
         [MinLength(1)]

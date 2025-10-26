@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ASAPPVC.UI.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,29 +34,11 @@ namespace ASAPPVC.UI.Models
         // Navigation property for parts (bridge rows)
         public List<ProductComponent> ProductComponents { get; set; } = new();
 
-        // Typed modifiers object stored as JSON. Each property holds a3-char code (or null):
-        // - Category (e.g. "WIN")
-        // - Colour (e.g. "RED")
-        // - Material (e.g. "ALU")
-        public ProductModifiers Modifiers { get; set; } = new();
-    }
+        // Enum-typed modifiers stored as simple columns.
+        // Each holds a single enum value (None when not set).
 
-    // Small DTO representing product modifiers by type.
-    // Stored on Product as JSON (TEXT column). Keep simple — just three3-char code fields.
-    public class ProductModifiers
-    {
-        [MaxLength(3)]
-        public string? Category { get; set; }
-
-        [MaxLength(3)]
-        public string? Colour { get; set; }
-
-        [MaxLength(3)]
-        public string? Material { get; set; }
-
-        public bool IsEmpty()
-            => string.IsNullOrWhiteSpace(Category)
-            && string.IsNullOrWhiteSpace(Colour)
-            && string.IsNullOrWhiteSpace(Material);
+        public Category Category { get; set; } = Category.None;
+        public Material Material { get; set; } = Material.None;
+        public Colour Colour { get; set; } = Colour.None;
     }
 }

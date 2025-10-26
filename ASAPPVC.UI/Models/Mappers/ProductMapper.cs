@@ -25,7 +25,7 @@ namespace ASAPPVC.UI.Models.Mappers
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var pcs = product.ProductComponents ?? [];
+            var pcs = product.ProductComponents ?? new List<ProductComponent>();
 
             return new ProductListVm
             {
@@ -35,7 +35,10 @@ namespace ASAPPVC.UI.Models.Mappers
                 Price = product.Price,
                 Description = product.Description,
                 HasImage = product.ImageData is { Length: > 0 } && !string.IsNullOrWhiteSpace(product.ImageType),
-                ComponentCount = pcs.Count
+                ComponentCount = pcs.Count,
+                Category = product.Category,
+                Material = product.Material,
+                Colour = product.Colour
             };
         }
 
@@ -70,7 +73,10 @@ namespace ASAPPVC.UI.Models.Mappers
                 Price = product.Price,
                 Description = product.Description,
                 ImageBase64DataUrl = includeImageDataUrl ? AsDataUrlOrNull(product.ImageData, product.ImageType) : null,
-                Components = components
+                Components = components,
+                Category = product.Category,
+                Material = product.Material,
+                Colour = product.Colour
             };
         }
 
@@ -99,7 +105,10 @@ namespace ASAPPVC.UI.Models.Mappers
                 Description = NormalizeString(vm.Description),
                 Price = NormalizePrice(vm.Price),
                 ImageData = vm.ImageData ?? Array.Empty<byte>(),
-                ImageType = NormalizeString(vm.ImageType)
+                ImageType = NormalizeString(vm.ImageType),
+                Category = vm.Category,
+                Material = vm.Material,
+                Colour = vm.Colour
             };
 
             product.ProductComponents = MapCreateComponents(vm.Components, product.Id);
@@ -146,6 +155,11 @@ namespace ASAPPVC.UI.Models.Mappers
                 target.ImageData = vm.ImageData;
                 target.ImageType = NormalizeString(vm.ImageType);
             }
+
+            // Map modifiers
+            target.Category = vm.Category;
+            target.Material = vm.Material;
+            target.Colour = vm.Colour;
 
             target.ProductComponents = MapEditComponents(vm.Components, target.Id);
         }
