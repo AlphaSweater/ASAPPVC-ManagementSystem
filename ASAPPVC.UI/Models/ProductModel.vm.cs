@@ -2,24 +2,19 @@
 
 namespace ASAPPVC.UI.Models
 {
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     //  Product ViewModels (Read + Write)
-    //───────────────────────────────────────────────\\
-    //
-    //  Purpose:
-    //  - Keep all VMs for the Product entity together
-    //  - Support list, detail, and create/edit screens
-    //  - Use clean, flat naming: ProductListVm, ProductDetailVm, etc.
-    //
-    //  Convention:
-    //  - List VMs → lightweight summaries for tables/cards
-    //  - Detail VMs → include nested component info
-    //  - Form VMs → used in POST forms with validation
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
 
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     // Summary (used in product lists, search results)
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Lightweight summary view model used in product lists and search results.<br/>
+    /// Contains only the fields needed for table/card displays and quick summaries.<br/>
+    /// Use this VM when rendering lists, search results, or small preview cards where full<br/>
+    /// product details are not required.<br/>
+    /// </summary>
     public sealed class ProductListVm
     {
         public Guid Id { get; init; }
@@ -44,9 +39,15 @@ namespace ASAPPVC.UI.Models
         public string ComponentsBadge => $"{ComponentCount} comp{(ComponentCount == 1 ? "" : "s")}";
     }
 
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     // Detail (used for view screen)
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Detailed view model for a single product used on product detail pages or detail modals.<br/>
+    /// Includes optional image data (base64) and a collection of read-only component entries.<br/>
+    /// Use this VM when you need to display full product information including linked components.<br/>
+    /// Not intended for form binding on create/edit endpoints.<br/>
+    /// </summary>
     public sealed class ProductDetailVm
     {
         public Guid Id { get; init; }
@@ -59,12 +60,18 @@ namespace ASAPPVC.UI.Models
         public string? ImageBase64 { get; init; }
 
         // Linked parts/components
-        public List<ProductComponentVm> Components { get; init; } = [];
+        public List<ProductComponentVm> Components { get; init; } = new();
     }
 
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     // Component inside product (read-only view)
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Read-only representation of a product component used inside product detail views.<br/>
+    /// Contains display fields and computed values useful for UI presentation.<br/>
+    /// Use this VM only for display purposes inside a ProductDetailVm; it is not intended<br/>
+    /// for create/edit form binding.<br/>
+    /// </summary>
     public sealed class ProductComponentVm
     {
         public Guid ComponentId { get; init; }
@@ -77,69 +84,110 @@ namespace ASAPPVC.UI.Models
         public decimal TotalCost => UnitCost * QuantityRequired;
     }
 
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     // Create form (used in POST / add product)
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Form view model used when creating a new product (POST).<br/>
+    /// Includes validation attributes for server-side model binding and a collection<br/>
+    /// of component entries. Use this VM for create forms and endpoints that accept<br/>
+    /// product creation data.<br/>
+    /// </summary>
     public sealed class CreateProductVm
     {
-        [Required, MaxLength(100)]
+        [Display(Name = "Product Name")]
+        [Required(ErrorMessage = "Product name is required.")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [Required, Range(0.01, double.MaxValue, ErrorMessage = "Price must be positive.")]
+        [Display(Name = "Unit Price")]
+        [Required(ErrorMessage = "Price is required.")]
+        [Range(0.01, 999999, ErrorMessage = "Price must be a positive amount.")]
         public decimal Price { get; set; }
 
-        [Required, MaxLength(500)]
+        [Display(Name = "Description")]
+        [Required(ErrorMessage = "Description is required.")]
+        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        // Image upload (optional)
+        [Display(Name = "Image File (optional)")]
         public byte[]? ImageBytes { get; set; }
 
         public string? ImageContentType { get; set; }
 
-        // Components chosen from inventory (optional)
-        public List<CreateProductComponentVm> Components { get; set; } = [];
+        [Display(Name = "Components")]
+        [MinLength(1)]
+        public List<CreateProductComponentVm> Components { get; set; } = new();
     }
 
+    /// <summary>
+    /// Component entry used within the create form. Represents the selected component and<br/>
+    /// the required quantity. Use as items of CreateProductVm.Components when creating products.<br/>
+    /// </summary>
     public sealed class CreateProductComponentVm
     {
-        [Required]
+        [Display(Name = "Component")]
+        [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
 
-        [Range(0.01, double.MaxValue)]
+        [Display(Name = "Quantity Required")]
+        [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
         public decimal QuantityRequired { get; set; }
     }
 
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
     // Edit form (used in PUT / update product)
-    //───────────────────────────────────────────────\\
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Form view model used when editing an existing product (PUT).<br/>
+    /// Includes the product Id and validation attributes for update binding.<br/>
+    /// Components include editable entries and may contain database ids for existing<br/>
+    /// associations. Use this VM for edit forms and update endpoints.<br/>
+    /// </summary>
     public sealed class EditProductVm
     {
-        [Required]
+        [Required(ErrorMessage = "Product ID is required.")]
         public Guid Id { get; set; }
 
-        [Required, MaxLength(100)]
+        [Display(Name = "Product Name")]
+        [Required(ErrorMessage = "Product name is required.")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [Required, Range(0.01, double.MaxValue)]
+        [Display(Name = "Unit Price")]
+        [Required(ErrorMessage = "Price is required.")]
+        [Range(0.01, 999999, ErrorMessage = "Price must be a positive amount.")]
         public decimal Price { get; set; }
 
-        [Required, MaxLength(500)]
+        [Display(Name = "Description")]
+        [Required(ErrorMessage = "Description is required.")]
+        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        // Image editing (optional)
+        [Display(Name = "Image File (optional)")]
         public byte[]? ImageBytes { get; set; }
 
         public string? ImageContentType { get; set; }
 
-        // Editable components
-        public List<EditProductComponentVm> Components { get; set; } = [];
+        [Display(Name = "Components")]
+        [MinLength(1)]
+        public List<EditProductComponentVm> Components { get; set; } = new();
     }
 
+    /// <summary>
+    /// Component entry used within the edit form. Includes an Id for the association (if persisted),<br/>
+    /// the selected component, and quantity. Use as items of EditProductVm.Components for updates.<br/>
+    /// </summary>
     public sealed class EditProductComponentVm
     {
-        public Guid Id { get; set; } // Bridge ID if you track it
-        [Required] public Guid ComponentId { get; set; }
-        [Range(0.01, double.MaxValue)] public decimal QuantityRequired { get; set; }
+        public Guid Id { get; set; }
+
+        [Display(Name = "Component")]
+        [Required(ErrorMessage = "Component is required.")]
+        public Guid ComponentId { get; set; }
+
+        [Display(Name = "Quantity Required")]
+        [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
+        public decimal QuantityRequired { get; set; }
     }
-}
 }
