@@ -37,7 +37,7 @@
         }
 
         /// <summary>
-        /// Convert a Component to a detail VM.
+        /// Convert a Component to a detail VM.<br/>
         /// If <paramref name="usedInProductsCount"/> is null, tries to infer from the reverse nav.
         /// <br/>
         /// <br/><b>Examples:</b>
