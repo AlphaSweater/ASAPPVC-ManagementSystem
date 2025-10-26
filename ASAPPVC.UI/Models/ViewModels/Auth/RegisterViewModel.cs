@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ASAPPVC.UI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models.ViewModels.Auth
 {

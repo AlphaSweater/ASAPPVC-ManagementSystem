@@ -2,7 +2,7 @@
 @model CreateProductViewModel
 @{
 	ViewData["Title"] = "Add New Product";
-	var components = ViewData["Components"] as List<ASAPPVC.UI.Models.ComponentModel>;
+	var components = ViewData["Components"] as List<ASAPPVC.UI.Models.Component>;
 }
 
 <link rel="stylesheet" href="~/css/Views/Inventory/products/AddProduct.css" asp-append-version="true" />
@@ -45,7 +45,7 @@
 					</div>
 					<div class="group">
 						<label asp-for="BasePrice" class="label"></label>
-						<input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. 299.99" />
+						<input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. R299.99" />
 						<span asp-validation-for="BasePrice" class="text-danger"></span>
 					</div>
 					<div class="group full-width">
@@ -57,7 +57,7 @@
 					<!-- Parts Collection Card -->
 					<div class="parts-card full-width">
 						<div class="parts-header">
-							<h3>Parts in this Product</h3>
+							<h3>Components in this Product</h3>
 							<button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
 						</div>
 						<table class="parts-table" id="partsTable">
@@ -115,26 +115,28 @@
 		const addRowBtn = document.getElementById('addRowBtn');
 		const grandEl = document.getElementById('grandTotal');
 
-		// **FIXED LINE**: Handle null before the .Select() to ensure type safety.
-		const partsData = @Html.Raw(Json.Serialize((components ?? new List<ComponentModel>()).Select(p => new { id = p.Id, name = p.Name, price = p.UnitCost })));
+		// Serialize server-side components into JS array (ids are GUID strings)
+		const partsData = @Html.Raw(Json.Serialize((components ?? new List<Component>()).Select(p => new { id = p.Id.ToString(), name = p.Name, price = p.UnitCost })));
 
-		const formatMoney = (n) => `R ${n.toFixed(2)}`;
+		const formatMoney = (n) => `R ${Number(n ||0).toFixed(2)}`;
 
 		function updateTotals() {
-			let grandTotal = 0;
-			tbody.querySelectorAll('tr').forEach(tr => {
+			let grandTotal =0;
+			Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
 				const sel = tr.querySelector('.part-select');
 				const qtyInput = tr.querySelector('.qty-input');
 				const unitPriceCell = tr.querySelector('.unit-price');
 				const subtotalCell = tr.querySelector('.subtotal');
 
-				const selectedPartId = parseInt(sel.value, 10);
-				const quantity = parseInt(qtyInput.value, 10) || 0;
+				if (!sel || !qtyInput || !unitPriceCell || !subtotalCell) return;
+
+				const selectedPartId = sel.value; // GUID string or empty
+				const quantity = parseInt(qtyInput.value,10) ||0;
 				const part = partsData.find(p => p.id === selectedPartId);
 
-				let unitPrice = 0;
+				let unitPrice =0;
 				if (part) {
-					unitPrice = part.price;
+					unitPrice = Number(part.price) ||0;
 				}
 
 				const subtotal = unitPrice * quantity;
@@ -147,9 +149,10 @@
 		}
 
 		function renumberIndexes() {
-			tbody.querySelectorAll('tr').forEach((tr, i) => {
+			Array.from(tbody.querySelectorAll('tr')).forEach((tr, i) => {
 				tr.querySelectorAll('[name]').forEach(input => {
-					input.name = input.name.replace(/\[\d+\]/, `[${i}]`);
+					// Replace any numeric index inside brackets with the new index
+					input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
 				});
 			});
 		}
@@ -162,26 +165,30 @@
 
 			tr.innerHTML = `
 				<td>
-					<select name="Parts[${index}].PartId" class="input part-select">
+					<select name="Components[${index}].ComponentId" class="input part-select">
 						<option value="">-- Select part --</option>
 						${optionsHtml}
 					</select>
 				</td>
 				<td style="text-align:center;">
-					<input class="input qty-input" type="number" name="Parts[${index}].Quantity" value="1" min="1" />
+					<input class="input qty-input" type="number" name="Components[${index}].Quantity" value="1" min="1" />
 				</td>
-				<td class="align-right unit-price">R 0.00</td>
-				<td class="align-right subtotal">R 0.00</td>
+				<td class="align-right unit-price">R0.00</td>
+				<td class="align-right subtotal">R0.00</td>
 				<td style="text-align:center;">
 					<button type="button" class="btn btn-remove">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" /></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="002020" fill="currentColor" width="20" height="20"><path d="M6.285.22a.75.75000-1.061.06L8.9410l-3.723.72a.75.750101.061.06L1011.06l3.723.72a.75.750101.06-1.06L11.0610l3.72-3.72a.75.75000-1.06-1.06L108.946.285.22z" /></svg>
 					</button>
 				</td>
 			`;
 
-			tr.querySelector('.part-select').addEventListener('change', updateTotals);
-			tr.querySelector('.qty-input').addEventListener('input', updateTotals);
-			tr.querySelector('.btn-remove').addEventListener('click', () => {
+			const sel = tr.querySelector('.part-select');
+			const qty = tr.querySelector('.qty-input');
+			const removeBtn = tr.querySelector('.btn-remove');
+
+			sel.addEventListener('change', updateTotals);
+			qty.addEventListener('input', updateTotals);
+			removeBtn.addEventListener('click', () => {
 				tr.remove();
 				renumberIndexes();
 				updateTotals();
@@ -193,10 +200,10 @@
 			updateTotals();
 		});
 
-		// Add one row to start with when the page loads
-		if (partsData.length > 0) {
-			 createRow();
-			 updateTotals();
+		// Add one row to start with when the page loads (only if there are components to select)
+		if (Array.isArray(partsData) && partsData.length >0) {
+			createRow();
+			updateTotals();
 		}
 	})();
 </script>

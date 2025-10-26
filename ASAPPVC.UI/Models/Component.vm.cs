@@ -1,0 +1,132 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ASAPPVC.UI.Models
+{
+    //-----------------------------------------------\\
+    // Component ViewModels (Read + Write)
+    //-----------------------------------------------\\
+
+    //-----------------------------------------------\\
+    // Summary (used in component lists, search results)
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Lightweight summary view model used when rendering lists, tables or small preview cards.
+    /// Contains only fields required for quick summaries and list displays.
+    /// </summary>
+    public sealed class ComponentListVm
+    {
+        public Guid Id { get; init; }
+        public string ComponentCode { get; init; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
+        public decimal UnitCost { get; init; }
+        public int CurrentAmount { get; init; }
+        public string StorageLocation { get; init; } = string.Empty;
+
+        // Optional small preview flag
+        public bool HasImage { get; init; }
+
+        // Optional computed fields for UI display
+        public string DisplayCost => UnitCost.ToString("C");
+
+        public string DisplayAmount => $"{CurrentAmount} pcs";
+    }
+
+    //-----------------------------------------------\\
+    // Detail (used for view screen)
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Detailed view model for a single component shown on a details page or modal.
+    /// Includes optional image data and a usage count for informational purposes.
+    /// </summary>
+    public sealed class ComponentDetailVm
+    {
+        public Guid Id { get; init; }
+        public string ComponentCode { get; init; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
+        public decimal UnitCost { get; init; }
+        public int CurrentAmount { get; init; }
+        public string StorageLocation { get; init; } = string.Empty;
+
+        // Optional image display (converted to base64 in controller/service)
+        public string? ImageBase64 { get; init; }
+
+        // Number of distinct products that reference this component
+        public int UsedInProductsCount { get; init; }
+
+        public string DisplayCost => UnitCost.ToString("C");
+        public string DisplayAmount => $"{CurrentAmount} pcs";
+    }
+
+    //-----------------------------------------------\\
+    // Create form (used in POST / add component)
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Form view model used when creating a new component (server-side binding).
+    /// Includes validation attributes used by Razor Pages forms and model binding.
+    /// </summary>
+    public sealed class CreateComponentVm
+    {
+        [Display(Name = "Component Name")]
+        [Required(ErrorMessage = "Component name is required.")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Component name must be between 2 and 100 characters.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Display(Name = "Unit Cost")]
+        [Required(ErrorMessage = "Unit cost is required.")]
+        [Range(0.01, 999999, ErrorMessage = "Unit cost must be a positive amount.")]
+        public decimal UnitCost { get; set; }
+
+        [Display(Name = "Current Amount")]
+        [Required(ErrorMessage = "Current amount is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Current amount cannot be negative.")]
+        public int CurrentAmount { get; set; }
+
+        [Display(Name = "Storage Location")]
+        [Required(ErrorMessage = "Storage location is required.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Storage location must be between 2 and 50 characters.")]
+        public string StorageLocation { get; set; } = string.Empty;
+
+        [Display(Name = "Image File (optional)")]
+        public byte[]? ImageBytes { get; set; }
+
+        public string? ImageContentType { get; set; }
+    }
+
+    //-----------------------------------------------\\
+    // Edit form (used in PUT / update component)
+    //-----------------------------------------------\\
+    /// <summary>
+    /// Form view model used when editing an existing component. Includes the Id and
+    /// validation attributes similar to the create model.
+    /// </summary>
+    public sealed class EditComponentVm
+    {
+        [Required(ErrorMessage = "Component ID is required.")]
+        public Guid Id { get; set; }
+
+        [Display(Name = "Component Name")]
+        [Required(ErrorMessage = "Component name is required.")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Component name must be between 2 and 100 characters.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Display(Name = "Unit Cost")]
+        [Required(ErrorMessage = "Unit cost is required.")]
+        [Range(0.01, 999999, ErrorMessage = "Unit cost must be a positive amount.")]
+        public decimal UnitCost { get; set; }
+
+        [Display(Name = "Current Amount")]
+        [Required(ErrorMessage = "Current amount is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Current amount cannot be negative.")]
+        public int CurrentAmount { get; set; }
+
+        [Display(Name = "Storage Location")]
+        [Required(ErrorMessage = "Storage location is required.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Storage location must be between 2 and 50 characters.")]
+        public string StorageLocation { get; set; } = string.Empty;
+
+        [Display(Name = "Image File (optional)")]
+        public byte[]? ImageBytes { get; set; }
+
+        public string? ImageContentType { get; set; }
+    }
+}

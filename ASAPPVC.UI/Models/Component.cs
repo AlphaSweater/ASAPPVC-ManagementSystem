@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ASAPPVC.UI.Models
 {
     [Index(nameof(ComponentCode), IsUnique = true)]
-    public class ComponentModel
+    public class Component
     {
         // Internal GUID primary key for safe relations
         [Key]

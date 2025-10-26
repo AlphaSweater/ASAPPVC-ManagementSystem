@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ASAPPVC.UI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models
 {
@@ -17,14 +18,19 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class ProductComponentVm
     {
+        public Guid Id { get; init; }
+        public Guid ProductId { get; init; }
         public Guid ComponentId { get; init; }
         public string ComponentCode { get; init; } = string.Empty;
         public string ComponentName { get; init; } = string.Empty;
+        public Unit UnitOfMeasure { get; init; }
         public decimal QuantityRequired { get; init; }
         public decimal UnitCost { get; init; }
 
         // Optional computed cost for UI
         public decimal TotalCost => UnitCost * QuantityRequired;
+
+        public string ShortFormattedQuantity => UnitOfMeasure.ToDisplay(QuantityRequired, true);
     }
 
     //-----------------------------------------------\\
@@ -36,11 +42,20 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class CreateProductComponentVm
     {
+        [Display(Name = "Product")]
+        [Required(ErrorMessage = "Product is required.")]
+        public Guid ProductId { get; set; }
+
         [Display(Name = "Component")]
         [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
 
+        [Display(Name = "Unit of Measure")]
+        [Required(ErrorMessage = "Unit of Measure is required.")]
+        public Unit UnitOfMeasure { get; init; }
+
         [Display(Name = "Quantity Required")]
+        [Required(ErrorMessage = "Quantity is required.")]
         [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
         public decimal QuantityRequired { get; set; }
     }
@@ -56,11 +71,20 @@ namespace ASAPPVC.UI.Models
     {
         public Guid Id { get; set; }
 
+        [Display(Name = "Product")]
+        [Required(ErrorMessage = "Product is required.")]
+        public Guid ProductId { get; set; }
+
         [Display(Name = "Component")]
         [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
 
+        [Display(Name = "Unit of Measure")]
+        [Required(ErrorMessage = "Unit of Measure is required.")]
+        public Unit UnitOfMeasure { get; init; }
+
         [Display(Name = "Quantity Required")]
+        [Required(ErrorMessage = "Quantity is required.")]
         [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
         public decimal QuantityRequired { get; set; }
     }

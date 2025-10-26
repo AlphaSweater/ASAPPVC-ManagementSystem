@@ -30,15 +30,15 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Creates a new component (reads image once, defers Save to repo)
-        public async Task<Result<ComponentModel>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default)
+        public async Task<Result<Component>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default)
         {
             var (ok, error) = ValidateCreateVm(vm);
             if (!ok)
-                return Result<ComponentModel>.Fail(error!);
+                return Result<Component>.Fail(error!);
 
             Normalize(vm);
 
-            var component = new ComponentModel
+            var component = new Component
             {
                 Name = vm.Name,
                 StorageLocation = vm.StorageLocation,
@@ -57,11 +57,11 @@ namespace ASAPPVC.UI.Services
                 }
                 catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
-                    return Result<ComponentModel>.Fail("Operation was canceled.");
+                    return Result<Component>.Fail("Operation was canceled.");
                 }
                 catch (Exception ex)
                 {
-                    return Result<ComponentModel>.Fail($"Failed to read image file: {ex.Message}");
+                    return Result<Component>.Fail($"Failed to read image file: {ex.Message}");
                 }
             }
 
@@ -69,17 +69,17 @@ namespace ASAPPVC.UI.Services
             {
                 var added = await _components.AddAsync(component, ct);
                 await _components.SaveAsync(ct);
-                return Result<ComponentModel>.Success(added);
+                return Result<Component>.Success(added);
             }
             catch (Exception ex)
             {
-                return Result<ComponentModel>.Fail($"Failed to create component: {ex.Message}");
+                return Result<Component>.Fail($"Failed to create component: {ex.Message}");
             }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves a single component by Id OR Code (repo decides precedence)
-        public async Task<Result<ComponentModel>> GetComponentByIdOrCodeAsync(
+        public async Task<Result<Component>> GetComponentByIdOrCodeAsync(
             Guid? id = null,
             string? code = null,
             CancellationToken ct = default)
@@ -88,18 +88,18 @@ namespace ASAPPVC.UI.Services
             {
                 var component = await _components.GetByIdOrCodeAsync(id, code, ct);
                 if (component is null)
-                    return Result<ComponentModel>.Fail("Component not found.");
-                return Result<ComponentModel>.Success(component);
+                    return Result<Component>.Fail("Component not found.");
+                return Result<Component>.Success(component);
             }
             catch (Exception ex)
             {
-                return Result<ComponentModel>.Fail($"Failed to retrieve component: {ex.Message}");
+                return Result<Component>.Fail($"Failed to retrieve component: {ex.Message}");
             }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves multiple components by Ids OR Codes (repo decides precedence)
-        public async Task<Result<List<ComponentModel>>> GetComponentsListByIdOrCodeAsync(
+        public async Task<Result<List<Component>>> GetComponentsListByIdOrCodeAsync(
             IEnumerable<Guid>? ids = null,
             IEnumerable<string>? codes = null,
             CancellationToken ct = default)
@@ -110,42 +110,42 @@ namespace ASAPPVC.UI.Services
                 var filteredCodes = codes?.Where(s => !string.IsNullOrWhiteSpace(s));
 
                 var list = await _components.GetListByIdOrCodeAsync(filteredIds, filteredCodes, ct);
-                return Result<List<ComponentModel>>.Success(list);
+                return Result<List<Component>>.Success(list);
             }
             catch (Exception ex)
             {
-                return Result<List<ComponentModel>>.Fail($"Failed to retrieve components: {ex.Message}");
+                return Result<List<Component>>.Fail($"Failed to retrieve components: {ex.Message}");
             }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves full components list
-        public async Task<Result<List<ComponentModel>>> GetComponentsListAsync(CancellationToken ct = default)
+        public async Task<Result<List<Component>>> GetComponentsListAsync(CancellationToken ct = default)
         {
             try
             {
-                var list = await _components.GetListAsync(ct);
-                return Result<List<ComponentModel>>.Success(list);
+                var list = await _components.GetListOrderedByCodeAsync(ct);
+                return Result<List<Component>>.Success(list);
             }
             catch (Exception ex)
             {
-                return Result<List<ComponentModel>>.Fail($"Failed to list components: {ex.Message}");
+                return Result<List<Component>>.Fail($"Failed to list components: {ex.Message}");
             }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Searches components by term (name/code contains, case-insensitive)
-        public async Task<Result<List<ComponentModel>>> SearchComponentsAsync(string? term, CancellationToken ct = default)
+        public async Task<Result<List<Component>>> SearchComponentsAsync(string? term, CancellationToken ct = default)
         {
             try
             {
                 term ??= string.Empty;
                 var list = await _components.SearchAsync(term, ct);
-                return Result<List<ComponentModel>>.Success(list);
+                return Result<List<Component>>.Success(list);
             }
             catch (Exception ex)
             {
-                return Result<List<ComponentModel>>.Fail($"Failed to search components: {ex.Message}");
+                return Result<List<Component>>.Fail($"Failed to search components: {ex.Message}");
             }
         }
     }

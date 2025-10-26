@@ -7,7 +7,7 @@ namespace ASAPPVC.UI.Services
     /// <summary>
     /// Service contract for component-related business logic.
     /// Provides higher-level operations that orchestrate validation, normalization and
-    /// repository interactions for <see cref="ComponentModel"/> instances.
+    /// repository interactions for <see cref="Component"/> instances.
     /// </summary>
     public interface IComponentService
     {
@@ -18,10 +18,10 @@ namespace ASAPPVC.UI.Services
         /// </summary>
         /// <param name="vm">Create view model containing component details. Must not be null.</param>
         /// <returns>
-        /// A <see cref="Result{T}"/> carrying the created <see cref="ComponentModel"/> on success
+        /// A <see cref="Result{T}"/> carrying the created <see cref="Component"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<ComponentModel>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default);
+        Task<Result<Component>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves a single component by its internal identifier or by its human-friendly code.
@@ -30,10 +30,10 @@ namespace ASAPPVC.UI.Services
         /// <param name="id">Optional internal GUID identifier of the component.</param>
         /// <param name="code">Optional human-friendly component code.</param>
         /// <returns>
-        /// A <see cref="Result{T}"/> containing the found <see cref="ComponentModel"/>, or a failure result
+        /// A <see cref="Result{T}"/> containing the found <see cref="Component"/>, or a failure result
         /// if the component does not exist or an error occurs.
         /// </returns>
-        Task<Result<ComponentModel>> GetComponentByIdOrCodeAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
+        Task<Result<Component>> GetComponentByIdOrCodeAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves multiple components by a collection of internal ids and/or human-friendly codes.
@@ -42,18 +42,18 @@ namespace ASAPPVC.UI.Services
         /// <param name="ids">Optional collection of internal component ids to retrieve.</param>
         /// <param name="codes">Optional collection of human-friendly component codes to retrieve.</param>
         /// <returns>
-        /// A <see cref="Result{T}"/> containing a list of matching <see cref="ComponentModel"/> instances;
+        /// A <see cref="Result{T}"/> containing a list of matching <see cref="Component"/> instances;
         /// an empty list indicates no matches were found.
         /// </returns>
-        Task<Result<List<ComponentModel>>> GetComponentsListByIdOrCodeAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, CancellationToken ct = default);
+        Task<Result<List<Component>>> GetComponentsListByIdOrCodeAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves the full list of components. This is a read-only operation suitable for lookups and display.
         /// </summary>
         /// <returns>
-        /// A <see cref="Result{T}"/> containing a list of all <see cref="ComponentModel"/> instances.
+        /// A <see cref="Result{T}"/> containing a list of all <see cref="Component"/> instances.
         /// </returns>
-        Task<Result<List<ComponentModel>>> GetComponentsListAsync(CancellationToken ct = default);
+        Task<Result<List<Component>>> GetComponentsListAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Searches components using a free-text term. Implementations may search against name, code,
@@ -64,6 +64,6 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> containing a list of components that match the search term;
         /// an empty list indicates no matches.
         /// </returns>
-        Task<Result<List<ComponentModel>>> SearchComponentsAsync(string? term, CancellationToken ct = default);
+        Task<Result<List<Component>>> SearchComponentsAsync(string? term, CancellationToken ct = default);
     }
 }

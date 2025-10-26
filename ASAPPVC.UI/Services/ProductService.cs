@@ -35,29 +35,28 @@ namespace ASAPPVC.UI.Services
             await AttachImageIfPresentAsync(product, vm, ct);
 
             var addedProduct = await _productRepository.AddAsync(product, ct);
-            await _productRepository.SaveAsync();
+            await _productRepository.SaveAsync(ct);
             return (true, null, addedProduct?.Id);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         /// <summary>Get product including its components.</summary>
-        public async Task<ProductModel?> GetAsync(Guid id, CancellationToken ct = default)
+        public async Task<Product?> GetAsync(Guid id, CancellationToken ct = default)
         {
-            return await _productRepository.GetWithComponentsAsync(id, ct);
+            return await _productRepository.GetByIdOrCodeWithComponentsAsync(id: id, code: null, ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        /// <summary>List products ordered by name.</summary>
-        public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default)
+        public async Task<List<Product>> ListAsync(CancellationToken ct = default)
         {
-            return await _productRepository.ListOrderedByNameAsync(ct);
+            return await _productRepository.GetListAsync(ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Helpers
 
         /// <summary>Σ(component.UnitCost × quantity) across requested components.</summary>
-        private static decimal CalculateComponentsTotalCost(List<ProductComponentViewModel> productComponents, List<ComponentModel> allComponents)
+        private static decimal CalculateComponentsTotalCost(List<ProductComponentViewModel> productComponents, List<Component> allComponents)
         {
             // Handle empty lists early.
             if (productComponents.Count == 0 || allComponents.Count == 0)
@@ -81,9 +80,9 @@ namespace ASAPPVC.UI.Services
         /// <summary>
         /// Creates a ProductModel using the base price plus calculated parts total.
         /// </summary>
-        private static ProductModel BuildProductFromVm(CreateProductViewModel vm, decimal partsTotalCost)
+        private static Product BuildProductFromVm(CreateProductViewModel vm, decimal partsTotalCost)
         {
-            return new ProductModel
+            return new Product
             {
                 Name = vm.ProductName!.Trim(),
                 Price = vm.BasePrice + partsTotalCost,
@@ -95,9 +94,9 @@ namespace ASAPPVC.UI.Services
         /// Maps view-model component lines to bridge entities (ProductComponentModel).
         /// ProductId is assigned by repository when saving the aggregate.
         /// </summary>
-        private static List<ProductComponentModel> BuildComponentRows(List<ProductComponentViewModel> productComponents)
+        private static List<ProductComponent> BuildComponentRows(List<ProductComponentViewModel> productComponents)
         {
-            return productComponents.Select(pc => new ProductComponentModel
+            return productComponents.Select(pc => new ProductComponent
             {
                 // Repository will normalize ProductId when adding the product with components,
                 // so we don't assign ProductId here to avoid confusion.
@@ -109,7 +108,7 @@ namespace ASAPPVC.UI.Services
         /// <summary>
         /// Copies image from the posted file to the product entity if present.
         /// </summary>
-        private static async Task AttachImageIfPresentAsync(ProductModel product, CreateProductViewModel vm, CancellationToken ct)
+        private static async Task AttachImageIfPresentAsync(Product product, CreateProductViewModel vm, CancellationToken ct)
         {
             if (vm.ImageFile is { Length: > 0 })
             {

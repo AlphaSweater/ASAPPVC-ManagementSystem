@@ -38,11 +38,4 @@ namespace ASAPPVC.UI.Models
             };
         }
     }
-
-    public enum RoleType
-    {
-        Admin,
-        WarehouseManager,
-        Unassigned
-    }
 }

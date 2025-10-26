@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public class ProductRepository(AppDbContext db) : BaseRepository<ProductModel>(db), IProductRepository
+    public class ProductRepository(AppDbContext db) : BaseRepository<Product>(db), IProductRepository
     {
         // ---------- Reads ----------
 
-        public async Task<ProductModel?> GetByIdOrCodeAsync(
+        public async Task<Product?> GetByIdOrCodeAsync(
             Guid? id = null,
             string? code = null,
             CancellationToken ct = default)
@@ -25,7 +25,7 @@ namespace ASAPPVC.UI.Repositories
             return null;
         }
 
-        public async Task<ProductModel?> GetByIdOrCodeWithComponentsAsync(
+        public async Task<Product?> GetByIdOrCodeWithComponentsAsync(
             Guid? id = null,
             string? code = null,
             CancellationToken ct = default)
@@ -48,7 +48,7 @@ namespace ASAPPVC.UI.Repositories
             return null;
         }
 
-        public async Task<List<ProductModel>> GetListByIdsOrCodesAsync(
+        public async Task<List<Product>> GetListByIdsOrCodesAsync(
             IEnumerable<Guid>? ids = null,
             IEnumerable<string>? codes = null,
             CancellationToken ct = default)
@@ -64,18 +64,62 @@ namespace ASAPPVC.UI.Repositories
                 return await GetListByCodesAsync(codes!, asNoTracking: true, ct);
 
             // Neither provided => empty
-            return new List<ProductModel>(0);
+            return new List<Product>(0);
         }
 
-        public async Task<List<ProductModel>> GetListAsync(CancellationToken ct = default)
+        public async Task<List<Product>> GetListByIdsOrCodesWithComponentsAsync(
+            IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+            CancellationToken ct = default)
+        {
+            // Prefer IDs when any valid Guid is present
+            var hasValidIds = ids?.Any(g => g != Guid.Empty) == true;
+            if (hasValidIds)
+            {
+                var idSet = ids!.Where(g => g != Guid.Empty).ToHashSet();
+                return await _set.AsNoTracking()
+                                 .Where(p => idSet.Contains(p.Id))
+                                 .Include(p => p.ProductComponents)
+                                   .ThenInclude(pc => pc.Component)
+                                 .OrderBy(p => p.ProductCode)
+                                 .ToListAsync(ct);
+            }
+
+            // Fallback to codes when any non-blank code is present
+            var hasValidCodes = codes?.Any(s => !string.IsNullOrWhiteSpace(s)) == true;
+            if (hasValidCodes)
+            {
+                var codeSet = codes!.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                return await _set.AsNoTracking()
+                                 .Where(p => codeSet.Contains(p.ProductCode))
+                                 .Include(p => p.ProductComponents)
+                                   .ThenInclude(pc => pc.Component)
+                                 .OrderBy(p => p.ProductCode)
+                                 .ToListAsync(ct);
+            }
+
+            // Neither provided => empty
+            return new List<Product>(0);
+        }
+
+        public async Task<List<Product>> GetListAsync(CancellationToken ct = default)
         {
             var list = await ListAsync(asNoTracking: true, ct);
             return list.OrderBy(p => p.ProductCode).ToList();
         }
 
+        public async Task<List<Product>> GetListWithComponentsAsync(CancellationToken ct = default)
+        {
+            return await _set.AsNoTracking()
+                             .Include(p => p.ProductComponents)
+                               .ThenInclude(pc => pc.Component)
+                             .OrderBy(p => p.ProductCode)
+                             .ToListAsync(ct);
+        }
+
         // ---------- Search ----------
 
-        public Task<List<ProductModel>> SearchAsync(string term, CancellationToken ct = default)
+        public Task<List<Product>> SearchAsync(string term, CancellationToken ct = default)
         {
             term = (term ?? string.Empty).Trim();
             if (term.Length == 0)

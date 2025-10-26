@@ -1,4 +1,5 @@
 using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.Enums;
 using ASAPPVC.UI.Models.ViewModels.Auth;
 using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Identity;

@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public class ComponentRepository(AppDbContext db) : BaseRepository<ComponentModel>(db), IComponentRepository
+    public class ComponentRepository(AppDbContext db) : BaseRepository<Component>(db), IComponentRepository
     {
         protected override string? CodePropertyName => "ComponentCode";
 
         // ---------- Reads ----------
 
-        public async Task<ComponentModel?> GetByIdOrCodeAsync(
+        public async Task<Component?> GetByIdOrCodeAsync(
             Guid? id = null,
             string? code = null,
             CancellationToken ct = default)
@@ -27,7 +27,7 @@ namespace ASAPPVC.UI.Repositories
             return null;
         }
 
-        public async Task<List<ComponentModel>> GetListByIdOrCodeAsync(
+        public async Task<List<Component>> GetListByIdOrCodeAsync(
             IEnumerable<Guid>? ids = null,
             IEnumerable<string>? codes = null,
             CancellationToken ct = default)
@@ -35,18 +35,18 @@ namespace ASAPPVC.UI.Repositories
             // Prefer IDs when any valid Guid is present
             var hasValidIds = ids?.Any(g => g != Guid.Empty) == true;
             if (hasValidIds)
-                return await GetByIdsAsync(ids!, asNoTracking: true, ct);
+                return await GetListByIdsAsync(ids!, asNoTracking: true, ct);
 
             // Fallback to codes when any non-blank code is present
             var hasValidCodes = codes?.Any(s => !string.IsNullOrWhiteSpace(s)) == true;
             if (hasValidCodes)
-                return await GetByCodesAsync(codes!, asNoTracking: true, ct);
+                return await GetListByCodesAsync(codes!, asNoTracking: true, ct);
 
             // Neither provided => empty
-            return new List<ComponentModel>(0);
+            return new List<Component>(0);
         }
 
-        public async Task<List<ComponentModel>> GetListAsync(CancellationToken ct = default)
+        public async Task<List<Component>> GetListOrderedByCodeAsync(CancellationToken ct = default)
         {
             var list = await ListAsync(asNoTracking: true, ct);
             return list.OrderBy(c => c.ComponentCode).ToList();
@@ -54,13 +54,13 @@ namespace ASAPPVC.UI.Repositories
 
         // ---------- Search ----------
 
-        public Task<List<ComponentModel>> SearchAsync(string term, CancellationToken ct = default)
+        public Task<List<Component>> SearchAsync(string term, CancellationToken ct = default)
         {
             term = (term ?? string.Empty).Trim();
             if (term.Length == 0)
             {
                 // When no term, return full list ordered by ComponentCode (align with new default list behavior)
-                return GetListAsync(ct);
+                return GetListOrderedByCodeAsync(ct);
             }
 
             // Simple contains search on Name/ComponentCode; push to DB with AsNoTracking

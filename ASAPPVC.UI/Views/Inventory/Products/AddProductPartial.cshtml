@@ -1,7 +1,7 @@
 ﻿@model ASAPPVC.UI.Models.ViewModels.Inventory.Product.CreateProductViewModel
 @using ASAPPVC.UI.Models
 @{
-	var parts = (ViewData["Parts"] as List<ComponentModel>) ?? new();
+	var parts = (ViewData["Parts"] as List<Component>) ?? new();
 }
 
 <div class="add-product-partial">

@@ -23,6 +23,6 @@ namespace ASAPPVC.UI.Models
 
         public OrderModel? Order { get; set; }
 
-        public ProductModel? Product { get; set; }
+        public Product? Product { get; set; }
     }
 }

@@ -81,7 +81,7 @@ namespace ASAPPVC.UI.Controllers
         public async Task<IActionResult> ViewComponentInventory(CancellationToken ct)
         {
             var result = await _components.GetComponentsListAsync(ct);
-            var list = result.Ok && result.Value is not null ? result.Value : new List<ComponentModel>();
+            var list = result.Ok && result.Value is not null ? result.Value : new List<Component>();
             //returns the view with the part inventory path and the list of parts
             return View(ComponentInventoryPath, list);
         }
@@ -92,7 +92,7 @@ namespace ASAPPVC.UI.Controllers
         public async Task<IActionResult> AddProductGet(CancellationToken ct)
         {
             var result = await _components.GetComponentsListAsync(ct);
-            var components = result.Ok && result.Value is not null ? result.Value : new List<ComponentModel>();
+            var components = result.Ok && result.Value is not null ? result.Value : new List<Component>();
             ViewData["Components"] = components;
             return View(AddProductPath, new CreateProductViewModel());
         }

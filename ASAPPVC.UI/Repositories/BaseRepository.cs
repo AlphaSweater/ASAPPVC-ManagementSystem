@@ -73,7 +73,7 @@ namespace ASAPPVC.UI.Repositories
                 .SingleOrDefaultAsync(e => EF.Property<string>(e, CodePropertyName) == code, ct);
         }
 
-        public virtual async Task<List<T>> GetByIdsAsync(
+        public virtual async Task<List<T>> GetListByIdsAsync(
             IEnumerable<Guid> ids,
             bool asNoTracking = true,
             CancellationToken ct = default)
@@ -89,7 +89,7 @@ namespace ASAPPVC.UI.Repositories
                 .ToListAsync(ct);
         }
 
-        public virtual async Task<List<T>> GetByCodesAsync(
+        public virtual async Task<List<T>> GetListByCodesAsync(
             IEnumerable<string> codes,
             bool asNoTracking = true,
             CancellationToken ct = default)

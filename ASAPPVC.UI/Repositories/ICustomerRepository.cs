@@ -9,7 +9,7 @@ namespace ASAPPVC.UI.Repositories
     public interface ICustomerRepository : IBaseRepository<CustomerModel>
     {
         /// <summary>
-        /// Lists all customers. No-tracking by default - intended for read-only operations.
+        /// Lists all customers. No-tracking by default - intended for read-only operations.<br/>
         /// </summary>
         Task<List<CustomerModel>> ListAsync(CancellationToken ct = default);
     }

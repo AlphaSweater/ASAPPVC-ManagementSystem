@@ -4,9 +4,9 @@ namespace ASAPPVC.UI.Models.Mappers
 {
     public static class ProductMappings
     {
-        public static ProductModel ToDomain(this CreateProductViewModel vm)
+        public static Product ToDomain(this CreateProductViewModel vm)
         {
-            var product = new ProductModel
+            var product = new Product
             {
                 Name = vm.ProductName ?? string.Empty,
                 Price = vm.BasePrice,
@@ -22,13 +22,13 @@ namespace ASAPPVC.UI.Models.Mappers
             }
 
             product.ProductComponents = vm.Components
-                .Select(c => new ProductComponentModel { ComponentId = c.ComponentId, Quantity = c.Quantity })
+                .Select(c => new ProductComponent { ComponentId = c.ComponentId, Quantity = c.Quantity })
                 .ToList();
 
             return product;
         }
 
-        public static ProductViewModel ToViewModel(this ProductModel model)
+        public static ProductViewModel ToViewModel(this Product model)
         {
             return new ProductViewModel
             {
@@ -50,11 +50,11 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         // Map a single ProductComponentViewModel to ProductComponentModel.
-        public static ProductComponentModel ToDomain(this ProductComponentViewModel vm, Guid productId = default)
+        public static ProductComponent ToDomain(this ProductComponentViewModel vm, Guid productId = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
-            return new ProductComponentModel
+            return new ProductComponent
             {
                 ComponentId = vm.ComponentId,
                 Quantity = vm.Quantity,
@@ -63,7 +63,7 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         // Map a single ProductComponentModel to ProductComponentViewModel.
-        public static ProductComponentViewModel ToViewModel(this ProductComponentModel model)
+        public static ProductComponentViewModel ToViewModel(this ProductComponent model)
         {
             ArgumentNullException.ThrowIfNull(model);
 

@@ -11,12 +11,12 @@ namespace ASAPPVC.UI.Data
         public DbSet<CustomerModel> Customers { get; set; }
 
         // Components Table
-        public DbSet<ComponentModel> Components { get; set; }
+        public DbSet<Component> Components { get; set; }
 
         // Products and ProductComponents Bridge Tables
-        public DbSet<ProductModel> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
 
-        public DbSet<ProductComponentModel> ProductComponents { get; set; }
+        public DbSet<ProductComponent> ProductComponents { get; set; }
 
         // Orders and OrderProducts Bridge Tables
         public DbSet<OrderModel> Orders { get; set; }
@@ -30,13 +30,13 @@ namespace ASAPPVC.UI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProductComponentModel>()
+            modelBuilder.Entity<ProductComponent>()
                 .HasOne(pp => pp.Product)
                 .WithMany(p => p.ProductComponents)
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ProductComponentModel>()
+            modelBuilder.Entity<ProductComponent>()
                 .HasOne(pp => pp.Component)
                 .WithMany()
                 .HasForeignKey(pp => pp.ComponentId)

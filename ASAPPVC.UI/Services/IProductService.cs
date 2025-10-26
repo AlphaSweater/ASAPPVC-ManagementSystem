@@ -7,7 +7,7 @@ namespace ASAPPVC.UI.Services
     {
         Task<(bool Ok, string? Error, Guid? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default);
 
-        Task<ProductModel?> GetAsync(Guid id, CancellationToken ct = default);
-        Task<List<ProductModel>> ListAsync(CancellationToken ct = default);
+        Task<Product?> GetAsync(Guid id, CancellationToken ct = default);
+        Task<List<Product>> ListAsync(CancellationToken ct = default);
     }
 }
