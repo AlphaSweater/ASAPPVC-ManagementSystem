@@ -19,7 +19,7 @@ namespace ASAPPVC.UI.Models
     {
         public Guid Id { get; init; }
         public string ProductCode { get; init; } = string.Empty;
-        public string ProductName { get; init; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
         public decimal Price { get; init; }
         public string Description { get; init; } = string.Empty;
 
@@ -29,13 +29,9 @@ namespace ASAPPVC.UI.Models
         // Distinct number of components linked to this product
         public int ComponentCount { get; init; }
 
-        // Sum of quantities required across all components (for "pieces in a set")
-        public decimal? TotalComponentQuantity { get; init; }
-
         // Optional computed fields for UI display
         public string DisplayPrice => Price.ToString("C"); // UI currency format
 
-        // Helpful label if you want to show "3 comps" quickly in a chip/badge
         public string ComponentsBadge => $"{ComponentCount} comp{(ComponentCount == 1 ? "" : "s")}";
     }
 
@@ -57,9 +53,9 @@ namespace ASAPPVC.UI.Models
         public string Description { get; init; } = string.Empty;
 
         // Optional image display (converted to base64 in controller/service)
-        public string? ImageBase64 { get; init; }
+        public string? ImageBase64DataUrl { get; init; }
 
-        // Linked parts/components
+        // Linked components
         public List<ProductComponentVm> Components { get; init; } = new();
     }
 
@@ -74,6 +70,10 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class CreateProductVm
     {
+        [Display(Name = "Product Code")]
+        [StringLength(64)]
+        public string? ProductCode { get; set; }
+
         [Display(Name = "Product Name")]
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
@@ -89,13 +89,13 @@ namespace ASAPPVC.UI.Models
         [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        [Display(Name = "Image File (optional)")]
-        public byte[]? ImageBytes { get; set; }
+        [Display(Name = "Image (optional)")]
+        public byte[]? ImageData { get; set; }
 
-        public string? ImageContentType { get; set; }
+        public string? ImageType { get; set; }
 
         [Display(Name = "Components")]
-        [MinLength(1)]
+        [MinLength(1, ErrorMessage = "A Product requires at least 1 Component")]
         public List<CreateProductComponentVm> Components { get; set; } = new();
     }
 
@@ -113,6 +113,11 @@ namespace ASAPPVC.UI.Models
         [Required(ErrorMessage = "Product ID is required.")]
         public Guid Id { get; set; }
 
+        [Display(Name = "Product Code")]
+        [Required(ErrorMessage = "Product code is required.")]
+        [StringLength(64)]
+        public string ProductCode { get; set; } = string.Empty;
+
         [Display(Name = "Product Name")]
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
@@ -128,10 +133,10 @@ namespace ASAPPVC.UI.Models
         [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        [Display(Name = "Image File (optional)")]
-        public byte[]? ImageBytes { get; set; }
+        [Display(Name = "Image (optional)")]
+        public byte[]? ImageData { get; set; }
 
-        public string? ImageContentType { get; set; }
+        public string? ImageType { get; set; }
 
         [Display(Name = "Components")]
         [MinLength(1)]

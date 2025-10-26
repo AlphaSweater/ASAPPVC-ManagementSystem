@@ -101,7 +101,7 @@ namespace ASAPPVC.UI.Services
                 // Repository will normalize ProductId when adding the product with components,
                 // so we don't assign ProductId here to avoid confusion.
                 ComponentId = pc.ComponentId,
-                Quantity = pc.Quantity
+                QuantityRequired = pc.Quantity
             }).ToList();
         }
 
@@ -115,7 +115,7 @@ namespace ASAPPVC.UI.Services
                 using var ms = new MemoryStream();
                 await vm.ImageFile.CopyToAsync(ms, ct);
                 product.ImageBytes = ms.ToArray();
-                product.ImageContentType = vm.ImageFile.ContentType;
+                product.ImageType = vm.ImageFile.ContentType;
             }
         }
     }

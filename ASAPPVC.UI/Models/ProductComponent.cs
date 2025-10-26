@@ -25,7 +25,7 @@ namespace ASAPPVC.UI.Models
         // Quantity of this Component in the Product
         [Required]
         [Range(typeof(decimal), "0.01", "999999", ErrorMessage = "Quantity must be greater than zero")]
-        public decimal Quantity { get; set; } = 1m;
+        public decimal QuantityRequired { get; set; } = 1m;
 
         // Navigation properties
         public Component? Component { get; set; }

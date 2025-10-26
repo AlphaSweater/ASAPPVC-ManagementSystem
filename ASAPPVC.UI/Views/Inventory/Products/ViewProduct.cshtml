@@ -4,9 +4,9 @@
 
 	// Pre-calculate the image source string for cleaner HTML
 	string? imgSrc = null;
-	if (Model?.ImageBytes != null && !string.IsNullOrEmpty(Model.ImageContentType))
+	if (Model?.ImageBytes != null && !string.IsNullOrEmpty(Model.ImageType))
 	{
-		imgSrc = $"data:{Model.ImageContentType};base64,{Convert.ToBase64String(Model.ImageBytes)}";
+		imgSrc = $"data:{Model.ImageType};base64,{Convert.ToBase64String(Model.ImageBytes)}";
 	}
 }
 
@@ -71,11 +71,11 @@
 						foreach (var line in Model.ProductComponents)
 						{
 							var unitCost = line.Component?.UnitCost ?? 0;
-							var subtotal = unitCost * line.Quantity;
+							var subtotal = unitCost * line.QuantityRequired;
 							grandTotal += subtotal;
 							<tr>
 								<td>@line.Component?.Name</td>
-								<td class="align-right">@line.Quantity</td>
+								<td class="align-right">@line.QuantityRequired</td>
 								<td class="align-right">@unitCost.ToString("C")</td>
 								<td class="align-right">@subtotal.ToString("C")</td>
 							</tr>
