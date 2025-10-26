@@ -1,9 +1,14 @@
 ﻿using ASAPPVC.UI.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.UI.Models
 {
+    /// <summary>
+    /// Bridge entity linking a Product to a Component with a required Quantity (per set).
+    /// </summary>
+    [Index(nameof(ProductId), nameof(ComponentId), IsUnique = true)]
     public class ProductComponent
     {
         // Internal GUID primary key

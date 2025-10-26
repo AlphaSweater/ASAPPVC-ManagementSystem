@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text.Json;
 
 namespace ASAPPVC.UI.Data
 {
@@ -19,7 +21,7 @@ namespace ASAPPVC.UI.Data
         public DbSet<ProductComponent> ProductComponents { get; set; }
 
         // Orders and OrderProducts Bridge Tables
-        public DbSet<OrderModel> Orders { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         public DbSet<OrderProductModel> OrderProducts { get; set; }
 
@@ -42,7 +44,7 @@ namespace ASAPPVC.UI.Data
                 .HasForeignKey(pp => pp.ComponentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<OrderModel>()
+            modelBuilder.Entity<Order>()
                 .HasOne(o => o.Customer)
                 .WithMany()
                 .HasForeignKey(o => o.CustomerId)
@@ -59,6 +61,31 @@ namespace ASAPPVC.UI.Data
                 .WithMany()
                 .HasForeignKey(op => op.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure JSON storage for Modifiers on Product using helper methods to avoid expression tree optional-arg issues
+            var modifiersConverter = new ValueConverter<ProductModifiers, string>(
+                v => SerializeModifiers(v),
+                v => DeserializeModifiers(v));
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Modifiers)
+                .HasConversion(modifiersConverter)
+                .HasColumnType("TEXT")
+                .IsRequired(false);
+        }
+
+        // Helpers used by the ValueConverter (must be static to be usable in expression trees)
+        private static string SerializeModifiers(ProductModifiers? mods)
+        {
+            return JsonSerializer.Serialize(mods ?? new ProductModifiers());
+        }
+
+        private static ProductModifiers DeserializeModifiers(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return new ProductModifiers();
+
+            return JsonSerializer.Deserialize<ProductModifiers>(json) ?? new ProductModifiers();
         }
     }
 }

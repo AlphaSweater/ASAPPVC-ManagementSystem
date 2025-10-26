@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public class OrderRepository(AppDbContext db) : BaseRepository<OrderModel>(db), IOrderRepository
+    public class OrderRepository(AppDbContext db) : BaseRepository<Order>(db), IOrderRepository
     {
         public Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default)
         {
@@ -13,7 +13,7 @@ namespace ASAPPVC.UI.Repositories
             return Task.CompletedTask;
         }
 
-        public async Task<List<OrderModel>> ListAsync(CancellationToken ct = default)
+        public async Task<List<Order>> ListAsync(CancellationToken ct = default)
         {
             return await _set
                 .AsNoTracking()
@@ -23,7 +23,7 @@ namespace ASAPPVC.UI.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<OrderModel?> GetWithDetailsAsync(Guid id, CancellationToken ct = default)
+        public async Task<Order?> GetWithDetailsAsync(Guid id, CancellationToken ct = default)
         {
             return await _set
                 .AsNoTracking()

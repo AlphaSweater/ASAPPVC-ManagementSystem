@@ -8,100 +8,183 @@ namespace ASAPPVC.UI.Utils
 
     public interface ICodeGenerator
     {
-        Task<string> GenerateAsync(CodeType type, string? name = null, string? relatedId = null);
+        Task<string> GenerateAsync(CodeRequest request, CancellationToken ct = default);
     }
 
     #endregion Interface
 
+    #region Request Model
+
+    /// <summary>
+    /// Strongly-typed request for code generation.
+    /// </summary>
+    public sealed class CodeRequest
+    {
+        public CodeType Type { get; init; }
+
+        // Optional descriptive category: e.g. "WIN" (window), "DRR" (door)
+        public string? Category { get; init; }
+
+        // Optional version or revision number (for products / picking slips)
+        public int? Version { get; init; }
+
+        // Optional related code (used by PickingSlips to tie to Order)
+        public string? RelatedCode { get; init; }
+
+        // Optional explicit timestamp for backfills
+        public DateTime? When { get; init; }
+    }
+
+    #endregion Request Model
+
     #region Implementation
 
-    public class CodeGenerator(ICodeCountersRepository countersRepo) : ICodeGenerator
+    public class CodeGenerator : ICodeGenerator
     {
-        private readonly ICodeCountersRepository _countersRepo = countersRepo;
+        private readonly ICodeCountersRepository _counters;
 
-        public async Task<string> GenerateAsync(CodeType type, string? name = null, string? relatedId = null)
+        public CodeGenerator(ICodeCountersRepository countersRepo)
         {
-            string prefix = GetPrefix(type);
-            string baseCode = prefix;
+            _counters = countersRepo;
+        }
 
-            string? periodKey = type == CodeType.Order ? DateTime.UtcNow.ToString("yyyyMM") : null;
+        public async Task<string> GenerateAsync(CodeRequest request, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
 
-            // Get next counter number
-            int nextNumber = await GetNextCounterAsync(type, periodKey);
+            var now = request.When?.ToUniversalTime() ?? DateTime.UtcNow;
+            string prefix = GetPrefix(request.Type);
+            string codeBase;
 
-            // Build base code depending on type
-            switch (type)
+            // determine if period-based
+            string? periodKey = request.Type == CodeType.Order ? now.ToString("yyyyMM") : null;
+
+            // determine counter scope
+            string scopeKey = $"{request.Type}-{periodKey ?? "GLOBAL"}";
+
+            // get next number
+            int next = await GetNextCounterAsync(scopeKey, ct);
+
+            // derive category and version
+            var cat3 = SanitizeAlphaNum(request.Category, 3);
+            var rev2 = $"V{Math.Clamp(request.Version ?? 1, 1, 99):00}";
+
+            // build code
+            switch (request.Type)
             {
                 case CodeType.Product:
+                    // PRD(-CAT3)?-SERIAL(-REV2)?-CHK
+                    codeBase = $"{prefix}"
+                             + (string.IsNullOrEmpty(cat3) ? "" : $"-{cat3}")
+                             + $"-{next:0000}"
+                             + (request.Version.HasValue ? $"-{rev2}" : "");
+                    break;
+
                 case CodeType.Component:
-                    var nameCode = GenerateNameCode(name ?? "Item", 4);
-                    baseCode += $"_{nameCode}_{nextNumber:000}";
+                    // CMP(-CAT3)?-SERIAL-CHK
+                    codeBase = $"{prefix}"
+                             + (string.IsNullOrEmpty(cat3) ? "" : $"-{cat3}")
+                             + $"-{next:00000}";
                     break;
 
                 case CodeType.Order:
-                    baseCode += $"_{periodKey}_{nextNumber:000}";
+                    // ORD-YYYYMM-SERIAL-CHK
+                    codeBase = $"{prefix}-{now:yyyyMM}-{next:0000}";
                     break;
 
                 case CodeType.PickingSlip:
-                    if (string.IsNullOrWhiteSpace(relatedId))
-                        throw new ArgumentException("relatedId required for PickingSlip generation.");
-                    baseCode += $"_{relatedId}_V{nextNumber}";
+                    // PSL-ORDxxxx-Vxx-CHK
+                    if (string.IsNullOrWhiteSpace(request.RelatedCode))
+                        throw new ArgumentException("RelatedCode required for PickingSlip generation.");
+                    var ordShort = DeriveOrderShort(request.RelatedCode) ?? $"ORD{next:0000}";
+                    codeBase = $"{prefix}-{ordShort}-{rev2}";
+                    break;
+
+                default:
+                    codeBase = $"{prefix}-{next:0000}";
                     break;
             }
 
-            var code = baseCode.ToUpperInvariant();
+            codeBase = codeBase.ToUpperInvariant();
 
-            // append a simple mod-10 checksum to help detect typos
-            var checksum = ChecksumUtils.ComputeChecksum(code);
-            return $"{code}-{checksum}";
+            // compute checksum (simple base36 mod)
+            var checksum = ComputeChecksum36(codeBase);
+
+            return $"{codeBase}-{checksum}";
         }
 
-        private async Task<int> GetNextCounterAsync(CodeType type, string? periodKey)
+        // ---------------------------------------------------------------------
+
+        private async Task<int> GetNextCounterAsync(string scopeKey, CancellationToken ct)
         {
-            // Use periodKey for date-based resets (e.g., orders reset monthly)
-            var counter = await _countersRepo.GetByTypeAndPeriodAsync(type.ToString(), periodKey);
+            var counter = await _counters.GetByTypeAndPeriodAsync("SCOPE", scopeKey, ct);
 
             if (counter == null)
             {
                 counter = new CodeCounters
                 {
-                    CodeType = type.ToString(),
-                    PeriodKey = periodKey,
+                    CodeType = "SCOPE",
+                    PeriodKey = scopeKey,
                     LastNumber = 1,
                     UpdatedAt = DateTime.UtcNow
                 };
-
-                counter = await _countersRepo.AddAndSaveAsync(counter);
+                await _counters.AddAndSaveAsync(counter, ct);
                 return counter.LastNumber;
             }
-            else
-            {
-                counter.LastNumber++;
-                counter.UpdatedAt = DateTime.UtcNow;
-            }
 
-            await _countersRepo.SaveAsync();
+            counter.LastNumber++;
+            counter.UpdatedAt = DateTime.UtcNow;
+            await _counters.SaveAsync(ct);
             return counter.LastNumber;
         }
 
-        private string GetPrefix(CodeType type)
+        private static string GetPrefix(CodeType type)
         {
             return type switch
             {
-                CodeType.Product => "PRO",
+                CodeType.Product => "PRD",
                 CodeType.Component => "CMP",
                 CodeType.Order => "ORD",
-                CodeType.PickingSlip => "PIC",
+                CodeType.PickingSlip => "PSL",
                 _ => "GEN"
             };
         }
 
-        private string GenerateNameCode(string name, int maxLen)
+        private static string SanitizeAlphaNum(string? input, int maxLen)
         {
-            var clean = Regex.Replace(name.ToUpper(), @"[^A-Z0-9]", "");
-            if (clean.Length > maxLen)
-                clean = clean[..maxLen];
-            return clean;
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            var clean = Regex.Replace(input.ToUpperInvariant(), @"[^A-Z0-9]", "");
+            return clean.Length <= maxLen ? clean : clean[..maxLen];
+        }
+
+        private static string? DeriveOrderShort(string? orderCode)
+        {
+            if (string.IsNullOrWhiteSpace(orderCode))
+                return null;
+
+            var m = Regex.Match(orderCode.ToUpperInvariant(), @"ORD[^0-9]*([0-9]{3,6})");
+            if (m.Success)
+                return $"ORD{m.Groups[1].Value[^4..]}";
+            return null;
+        }
+
+        private static char ComputeChecksum36(string s)
+        {
+            var up = Regex.Replace(s.ToUpperInvariant(), @"\s+", "");
+            int sum = 0;
+            foreach (var ch in up)
+            {
+                int v = ch switch
+                {
+                    >= '0' and <= '9' => ch - '0',
+                    >= 'A' and <= 'Z' => 10 + (ch - 'A'),
+                    _ => 0
+                };
+                sum = (sum * 31 + v) % 36;
+            }
+            return (char)(sum < 10 ? '0' + sum : 'A' + (sum - 10));
         }
     }
 

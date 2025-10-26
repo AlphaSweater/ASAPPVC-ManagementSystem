@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ASAPPVC.UI.Models
 {
     [Index(nameof(OrderCode), IsUnique = true)]
-    public class OrderModel
+    public class Order
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();

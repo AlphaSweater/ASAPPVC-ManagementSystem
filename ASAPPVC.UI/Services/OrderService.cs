@@ -16,7 +16,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //creates a new order with associated products
-        public async Task<(bool Ok, string? Error, OrderModel? Order)> CreateAsync(CreateOrderViewModel vm, CancellationToken ct = default)
+        public async Task<(bool Ok, string? Error, Order? Order)> CreateAsync(CreateOrderViewModel vm, CancellationToken ct = default)
         {
             //validates input and returns an error message if invalid
             if (vm == null)
@@ -26,7 +26,7 @@ namespace ASAPPVC.UI.Services
                 return (false, "Please select at least one product.", null);
 
             //Create main order
-            var order = new OrderModel
+            var order = new Order
             {
                 CustomerId = vm.CustomerId,
                 OrderDate = vm.OrderDate ?? DateTime.UtcNow
@@ -61,14 +61,14 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a single order with details by ID
-        public async Task<OrderModel?> GetAsync(Guid id, CancellationToken ct = default)
+        public async Task<Order?> GetAsync(Guid id, CancellationToken ct = default)
         {
             return await _repo.GetWithDetailsAsync(id, ct);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a list of orders with customer and products
-        public async Task<List<OrderModel>> ListAsync(CancellationToken ct = default)
+        public async Task<List<Order>> ListAsync(CancellationToken ct = default)
         {
             return await _repo.ListAsync(ct);
         }

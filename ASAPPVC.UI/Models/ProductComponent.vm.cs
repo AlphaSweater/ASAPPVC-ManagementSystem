@@ -21,13 +21,14 @@ namespace ASAPPVC.UI.Models
         public Guid Id { get; init; }
         public Guid ProductId { get; init; }
         public Guid ComponentId { get; init; }
+
         public string ComponentCode { get; init; } = string.Empty;
         public string ComponentName { get; init; } = string.Empty;
+
         public Unit Unit { get; init; }
         public decimal QuantityRequired { get; init; }
-        public decimal UnitCost { get; init; }
 
-        // Optional computed cost for UI
+        public decimal UnitCost { get; init; }
         public decimal TotalCost => UnitCost * QuantityRequired;
 
         public string ShortFormattedQuantity => Unit.ToDisplay(QuantityRequired, shortForm: true);
@@ -42,17 +43,9 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class CreateProductComponentVm
     {
-        [Display(Name = "Product")]
-        [Required(ErrorMessage = "Product is required.")]
-        public Guid ProductId { get; set; }
-
         [Display(Name = "Component")]
         [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
-
-        [Display(Name = "Unit of Measure")]
-        [Required(ErrorMessage = "Unit of Measure is required.")]
-        public Unit Unit { get; init; }
 
         [Display(Name = "Quantity Required")]
         [Required(ErrorMessage = "Quantity is required.")]
@@ -69,19 +62,12 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class EditProductComponentVm
     {
-        public Guid Id { get; set; }
-
-        [Display(Name = "Product")]
-        [Required(ErrorMessage = "Product is required.")]
-        public Guid ProductId { get; set; }
+        /// <summary>Existing bridge entity Id if present (null for new entities on edit).</summary>
+        public Guid? ProductComponentId { get; set; }
 
         [Display(Name = "Component")]
         [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
-
-        [Display(Name = "Unit of Measure")]
-        [Required(ErrorMessage = "Unit of Measure is required.")]
-        public Unit Unit { get; init; }
 
         [Display(Name = "Quantity Required")]
         [Required(ErrorMessage = "Quantity is required.")]
