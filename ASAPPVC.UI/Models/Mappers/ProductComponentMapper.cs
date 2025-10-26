@@ -3,8 +3,9 @@
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Converts between ProductComponent bridge rows and their corresponding VMs.
-    /// Designed to mirror ProductMapper patterns for muscle memory.
+    /// Converts between <see cref="ProductComponent"/> bridge entities and their ViewModels
+    /// (<see cref="CreateProductComponentVm"/>, <see cref="EditProductComponentVm"/>, <see cref="ProductComponentVm"/>).
+    /// Uses shared helpers for merging duplicate lines, normalizing quantities and resolving units.
     /// </summary>
     public static class ProductComponentMapper
     {
@@ -13,12 +14,10 @@ namespace ASAPPVC.UI.Models.Mappers
         // ------------------------------------------------------------
 
         /// <summary>
-        /// Converts a ProductComponent domain entity to a read-only VM <br/>
-        /// for display inside product detail views.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Converts a single <see cref="ProductComponent"/> domain entity
+        /// into a read-only view model for use in product detail or summary views.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Domain → VM (single)
         /// var vm = ProductComponentMapper.ToVm(productComponent);
         /// </code>
         /// </summary>
@@ -40,11 +39,10 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         /// <summary>
-        /// Converts a collection of ProductComponents to read-only VMs.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Converts a collection of <see cref="ProductComponent"/> entities to read-only view models.
+        /// Returns an empty list if <paramref name="items"/> is null.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Domain → VMs (collection)
         /// var vmLines = ProductComponentMapper.ToVms(product.ProductComponents);
         /// </code>
         /// </summary>
@@ -61,20 +59,17 @@ namespace ASAPPVC.UI.Models.Mappers
         // ------------------------------------------------------------
 
         /// <summary>
-        /// Create a ProductComponent from a create-line VM.<br/>
-        /// Provide the parent productId and a Unit lookup dictionary.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Creates a new <see cref="ProductComponent"/> from a create-line view model.<br/>
+        /// Requires the parent product ID and a lookup dictionary mapping ComponentId → Unit.
+        /// Falls back to <see cref="Unit.Piece"/> if the unit cannot be resolved.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Create → Domain
-        /// var components = await _components.GetByIdsAsync(vm.Components.Select(c => c.ComponentId), ct);
         /// var unitLookup = components.ToDictionary(c => c.Id, c => c.Unit);
-        ///
         /// var line = ProductComponentMapper.FromCreateVm(productId, createLineVm, unitLookup);
         /// </code>
         /// </summary>
-        /// <param name="productId">The parent Product Id.</param>
-        /// <param name="componentUnitLookup">A lookup dictionary to resolve ComponentId → Unit.</param>
+        /// <param name="productId">The parent Product identifier.</param>
+        /// <param name="componentUnitLookup">A lookup dictionary to resolve units for each component.</param>
         public static ProductComponent FromCreateVm(
             Guid productId,
             CreateProductComponentVm vm,
@@ -93,15 +88,11 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         /// <summary>
-        /// Bulk helper: merge duplicates by ComponentId and create ProductComponent rows using a Unit lookup dictionary.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Bulk helper: merges duplicates (by ComponentId) and creates ProductComponent rows.<br/>
+        /// Automatically sums quantities and resolves units using the provided lookup.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Create lines → Domain (bulk)
-        /// var components = await _components.GetByIdsAsync(vm.Components.Select(c => c.ComponentId), ct);
-        /// var unitLookup = components.ToDictionary(c => c.Id, c => c.Unit);
-        ///
-        /// var lines = ProductComponentMapper.FromCreateVms(productId, createVm.Components, unitLookup);
+        /// var lines = ProductComponentMapper.FromCreateVms(productId, vm.Components, unitLookup);
         /// </code>
         /// </summary>
         public static List<ProductComponent> FromCreateVms(
@@ -111,18 +102,14 @@ namespace ASAPPVC.UI.Models.Mappers
         {
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
-            if (items is null)
-                return new();
-
-            return items
+            return (items ?? Enumerable.Empty<CreateProductComponentVm>())
                 .GroupBy(i => i.ComponentId)
-                .Select(g => new ProductComponent
+                .Select(g => new CreateProductComponentVm
                 {
-                    ProductId = productId,
                     ComponentId = g.Key,
-                    Unit = ResolveUnit(componentUnitLookup, g.Key),
-                    QuantityRequired = NormalizeQuantity(g.Sum(x => x.QuantityRequired))
+                    QuantityRequired = g.Sum(x => x.QuantityRequired)
                 })
+                .Select(vm => FromCreateVm(productId, vm, componentUnitLookup))
                 .ToList();
         }
 
@@ -131,15 +118,11 @@ namespace ASAPPVC.UI.Models.Mappers
         // ------------------------------------------------------------
 
         /// <summary>
-        /// Apply an edit line to an existing ProductComponent.<br/>
-        /// Optionally refresh Unit via the lookup (e.g., if Component changed).
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Applies an edit-line view model to an existing <see cref="ProductComponent"/> entity.<br/>
+        /// Recalculates quantity and optionally updates the unit if the component changed
+        /// or if no unit was previously assigned.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Edit line → Apply to existing row
-        /// var components = await _components.GetByIdsAsync(vm.Components.Select(c => c.ComponentId), ct);
-        /// var unitLookup = components.ToDictionary(c => c.Id, c => c.Unit);
-        ///
         /// ProductComponentMapper.ApplyEditVm(existingLine, editLineVm, unitLookup);
         /// </code>
         /// </summary>
@@ -161,15 +144,61 @@ namespace ASAPPVC.UI.Models.Mappers
                 target.Unit = ResolveUnit(componentUnitLookup, vm.ComponentId);
         }
 
+        /// <summary>
+        /// Bulk helper: applies a collection of edit-line view models to an existing product’s components.<br/>
+        /// Updates existing lines, creates missing ones, and merges duplicates by ComponentId.
+        /// Automatically sums duplicate quantities and resolves missing units.
+        /// <br/><br/><b>Example:</b>
+        /// <code>
+        /// product.ProductComponents = ProductComponentMapper.ApplyEditVms(
+        ///     product.ProductComponents,
+        ///     editVm.Components,
+        ///     unitLookup);
+        /// </code>
+        /// </summary>
+        public static List<ProductComponent> ApplyEditVms(
+            IEnumerable<ProductComponent> existingComponents,
+            IEnumerable<EditProductComponentVm> editVms,
+            IDictionary<Guid, Unit> componentUnitLookup)
+        {
+            ArgumentNullException.ThrowIfNull(componentUnitLookup);
+
+            var existingByComponent = (existingComponents ?? Enumerable.Empty<ProductComponent>())
+                .ToDictionary(x => x.ComponentId, x => x);
+
+            return (editVms ?? Enumerable.Empty<EditProductComponentVm>())
+                .GroupBy(vm => vm.ComponentId)
+                .Select(g => new EditProductComponentVm
+                {
+                    ComponentId = g.Key,
+                    QuantityRequired = g.Sum(x => x.QuantityRequired)
+                })
+                .Select(vm =>
+                {
+                    var line = existingByComponent.TryGetValue(vm.ComponentId, out var existing)
+                        ? existing
+                        : new ProductComponent();
+                    ApplyEditVm(line, vm, componentUnitLookup);
+                    return line;
+                })
+                .ToList();
+        }
+
         // ------------------------------------------------------------
         // Utilities
         // ------------------------------------------------------------
 
+        /// <summary>
+        /// Ensures the quantity is non-negative and rounded to four decimals.
+        /// </summary>
         private static decimal NormalizeQuantity(decimal q)
         {
             return q < 0 ? 0 : Math.Round(q, 4, MidpointRounding.AwayFromZero);
         }
 
+        /// <summary>
+        /// Resolves the component’s unit from the lookup or defaults to <see cref="Unit.Piece"/>.
+        /// </summary>
         private static Unit ResolveUnit(IDictionary<Guid, Unit> lookup, Guid componentId)
         {
             return lookup.TryGetValue(componentId, out var u) ? u : Unit.Piece;

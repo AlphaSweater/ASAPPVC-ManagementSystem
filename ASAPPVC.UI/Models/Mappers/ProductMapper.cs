@@ -3,8 +3,9 @@
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Provides conversion between <see cref="Product"/> domain entities and their corresponding
-    /// ViewModels (<see cref="CreateProductVm"/>, <see cref="EditProductVm"/>, <see cref="ProductListVm"/>, <see cref="ProductDetailVm"/>).
+    /// Converts between <see cref="Product"/> domain entities and their ViewModels
+    /// (<see cref="CreateProductVm"/>, <see cref="EditProductVm"/>, <see cref="ProductListVm"/>, <see cref="ProductDetailVm"/>).
+    /// Uses <see cref="ProductComponentMapper"/> for component-line mapping to keep behavior consistent.
     /// </summary>
     public static class ProductMapper
     {
@@ -13,11 +14,10 @@ namespace ASAPPVC.UI.Models.Mappers
         // ------------------------------------------------------------
 
         /// <summary>
-        /// Converts a <see cref="Product"/> to a lightweight <see cref="ProductListVm"/> for table/card lists.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Converts a <see cref="Product"/> to a lightweight <see cref="ProductListVm"/> for lists/cards.
+        /// Counts component lines from <see cref="Product.ProductComponents"/> (null-safe).
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Domain → List
         /// var listVms = products.Select(ProductMapper.ToListVm).ToList();
         /// </code>
         /// </summary>
@@ -43,11 +43,11 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         /// <summary>
-        /// Converts a <see cref="Product"/> to a full <see cref="ProductDetailVm"/> with optional inline image data URL.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Converts a <see cref="Product"/> to a full <see cref="ProductDetailVm"/>.
+        /// Delegates line mapping to <see cref="ProductComponentMapper.ToVms(System.Collections.Generic.IEnumerable{ProductComponent})"/>.
+        /// Optionally includes an inline Base64 image data URL.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Domain → Detail
         /// var detailVm = ProductMapper.ToDetailVm(product);
         /// </code>
         /// </summary>
@@ -55,15 +55,7 @@ namespace ASAPPVC.UI.Models.Mappers
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var components = (product.ProductComponents ?? new List<ProductComponent>())
-                .Select(pc => new ProductComponentVm
-                {
-                    ComponentId = pc.ComponentId,
-                    ComponentName = pc.Component?.Name ?? "(unknown)",
-                    Unit = pc.Component?.Unit ?? Unit.Piece,
-                    QuantityRequired = pc.QuantityRequired
-                })
-                .ToList();
+            var components = ProductComponentMapper.ToVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
 
             return new ProductDetailVm
             {
@@ -85,16 +77,19 @@ namespace ASAPPVC.UI.Models.Mappers
         // ------------------------------------------------------------
 
         /// <summary>
-        /// Creates a new <see cref="Product"/> domain entity from a <see cref="CreateProductVm"/>.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Creates a new <see cref="Product"/> from a <see cref="CreateProductVm"/>.
+        /// Component lines are created via <see cref="ProductComponentMapper.FromCreateVms(Guid,System.Collections.Generic.IEnumerable{CreateProductComponentVm},System.Collections.Generic.IDictionary{System.Guid, Unit})"/>,
+        /// which merges duplicate components and resolves units using the given lookup (defaults to <see cref="Unit.Piece"/> when missing).
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Create → Domain
-        /// var domain = ProductMapper.FromCreateVm(createVm, () => CodeGenerator.Next());
+        /// var domain = ProductMapper.FromCreateVm(createVm, () => CodeGenerator.Next(), unitLookup);
         /// await _repo.AddAsync(domain, ct);
         /// </code>
         /// </summary>
-        public static Product FromCreateVm(CreateProductVm vm, Func<string>? codeGenerator = null)
+        public static Product FromCreateVm(
+            CreateProductVm vm,
+            Func<string>? codeGenerator = null,
+            IDictionary<Guid, Unit>? componentUnitLookup = null)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -111,21 +106,30 @@ namespace ASAPPVC.UI.Models.Mappers
                 Colour = vm.Colour
             };
 
-            product.ProductComponents = MapCreateComponents(vm.Components, product.Id);
+            // Lines via shared mapper (handles duplicate merge + unit resolution).
+            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
+            product.ProductComponents = ProductComponentMapper.FromCreateVms(
+                product.Id,
+                vm.Components ?? Enumerable.Empty<CreateProductComponentVm>(),
+                lookup);
+
             return product;
         }
 
         /// <summary>
-        /// Updates an existing <see cref="Product"/> with data from an <see cref="EditProductVm"/>.
-        /// <br/>
-        /// <br/><b>Examples:</b>
+        /// Applies an <see cref="EditProductVm"/> to an existing <see cref="Product"/>.
+        /// Component lines are updated via <see cref="ProductComponentMapper.ApplyEditVms(System.Collections.Generic.IEnumerable{ProductComponent},System.Collections.Generic.IEnumerable{EditProductComponentVm},System.Collections.Generic.IDictionary{System.Guid, Unit})"/>,
+        /// which updates/creates/merges by <c>ComponentId</c> and re-resolves units when needed.
+        /// <br/><br/><b>Example:</b>
         /// <code>
-        /// Edit → Apply
-        /// ProductMapper.ApplyEditVm(existingProduct, editVm);
+        /// ProductMapper.ApplyEditVm(existingProduct, editVm, unitLookup);
         /// await _repo.SaveAsync(ct);
         /// </code>
         /// </summary>
-        public static void ApplyEditVm(Product target, EditProductVm vm)
+        public static void ApplyEditVm(
+            Product target,
+            EditProductVm vm,
+            IDictionary<Guid, Unit>? componentUnitLookup = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
@@ -143,7 +147,7 @@ namespace ASAPPVC.UI.Models.Mappers
             // filled → replace
             if (vm.ImageData is null)
             {
-                // no change
+                // leave as-is
             }
             else if (vm.ImageData.Length == 0)
             {
@@ -156,48 +160,17 @@ namespace ASAPPVC.UI.Models.Mappers
                 target.ImageType = NormalizeString(vm.ImageType);
             }
 
-            // Map modifiers
+            // Simple modifiers
             target.Category = vm.Category;
             target.Material = vm.Material;
             target.Colour = vm.Colour;
 
-            target.ProductComponents = MapEditComponents(vm.Components, target.Id);
-        }
+            // Delegate edit-line mapping to shared mapper (null-safe on both sides).
+            var existingLines = target.ProductComponents ?? Enumerable.Empty<ProductComponent>();
+            var editLines = vm.Components ?? Enumerable.Empty<EditProductComponentVm>();
+            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
 
-        // ------------------------------------------------------------
-        // Private mapping helpers
-        // ------------------------------------------------------------
-
-        private static List<ProductComponent> MapCreateComponents(List<CreateProductComponentVm> items, Guid productId)
-        {
-            if (items is null || items.Count == 0)
-                return new();
-
-            return items
-                .GroupBy(i => i.ComponentId)
-                .Select(g => new ProductComponent
-                {
-                    ProductId = productId,
-                    ComponentId = g.Key,
-                    QuantityRequired = g.Sum(x => x.QuantityRequired)
-                })
-                .ToList();
-        }
-
-        private static List<ProductComponent> MapEditComponents(List<EditProductComponentVm> items, Guid productId)
-        {
-            if (items is null || items.Count == 0)
-                return new();
-
-            return items
-                .GroupBy(i => i.ComponentId)
-                .Select(g => new ProductComponent
-                {
-                    ProductId = productId,
-                    ComponentId = g.Key,
-                    QuantityRequired = g.Sum(x => x.QuantityRequired)
-                })
-                .ToList();
+            target.ProductComponents = ProductComponentMapper.ApplyEditVms(existingLines, editLines, lookup);
         }
 
         // ------------------------------------------------------------
@@ -222,6 +195,7 @@ namespace ASAPPVC.UI.Models.Mappers
                     return gen;
             }
 
+            // Fallback: short stable unique-ish code prefix
             return $"PROD-{Guid.NewGuid():N}".Substring(0, 13);
         }
 
