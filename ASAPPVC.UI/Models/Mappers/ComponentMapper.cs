@@ -1,8 +1,8 @@
 ﻿namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Maps between Component domain entities and their ViewModels.
-    /// Mirrors the API of ProductMapper for consistency.
+    /// Maps between Component domain entities and their ViewModels.<br/>
+    /// ViewModels (<see cref="CreateComponentVm"/>, <see cref="EditComponentVm"/>, <see cref="ComponentListVm"/>, <see cref="ComponentDetailVm"/>).
     /// </summary>
     public static class ComponentMapper
     {
@@ -12,6 +12,12 @@
 
         /// <summary>
         /// Convert a Component to a lightweight list VM.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → List
+        /// var list = components.Select(ComponentMapper.ToListVm).ToList();
+        /// </code>
         /// </summary>
         public static ComponentListVm ToListVm(Component component)
         {
@@ -33,6 +39,12 @@
         /// <summary>
         /// Convert a Component to a detail VM.
         /// If <paramref name="usedInProductsCount"/> is null, tries to infer from the reverse nav.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → Detail (with inferred usage count)
+        /// var detail = ComponentMapper.ToDetailVm(component);
+        /// </code>
         /// </summary>
         public static ComponentDetailVm ToDetailVm(
             Component component,
@@ -65,6 +77,13 @@
 
         /// <summary>
         /// Materialize a new Component from Create VM. Trims/normalizes input.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Create → Domain
+        /// var comp = ComponentMapper.FromCreateVm(createVm, () => CodeGen.NextComponent());
+        /// await _components.AddAsync(comp, ct);
+        /// </code>
         /// </summary>
         public static Component FromCreateVm(CreateComponentVm vm, Func<string>? codeGenerator = null)
         {
@@ -85,6 +104,13 @@
 
         /// <summary>
         /// Apply edits from Edit VM to an existing Component (in-place).
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Edit → Apply
+        /// ComponentMapper.ApplyEditVm(existing, editVm);
+        /// await _repo.SaveAsync(ct);
+        /// </code>
         /// </summary>
         public static void ApplyEditVm(Component target, EditComponentVm vm)
         {
@@ -156,29 +182,5 @@
             var b64 = Convert.ToBase64String(data);
             return $"data:{safeMime};base64,{b64}";
         }
-
-        // ------------------------------------------------------------
-        // Usage examples
-        // ------------------------------------------------------------
-
-        /// <example>
-        /// <code>
-        /// // Create → Domain
-        /// var comp = ComponentMapper.FromCreateVm(createVm, () => CodeGen.NextComponent());
-        /// await _components.AddAsync(comp, ct);
-        ///
-        /// // Domain → List
-        /// var list = components.Select(ComponentMapper.ToListVm).ToList();
-        ///
-        /// // Domain → Detail (with inferred usage count)
-        /// var detail = ComponentMapper.ToDetailVm(component);
-        ///
-        /// // Edit → Apply
-        /// ComponentMapper.ApplyEditVm(existing, editVm);
-        /// await _repo.SaveAsync(ct);
-        /// </code>
-        /// </example>
-        public static void __UsageDocOnly()
-        { /* docs only */ }
     }
 }

@@ -14,6 +14,12 @@ namespace ASAPPVC.UI.Models.Mappers
 
         /// <summary>
         /// Converts a <see cref="Product"/> to a lightweight <see cref="ProductListVm"/> for table/card lists.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → List
+        /// var listVms = products.Select(ProductMapper.ToListVm).ToList();
+        /// </code>
         /// </summary>
         public static ProductListVm ToListVm(Product product)
         {
@@ -35,6 +41,12 @@ namespace ASAPPVC.UI.Models.Mappers
 
         /// <summary>
         /// Converts a <see cref="Product"/> to a full <see cref="ProductDetailVm"/> with optional inline image data URL.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → Detail
+        /// var detailVm = ProductMapper.ToDetailVm(product);
+        /// </code>
         /// </summary>
         public static ProductDetailVm ToDetailVm(Product product, bool includeImageDataUrl = true)
         {
@@ -68,6 +80,13 @@ namespace ASAPPVC.UI.Models.Mappers
 
         /// <summary>
         /// Creates a new <see cref="Product"/> domain entity from a <see cref="CreateProductVm"/>.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Create → Domain
+        /// var domain = ProductMapper.FromCreateVm(createVm, () => CodeGenerator.Next());
+        /// await _repo.AddAsync(domain, ct);
+        /// </code>
         /// </summary>
         public static Product FromCreateVm(CreateProductVm vm, Func<string>? codeGenerator = null)
         {
@@ -89,6 +108,13 @@ namespace ASAPPVC.UI.Models.Mappers
 
         /// <summary>
         /// Updates an existing <see cref="Product"/> with data from an <see cref="EditProductVm"/>.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Edit → Apply
+        /// ProductMapper.ApplyEditVm(existingProduct, editVm);
+        /// await _repo.SaveAsync(ct);
+        /// </code>
         /// </summary>
         public static void ApplyEditVm(Product target, EditProductVm vm)
         {
@@ -198,29 +224,5 @@ namespace ASAPPVC.UI.Models.Mappers
             var b64 = Convert.ToBase64String(data);
             return $"data:{safeType};base64,{b64}";
         }
-
-        // ------------------------------------------------------------
-        // Usage Examples
-        // ------------------------------------------------------------
-
-        /// <example>
-        /// <code>
-        /// // Create → Domain
-        /// var domain = ProductMapper.FromCreateVm(createVm, () => CodeGenerator.Next());
-        /// await _repo.AddAsync(domain, ct);
-        ///
-        /// // Domain → List
-        /// var listVms = products.Select(ProductMapper.ToListVm).ToList();
-        ///
-        /// // Domain → Detail
-        /// var detailVm = ProductMapper.ToDetailVm(product);
-        ///
-        /// // Edit → Apply
-        /// ProductMapper.ApplyEditVm(existingProduct, editVm);
-        /// await _repo.SaveAsync(ct);
-        /// </code>
-        /// </example>
-        public static void __UsageDocOnly()
-        { /* documentation only */ }
     }
 }
