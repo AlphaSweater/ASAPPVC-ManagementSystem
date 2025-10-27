@@ -16,6 +16,9 @@
                                                                               "ComponentMapper.cs":  [
                                                                                                          "IComponentMapper.cs"
                                                                                                      ],
+                                                                              "ImageService.cs":  [
+                                                                                                      "IImageService.cs"
+                                                                                                  ],
                                                                               "OrderService.cs":  [
                                                                                                       "IOrderService.cs"
                                                                                                   ],
@@ -37,35 +40,35 @@
                                                                               "ProductComponentMapper.cs":  [
                                                                                                                 "IProductComponentMapper.cs"
                                                                                                             ],
-                                                                              "BaseRepository.cs":  [
-                                                                                                        "IBaseRepository.cs"
-                                                                                                    ],
                                                                               "OrderProductMapper.cs":  [
                                                                                                             "IOrderProductMapper.cs"
                                                                                                         ],
+                                                                              "UserRepository.cs":  [
+                                                                                                        "IUserRepository.cs"
+                                                                                                    ],
                                                                               "CodeCountersRepository.cs":  [
                                                                                                                 "ICodeCountersRepository.cs"
                                                                                                             ],
-                                                                              "ComponentService.cs":  [
-                                                                                                          "IComponentService.cs"
-                                                                                                      ],
                                                                               "UserService.cs":  [
                                                                                                      "IUserService.cs"
                                                                                                  ],
                                                                               "ProductService.cs":  [
                                                                                                         "IProductService.cs"
                                                                                                     ],
-                                                                              "AuthService.cs":  [
-                                                                                                     "IAuthService.cs"
-                                                                                                 ],
+                                                                              "ComponentService.cs":  [
+                                                                                                          "IComponentService.cs"
+                                                                                                      ],
                                                                               "CustomerService.cs":  [
                                                                                                          "ICustomerService.cs"
                                                                                                      ],
+                                                                              "AuthService.cs":  [
+                                                                                                     "IAuthService.cs"
+                                                                                                 ],
                                                                               "CustomerRepository.cs":  [
                                                                                                             "ICustomerRepository.cs"
                                                                                                         ],
-                                                                              "UserRepository.cs":  [
-                                                                                                        "IUserRepository.cs"
+                                                                              "BaseRepository.cs":  [
+                                                                                                        "IBaseRepository.cs"
                                                                                                     ],
                                                                               "ProductRepository.cs":  [
                                                                                                            "IProductRepository.cs"

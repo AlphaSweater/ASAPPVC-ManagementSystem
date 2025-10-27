@@ -1,4 +1,5 @@
 ﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.General;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +60,19 @@ namespace ASAPPVC.UI.Data
                 .WithMany()
                 .HasForeignKey(op => op.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Minimal owned-type configuration for AppImage on Product and Component
+            modelBuilder.Entity<Product>().OwnsOne(p => p.Image, b =>
+            {
+                b.Property(i => i.ContentType).HasMaxLength(64);
+                b.Property(i => i.Sha256).HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<Component>().OwnsOne(c => c.Image, b =>
+            {
+                b.Property(i => i.ContentType).HasMaxLength(64);
+                b.Property(i => i.Sha256).HasMaxLength(64);
+            });
         }
     }
 }

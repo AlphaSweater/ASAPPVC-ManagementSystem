@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.UI.Models.General
 {
     /// <summary>
     /// Tracks last used sequence numbers for each code type and (optionally) period.

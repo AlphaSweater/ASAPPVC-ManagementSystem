@@ -1,4 +1,4 @@
-using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.General;
 using ASAPPVC.UI.Utils;
 
 namespace ASAPPVC.UI.Services

@@ -1,4 +1,5 @@
 ﻿using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.UI.Models.General;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,10 +27,7 @@ namespace ASAPPVC.UI.Models
         public string Description { get; set; } = string.Empty;
 
         // Optional image data
-        public byte[] ImageData { get; set; } = Array.Empty<byte>();
-
-        [MaxLength(50)]
-        public string ImageType { get; set; } = string.Empty;
+        public AppImage? Image { get; set; }
 
         // Navigation property for parts (bridge rows)
         public List<ProductComponent> ProductComponents { get; set; } = new();

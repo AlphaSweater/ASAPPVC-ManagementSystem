@@ -1,5 +1,5 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.UI.Models.General;
 using ASAPPVC.UI.Repositories;
 using ASAPPVC.UI.Utils;
 using System.Text;

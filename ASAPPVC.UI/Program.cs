@@ -40,7 +40,20 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// configure options
+builder.Services.Configure<ImageServiceOptions>(opt =>
+{
+	opt.MaxBytes = 5 * 1024 * 1024;
+	opt.MaxWidth = 2048;
+	opt.MaxHeight = 2048;
+	opt.ThumbWidth = 400;
+	opt.ThumbHeight = 400;
+	opt.AllowedContentTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+	opt.ForceEncodeAs = "image/webp";
+});
+
 // registering services
+builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<ICodeGenerationService, CodeGenerationService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
