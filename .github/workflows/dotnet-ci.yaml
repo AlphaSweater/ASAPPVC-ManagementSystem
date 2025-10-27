@@ -50,7 +50,7 @@ jobs:
       - name: 🔧 Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      # ── SonarQube BEGIN (non-blocking) ─────────────────────────────
+      # ── SonarQube BEGIN (non-blocking)
       - name: 📡 SonarQube begin (report only)
         continue-on-error: true
         env:
@@ -60,11 +60,9 @@ jobs:
           dotnet-sonarscanner begin \
             /k:"AlphaSweater_ASAPPVC-Management_a00e5c53-35f0-4e1b-962f-423d84353d3c" \
             /d:sonar.host.url="${SONAR_HOST_URL}" \
-            /d:sonar.login="${SONAR_TOKEN}" \
+            /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/*coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
-            # If using SonarCloud, add:  /o:"your_org"
-      # ───────────────────────────────────────────────────────────────
 
       - name: 🏗️ Build
         run: dotnet build --no-restore -c Release
@@ -103,15 +101,15 @@ jobs:
         if: steps.find_tests.outputs.has_tests != 'true'
         run: echo "No test projects found. Skipping tests successfully."
 
-      # ── SonarQube END (non-blocking) ──────────────────
+      # ── SonarQube END (non-blocking)
       - name: 📤 SonarQube end (upload results)
         if: always()
         continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"
+        run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
-      # ── Optional “block only on serious vulns” gate ────────────────
+      # ── Optional “block only on serious vulns” gate
       - name: 🚦 Fail on CRITICAL/BLOCKER vulnerabilities
         if: ${{ env.FAIL_ON_CRITICAL_VULNS == 'true' }}
         env:
