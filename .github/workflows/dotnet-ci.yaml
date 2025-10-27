@@ -1,4 +1,4 @@
-﻿name: CI • Build & Verify (.NET)
+name: CI • Build & Verify (.NET)
 
 on:
   workflow_call: {}
@@ -6,10 +6,13 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 env:
   DOTNET_VERSION: '8.0.x'
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  # Value to block on serious vulns.
+  FAIL_ON_CRITICAL_VULNS: 'true'
 
 jobs:
   # ───────────────────────────
@@ -36,6 +39,33 @@ jobs:
       - name: 📦 Restore NuGet packages
         run: dotnet restore --locked-mode
 
+      - name: 🧭 Install SonarScanner (non-blocking)
+        continue-on-error: true
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: ➕ Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      # jq is used in the optional gate
+      - name: 🔧 Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # ── SonarQube BEGIN (non-blocking) ─────────────────────────────
+      - name: 📡 SonarQube begin (report only)
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          dotnet-sonarscanner begin \
+            /k:"AlphaSweater_ASAPPVC-Management_a00e5c53-35f0-4e1b-962f-423d84353d3c" \
+            /d:sonar.host.url="${SONAR_HOST_URL}" \
+            /d:sonar.login="${SONAR_TOKEN}" \
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*coverage.opencover.xml" \
+            /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
+            # If using SonarCloud, add:  /o:"your_org"
+      # ───────────────────────────────────────────────────────────────
+
       - name: 🏗️ Build
         run: dotnet build --no-restore -c Release
 
@@ -51,16 +81,72 @@ jobs:
             echo "has_tests=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: ✅ Run tests
+      - name: ✅ Run tests (with coverage per project)
         if: steps.find_tests.outputs.has_tests == 'true'
+        shell: bash
         run: |
           echo "Discovered test projects:"
           cat tests.txt
           while IFS= read -r proj; do
+            base="$(basename "$proj" .csproj)"
+            outdir="$(dirname "$proj")/TestResults"
+            mkdir -p "$outdir"
             echo "▶ dotnet test $proj"
-            dotnet test "$proj" --no-build -c Release --logger "trx;LogFileName=test-results.trx"
+            dotnet test "$proj" --no-build -c Release \
+              --logger "trx;LogFileName=${base}-test-results.trx" \
+              /p:CollectCoverage=true \
+              /p:CoverletOutputFormat=opencover \
+              /p:CoverletOutput="${outdir}/${base}-coverage.opencover.xml"
           done < tests.txt
 
       - name: ℹ️ No tests found - skipping
         if: steps.find_tests.outputs.has_tests != 'true'
         run: echo "No test projects found. Skipping tests successfully."
+
+      # ── SonarQube END (non-blocking) ──────────────────
+      - name: 📤 SonarQube end (upload results)
+        if: always()
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.login="${SONAR_TOKEN}"
+
+      # ── Optional “block only on serious vulns” gate ────────────────
+      - name: 🚦 Fail on CRITICAL/BLOCKER vulnerabilities
+        if: ${{ env.FAIL_ON_CRITICAL_VULNS == 'true' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          PROJECT_KEY: "AlphaSweater_ASAPPVC-Management_a00e5c53-35f0-4e1b-962f-423d84353d3c"
+        shell: bash
+        run: |
+          # Wait briefly for the Compute Engine to finish the analysis
+          deadline=$((SECONDS+120))
+          in_progress=1
+          while [ $SECONDS -lt $deadline ] && [ $in_progress -eq 1 ]; do
+            resp=$(curl -sf -u "${SONAR_TOKEN}:" \
+              "${SONAR_HOST_URL}/api/ce/component?componentKey=${PROJECT_KEY}" || true)
+            status=$(echo "$resp" | jq -r '.current.status // "NONE"')
+            # statuses: PENDING, IN_PROGRESS, SUCCESS, FAILED, CANCELED
+            if [ "$status" = "PENDING" ] || [ "$status" = "IN_PROGRESS" ]; then
+              sleep 5
+            else
+              in_progress=0
+            fi
+          done
+
+          # Count serious (CRITICAL/BLOCKER) vulnerabilities
+          issues=$(curl -sf -u "${SONAR_TOKEN}:" \
+            --get "${SONAR_HOST_URL}/api/issues/search" \
+            --data-urlencode "componentKeys=${PROJECT_KEY}" \
+            --data-urlencode "types=VULNERABILITY" \
+            --data-urlencode "severities=CRITICAL,BLOCKER" \
+            --data-urlencode "resolved=false" | jq -r '.total // 0')
+
+          echo "Serious vulnerability count: $issues"
+          if [ "$issues" -gt 0 ]; then
+            echo "❌ Blocking: Found CRITICAL/BLOCKER vulnerabilities."
+            exit 1
+          else
+            echo "✅ No serious vulnerabilities found; not blocking."
+          fi
