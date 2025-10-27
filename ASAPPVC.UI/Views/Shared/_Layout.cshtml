@@ -9,6 +9,9 @@
 	var explicitHide = ViewData["HideNavbar"] is bool b && b;
 	var hideSidebar = explicitHide || excludedRoutes.Contains(routeKey);
 	var current = routeKey.ToLowerInvariant();
+
+	var isWarehouseOpen = current == "inventory/viewproductinventory"
+								|| current == "inventory/viewcomponentinventory";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -113,6 +116,72 @@
 					background: #fff;
 				}
 
+		.sb-group {
+			margin: 4px 6px;
+		}
+
+		.sb-toggle {
+			display: grid;
+			grid-template-columns: 28px 1fr auto;
+			align-items: center;
+			gap: 12px;
+			padding: 10px 12px;
+			width: 100%;
+			margin: 0;
+			border: 0;
+			border-radius: 10px;
+			background: transparent;
+			color: #ffffffcc;
+			font-weight: 600;
+			text-align: left;
+			cursor: pointer;
+			transition: background .15s ease, color .15s ease;
+		}
+
+			.sb-toggle:hover {
+				background: rgba(255,255,255,0.12);
+				color: #fff;
+			}
+
+		.sb-caret {
+			transition: transform .15s ease;
+		}
+
+		.sb-group[aria-expanded="true"] .sb-caret {
+			transform: rotate(180deg);
+		}
+
+		.sb-subnav {
+			overflow: hidden;
+			max-height: 0;
+			transition: max-height .2s ease;
+			margin-left: 34px; /* indent under icon column */
+		}
+
+		.sb-group[aria-expanded="true"] .sb-subnav {
+			max-height: 400px;
+		}
+
+		.sb-subitem {
+			display: block;
+			color: #ffffffcc;
+			text-decoration: none;
+			padding: 8px 10px;
+			margin: 4px 0;
+			border-radius: 8px;
+			transition: background .15s ease, color .15s ease;
+		}
+
+			.sb-subitem:hover {
+				background: rgba(255,255,255,0.12);
+				color: #fff;
+			}
+
+			.sb-subitem.active {
+				background: rgba(255,255,255,0.18);
+				color: #fff;
+			}
+
 		/* Main content */
 		.main {
 			min-height: 100%;
@@ -128,20 +197,23 @@
 			margin-left: 0;
 		}
 
-		/* Responsive collapse */
+		/* (left as-is) Responsive collapse */
 		.media (max-width: 900px) {
-			: root {
-				--sb-w: 78px;
-			}
+			: root
 
-			.sb-item {
-				grid-template-columns: 1fr;
-				justify-items: center;
-			}
+		{
+			--sb-w: 78px;
+		}
 
-			.sb-label {
-				display: none;
-			}
+		.sb-item {
+			grid-template-columns: 1fr;
+			justify-items: center;
+		}
+
+		.sb-label {
+			display: none;
+		}
+
 		}
 	</style>
 </head>
@@ -159,29 +231,39 @@
 				<a class="sb-item @(current == "home/index" ? "active" : "")" asp-controller="Home" asp-action="Index">
 					<span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
 				</a>
-				<a class="sb-item @(current == "customers/index" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
-					<span class="sb-icon">👥</span><span class="sb-label">Customers</span>
+
+				<a class="sb-item @(current == "customer/viewcustomer" ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
+					<span class="sb-icon">👥</span><span class="sb-label">Manage Customers</span>
 				</a>
-				<a class="sb-item @(current == "orders/index" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
-					<span class="sb-icon">🚚</span><span class="sb-label">Order</span>
-				</a>
-				<a class="sb-item @(current == "transactions/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewProductInventory">
-					<span class="sb-icon">📦</span><span class="sb-label">Product inventory</span>
-				</a>
-				<a class="sb-item @(current == "stock/index" ? "active" : "")" asp-controller="Inventory" asp-action="ViewComponentInventory">
-					<span class="sb-icon">📦</span><span class="sb-label">Component Inventory</span>
-				</a>
-				<a class="sb-item @(current == "financial/index" ? "active" : "")" asp-controller="Financial" asp-action="Index">
-					<span class="sb-icon">💼</span><span class="sb-label">Financial</span>
-				</a>
-				<a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Finance" asp-action="Transactions">
-					<span class="sb-icon">🛠️</span><span class="sb-label">Transactions</span>
-				</a>
-				<a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="Order" asp-action="AddOrder">
-					<span class="sb-icon">🛠️</span><span class="sb-label">order add</span>
-				</a>
-				<a class="sb-item @(current == "settings/index" ? "active" : "")" asp-controller="StockTake" asp-action="StockTake">
-					<span class="sb-icon">🛠️</span><span class="sb-label">Stock Take</span>
+
+				<section class="sb-group" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
+					<button type="button" class="sb-toggle" aria-controls="grp-warehouse" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
+						<span class="sb-icon">🏭</span>
+						<span class="sb-label">Manage Warehouse</span>
+						<span class="sb-caret">▾</span>
+					</button>
+
+					<div id="grp-warehouse" class="sb-subnav">
+						<a class="sb-subitem @(current == "inventory/viewcomponentinventory" ? "active" : "")"
+						   asp-controller="Inventory" asp-action="WarehouseDashboard">
+							Warehouse Dashboard
+						</a>
+						
+						<a class="sb-subitem @(current == "inventory/viewproductinventory" ? "active" : "")"
+						   asp-controller="Inventory" asp-action="ViewProductInventory">
+							Manage Products
+						</a>
+
+						<a class="sb-subitem @(current == "inventory/viewcomponentinventory" ? "active" : "")"
+						   asp-controller="Inventory" asp-action="ViewComponentInventory">
+							Manage Components
+						</a>
+					</div>
+				</section>
+
+
+				<a class="sb-item @(current == "order/vieworders" ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
+					<span class="sb-icon">🚚</span><span class="sb-label">Manage Order</span>
 				</a>
 			</nav>
 		</aside>
@@ -196,6 +278,18 @@
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
+
+	<script>
+		document.querySelectorAll('.sb-group').forEach(function (group) {
+			var btn = group.querySelector('.sb-toggle');
+			btn.addEventListener('click', function () {
+				var open = group.getAttribute('aria-expanded') === 'true';
+				group.setAttribute('aria-expanded', String(!open));
+				btn.setAttribute('aria-expanded', String(!open));
+			});
+		});
+	</script>
+
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
