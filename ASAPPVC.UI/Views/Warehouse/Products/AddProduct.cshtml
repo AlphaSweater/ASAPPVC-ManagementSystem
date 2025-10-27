@@ -1,5 +1,5 @@
-﻿@using ASAPPVC.UI.Models.ViewModels.Inventory.Product
-@model CreateProductViewModel
+﻿@using ASAPPVC.UI.Models
+@model ASAPPVC.UI.Models.CreateProductVm
 @{
 	ViewData["Title"] = "Add New Product";
 	var components = ViewData["Components"] as List<ASAPPVC.UI.Models.Component>;
@@ -10,16 +10,14 @@
 <div class="viewport">
 	<div class="form-container">
 		<div class="form-header-section">
-			<a class="back-link" href="javascript:history.back()">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
-					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
-				</svg>
+			<a href="javascript:void(0);" class="back-link" onclick="window.history.back();">
+				<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
 				Back
 			</a>
 			<h2 class="main-title">@ViewData["Title"]</h2>
 		</div>
 
-		<form id="addProductForm" asp-controller="Inventory" asp-action="AddProductPost" method="post" enctype="multipart/form-data">
+		<form id="addProductForm" asp-controller="Products" asp-action="AddProduct" method="post" enctype="multipart/form-data">
 			@Html.AntiForgeryToken()
 			<div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
 
@@ -32,21 +30,21 @@
 					<button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
 						Upload Image
 					</button>
-					<input id="imageFile" asp-for="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
-					<span asp-validation-for="ImageFile" class="text-danger"></span>
+					<input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+					<!-- Note: CreateProductVm does not include IFormFile; controller/service should read Request.Form.Files if used -->
 				</div>
 
 				<!-- Right: Form -->
 				<div class="form-fields-grid">
 					<div class="group">
-						<label asp-for="ProductName" class="label"></label>
-						<input asp-for="ProductName" class="input" placeholder="Enter product name" />
-						<span asp-validation-for="ProductName" class="text-danger"></span>
+						<label asp-for="Name" class="label"></label>
+						<input asp-for="Name" class="input" placeholder="Enter product name" />
+						<span asp-validation-for="Name" class="text-danger"></span>
 					</div>
 					<div class="group">
-						<label asp-for="BasePrice" class="label"></label>
-						<input asp-for="BasePrice" class="input" step="0.01" placeholder="e.g. R299.99" />
-						<span asp-validation-for="BasePrice" class="text-danger"></span>
+						<label asp-for="Price" class="label"></label>
+						<input asp-for="Price" class="input" step="0.01" placeholder="e.g. R299.99" />
+						<span asp-validation-for="Price" class="text-danger"></span>
 					</div>
 					<div class="group full-width">
 						<label asp-for="Description" class="label"></label>
@@ -76,7 +74,7 @@
 							<tfoot>
 								<tr>
 									<td colspan="3" class="align-right">Grand Total:</td>
-									<td class="align-right grand-total" id="grandTotal">R 0.00</td>
+									<td class="align-right grand-total" id="grandTotal">R0.00</td>
 									<td></td>
 								</tr>
 							</tfoot>
@@ -116,7 +114,11 @@
 		const grandEl = document.getElementById('grandTotal');
 
 		// Serialize server-side components into JS array (ids are GUID strings)
-		const partsData = @Html.Raw(Json.Serialize((components ?? new List<Component>()).Select(p => new { id = p.Id.ToString(), name = p.Name, price = p.UnitCost })));
+		const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+			(components != null)
+				? components.Select(p => new { id = p.Id.ToString(), name = (p as dynamic)?.Name ?? string.Empty, price = (p as dynamic)?.UnitCost ??0 })
+				: System.Linq.Enumerable.Empty<object>()
+		));
 
 		const formatMoney = (n) => `R ${Number(n ||0).toFixed(2)}`;
 
@@ -131,7 +133,7 @@
 				if (!sel || !qtyInput || !unitPriceCell || !subtotalCell) return;
 
 				const selectedPartId = sel.value; // GUID string or empty
-				const quantity = parseInt(qtyInput.value,10) ||0;
+				const quantity = parseFloat(qtyInput.value) ||0;
 				const part = partsData.find(p => p.id === selectedPartId);
 
 				let unitPrice =0;
@@ -171,13 +173,13 @@
 					</select>
 				</td>
 				<td style="text-align:center;">
-					<input class="input qty-input" type="number" name="Components[${index}].Quantity" value="1" min="1" />
+					<input class="input qty-input" type="number" name="Components[${index}].QuantityRequired" value="1" min="0.01" step="0.01" />
 				</td>
 				<td class="align-right unit-price">R0.00</td>
 				<td class="align-right subtotal">R0.00</td>
 				<td style="text-align:center;">
 					<button type="button" class="btn btn-remove">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="002020" fill="currentColor" width="20" height="20"><path d="M6.285.22a.75.75000-1.061.06L8.9410l-3.723.72a.75.750101.061.06L1011.06l3.723.72a.75.750101.06-1.06L11.0610l3.72-3.72a.75.75000-1.06-1.06L108.946.285.22z" /></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="002020" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M6.285.22a.75.750011.06.06L8.942.02l3.72-.72a.75.75001.98.98l-.723.722.021.59a.75.75001-1.061.06L11.068.94l-3.72.72a.75.75001-.98-.98l.72-3.72L2.224.94A.75.750013.283.88l3.005-3.665z" clip-rule="evenodd"/></svg>
 					</button>
 				</td>
 			`;

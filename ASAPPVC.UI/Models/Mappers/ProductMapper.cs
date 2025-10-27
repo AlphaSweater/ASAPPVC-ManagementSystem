@@ -1,5 +1,4 @@
 using ASAPPVC.UI.Models.Enums;
-
 using ASAPPVC.UI.Services;
 
 namespace ASAPPVC.UI.Models.Mappers
@@ -9,8 +8,8 @@ namespace ASAPPVC.UI.Models.Mappers
     /// </summary>
     public class ProductMapper(
         IProductComponentMapper productComponentMapper,
-        ICodeGenerationService? codeGenerationService = null,
-        IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IProductMapper
+    ICodeGenerationService? codeGenerationService = null,
+     IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IProductMapper
     {
         private readonly IProductComponentMapper _productComponentMapper = productComponentMapper ?? throw new ArgumentNullException(nameof(productComponentMapper));
 
@@ -31,7 +30,8 @@ namespace ASAPPVC.UI.Models.Mappers
                 Name = product.Name,
                 Price = product.Price,
                 Description = product.Description,
-                HasImage = product.ImageData is { Length: > 0 } && !string.IsNullOrWhiteSpace(product.ImageType),
+                HasImage = product.Image?.Data is { Length: > 0 },
+                ThumbUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image/thumb" : null,
                 ComponentCount = pcs.Count,
                 Category = product.Category,
                 Material = product.Material,
@@ -52,7 +52,7 @@ namespace ASAPPVC.UI.Models.Mappers
                 Name = product.Name,
                 Price = product.Price,
                 Description = product.Description,
-                ImageBase64DataUrl = includeImageDataUrl ? AsDataUrlOrNull(product.ImageData, product.ImageType) : null,
+                ImageUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image" : null,
                 Components = components,
                 Category = product.Category,
                 Material = product.Material,
@@ -64,7 +64,7 @@ namespace ASAPPVC.UI.Models.Mappers
         // ViewModels → Domain
         // ------------------------------------------------------------
 
-        public Product FromCreateVm(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null)
+        public async Task<Product> FromCreateVmAsync(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -74,24 +74,35 @@ namespace ASAPPVC.UI.Models.Mappers
                 Name = NormalizeString(vm.Name),
                 Description = NormalizeString(vm.Description),
                 Price = NormalizeMoney(vm.Price),
-                ImageData = vm.ImageData ?? Array.Empty<byte>(),
-                ImageType = NormalizeString(vm.ImageType),
                 Category = vm.Category,
                 Material = vm.Material,
                 Colour = vm.Colour
             };
 
+            // Process image upload if provided
+            if (vm.ImageData is { Length: > 0 } && !string.IsNullOrWhiteSpace(vm.ImageType))
+            {
+                if (ImageService is null)
+                    throw new InvalidOperationException("Image service is not available.");
+
+                var processed = await ImageService.ProcessBytesAsync(vm.ImageData, vm.ImageType, ct);
+                if (!processed.Ok)
+                    throw new InvalidOperationException(processed.Error);
+
+                product.Image = processed.Value!.ToAppImage();
+            }
+
             // Lines via shared mapper (handles duplicate merge + unit resolution).
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
             product.ProductComponents = _productComponentMapper.FromCreateVms(
-                product.Id,
-                vm.Components ?? Enumerable.Empty<CreateProductComponentVm>(),
-                lookup);
+        product.Id,
+                 vm.Components ?? Enumerable.Empty<CreateProductComponentVm>(),
+             lookup);
 
             return product;
         }
 
-        public void ApplyEditVm(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null)
+        public async Task ApplyEditVmAsync(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
@@ -113,13 +124,18 @@ namespace ASAPPVC.UI.Models.Mappers
             }
             else if (vm.ImageData.Length == 0)
             {
-                target.ImageData = Array.Empty<byte>();
-                target.ImageType = string.Empty;
+                target.Image = null;
             }
-            else
+            else if (!string.IsNullOrWhiteSpace(vm.ImageType))
             {
-                target.ImageData = vm.ImageData;
-                target.ImageType = NormalizeString(vm.ImageType);
+                if (ImageService is null)
+                    throw new InvalidOperationException("Image service is not available.");
+
+                var processed = await ImageService.ProcessBytesAsync(vm.ImageData, vm.ImageType, ct);
+                if (!processed.Ok)
+                    throw new InvalidOperationException(processed.Error);
+
+                target.Image = processed.Value!.ToAppImage();
             }
 
             // Simple modifiers

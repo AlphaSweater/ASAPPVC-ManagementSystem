@@ -24,6 +24,8 @@ namespace ASAPPVC.UI.Models.Mappers
                 CurrentAmount = component.CurrentAmount,
                 UnitCost = component.UnitCost,
                 StorageLocation = component.StorageLocation,
+                HasImage = component.Image?.Data is { Length: > 0 },
+                ThumbUrl = component.Image?.Data is { Length: > 0 } ? $"/components/{component.Id}/image/thumb" : null,
             };
         }
 
@@ -48,6 +50,9 @@ namespace ASAPPVC.UI.Models.Mappers
                 UnitCost = component.UnitCost,
                 StorageLocation = component.StorageLocation,
                 UsedInProductsCount = count,
+                HasImage = component.Image?.Data is { Length: > 0 },
+                ImageUrl = component.Image?.Data is { Length: > 0 } ? $"/components/{component.Id}/image" : null,
+                ImageEtag = component.Image?.Sha256
             };
         }
 

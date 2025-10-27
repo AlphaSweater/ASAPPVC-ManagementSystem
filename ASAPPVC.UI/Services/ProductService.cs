@@ -121,8 +121,8 @@ namespace ASAPPVC.UI.Services
                 if (missingIds.Any())
                     return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
 
-                // Map VM to domain entity (mapper handles code generation and component mapping)
-                var product = _mapper.FromCreateVm(vm, unitLookup);
+                // Map VM to domain entity (mapper handles code generation and component mapping and image processing)
+                var product = await _mapper.FromCreateVmAsync(vm, unitLookup, ct);
 
                 // Persist
                 var added = await _products.AddAsync(product, ct);
@@ -153,7 +153,7 @@ namespace ASAPPVC.UI.Services
             try
             {
                 // Fetch existing product with components (tracking enabled for update)
-                var existing = await _products.GetByIdOrCodeWithComponentsAsync(vm.Id, asNoTracking: false, ct);
+                var existing = await _products.GetByIdOrCodeWithComponentsAsync(vm.Id, null, asNoTracking: false, ct: ct);
                 if (existing is null)
                     return Result<Product>.Fail("Product not found.");
 
@@ -177,8 +177,8 @@ namespace ASAPPVC.UI.Services
                 if (missingIds.Any())
                     return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
 
-                // Apply changes via mapper (handles component reconciliation)
-                _mapper.ApplyEditVm(existing, vm, unitLookup);
+                // Apply changes via mapper (handles component reconciliation and image processing)
+                await _mapper.ApplyEditVmAsync(existing, vm, unitLookup, ct);
 
                 // Persist changes
                 _products.Update(existing);
@@ -205,7 +205,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var product = await _products.GetByIdOrCodeWithComponentsAsync(id, code, ct);
+                var product = await _products.GetByIdOrCodeWithComponentsAsync(id, code, asNoTracking: false, ct);
                 if (product is null)
                     return Result<ProductDetailVm>.Fail("Product not found.");
 
@@ -227,7 +227,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var product = await _products.GetByIdOrCodeAsync(id, code, ct);
+                var product = await _products.GetByIdOrCodeAsync(id, code, asNoTracking: false, ct);
                 if (product is null)
                     return Result<Product>.Fail("Product not found.");
 
@@ -245,7 +245,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var products = await _products.GetListAsync(ct);
+                var products = await _products.GetListAsync(asNoTracking: true, ct: ct);
                 var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
                 return Result<List<ProductListVm>>.Success(listVms);
             }
@@ -258,16 +258,16 @@ namespace ASAPPVC.UI.Services
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves multiple products by IDs or codes (mapped to list VMs)
         public async Task<Result<List<ProductListVm>>> GetListByIdsOrCodesAsync(
-            IEnumerable<Guid>? ids = null,
+        IEnumerable<Guid>? ids = null,
             IEnumerable<string>? codes = null,
-            CancellationToken ct = default)
+    CancellationToken ct = default)
         {
             try
             {
                 var filteredIds = ids?.Where(g => g != Guid.Empty);
                 var filteredCodes = codes?.Where(s => !string.IsNullOrWhiteSpace(s));
 
-                var products = await _products.GetListByIdsOrCodesAsync(filteredIds, filteredCodes, ct);
+                var products = await _products.GetListByIdsOrCodesAsync(filteredIds, filteredCodes, asNoTracking: true, ct: ct);
                 var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
                 return Result<List<ProductListVm>>.Success(listVms);
             }
@@ -284,7 +284,7 @@ namespace ASAPPVC.UI.Services
             try
             {
                 term ??= string.Empty;
-                var products = await _products.SearchAsync(term, ct);
+                var products = await _products.SearchAsync(term, asNoTracking: true, ct: ct);
                 var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
                 return Result<List<ProductListVm>>.Success(listVms);
             }

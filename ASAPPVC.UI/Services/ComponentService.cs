@@ -109,7 +109,7 @@ namespace ASAPPVC.UI.Services
             try
             {
                 // Fetch existing component (tracking enabled for update)
-                var existing = await _components.GetByIdOrCodeAsync(vm.Id, asNoTracking: false, ct);
+                var existing = await _components.GetByIdOrCodeAsync(vm.Id, asNoTracking: false, ct: ct);
                 if (existing is null)
                     return Result<Component>.Fail("Component not found.");
 
@@ -152,7 +152,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var component = await _components.GetByIdOrCodeAsync(id, code, ct);
+                var component = await _components.GetByIdOrCodeAsync(id, code, asNoTracking: true, ct);
                 if (component is null)
                     return Result<ComponentDetailVm>.Fail("Component not found.");
 
@@ -174,7 +174,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var component = await _components.GetByIdOrCodeAsync(id, code, ct);
+                var component = await _components.GetByIdOrCodeAsync(id, code, asNoTracking: true, ct);
                 if (component is null)
                     return Result<Component>.Fail("Component not found.");
 
@@ -192,7 +192,7 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
-                var components = await _components.GetListOrderedByCodeAsync(ct);
+                var components = await _components.GetListOrderedByCodeAsync(asNoTracking: true, ct);
                 var listVms = components.Select(c => _mapper.ToListVm(c)).ToList();
                 return Result<List<ComponentListVm>>.Success(listVms);
             }
@@ -214,7 +214,7 @@ namespace ASAPPVC.UI.Services
                 var filteredIds = ids?.Where(g => g != Guid.Empty);
                 var filteredCodes = codes?.Where(s => !string.IsNullOrWhiteSpace(s));
 
-                var components = await _components.GetListByIdOrCodeAsync(filteredIds, filteredCodes, ct);
+                var components = await _components.GetListByIdOrCodeAsync(filteredIds, filteredCodes, asNoTracking: true, ct);
                 var listVms = components.Select(c => _mapper.ToListVm(c)).ToList();
                 return Result<List<ComponentListVm>>.Success(listVms);
             }
@@ -231,7 +231,7 @@ namespace ASAPPVC.UI.Services
             try
             {
                 term ??= string.Empty;
-                var components = await _components.SearchAsync(term, ct);
+                var components = await _components.SearchAsync(term, asNoTracking: true, ct);
                 var listVms = components.Select(c => _mapper.ToListVm(c)).ToList();
                 return Result<List<ComponentListVm>>.Success(listVms);
             }

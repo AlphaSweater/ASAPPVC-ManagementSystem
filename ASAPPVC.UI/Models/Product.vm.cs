@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.UI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models
 {
@@ -24,14 +24,15 @@ namespace ASAPPVC.UI.Models
         public decimal Price { get; init; }
         public string Description { get; init; } = string.Empty;
 
-        // Optional small preview flag
-        public bool HasImage { get; init; }
+        public bool HasImage { get; set; }
+        public string? ThumbUrl { get; init; }
 
         // Distinct number of components linked to this product
         public int ComponentCount { get; init; }
 
         // Enum modifiers (typed)
         public Category Category { get; init; } = Category.None;
+
         public Material Material { get; init; } = Material.None;
         public Colour Colour { get; init; } = Colour.None;
 
@@ -58,11 +59,13 @@ namespace ASAPPVC.UI.Models
         public decimal Price { get; init; }
         public string Description { get; init; } = string.Empty;
 
-        // Optional image display (converted to base64 in controller/service)
-        public string? ImageBase64DataUrl { get; init; }
+        public bool HasImage { get; set; }
+        public string? ImageUrl { get; init; }
+        public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
 
         // Enum modifiers
         public Category Category { get; init; } = Category.None;
+
         public Material Material { get; init; } = Material.None;
         public Colour Colour { get; init; } = Colour.None;
 

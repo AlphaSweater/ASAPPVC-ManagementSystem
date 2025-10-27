@@ -1,37 +1,41 @@
 ﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Services;
+using ASAPPVC.UI.ViewModels.Warehouse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers.Warehouse
 {
     [Authorize]
-    public class ComponentsController : Controller
+    public class ComponentsController(IComponentService components) : Controller
     {
-        private readonly IComponentService _components;
+        private readonly IComponentService _components = components;
 
         // Component view paths - reuse WarehouseController.ViewRoot
         public const string ViewRoot = WarehouseController.ViewRoot + "Components/";
 
-        private const string AddComponentPath = ViewRoot + "AddComponent.cshtml";
-        private const string ViewComponentPath = ViewRoot + "ViewComponent.cshtml";
-        private const string ComponentInventoryPath = ViewRoot + "ViewComponentInventory.cshtml";
-
-        public ComponentsController(IComponentService components)
-        {
-            _components = components;
-        }
+        private const string ManageComponentsViewName = ViewRoot + "ManageComponents";
+        private const string ViewComponentViewName = ViewRoot + "ViewComponent";
+        private const string AddComponentViewName = ViewRoot + "AddComponent";
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-            return View();
+            var result = await _components.ListAsync(ct);
+            if (!result.Ok || result.Value is null)
+            {
+                TempData["ErrorMessage"] = result.Error ?? "Failed to load components.";
+                return View(ManageComponentsViewName, ManageComponentsVm.Create());
+            }
+
+            var vm = ManageComponentsVm.Create(result.Value);
+            return View(ManageComponentsViewName, vm);
         }
 
         [HttpGet]
         public IActionResult AddComponent()
         {
-            return View(AddComponentPath);
+            return View(AddComponentViewName, new CreateComponentVm());
         }
 
         [HttpPost]
@@ -39,13 +43,13 @@ namespace ASAPPVC.UI.Controllers.Warehouse
         public async Task<IActionResult> AddComponent(CreateComponentVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
-                return View(AddComponentPath, vm);
+                return View(AddComponentViewName, vm);
 
-            var result = await _components.CreateComponentAsync(vm, ct);
+            var result = await _components.CreateAsync(vm, ct);
             if (!result.Ok || result.Value is null)
             {
                 ModelState.AddModelError(string.Empty, result.Error ?? "Unable to create component.");
-                return View(AddComponentPath, vm);
+                return View(AddComponentViewName, vm);
             }
 
             var component = result.Value;
@@ -56,19 +60,28 @@ namespace ASAPPVC.UI.Controllers.Warehouse
         [HttpGet]
         public async Task<IActionResult> ViewComponent(Guid id, CancellationToken ct)
         {
-            var result = await _components.GetComponentByIdOrCodeAsync(id, null, ct);
+            var result = await _components.GetDetailAsync(id: id, ct: ct);
             if (!result.Ok || result.Value is null)
-                return NotFound();
+            {
+                TempData["ErrorMessage"] = result.Error ?? "Component not found.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            return View(ViewComponentPath, result.Value);
+            return View(ViewComponentViewName, result.Value);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewComponentInventory(CancellationToken ct)
+        public async Task<IActionResult> Search(string? term, CancellationToken ct)
         {
-            var result = await _components.GetComponentsListAsync(ct);
-            var list = result.Ok && result.Value is not null ? result.Value : new List<Component>();
-            return View(ComponentInventoryPath, list);
+            var result = await _components.SearchAsync(term, ct);
+            if (!result.Ok || result.Value is null)
+            {
+                TempData["ErrorMessage"] = result.Error ?? "Failed to search components.";
+                return View(ManageComponentsViewName, ManageComponentsVm.Create());
+            }
+
+            var vm = ManageComponentsVm.Create(result.Value, searchQuery: term);
+            return View(ManageComponentsViewName, vm);
         }
     }
 }

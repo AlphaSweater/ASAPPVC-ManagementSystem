@@ -142,7 +142,7 @@ namespace ASAPPVC.UI.Services
             try
             {
                 // Fetch existing order with details (tracking enabled for update)
-                var existing = await _orders.GetByIdOrCodeWithDetailsAsync(vm.Id, asNoTracking: false, ct);
+                var existing = await _orders.GetByIdOrCodeWithDetailsAsync(vm.Id, asNoTracking: false, ct: ct);
                 if (existing is null)
                     return Result<Order>.Fail("Order not found.");
 
@@ -222,7 +222,7 @@ namespace ASAPPVC.UI.Services
 
             try
             {
-                var order = await _orders.GetByIdOrCodeWithDetailsAsync(id, asNoTracking: true, ct);
+                var order = await _orders.GetByIdOrCodeWithDetailsAsync(id, asNoTracking: true, ct: ct);
                 if (order is null)
                     return Result<OrderDetailVm>.Fail("Order not found.");
 
@@ -244,7 +244,7 @@ namespace ASAPPVC.UI.Services
 
             try
             {
-                var order = await _orders.GetByIdOrCodeWithDetailsAsync(id, asNoTracking: true, ct);
+                var order = await _orders.GetByIdOrCodeWithDetailsAsync(id, asNoTracking: true, ct: ct);
                 if (order is null)
                     return Result<Order>.Fail("Order not found.");
 

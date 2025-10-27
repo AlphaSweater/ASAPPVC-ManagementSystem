@@ -1,5 +1,6 @@
 using ASAPPVC.UI.Models.Enums;
 using ASAPPVC.UI.Services;
+using ASAPPVC.UI.Models.General;
 
 namespace ASAPPVC.UI.Models.Mappers
 {
@@ -46,10 +47,26 @@ namespace ASAPPVC.UI.Models.Mappers
             var safeMime = string.IsNullOrWhiteSpace(mime) ? "image/png" : mime.Trim();
 
             if (ImageService is not null)
-                return ImageService.GetDataUrl(data, safeMime);
+            {
+                try
+                {
+                    // Attempt to let the image service process the bytes and use its payload (may contain thumbnails, normalized content type, etc.)
+                    var res = ImageService.ProcessBytesAsync(data, safeMime).GetAwaiter().GetResult();
+                    if (res.Ok && res.Value is not null && res.Value.Data is { Length: > 0 })
+                    {
+                        var contentType = string.IsNullOrWhiteSpace(res.Value.ContentType) ? safeMime : res.Value.ContentType.Trim();
+                        var b64 = Convert.ToBase64String(res.Value.Data);
+                        return $"data:{contentType};base64,{b64}";
+                    }
+                }
+                catch
+                {
+                    // swallow and fall back to direct conversion below
+                }
+            }
 
-            var b64 = Convert.ToBase64String(data);
-            return $"data:{safeMime};base64,{b64}";
+            var b64Fallback = Convert.ToBase64String(data);
+            return $"data:{safeMime};base64,{b64Fallback}";
         }
 
         /// <summary>

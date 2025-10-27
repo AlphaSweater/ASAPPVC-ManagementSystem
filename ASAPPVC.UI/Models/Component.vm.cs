@@ -24,11 +24,8 @@ namespace ASAPPVC.UI.Models
         public decimal UnitCost { get; init; }
         public string StorageLocation { get; init; } = string.Empty;
 
-        // Optional small preview flag
-
-        public bool HasImage { get; init; }
+        public bool HasImage { get; set; }
         public string? ThumbUrl { get; init; }
-        public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
 
         // Optional computed fields for UI display
         public string DisplayCost => UnitCost.ToString("C");
@@ -53,9 +50,7 @@ namespace ASAPPVC.UI.Models
         public decimal UnitCost { get; init; }
         public string StorageLocation { get; init; } = string.Empty;
 
-        // Optional image url (null if no image)
-
-        public bool HasImage { get; init; }
+        public bool HasImage { get; set; }
         public string? ImageUrl { get; init; }
         public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
 

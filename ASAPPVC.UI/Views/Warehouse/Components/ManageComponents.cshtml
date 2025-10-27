@@ -1,12 +1,12 @@
 ﻿@using System.Linq
-@model IEnumerable<ASAPPVC.UI.Models.Component>
+@using ASAPPVC.UI.ViewModels.Warehouse
+@model ManageComponentsVm
 
 @{
 	ViewData["Title"] = "Inventory";
 }
 
 <link rel="stylesheet" href="~/css/Views/Inventory/components/ViewComponentInventory.css" asp-append-version="true" />
-
 
 <div class="viewport">
 	<div class="content-container">
@@ -15,11 +15,11 @@
 		</div>
 
 		<div class="toolbar">
-			<form class="search-form" asp-controller="Inventory" asp-action="ViewComponentInventory" method="get">
-				<input class="input" type="text" name="q" placeholder="Search by component name or location..." value="@Context.Request.Query["q"]" />
+			<form class="search-form" asp-controller="Components" asp-action="Search" method="get">
+				<input class="input" type="text" name="term" placeholder="Search by component name or location..." value="@Model.SearchQuery" />
 				<button type="submit" class="btn btn-secondary">Search</button>
 			</form>
-			<a class="btn btn-primary" asp-controller="Inventory" asp-action="AddComponent">+ Add New Component</a>
+			<a class="btn btn-primary" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
 		</div>
 
 		<section class="table-section">
@@ -35,9 +35,9 @@
 					</tr>
 				</thead>
 				<tbody>
-					@if (Model != null && Model.Any())
+					@if (Model != null && Model.HasComponents)
 					{
-						foreach (var p in Model)
+						foreach (var p in Model.Components)
 						{
 							<tr>
 								<td>@p.ComponentCode</td>
@@ -48,9 +48,9 @@
 								<td>
 									<div class="actions">
 										<a class="btn btn-secondary btn-sm"
-										   asp-controller="Inventory" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
+										   asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
 										<a class="btn btn-primary btn-sm"
-										   asp-controller="Inventory" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
+										   asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
 									</div>
 								</td>
 							</tr>
@@ -59,7 +59,7 @@
 					else
 					{
 						<tr>
-							<td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">
+							<td colspan="6" style="text-align:center; padding:40px; color: var(--text-muted);">
 								No components found.
 							</td>
 						</tr>

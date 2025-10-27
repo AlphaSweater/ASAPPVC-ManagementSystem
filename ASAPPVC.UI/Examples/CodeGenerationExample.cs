@@ -1,6 +1,5 @@
+using ASAPPVC.UI.Models.General;
 using ASAPPVC.UI.Services;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Enums;
 
 namespace ASAPPVC.UI.Examples
 {

@@ -1,13 +1,12 @@
-﻿@model ASAPPVC.UI.Models.Product
+﻿@model ASAPPVC.UI.Models.ProductDetailVm
 @{
 	ViewData["Title"] = "View Product";
+	ProductDetailVm vm = Model!;
 
-	// Pre-calculate the image source string for cleaner HTML
-	string? imgSrc = null;
-	if (Model?.ImageBytes != null && !string.IsNullOrEmpty(Model.ImageType))
-	{
-		imgSrc = $"data:{Model.ImageType};base64,{Convert.ToBase64String(Model.ImageBytes)}";
-	}
+	// Determine the image source, using a placeholder if no image exists.
+	var imgSrc = (vm != null && vm.HasImage && !string.IsNullOrWhiteSpace(vm.ImageUrl))
+		? vm.ImageUrl
+		: "/Assets/Images/placeholder.png";
 }
 
 <link rel="stylesheet" href="~/css/Views/Inventory/products/ViewProduct.css" asp-append-version="true" />
@@ -15,27 +14,18 @@
 <div class="viewport">
 	<div class="view-container">
 		<div class="header-section">
-			<a href="javascript:void(0);" class="back-link" onclick="window.history.back();">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20" aria-hidden="true">
-					<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.81 10l2.98 2.97a.75.75 0 11-1.06 1.06l-3.5-3.5a.75.75 0 010-1.06l3.5-3.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
-				</svg>
+			<a heref="javascript:void(0);" class="back-link" onclick="window.history.back();">
+				<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
 				Back
 			</a>
-			<h2 class="main-title">@Model.Name</h2>
+			<h2 class="main-title">@vm!.Name</h2>
 		</div>
 
 		<div class="details-layout-grid">
 			<!-- Image Column -->
 			<div class="image-col">
 				<div class="image-box">
-					@if (!string.IsNullOrEmpty(imgSrc))
-					{
-						<img src="@imgSrc" alt="Product Image" />
-					}
-					else
-					{
-						<span class="no-image-text">No Image</span>
-					}
+					<img src="@imgSrc" alt="Product Image" />
 				</div>
 			</div>
 
@@ -43,53 +33,53 @@
 			<div class="info-col">
 				<div class="info-pair">
 					<div class="label">Product Price</div>
-					<div class="value price">@Model?.Price.ToString("C")</div>
+					<div class="value price">@vm.Price.ToString("C")</div>
 				</div>
 				<div class="info-pair">
 					<div class="label">Description</div>
-					<div class="value">@(string.IsNullOrEmpty(Model?.Description) ? "No description provided." : Model.Description)</div>
+					<div class="value">@(string.IsNullOrEmpty(vm.Description) ? "No description provided." : vm.Description)</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- Parts in this Product -->
+		<!-- Components in this Product -->
 		<section class="parts-section">
-			<h3>Parts in this Product</h3>
+			<h3>Components in this Product</h3>
 			<table class="table">
 				<thead>
 					<tr>
-						<th>Part Name</th>
+						<th>Component Name</th>
 						<th class="align-right" style="width:120px;">Quantity</th>
 						<th class="align-right" style="width:140px;">Unit Price</th>
 						<th class="align-right" style="width:140px;">Subtotal</th>
 					</tr>
 				</thead>
 				<tbody>
-					@if (Model?.ProductComponents != null && Model.ProductComponents.Any())
+					@if (vm.Components != null && vm.Components.Any())
 					{
 						decimal grandTotal = 0;
-						foreach (var line in Model.ProductComponents)
+						foreach (var line in vm.Components)
 						{
-							var unitCost = line.Component?.UnitCost ?? 0;
+							var unitCost = line.UnitCost;
 							var subtotal = unitCost * line.QuantityRequired;
 							grandTotal += subtotal;
 							<tr>
-								<td>@line.Component?.Name</td>
+								<td>@line.ComponentName</td>
 								<td class="align-right">@line.QuantityRequired</td>
 								<td class="align-right">@unitCost.ToString("C")</td>
 								<td class="align-right">@subtotal.ToString("C")</td>
 							</tr>
 						}
 						<tr class="grand-total-row">
-							<td colspan="3" class="align-right">Total Cost of Parts:</td>
+							<td colspan="3" class="align-right">Total Cost of Components:</td>
 							<td class="align-right">@grandTotal.ToString("C")</td>
 						</tr>
 					}
 					else
 					{
 						<tr>
-							<td colspan="4" style="text-align:center; padding: 24px; color: var(--text-muted);">
-								No parts are linked to this product.
+							<td colspan="4" style="text-align:center; padding:24px; color: var(--text-muted);">
+								No Components are linked to this product.
 							</td>
 						</tr>
 					}
@@ -102,7 +92,7 @@
 			<a class="btn btn-primary"
 			   asp-controller="Inventory"
 			   asp-action="EditProduct"
-			   asp-route-id="@Model.Id">Edit Product</a>
+			   asp-route-id="@vm.Id">Edit Product</a>
 		</div>
 	</div>
 </div>

@@ -36,11 +36,11 @@ namespace ASAPPVC.UI.Models.Mappers
         /// which merges duplicate components and resolves units using the given lookup (defaults to <see cref="Unit.Piece"/> when missing).
         /// <br/><br/><b>Example:</b>
         /// <code>
-        /// var domain = _mapper.FromCreateVm(createVm, unitLookup);
+        /// var domain = await _mapper.FromCreateVmAsync(createVm, unitLookup, ct);
         /// await _repo.AddAsync(domain, ct);
         /// </code>
         /// </summary>
-        Product FromCreateVm(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null);
+        Task<Product> FromCreateVmAsync(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
 
         /// <summary>
         /// Applies an <see cref="EditProductVm"/> to an existing <see cref="Product"/>.
@@ -48,10 +48,10 @@ namespace ASAPPVC.UI.Models.Mappers
         /// which updates/creates/merges by <c>ComponentId</c> and re-resolves units when needed.
         /// <br/><br/><b>Example:</b>
         /// <code>
-        /// _mapper.ApplyEditVm(existingProduct, editVm, unitLookup);
+        /// await _mapper.ApplyEditVmAsync(existingProduct, editVm, unitLookup, ct);
         /// await _repo.SaveAsync(ct);
         /// </code>
         /// </summary>
-        void ApplyEditVm(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null);
+        Task ApplyEditVmAsync(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
     }
 }

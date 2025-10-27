@@ -1,5 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Services;
+using ASAPPVC.UI.ViewModels.Warehouse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,45 +27,46 @@ namespace ASAPPVC.UI.Controllers.Warehouse
             if (!result.Ok || result.Value is null)
             {
                 TempData["ErrorMessage"] = result.Error ?? "Failed to load products.";
-                return View(ManageProductsViewName, new List<ProductListVm>());
+                return View(ManageProductsViewName, ManageProductsVm.Create());
             }
 
-            return View(ManageProductsViewName, result.Value);
+            var vm = ManageProductsVm.Create(result.Value);
+            return View(ManageProductsViewName, vm);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewProductInventory(CancellationToken ct)
+        public async Task<IActionResult> AddProduct(CancellationToken ct)
         {
-            var result = await _products.ListAsync(ct);
-            if (!result.Ok || result.Value is null)
-            {
-                TempData["ErrorMessage"] = result.Error ?? "Failed to load products.";
-                return View(ManageProductsViewName, new List<ProductListVm>());
-            }
-
-            return View(ManageProductsViewName, result.Value);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AddProductGet(CancellationToken ct)
-        {
-            var result = await _components.GetComponentsListAsync(ct);
-            var componentList = result.Ok && result.Value is not null ? result.Value : new List<Component>();
+            var result = await _components.ListAsync(ct);
+            var componentList = result.Ok && result.Value is not null ? result.Value : new List<ComponentListVm>();
             ViewData["Components"] = componentList;
             return View(AddProductViewName, new CreateProductVm());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProductPost(CreateProductVm vm, CancellationToken ct)
+        public async Task<IActionResult> AddProduct(CreateProductVm vm, CancellationToken ct)
         {
+            // If a file was uploaded via the form input named 'ImageFile', read it into the VM
+            if (HttpContext.Request?.Form?.Files?.Count > 0)
+            {
+                var file = HttpContext.Request.Form.Files.FirstOrDefault(f => f.Name == "ImageFile" || f.Name == "imageFile");
+                if (file is not null && file.Length > 0)
+                {
+                    using var ms = new MemoryStream();
+                    await file.CopyToAsync(ms, ct);
+                    vm.ImageData = ms.ToArray();
+                    vm.ImageType = file.ContentType;
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 // Reload components for the form
-                var componentsResult = await _components.GetComponentsListAsync(ct);
+                var componentsResult = await _components.ListAsync(ct);
                 ViewData["Components"] = componentsResult.Ok && componentsResult.Value is not null
                     ? componentsResult.Value
-                    : new List<Component>();
+                    : new List<ComponentListVm>();
                 return View(AddProductViewName, vm);
             }
 
@@ -74,15 +76,16 @@ namespace ASAPPVC.UI.Controllers.Warehouse
                 ModelState.AddModelError(string.Empty, result.Error ?? "Unable to create product.");
 
                 // Reload components for the form
-                var componentsResult = await _components.GetComponentsListAsync(ct);
+                var componentsResult = await _components.ListAsync(ct);
                 ViewData["Components"] = componentsResult.Ok && componentsResult.Value is not null
                     ? componentsResult.Value
-                    : new List<Component>();
+                    : new List<ComponentListVm>();
                 return View(AddProductViewName, vm);
             }
 
+            var product = result.Value;
             TempData["AlertMessage"] = $"Product '{vm.Name}' created successfully.";
-            return RedirectToAction(nameof(ViewProductInventory));
+            return RedirectToAction(nameof(ViewProduct), new { id = product.Id });
         }
 
         [HttpGet]
@@ -92,7 +95,7 @@ namespace ASAPPVC.UI.Controllers.Warehouse
             if (!result.Ok || result.Value is null)
             {
                 TempData["ErrorMessage"] = result.Error ?? "Product not found.";
-                return RedirectToAction(nameof(ViewProductInventory));
+                return RedirectToAction(nameof(Index));
             }
 
             return View(ViewProductViewName, result.Value);
@@ -105,10 +108,11 @@ namespace ASAPPVC.UI.Controllers.Warehouse
             if (!result.Ok || result.Value is null)
             {
                 TempData["ErrorMessage"] = result.Error ?? "Failed to search products.";
-                return View(ManageProductsViewName, new List<ProductListVm>());
+                return View(ManageProductsViewName, ManageProductsVm.Create());
             }
 
-            return View(ManageProductsViewName, result.Value);
+            var vm = ManageProductsVm.Create(result.Value, searchQuery: term);
+            return View(ManageProductsViewName, vm);
         }
     }
 }
