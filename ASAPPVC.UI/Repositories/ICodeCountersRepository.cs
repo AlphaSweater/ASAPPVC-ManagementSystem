@@ -1,10 +1,12 @@
-using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.Enums;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public interface ICodeCountersRepository : IBaseRepository<CodeCounters>
+    public interface ICodeCountersRepository
     {
-        Task<CodeCounters?> GetByTypeAndPeriodAsync(string codeType, string? periodKey, CancellationToken ct = default);
-        Task<CodeCounters> AddAndSaveAsync(CodeCounters counter, CancellationToken ct = default);
+        /// <summary>
+        /// Atomically increments and returns the new LastNumber for (type, periodKey).
+        /// </summary>
+        Task<int> IncrementAndGetAsync(CodeType type, string? periodKey, CancellationToken ct = default);
     }
 }
