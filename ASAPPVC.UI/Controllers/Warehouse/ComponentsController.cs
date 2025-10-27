@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ASAPPVC.UI.Models;
+﻿using ASAPPVC.UI.Models;
 using ASAPPVC.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +10,12 @@ namespace ASAPPVC.UI.Controllers.Warehouse
     {
         private readonly IComponentService _components;
 
-        // Parts view paths (kept explicit to match existing views)
-        private const string AddComponentPath = "~/Views/Inventory/Components/AddComponent.cshtml";
-        private const string ViewComponentPath = "~/Views/Inventory/Components/ViewComponent.cshtml";
-        private const string ComponentInventoryPath = "~/Views/Inventory/Components/ViewComponentInventory.cshtml";
+        // Component view paths - reuse WarehouseController.ViewRoot
+        public const string ViewRoot = WarehouseController.ViewRoot + "Components/";
+
+        private const string AddComponentPath = ViewRoot + "AddComponent.cshtml";
+        private const string ViewComponentPath = ViewRoot + "ViewComponent.cshtml";
+        private const string ComponentInventoryPath = ViewRoot + "ViewComponentInventory.cshtml";
 
         public ComponentsController(IComponentService components)
         {
@@ -73,4 +71,4 @@ namespace ASAPPVC.UI.Controllers.Warehouse
             return View(ComponentInventoryPath, list);
         }
     }
-}}
+}

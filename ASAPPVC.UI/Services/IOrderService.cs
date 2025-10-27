@@ -1,7 +1,7 @@
 ﻿namespace ASAPPVC.UI.Services;
 
 using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Order;
+using ASAPPVC.UI.ViewModels.Order;
 
 public interface IOrderService
 {

@@ -1,6 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Order;
 using ASAPPVC.UI.Repositories;
+using ASAPPVC.UI.ViewModels.Order;
 
 namespace ASAPPVC.UI.Services
 {

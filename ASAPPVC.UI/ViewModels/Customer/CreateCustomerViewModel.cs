@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models.ViewModels.Customer
+namespace ASAPPVC.UI.ViewModels.Customer
 {
     public class CreateCustomerViewModel
     {

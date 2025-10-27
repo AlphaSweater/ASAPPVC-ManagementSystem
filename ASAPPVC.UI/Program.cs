@@ -56,26 +56,26 @@ builder.Services.Configure<ImageServiceOptions>(opt =>
 builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddScoped<ICodeGenerationService, CodeGenerationService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IComponentService, ComponentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-builder.Services.AddScoped<IComponentService, ComponentService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
 
 // registering mappers
-builder.Services.AddScoped<IComponentMapper, ComponentMapper>();
-builder.Services.AddScoped<IProductComponentMapper, ProductComponentMapper>();
-builder.Services.AddScoped<IProductMapper, ProductMapper>();
-builder.Services.AddScoped<IOrderProductMapper, OrderProductMapper>();
 builder.Services.AddScoped<IOrderMapper, OrderMapper>();
+builder.Services.AddScoped<IOrderProductMapper, OrderProductMapper>();
+builder.Services.AddScoped<IProductMapper, ProductMapper>();
+builder.Services.AddScoped<IProductComponentMapper, ProductComponentMapper>();
+builder.Services.AddScoped<IComponentMapper, ComponentMapper>();
 
 //registering repositories
 builder.Services.AddScoped<ICodeCountersRepository, CodeCountersRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IComponentRepository, ComponentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IComponentRepository, ComponentRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 var app = builder.Build();
 

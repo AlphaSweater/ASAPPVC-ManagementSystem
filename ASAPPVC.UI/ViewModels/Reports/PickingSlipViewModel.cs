@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Models.ViewModels.Reports
+﻿namespace ASAPPVC.UI.ViewModels.Reports
 {
     public class PickingSlipViewModel
     {

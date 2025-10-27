@@ -1,5 +1,5 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Order;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.UI.Services;
+using ASAPPVC.UI.ViewModels.Order;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers

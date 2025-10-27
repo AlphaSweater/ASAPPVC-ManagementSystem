@@ -1,5 +1,5 @@
-﻿using ASAPPVC.UI.Models.ViewModels.Customer;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.UI.Services;
+using ASAPPVC.UI.ViewModels.Customer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

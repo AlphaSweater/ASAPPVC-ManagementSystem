@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models.ViewModels.Order
+namespace ASAPPVC.UI.ViewModels.Order
 {
     public class ProductQuantityViewModel
     {
