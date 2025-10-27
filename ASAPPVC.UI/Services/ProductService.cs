@@ -153,15 +153,18 @@ namespace ASAPPVC.UI.Services
             try
             {
                 // Fetch existing product with components (tracking enabled for update)
-                var existing = await _products.GetByIdOrCodeWithComponentsAsync(id: vm.Id, ct: ct);
+                var existing = await _products.GetByIdOrCodeWithComponentsAsync(vm.Id, asNoTracking: false, ct);
                 if (existing is null)
                     return Result<Product>.Fail("Product not found.");
 
                 // Check if code changed and conflicts with another product
                 if (existing.ProductCode != vm.ProductCode)
                 {
-                    var codeConflict = await _products.GetByCodeAsync(vm.ProductCode, asNoTracking: true, ct);
-                    if (codeConflict is not null && codeConflict.Id != vm.Id)
+                    var existsResult = await ExistsAsync(vm.ProductCode, excludeId: vm.Id, ct);
+                    if (!existsResult.Ok)
+                        return Result<Product>.Fail($"Failed to check product code existence: {existsResult.Error}");
+
+                    if (existsResult.Value)
                         return Result<Product>.Fail($"Product code '{vm.ProductCode}' is already in use.");
                 }
 
@@ -217,7 +220,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves a single product entity (raw domain model)
-        public async Task<Result<Product>> GetAsync(
+        public async Task<Result<Product>> GetDomainAsync(
             Guid? id = null,
             string? code = null,
             CancellationToken ct = default)

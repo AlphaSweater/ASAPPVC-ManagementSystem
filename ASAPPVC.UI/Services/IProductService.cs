@@ -56,7 +56,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> containing the found <see cref="Product"/>, or a failure result
         /// if the product does not exist or an error occurs.
         /// </returns>
-        Task<Result<Product>> GetAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
+        Task<Result<Product>> GetDomainAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves the full list of products mapped to lightweight list view models.

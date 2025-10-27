@@ -17,8 +17,9 @@ namespace ASAPPVC.UI.Repositories
         /// </summary>
         /// <param name="id">Optional internal identifier of the product.</param>
         /// <param name="code">Optional human-friendly product code.</param>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>The matching <see cref="Product"/> if found; otherwise <c>null</c>.</returns>
-        Task<Product?> GetByIdOrCodeAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
+        Task<Product?> GetByIdOrCodeAsync(Guid? id = null, string? code = null, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves a product including its <see cref="Product.ProductComponents"/> and related component entities<br/>
@@ -27,8 +28,9 @@ namespace ASAPPVC.UI.Repositories
         /// </summary>
         /// <param name="id">Optional internal identifier of the product.</param>
         /// <param name="code">Optional human-friendly product code.</param>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>The matching <see cref="Product"/> with components loaded if found; otherwise <c>null</c>.</returns>
-        Task<Product?> GetByIdOrCodeWithComponentsAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
+        Task<Product?> GetByIdOrCodeWithComponentsAsync(Guid? id = null, string? code = null, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves multiple products by either a collection of <paramref name="ids"/> or a collection of <paramref name="codes"/>.<br/>
@@ -36,8 +38,9 @@ namespace ASAPPVC.UI.Repositories
         /// </summary>
         /// <param name="ids">Optional collection of product ids to retrieve.</param>
         /// <param name="codes">Optional collection of product codes to retrieve.</param>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>List of matching <see cref="Product"/> instances; an empty list if none found.</returns>
-        Task<List<Product>> GetListByIdsOrCodesAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, CancellationToken ct = default);
+        Task<List<Product>> GetListByIdsOrCodesAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves multiple products by either a collection of <paramref name="ids"/> or a collection of <paramref name="codes"/>,<br/>
@@ -46,23 +49,26 @@ namespace ASAPPVC.UI.Repositories
         /// </summary>
         /// <param name="ids">Optional collection of product ids to retrieve.</param>
         /// <param name="codes">Optional collection of product codes to retrieve.</param>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>List of matching <see cref="Product"/> instances with components loaded; an empty list if none found.</returns>
-        Task<List<Product>> GetListByIdsOrCodesWithComponentsAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, CancellationToken ct = default);
+        Task<List<Product>> GetListByIdsOrCodesWithComponentsAsync(IEnumerable<Guid>? ids = null, IEnumerable<string>? codes = null, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Lists all products ordered by <see cref="Product.ProductCode"/>. Intended for lookup and display<br/>
         /// scenarios where deterministic ordering is useful.<br/>
         /// </summary>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>Ordered list of all <see cref="Product"/> instances.</returns>
-        Task<List<Product>> GetListAsync(CancellationToken ct = default);
+        Task<List<Product>> GetListAsync(bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Lists all products with their components included, ordered by <see cref="Product.ProductCode"/>.<br/>
         /// Intended for lookup and display scenarios where deterministic ordering is useful and component<br/>
         /// information is required.<br/>
         /// </summary>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>Ordered list of all <see cref="Product"/> instances with components loaded.</returns>
-        Task<List<Product>> GetListWithComponentsAsync(CancellationToken ct = default);
+        Task<List<Product>> GetListWithComponentsAsync(bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
         /// Performs a simple search for products using <paramref name="term"/> against <see cref="Product.Name"/><br/>
@@ -70,7 +76,8 @@ namespace ASAPPVC.UI.Repositories
         /// implementation may return the full ordered list.<br/>
         /// </summary>
         /// <param name="term">Search term to match against name or product code.</param>
+        /// <param name="asNoTracking">If true returns untracked entities suitable for read-only operations. Defaults to true.</param>
         /// <returns>List of matching <see cref="Product"/> instances; an empty list if none match.</returns>
-        Task<List<Product>> SearchAsync(string term, CancellationToken ct = default);
+        Task<List<Product>> SearchAsync(string term, bool asNoTracking = true, CancellationToken ct = default);
     }
 }
