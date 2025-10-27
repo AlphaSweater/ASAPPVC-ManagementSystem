@@ -4,7 +4,7 @@ namespace ASAPPVC.UI.Repositories
 {
     public interface IOrderRepository : IBaseRepository<Order>
     {
-        Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default);
+        Task AddOrderProductsAsync(IEnumerable<OrderProduct> lines, CancellationToken ct = default);
 
         Task<List<Order>> ListAsync(CancellationToken ct = default);
 

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.UI.Models
 {
-    public class OrderProductModel
+    public class OrderProduct
     {
         // Internal GUID primary key for safe relations
         [Key]

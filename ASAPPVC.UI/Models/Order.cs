@@ -24,7 +24,7 @@ namespace ASAPPVC.UI.Models
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
         public CustomerModel? Customer { get; set; }
-        public List<OrderProductModel> OrderProducts { get; set; } = new();
+        public List<OrderProduct> OrderProducts { get; set; } = new();
     }
 
     public enum OrderStatus

@@ -21,7 +21,7 @@ namespace ASAPPVC.UI.Data
         // Orders and OrderProducts Bridge Tables
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<OrderProductModel> OrderProducts { get; set; }
+        public DbSet<OrderProduct> OrderProducts { get; set; }
 
         // CodeCounters Table for generating sequential codes
         public DbSet<CodeCounters> CodeCounters { get; set; }
@@ -48,13 +48,13 @@ namespace ASAPPVC.UI.Data
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<OrderProductModel>()
+            modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Order)
                 .WithMany(o => o.OrderProducts)
                 .HasForeignKey(op => op.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<OrderProductModel>()
+            modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Product)
                 .WithMany()
                 .HasForeignKey(op => op.ProductId)

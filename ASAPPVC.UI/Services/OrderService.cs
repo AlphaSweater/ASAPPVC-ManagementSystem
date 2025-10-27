@@ -40,7 +40,7 @@ namespace ASAPPVC.UI.Services
             var orderLines = vm.ProductQuantities
                 .Where(pq => pq != null && pq.ProductId != Guid.Empty && pq.Quantity > 0)
                 .GroupBy(pq => pq.ProductId)
-                .Select(g => new OrderProductModel
+                .Select(g => new OrderProduct
                 {
                     OrderId = addedOrder.Id,
                     ProductId = g.Key,

@@ -6,7 +6,7 @@ namespace ASAPPVC.UI.Repositories
 {
     public class OrderRepository(AppDbContext db) : BaseRepository<Order>(db), IOrderRepository
     {
-        public Task AddOrderProductsAsync(IEnumerable<OrderProductModel> lines, CancellationToken ct = default)
+        public Task AddOrderProductsAsync(IEnumerable<OrderProduct> lines, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(lines);
             _db.OrderProducts.AddRange(lines);
