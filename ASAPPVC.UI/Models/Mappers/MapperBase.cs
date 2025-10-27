@@ -1,3 +1,6 @@
+using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.UI.Services;
+
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
@@ -6,12 +9,12 @@ namespace ASAPPVC.UI.Models.Mappers
     /// </summary>
     public abstract class MapperBase
     {
-        protected readonly ICodeGenerator? CodeGenerator;
+        protected readonly ICodeGenerationService? CodeGenerationService;
         protected readonly IImageService? ImageService;
 
-        protected MapperBase(ICodeGenerator? codeGenerator = null, IImageService? imageService = null)
+        protected MapperBase(ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null)
         {
-            CodeGenerator = codeGenerator;
+            CodeGenerationService = codeGenerationService;
             ImageService = imageService;
         }
 
@@ -59,11 +62,32 @@ namespace ASAPPVC.UI.Models.Mappers
             if (!string.IsNullOrWhiteSpace(trimmed))
                 return trimmed;
 
-            if (CodeGenerator is not null)
+            // Try using the new async code generation service if available. We call it synchronously
+            // here because mapper APIs are synchronous; if generation fails we fall back to GUID.
+            if (CodeGenerationService is not null)
             {
-                var gen = (CodeGenerator.Generate(prefix) ?? string.Empty).Trim();
-                if (!string.IsNullOrWhiteSpace(gen))
-                    return gen;
+                try
+                {
+                    // Map simple prefix hints to CodeType. Keep it forgiving and case-insensitive.
+                    var p = (prefix ?? string.Empty).Trim().ToUpperInvariant();
+                    var type = p switch
+                    {
+                        var s when s.StartsWith("PROD") || s.StartsWith("PRO") => CodeType.Product,
+                        var s when s.StartsWith("COMP") || s.StartsWith("COMP") => CodeType.Component,
+                        var s when s.StartsWith("ORD") => CodeType.Order,
+                        var s when s.StartsWith("PSL") || s.StartsWith("PICK") => CodeType.PickingSlip,
+                        _ => CodeType.Product
+                    };
+
+                    var req = new CodeGenerationRequest { Type = type };
+                    var res = CodeGenerationService.GenerateCodeAsync(req).GetAwaiter().GetResult();
+                    if (res.Ok && !string.IsNullOrWhiteSpace(res.Value))
+                        return res.Value.Trim();
+                }
+                catch
+                {
+                    // swallow and fallback to GUID-style code below
+                }
             }
 
             // Fallback: short stable unique-ish code

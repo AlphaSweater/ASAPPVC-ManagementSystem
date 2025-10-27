@@ -1,5 +1,7 @@
 using ASAPPVC.UI.Models.Enums;
 
+using ASAPPVC.UI.Services;
+
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
@@ -7,8 +9,8 @@ namespace ASAPPVC.UI.Models.Mappers
     /// </summary>
     public class ProductMapper(
         IProductComponentMapper productComponentMapper,
-        ICodeGenerator? codeGenerator = null,
-        IImageService? imageService = null) : MapperBase(codeGenerator, imageService), IProductMapper
+        ICodeGenerationService? codeGenerationService = null,
+        IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IProductMapper
     {
         private readonly IProductComponentMapper _productComponentMapper = productComponentMapper ?? throw new ArgumentNullException(nameof(productComponentMapper));
 

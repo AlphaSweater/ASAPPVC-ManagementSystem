@@ -1,9 +1,11 @@
-﻿namespace ASAPPVC.UI.Models.Mappers
+﻿using ASAPPVC.UI.Services;
+
+namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
     /// Implementation of <see cref="IComponentMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
     /// </summary>
-    public class ComponentMapper(ICodeGenerator? codeGenerator = null, IImageService? imageService = null) : MapperBase(codeGenerator, imageService), IComponentMapper
+    public class ComponentMapper(ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IComponentMapper
     {
         // ------------------------------------------------------------
         // Domain → ViewModels

@@ -1,3 +1,5 @@
+using ASAPPVC.UI.Services;
+
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
@@ -5,8 +7,8 @@ namespace ASAPPVC.UI.Models.Mappers
     /// </summary>
     public class OrderMapper(
         IOrderProductMapper orderProductMapper,
-        ICodeGenerator? codeGenerator = null,
-        IImageService? imageService = null) : MapperBase(codeGenerator, imageService), IOrderMapper
+        ICodeGenerationService? codeGenerationService = null,
+        IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IOrderMapper
     {
         private readonly IOrderProductMapper _orderProductMapper = orderProductMapper ?? throw new ArgumentNullException(nameof(orderProductMapper));
 
