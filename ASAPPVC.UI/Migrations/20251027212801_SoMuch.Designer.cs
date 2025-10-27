@@ -3,6 +3,7 @@ using System;
 using ASAPPVC.UI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASAPPVC.UI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027212801_SoMuch")]
+    partial class SoMuch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -295,6 +298,9 @@ namespace ASAPPVC.UI.Migrations
                     b.Property<Guid>("ComponentId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("ComponentId1")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("TEXT");
 
@@ -307,6 +313,8 @@ namespace ASAPPVC.UI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ComponentId");
+
+                    b.HasIndex("ComponentId1");
 
                     b.HasIndex("ProductId", "ComponentId")
                         .IsUnique();
@@ -567,10 +575,14 @@ namespace ASAPPVC.UI.Migrations
             modelBuilder.Entity("ASAPPVC.UI.Models.ProductComponent", b =>
                 {
                     b.HasOne("ASAPPVC.UI.Models.Component", "Component")
-                        .WithMany("ProductComponents")
+                        .WithMany()
                         .HasForeignKey("ComponentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("ASAPPVC.UI.Models.Component", null)
+                        .WithMany("ProductComponents")
+                        .HasForeignKey("ComponentId1");
 
                     b.HasOne("ASAPPVC.UI.Models.Product", "Product")
                         .WithMany("ProductComponents")

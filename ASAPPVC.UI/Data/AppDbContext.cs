@@ -37,9 +37,10 @@ namespace ASAPPVC.UI.Data
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Explicitly map the relationship to Component.ProductComponents to avoid EF creating a shadow FK (ComponentId1)
             modelBuilder.Entity<ProductComponent>()
                 .HasOne(pp => pp.Component)
-                .WithMany()
+                .WithMany(c => c.ProductComponents)
                 .HasForeignKey(pp => pp.ComponentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
