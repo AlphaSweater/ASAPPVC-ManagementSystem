@@ -24,7 +24,6 @@ namespace ASAPPVC.UI.Models.Mappers
                 CurrentAmount = component.CurrentAmount,
                 UnitCost = component.UnitCost,
                 StorageLocation = component.StorageLocation,
-                HasImage = component.ImageData is { Length: > 0 } && !string.IsNullOrWhiteSpace(component.ImageType),
             };
         }
 
@@ -48,8 +47,7 @@ namespace ASAPPVC.UI.Models.Mappers
                 CurrentAmount = component.CurrentAmount,
                 UnitCost = component.UnitCost,
                 StorageLocation = component.StorageLocation,
-                ImageBase64DataUrl = includeImageDataUrl ? AsDataUrlOrNull(component.ImageData, component.ImageType) : null,
-                UsedInProductsCount = count
+                UsedInProductsCount = count,
             };
         }
 
@@ -57,11 +55,11 @@ namespace ASAPPVC.UI.Models.Mappers
         // ViewModels → Domain
         // ------------------------------------------------------------
 
-        public Component FromCreateVm(CreateComponentVm vm)
+        public async Task<Component> FromCreateVmAsync(CreateComponentVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
-            return new Component
+            var entity = new Component
             {
                 ComponentCode = NormalizeCodeOrGenerate(vm.ComponentCode, "COMP"),
                 Name = NormalizeString(vm.Name),
@@ -69,13 +67,26 @@ namespace ASAPPVC.UI.Models.Mappers
                 CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount,
                 UnitCost = NormalizeMoney(vm.UnitCost),
                 StorageLocation = NormalizeString(vm.StorageLocation),
-                ImageData = vm.ImageData ?? Array.Empty<byte>(),
-                ImageType = NormalizeString(vm.ImageType)
             };
+
+            if (vm.Image is not null)
+            {
+                if (ImageService is null)
+                    throw new InvalidOperationException("Image service is not available.");
+
+                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                if (!processed.Ok)
+                    throw new InvalidOperationException(processed.Error);
+
+                entity.Image = processed.Value!.ToAppImage();
+            }
+
+            return entity;
         }
 
-        public void ApplyEditVm(Component target, EditComponentVm vm)
+        public async Task ApplyEditVmAsync(Component target, EditComponentVm vm, CancellationToken ct = default)
         {
+            // Validate and apply synchronous fields
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
             if (target.Id != vm.Id)
@@ -88,21 +99,19 @@ namespace ASAPPVC.UI.Models.Mappers
             target.UnitCost = NormalizeMoney(vm.UnitCost);
             target.StorageLocation = NormalizeString(vm.StorageLocation);
 
-            // Image semantics (null: keep, empty: clear, data: replace)
-            if (vm.ImageData is null)
+            // Handle optional image processing asynchronously
+            if (vm.Image is not null)
             {
-                // keep existing
+                if (ImageService is null)
+                    throw new InvalidOperationException("Image service is not available.");
+
+                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                if (!processed.Ok)
+                    throw new InvalidOperationException(processed.Error);
+
+                target.Image = processed.Value!.ToAppImage(); // replace existing
             }
-            else if (vm.ImageData.Length == 0)
-            {
-                target.ImageData = Array.Empty<byte>();
-                target.ImageType = string.Empty;
-            }
-            else
-            {
-                target.ImageData = vm.ImageData;
-                target.ImageType = NormalizeString(vm.ImageType);
-            }
+            // If vm.Image is null -> keep current image as-is.
         }
     }
 }

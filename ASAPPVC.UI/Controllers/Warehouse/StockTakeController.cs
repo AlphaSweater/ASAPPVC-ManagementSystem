@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.UI.Controllers.Warehouse
 {
     public class StockTakeController : Controller
     {

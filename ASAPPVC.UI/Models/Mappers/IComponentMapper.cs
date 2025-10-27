@@ -31,26 +31,28 @@ namespace ASAPPVC.UI.Models.Mappers
 
         /// <summary>
         /// Materialize a new Component from Create VM. Trims/normalizes input.
+        /// This operation may process an uploaded image and is therefore async.
         /// <br/>
         /// <br/><b>Examples:</b>
         /// <code>
         /// Create → Domain
-        /// var comp = _mapper.FromCreateVm(createVm);
+        /// var comp = await _mapper.FromCreateVmAsync(createVm, ct);
         /// await _components.AddAsync(comp, ct);
         /// </code>
         /// </summary>
-        Component FromCreateVm(CreateComponentVm vm);
+        Task<Component> FromCreateVmAsync(CreateComponentVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Apply edits from Edit VM to an existing Component (in-place).
+        /// This operation may process an uploaded image and is therefore async.
         /// <br/>
         /// <br/><b>Examples:</b>
         /// <code>
         /// Edit → Apply
-        /// _mapper.ApplyEditVm(existing, editVm);
+        /// await _mapper.ApplyEditVmAsync(existing, editVm, ct);
         /// await _repo.SaveAsync(ct);
         /// </code>
         /// </summary>
-        void ApplyEditVm(Component target, EditComponentVm vm);
+        Task ApplyEditVmAsync(Component target, EditComponentVm vm, CancellationToken ct = default);
     }
 }

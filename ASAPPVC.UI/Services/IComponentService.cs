@@ -1,5 +1,4 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Inventory.Component;
 using ASAPPVC.UI.Utils;
 
 namespace ASAPPVC.UI.Services
@@ -21,7 +20,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> carrying the created <see cref="Component"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<Component>> CreateComponentAsync(CreateComponentViewModel vm, CancellationToken ct = default);
+        Task<Result<Component>> CreateComponentAsync(CreateComponentVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves a single component by its internal identifier or by its human-friendly code.

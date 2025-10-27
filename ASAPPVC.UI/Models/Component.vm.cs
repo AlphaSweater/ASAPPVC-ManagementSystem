@@ -25,7 +25,10 @@ namespace ASAPPVC.UI.Models
         public string StorageLocation { get; init; } = string.Empty;
 
         // Optional small preview flag
+
         public bool HasImage { get; init; }
+        public string? ThumbUrl { get; init; }
+        public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
 
         // Optional computed fields for UI display
         public string DisplayCost => UnitCost.ToString("C");
@@ -50,8 +53,11 @@ namespace ASAPPVC.UI.Models
         public decimal UnitCost { get; init; }
         public string StorageLocation { get; init; } = string.Empty;
 
-        // Optional image display (converted to base64 in controller/service)
-        public string? ImageBase64DataUrl { get; init; }
+        // Optional image url (null if no image)
+
+        public bool HasImage { get; init; }
+        public string? ImageUrl { get; init; }
+        public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
 
         // Number of distinct products that reference this component
         public int UsedInProductsCount { get; init; }
@@ -98,9 +104,7 @@ namespace ASAPPVC.UI.Models
         public string StorageLocation { get; set; } = string.Empty;
 
         [Display(Name = "Image (optional)")]
-        public byte[]? ImageData { get; set; }
-
-        public string? ImageType { get; set; }
+        public IFormFile? Image { get; set; }
     }
 
     //-----------------------------------------------\\
@@ -145,8 +149,8 @@ namespace ASAPPVC.UI.Models
         public string StorageLocation { get; set; } = string.Empty;
 
         [Display(Name = "Image (optional)")]
-        public byte[]? ImageData { get; set; }
+        public IFormFile? Image { get; set; }
 
-        public string? ImageType { get; set; }
+        public string? ExistingImageUrl { get; set; }
     }
 }
