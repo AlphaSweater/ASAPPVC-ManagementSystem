@@ -2,64 +2,64 @@
 using ASAPPVC.UI.Models.Enums;
 using ASAPPVC.UI.Repositories;
 using ASAPPVC.UI.Utils;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace ASAPPVC.UI.Services
 {
     /// <summary>
-    /// Service for generating unique, checksummed codes for Products, Components, Orders, and PickingSlips.
-    /// Implements sequential numbering with optional period-based resets and customizable formats.
+    /// Generates unique, checksummed codes for Products, Components, Orders, and PickingSlips.
+    /// Sequential numbering with optional period-based resets and customizable formats.
+    ///
+    /// Formats (before checksum):
+    /// - Product     : PRD(-CAT3)?-NNNN(-Vxx)?
+    /// - Component   : CMP(-CAT3)?-NNNNN
+    /// - Order       : ORD-YYYYMM-NNNN            (period always before serial)
+    /// - PickingSlip : PSL-ORDNNNN-Vxx            (uses short order form: ORD####)
+    ///
+    /// Final: "<base>-<checksum>" (checksum is single base-36 char).
     /// </summary>
-    public class CodeGenerationService : ICodeGenerationService
+    public class CodeGenerationService(ICodeCountersRepository countersRepository) : ICodeGenerationService
     {
-        private readonly ICodeCountersRepository _counters;
-
-        // Compiled regex patterns for performance
-        private static readonly Regex _alphaNumericRegex = new(@"[^A-Z0-9]", RegexOptions.Compiled);
-
-        private static readonly Regex _orderCodeRegex = new(@"ORD[^0-9]*([0-9]{3,6})", RegexOptions.Compiled);
-        private static readonly Regex _whitespaceRegex = new(@"\s+", RegexOptions.Compiled);
-
-        public CodeGenerationService(ICodeCountersRepository countersRepository)
-        {
-            _counters = countersRepository ?? throw new ArgumentNullException(nameof(countersRepository));
-        }
+        private readonly ICodeCountersRepository _counters = countersRepository ?? throw new ArgumentNullException(nameof(countersRepository));
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Generate a new code based on request parameters
         public async Task<Result<string>> GenerateCodeAsync(CodeGenerationRequest request, CancellationToken ct = default)
         {
-            // Validate request
+            // Validate request (fast-fail)
             var (isValid, validationError) = ValidateRequest(request);
             if (!isValid)
                 return Result<string>.Fail(validationError!);
 
             try
             {
-                var now = request.When?.ToUniversalTime() ?? DateTime.UtcNow;
+                // Freeze time for the whole operation
+                var nowUtc = (request.When ?? DateTime.UtcNow).ToUniversalTime();
+
+                // Prefix per-type (PRD/CMP/ORD/PSL)
                 string prefix = GetPrefixForType(request.Type);
 
-                // Determine if this code type uses period-based resets
-                string? periodKey = request.Type == CodeType.Order ? now.ToString("yyyyMM") : null;
+                // Period scoping (only Orders reset monthly)
+                string? periodKey = request.Type == CodeType.Order ? nowUtc.ToString("yyyyMM") : null;
 
-                // Build scope key for counter lookup
+                // Counter scope (Type + period bucket)
                 string scopeKey = $"{request.Type}-{periodKey ?? "GLOBAL"}";
 
-                // Get next sequential number
+                // Next number from counter store
                 var nextNumberResult = await GetNextCounterValueAsync(scopeKey, ct);
                 if (!nextNumberResult.Ok)
                     return Result<string>.Fail(nextNumberResult.Error!);
 
                 int nextNumber = nextNumberResult.Value;
 
-                // Build the code base (without checksum)
-                string codeBase = BuildCodeBase(request, prefix, nextNumber, now);
+                // Build base (no checksum)
+                string codeBase = BuildCodeBase(request, prefix, nextNumber, nowUtc);
 
-                // Compute and append checksum
+                // Compute checksum over normalized, alphanumeric-only form
                 char checksum = ComputeChecksum(codeBase);
-                string fullCode = $"{codeBase}-{checksum}";
 
-                return Result<string>.Success(fullCode);
+                // Final form: base + "-" + checksum
+                return Result<string>.Success($"{codeBase}-{checksum}");
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {
@@ -78,22 +78,19 @@ namespace ASAPPVC.UI.Services
             if (string.IsNullOrWhiteSpace(code))
                 return false;
 
-            // Code format: XXX-...-C (checksum is last character after final dash)
-            var parts = code.Split('-');
-            if (parts.Length < 2)
+            // checksum is last char after the final '-'
+            int lastDash = code.LastIndexOf('-');
+            if (lastDash <= 0 || lastDash == code.Length - 1)
                 return false;
 
-            string checksumPart = parts[^1];
+            string codeBase = code[..lastDash];
+            string checksumPart = code[(lastDash + 1)..];
+
             if (checksumPart.Length != 1)
                 return false;
 
-            // Reconstruct code base without checksum
-            string codeBase = string.Join("-", parts[..^1]);
-
-            // Recompute checksum
-            char expectedChecksum = ComputeChecksum(codeBase);
-
-            return checksumPart[0] == expectedChecksum;
+            char expected = ComputeChecksum(codeBase);
+            return checksumPart[0] == expected;
         }
 
         // ===================================================================
@@ -111,8 +108,14 @@ namespace ASAPPVC.UI.Services
             if (!Enum.IsDefined(typeof(CodeType), request.Type))
                 return (false, "Invalid code type specified.");
 
-            if (request.Type == CodeType.PickingSlip && string.IsNullOrWhiteSpace(request.RelatedCode))
-                return (false, "RelatedCode is required for PickingSlip generation.");
+            // PickingSlip needs a related Order code and a version (for revisions).
+            if (request.Type == CodeType.PickingSlip)
+            {
+                if (string.IsNullOrWhiteSpace(request.RelatedCode))
+                    return (false, "RelatedCode is required for PickingSlip generation.");
+                if (!request.Version.HasValue)
+                    return (false, "Version is required for PickingSlip generation.");
+            }
 
             if (request.Version.HasValue && (request.Version.Value < 1 || request.Version.Value > 99))
                 return (false, "Version must be between 1 and 99.");
@@ -127,11 +130,12 @@ namespace ASAPPVC.UI.Services
         {
             try
             {
+                // NOTE: Consider making this atomic in the repository (single round-trip UPDATE LastNumber=LastNumber+1 ... RETURNING).
                 var counter = await _counters.GetByTypeAndPeriodAsync("SCOPE", scopeKey, ct);
 
-                if (counter == null)
+                if (counter is null)
                 {
-                    // Create new counter starting at 1
+                    // First number
                     counter = new CodeCounters
                     {
                         CodeType = "SCOPE",
@@ -139,16 +143,21 @@ namespace ASAPPVC.UI.Services
                         LastNumber = 1,
                         UpdatedAt = DateTime.UtcNow
                     };
+
                     await _counters.AddAndSaveAsync(counter, ct);
                     return Result<int>.Success(counter.LastNumber);
                 }
 
-                // Increment existing counter
+                // Increment existing
                 counter.LastNumber++;
                 counter.UpdatedAt = DateTime.UtcNow;
                 await _counters.SaveAsync(ct);
 
                 return Result<int>.Success(counter.LastNumber);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                return Result<int>.Fail("Counter retrieval was canceled.");
             }
             catch (Exception ex)
             {
@@ -159,75 +168,127 @@ namespace ASAPPVC.UI.Services
         /// <summary>
         /// Builds the code base string (without checksum) based on request parameters.
         /// </summary>
-        private static string BuildCodeBase(CodeGenerationRequest request, string prefix, int number, DateTime timestamp)
+        private static string BuildCodeBase(CodeGenerationRequest request, string prefix, int number, DateTime timestampUtc)
         {
-            var category = SanitizeAlphaNumeric(request.Category, 3);
-            var version = $"V{Math.Clamp(request.Version ?? 1, 1, 99):00}";
+            // Normalize inputs once
+            string category = KeepAlnumUpper(request.Category, 3);
+            string? version = request.Version.HasValue
+                ? $"V{Math.Clamp(request.Version.Value, 1, 99):00}"
+                : null;
 
             string codeBase = request.Type switch
             {
-                CodeType.Product => BuildProductCode(prefix, category, number, request.Version.HasValue ? version : null),
+                CodeType.Product => BuildProductCode(prefix, category, number, version),
                 CodeType.Component => BuildComponentCode(prefix, category, number),
-                CodeType.Order => BuildOrderCode(prefix, timestamp, number),
-                CodeType.PickingSlip => BuildPickingSlipCode(prefix, request.RelatedCode!, version, number),
+                CodeType.Order => BuildOrderCode(prefix, timestampUtc, number),
+                CodeType.PickingSlip => BuildPickingSlipCode(prefix, request.RelatedCode!, version!, number),
                 _ => $"{prefix}-{number:0000}"
             };
 
+            // Ensure final casing is consistent
             return codeBase.ToUpperInvariant();
         }
 
         /// <summary>
-        /// Builds a product code: PRD(-CAT3)?-SERIAL(-REV2)?
+        /// Product base: PRD(-CAT3)?-NNNN(-Vxx)?
         /// Example: PRD-WIN-0001-V01 or PRD-0042
         /// </summary>
         private static string BuildProductCode(string prefix, string category, int number, string? version)
         {
-            var code = prefix;
+            if (!string.IsNullOrEmpty(category) && version is not null)
+                return $"{prefix}-{category}-{number:0000}-{version}";
 
             if (!string.IsNullOrEmpty(category))
-                code += $"-{category}";
+                return $"{prefix}-{category}-{number:0000}";
 
-            code += $"-{number:0000}";
+            if (version is not null)
+                return $"{prefix}-{number:0000}-{version}";
 
-            if (version != null)
-                code += $"-{version}";
-
-            return code;
+            return $"{prefix}-{number:0000}";
         }
 
         /// <summary>
-        /// Builds a component code: CMP(-CAT3)?-SERIAL
+        /// Component base: CMP(-CAT3)?-NNNNN
         /// Example: CMP-DRR-00001 or CMP-00042
         /// </summary>
         private static string BuildComponentCode(string prefix, string category, int number)
         {
-            var code = prefix;
-
-            if (!string.IsNullOrEmpty(category))
-                code += $"-{category}";
-
-            code += $"-{number:00000}";
-
-            return code;
+            return string.IsNullOrEmpty(category)
+                ? $"{prefix}-{number:00000}"
+                : $"{prefix}-{category}-{number:00000}";
         }
 
         /// <summary>
-        /// Builds an order code: ORD-YYYYMM-SERIAL
+        /// Order base: ORD-YYYYMM-NNNN
         /// Example: ORD-202401-0042
         /// </summary>
-        private static string BuildOrderCode(string prefix, DateTime timestamp, int number)
+        private static string BuildOrderCode(string prefix, DateTime timestampUtc, int number)
         {
-            return $"{prefix}-{timestamp:yyyyMM}-{number:0000}";
+            return $"{prefix}-{timestampUtc:yyyyMM}-{number:0000}";
         }
 
         /// <summary>
-        /// Builds a picking slip code: PSL-ORDxxxx-Vxx
-        /// Example: PSL-ORD0042-V01
+        /// Picking Slip base: PSL-ORD####-Vxx
+        /// - Extracts "ORD####" from Related Order code (strict ORD-YYYYMM-####[-Vxx][-C]).
+        /// - If extraction fails, falls back to current slip sequence as "ORD####".
+        /// Example target: PSL-ORD0042-V01
+        /// (Final code will be PSL-ORD0042-V01-<checksum>).
         /// </summary>
         private static string BuildPickingSlipCode(string prefix, string relatedOrderCode, string version, int fallbackNumber)
         {
-            var orderShort = ExtractOrderShortCode(relatedOrderCode) ?? $"ORD{fallbackNumber:0000}";
-            return $"{prefix}-{orderShort}-{version}";
+            var shortOrd = TryGetOrderShort(relatedOrderCode, out var s)
+                ? s
+                : $"ORD{fallbackNumber:0000}";
+
+            return $"{prefix}-{shortOrd}-{version}";
+        }
+
+        /// <summary>
+        /// Attempts to convert a strict Order code:
+        ///   ORD-YYYYMM-####[-Vxx][-C]
+        /// into a short form "ORD####".
+        /// Returns true if successful and outputs 'shortCode'.
+        /// </summary>
+        private static bool TryGetOrderShort(string? orderCode, out string shortCode)
+        {
+            shortCode = string.Empty;
+            if (string.IsNullOrWhiteSpace(orderCode))
+                return false;
+
+            // Upper + trim
+            var s = orderCode.Trim().ToUpperInvariant();
+
+            // Strip trailing checksum segment if last '-' part is a single char
+            int lastDash = s.LastIndexOf('-');
+            if (lastDash > 0 && lastDash < s.Length - 1 && (s.Length - (lastDash + 1)) == 1)
+                s = s[..lastDash];
+
+            // Split parts
+            var parts = s.Split('-');
+            // Must be ORD-YYYYMM-#### or ORD-YYYYMM-####-Vxx
+            if (parts.Length is not (3 or 4))
+                return false;
+            if (parts[0] != "ORD")
+                return false;
+
+            // YYYYMM
+            if (parts[1].Length != 6 || !AllDigits(parts[1]))
+                return false;
+
+            // ####
+            if (parts[2].Length != 4 || !AllDigits(parts[2]))
+                return false;
+
+            // Optional Vxx (if present)
+            if (parts.Length == 4)
+            {
+                var v = parts[3];
+                if (v.Length != 3 || v[0] != 'V' || !char.IsDigit(v[1]) || !char.IsDigit(v[2]))
+                    return false;
+            }
+
+            shortCode = $"ORD{parts[2]}";
+            return true;
         }
 
         /// <summary>
@@ -245,58 +306,55 @@ namespace ASAPPVC.UI.Services
             };
         }
 
-        /// <summary>
-        /// Sanitizes input to alphanumeric characters only and truncates to max length.
-        /// </summary>
-        private static string SanitizeAlphaNumeric(string? input, int maxLength)
+        private static bool AllDigits(string s)
         {
-            if (string.IsNullOrWhiteSpace(input))
-                return string.Empty;
-
-            var cleaned = _alphaNumericRegex.Replace(input.ToUpperInvariant(), "");
-            return cleaned.Length <= maxLength ? cleaned : cleaned[..maxLength];
-        }
-
-        /// <summary>
-        /// Extracts the last 4 digits from an order code.
-        /// Example: "ORD-202401-0042-X" → "ORD0042"
-        /// </summary>
-        private static string? ExtractOrderShortCode(string? orderCode)
-        {
-            if (string.IsNullOrWhiteSpace(orderCode))
-                return null;
-
-            var match = _orderCodeRegex.Match(orderCode.ToUpperInvariant());
-            if (match.Success)
-            {
-                string digits = match.Groups[1].Value;
-                // Take last 4 digits
-                return $"ORD{digits[^4..]}";
-            }
-
-            return null;
+            for (int i = 0; i < s.Length; i++)
+                if (!char.IsDigit(s[i]))
+                    return false;
+            return true;
         }
 
         /// <summary>
         /// Computes a base-36 checksum character for the given string.
+        /// Ignores any non-alphanumeric separators (hyphens, spaces, etc.).
         /// </summary>
         private static char ComputeChecksum(string codeBase)
         {
-            var cleaned = _whitespaceRegex.Replace(codeBase.ToUpperInvariant(), "");
+            var s = codeBase.ToUpperInvariant();
             int sum = 0;
 
-            foreach (char ch in cleaned)
+            for (int i = 0; i < s.Length; i++)
             {
-                int value = ch switch
-                {
-                    >= '0' and <= '9' => ch - '0',
-                    >= 'A' and <= 'Z' => 10 + (ch - 'A'),
-                    _ => 0
-                };
-                sum = (sum * 31 + value) % 36;
+                char ch = s[i];
+
+                int value =
+                    (ch >= '0' && ch <= '9') ? (ch - '0') :
+                    (ch >= 'A' && ch <= 'Z') ? (10 + (ch - 'A')) :
+                    -1;
+
+                if (value >= 0)
+                    sum = (sum * 31 + value) % 36;
             }
 
             return (char)(sum < 10 ? '0' + sum : 'A' + (sum - 10));
+        }
+
+        /// <summary>
+        /// Keeps only alphanumeric characters, uppercases, and truncates to max length (regex-free).
+        /// </summary>
+        private static string KeepAlnumUpper(string? input, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(input) || maxLength <= 0)
+                return string.Empty;
+
+            var sb = new StringBuilder(Math.Min(input.Length, maxLength));
+            for (int i = 0; i < input.Length && sb.Length < maxLength; i++)
+            {
+                char c = input[i];
+                if (char.IsLetterOrDigit(c))
+                    sb.Append(char.ToUpperInvariant(c));
+            }
+            return sb.ToString();
         }
     }
 }
