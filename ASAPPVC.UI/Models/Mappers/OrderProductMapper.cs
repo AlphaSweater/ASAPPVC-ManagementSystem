@@ -1,17 +1,15 @@
-﻿namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Converts between <see cref="OrderProduct"/> bridge entities and their ViewModels
-    /// (<see cref="CreateOrderProductVm"/>, <see cref="EditOrderProductVm"/>, <see cref="OrderProductVm"/>).
-    /// Provides bulk helpers for merging duplicates and normalizing quantities.
+    /// Implementation of <see cref="IOrderProductMapper"/>.
     /// </summary>
-    public static class OrderProductMapper
+    public class OrderProductMapper : IOrderProductMapper
     {
         // ------------------------------------------------------------
         // Domain → VM
         // ------------------------------------------------------------
 
-        public static OrderProductVm ToVm(OrderProduct orderProduct)
+        public OrderProductVm ToVm(OrderProduct orderProduct)
         {
             ArgumentNullException.ThrowIfNull(orderProduct);
 
@@ -27,7 +25,7 @@
             };
         }
 
-        public static List<OrderProductVm> ToVms(IEnumerable<OrderProduct> items)
+        public List<OrderProductVm> ToVms(IEnumerable<OrderProduct> items)
         {
             if (items is null)
                 return new();
@@ -39,7 +37,7 @@
         // Create VM → Domain
         // ------------------------------------------------------------
 
-        public static OrderProduct FromCreateVm(Guid orderId, CreateOrderProductVm vm)
+        public OrderProduct FromCreateVm(Guid orderId, CreateOrderProductVm vm)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -51,7 +49,7 @@
             };
         }
 
-        public static List<OrderProduct> FromCreateVms(Guid orderId, IEnumerable<CreateOrderProductVm> items)
+        public List<OrderProduct> FromCreateVms(Guid orderId, IEnumerable<CreateOrderProductVm> items)
         {
             return (items ?? Enumerable.Empty<CreateOrderProductVm>())
             .GroupBy(i => i.ProductId)
@@ -68,12 +66,10 @@
         // Edit VM → Domain (apply to existing)
         // ------------------------------------------------------------
 
-        public static void ApplyEditVm(OrderProduct target, EditOrderProductVm vm)
+        public void ApplyEditVm(OrderProduct target, EditOrderProductVm vm)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
-
-            var productChanged = target.ProductId != vm.ProductId;
 
             target.ProductId = vm.ProductId;
             target.Quantity = NormalizeQuantity(vm.Quantity);
@@ -82,9 +78,7 @@
             // If product changed, the associated Product navigation may be stale and should be reloaded by caller if needed.
         }
 
-        public static List<OrderProduct> ApplyEditVms(
-        IEnumerable<OrderProduct> existingProducts,
-        IEnumerable<EditOrderProductVm> editVms)
+        public List<OrderProduct> ApplyEditVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<EditOrderProductVm> editVms)
         {
             var existingByProduct = (existingProducts ?? Enumerable.Empty<OrderProduct>())
             .ToDictionary(x => x.ProductId, x => x);

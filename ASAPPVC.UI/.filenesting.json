@@ -13,41 +13,59 @@
                                                                         },
                                                "fileToFile":  {
                                                                   "add":  {
+                                                                              "ComponentMapper.cs":  [
+                                                                                                         "IComponentMapper.cs"
+                                                                                                     ],
                                                                               "OrderService.cs":  [
                                                                                                       "IOrderService.cs"
                                                                                                   ],
+                                                                              "CodeGenerationService.cs":  [
+                                                                                                               "ICodeGenerationService.cs"
+                                                                                                           ],
                                                                               "ComponentRepository.cs":  [
                                                                                                              "IComponentRepository.cs"
                                                                                                          ],
-                                                                              "AuthService.cs":  [
-                                                                                                     "IAuthService.cs"
+                                                                              "OrderMapper.cs":  [
+                                                                                                     "IOrderMapper.cs"
                                                                                                  ],
                                                                               "OrderRepository.cs":  [
                                                                                                          "IOrderRepository.cs"
                                                                                                      ],
-                                                                              "UserRepository.cs":  [
-                                                                                                        "IUserRepository.cs"
+                                                                              "ProductMapper.cs":  [
+                                                                                                       "IProductMapper.cs"
+                                                                                                   ],
+                                                                              "ProductComponentMapper.cs":  [
+                                                                                                                "IProductComponentMapper.cs"
+                                                                                                            ],
+                                                                              "BaseRepository.cs":  [
+                                                                                                        "IBaseRepository.cs"
                                                                                                     ],
+                                                                              "OrderProductMapper.cs":  [
+                                                                                                            "IOrderProductMapper.cs"
+                                                                                                        ],
                                                                               "CodeCountersRepository.cs":  [
                                                                                                                 "ICodeCountersRepository.cs"
                                                                                                             ],
+                                                                              "ComponentService.cs":  [
+                                                                                                          "IComponentService.cs"
+                                                                                                      ],
                                                                               "UserService.cs":  [
                                                                                                      "IUserService.cs"
                                                                                                  ],
                                                                               "ProductService.cs":  [
                                                                                                         "IProductService.cs"
                                                                                                     ],
-                                                                              "ComponentService.cs":  [
-                                                                                                          "IComponentService.cs"
-                                                                                                      ],
+                                                                              "AuthService.cs":  [
+                                                                                                     "IAuthService.cs"
+                                                                                                 ],
                                                                               "CustomerService.cs":  [
                                                                                                          "ICustomerService.cs"
                                                                                                      ],
                                                                               "CustomerRepository.cs":  [
                                                                                                             "ICustomerRepository.cs"
                                                                                                         ],
-                                                                              "BaseRepository.cs":  [
-                                                                                                        "IBaseRepository.cs"
+                                                                              "UserRepository.cs":  [
+                                                                                                        "IUserRepository.cs"
                                                                                                     ],
                                                                               "ProductRepository.cs":  [
                                                                                                            "IProductRepository.cs"

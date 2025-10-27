@@ -1,27 +1,22 @@
-﻿using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.UI.Models.Enums;
 
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Converts between <see cref="Product"/> domain entities and their ViewModels
-    /// (<see cref="CreateProductVm"/>, <see cref="EditProductVm"/>, <see cref="ProductListVm"/>, <see cref="ProductDetailVm"/>).
-    /// Uses <see cref="ProductComponentMapper"/> for component-line mapping to keep behavior consistent.
+    /// Implementation of <see cref="IProductMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
     /// </summary>
-    public static class ProductMapper
+    public class ProductMapper(
+        IProductComponentMapper productComponentMapper,
+        ICodeGenerator? codeGenerator = null,
+        IImageService? imageService = null) : MapperBase(codeGenerator, imageService), IProductMapper
     {
+        private readonly IProductComponentMapper _productComponentMapper = productComponentMapper ?? throw new ArgumentNullException(nameof(productComponentMapper));
+
         // ------------------------------------------------------------
         // Domain → ViewModels
         // ------------------------------------------------------------
 
-        /// <summary>
-        /// Converts a <see cref="Product"/> to a lightweight <see cref="ProductListVm"/> for lists/cards.
-        /// Counts component lines from <see cref="Product.ProductComponents"/> (null-safe).
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// var listVms = products.Select(ProductMapper.ToListVm).ToList();
-        /// </code>
-        /// </summary>
-        public static ProductListVm ToListVm(Product product)
+        public ProductListVm ToListVm(Product product)
         {
             ArgumentNullException.ThrowIfNull(product);
 
@@ -42,20 +37,11 @@ namespace ASAPPVC.UI.Models.Mappers
             };
         }
 
-        /// <summary>
-        /// Converts a <see cref="Product"/> to a full <see cref="ProductDetailVm"/>.
-        /// Delegates line mapping to <see cref="ProductComponentMapper.ToVms(System.Collections.Generic.IEnumerable{ProductComponent})"/>.
-        /// Optionally includes an inline Base64 image data URL.
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// var detailVm = ProductMapper.ToDetailVm(product);
-        /// </code>
-        /// </summary>
-        public static ProductDetailVm ToDetailVm(Product product, bool includeImageDataUrl = true)
+        public ProductDetailVm ToDetailVm(Product product, bool includeImageDataUrl = true)
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var components = ProductComponentMapper.ToVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+            var components = _productComponentMapper.ToVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
 
             return new ProductDetailVm
             {
@@ -76,26 +62,13 @@ namespace ASAPPVC.UI.Models.Mappers
         // ViewModels → Domain
         // ------------------------------------------------------------
 
-        /// <summary>
-        /// Creates a new <see cref="Product"/> from a <see cref="CreateProductVm"/>.
-        /// Component lines are created via <see cref="ProductComponentMapper.FromCreateVms(Guid,System.Collections.Generic.IEnumerable{CreateProductComponentVm},System.Collections.Generic.IDictionary{System.Guid, Unit})"/>,
-        /// which merges duplicate components and resolves units using the given lookup (defaults to <see cref="Unit.Piece"/> when missing).
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// var domain = ProductMapper.FromCreateVm(createVm, () => CodeGenerator.Next(), unitLookup);
-        /// await _repo.AddAsync(domain, ct);
-        /// </code>
-        /// </summary>
-        public static Product FromCreateVm(
-            CreateProductVm vm,
-            Func<string>? codeGenerator = null,
-            IDictionary<Guid, Unit>? componentUnitLookup = null)
+        public Product FromCreateVm(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
             var product = new Product
             {
-                ProductCode = NormalizeCodeOrGenerate(vm.ProductCode, codeGenerator),
+                ProductCode = NormalizeCodeOrGenerate(vm.ProductCode, "PROD"),
                 Name = NormalizeString(vm.Name),
                 Description = NormalizeString(vm.Description),
                 Price = NormalizeMoney(vm.Price),
@@ -108,7 +81,7 @@ namespace ASAPPVC.UI.Models.Mappers
 
             // Lines via shared mapper (handles duplicate merge + unit resolution).
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            product.ProductComponents = ProductComponentMapper.FromCreateVms(
+            product.ProductComponents = _productComponentMapper.FromCreateVms(
                 product.Id,
                 vm.Components ?? Enumerable.Empty<CreateProductComponentVm>(),
                 lookup);
@@ -116,20 +89,7 @@ namespace ASAPPVC.UI.Models.Mappers
             return product;
         }
 
-        /// <summary>
-        /// Applies an <see cref="EditProductVm"/> to an existing <see cref="Product"/>.
-        /// Component lines are updated via <see cref="ProductComponentMapper.ApplyEditVms(System.Collections.Generic.IEnumerable{ProductComponent},System.Collections.Generic.IEnumerable{EditProductComponentVm},System.Collections.Generic.IDictionary{System.Guid, Unit})"/>,
-        /// which updates/creates/merges by <c>ComponentId</c> and re-resolves units when needed.
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// ProductMapper.ApplyEditVm(existingProduct, editVm, unitLookup);
-        /// await _repo.SaveAsync(ct);
-        /// </code>
-        /// </summary>
-        public static void ApplyEditVm(
-            Product target,
-            EditProductVm vm,
-            IDictionary<Guid, Unit>? componentUnitLookup = null)
+        public void ApplyEditVm(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
@@ -170,47 +130,7 @@ namespace ASAPPVC.UI.Models.Mappers
             var editLines = vm.Components ?? Enumerable.Empty<EditProductComponentVm>();
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
 
-            target.ProductComponents = ProductComponentMapper.ApplyEditVms(existingLines, editLines, lookup);
-        }
-
-        // ------------------------------------------------------------
-        // Utility helpers
-        // ------------------------------------------------------------
-
-        private static string NormalizeString(string? s)
-        {
-            return (s ?? string.Empty).Trim();
-        }
-
-        private static string NormalizeCodeOrGenerate(string? code, Func<string>? generator)
-        {
-            var trimmed = (code ?? string.Empty).Trim();
-            if (!string.IsNullOrWhiteSpace(trimmed))
-                return trimmed;
-
-            if (generator is not null)
-            {
-                var gen = (generator() ?? string.Empty).Trim();
-                if (!string.IsNullOrWhiteSpace(gen))
-                    return gen;
-            }
-
-            // Fallback: short stable unique-ish code prefix
-            return $"PROD-{Guid.NewGuid():N}".Substring(0, 13);
-        }
-
-        private static decimal NormalizeMoney(decimal price)
-        {
-            return price < 0 ? 0 : decimal.Round(price, 2, MidpointRounding.AwayFromZero);
-        }
-
-        private static string? AsDataUrlOrNull(byte[]? data, string? mime)
-        {
-            if (data is not { Length: > 0 })
-                return null;
-            var safeType = string.IsNullOrWhiteSpace(mime) ? "image/png" : mime.Trim();
-            var b64 = Convert.ToBase64String(data);
-            return $"data:{safeType};base64,{b64}";
+            target.ProductComponents = _productComponentMapper.ApplyEditVms(existingLines, editLines, lookup);
         }
     }
 }
