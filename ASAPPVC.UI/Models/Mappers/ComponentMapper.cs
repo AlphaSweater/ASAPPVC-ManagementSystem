@@ -92,13 +92,13 @@
             return new Component
             {
                 ComponentCode = NormalizeCodeOrGenerate(vm.ComponentCode, codeGenerator),
-                Name = Normalize(vm.Name),
+                Name = NormalizeString(vm.Name),
                 Unit = vm.Unit,
                 CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount,
                 UnitCost = NormalizeMoney(vm.UnitCost),
-                StorageLocation = Normalize(vm.StorageLocation),
+                StorageLocation = NormalizeString(vm.StorageLocation),
                 ImageData = vm.ImageData ?? Array.Empty<byte>(),
-                ImageType = Normalize(vm.ImageType)
+                ImageType = NormalizeString(vm.ImageType)
             };
         }
 
@@ -119,12 +119,12 @@
             if (target.Id != vm.Id)
                 throw new InvalidOperationException("Mismatched component Id.");
 
-            target.ComponentCode = Normalize(vm.ComponentCode);
-            target.Name = Normalize(vm.Name);
+            target.ComponentCode = NormalizeString(vm.ComponentCode);
+            target.Name = NormalizeString(vm.Name);
             target.Unit = vm.Unit;
             target.CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount;
             target.UnitCost = NormalizeMoney(vm.UnitCost);
-            target.StorageLocation = Normalize(vm.StorageLocation);
+            target.StorageLocation = NormalizeString(vm.StorageLocation);
 
             // Image semantics (null: keep, empty: clear, data: replace)
             if (vm.ImageData is null)
@@ -139,7 +139,7 @@
             else
             {
                 target.ImageData = vm.ImageData;
-                target.ImageType = Normalize(vm.ImageType);
+                target.ImageType = NormalizeString(vm.ImageType);
             }
         }
 
@@ -147,7 +147,7 @@
         // Helpers
         // ------------------------------------------------------------
 
-        private static string Normalize(string? s)
+        private static string NormalizeString(string? s)
         {
             return (s ?? string.Empty).Trim();
         }

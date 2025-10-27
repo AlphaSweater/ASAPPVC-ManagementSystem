@@ -98,7 +98,7 @@ namespace ASAPPVC.UI.Models.Mappers
                 ProductCode = NormalizeCodeOrGenerate(vm.ProductCode, codeGenerator),
                 Name = NormalizeString(vm.Name),
                 Description = NormalizeString(vm.Description),
-                Price = NormalizePrice(vm.Price),
+                Price = NormalizeMoney(vm.Price),
                 ImageData = vm.ImageData ?? Array.Empty<byte>(),
                 ImageType = NormalizeString(vm.ImageType),
                 Category = vm.Category,
@@ -139,7 +139,7 @@ namespace ASAPPVC.UI.Models.Mappers
             target.ProductCode = NormalizeString(vm.ProductCode);
             target.Name = NormalizeString(vm.Name);
             target.Description = NormalizeString(vm.Description);
-            target.Price = NormalizePrice(vm.Price);
+            target.Price = NormalizeMoney(vm.Price);
 
             // Image semantics:
             // null   → leave unchanged
@@ -199,16 +199,16 @@ namespace ASAPPVC.UI.Models.Mappers
             return $"PROD-{Guid.NewGuid():N}".Substring(0, 13);
         }
 
-        private static decimal NormalizePrice(decimal price)
+        private static decimal NormalizeMoney(decimal price)
         {
             return price < 0 ? 0 : decimal.Round(price, 2, MidpointRounding.AwayFromZero);
         }
 
-        private static string? AsDataUrlOrNull(byte[]? data, string? type)
+        private static string? AsDataUrlOrNull(byte[]? data, string? mime)
         {
             if (data is not { Length: > 0 })
                 return null;
-            var safeType = string.IsNullOrWhiteSpace(type) ? "image/png" : type.Trim();
+            var safeType = string.IsNullOrWhiteSpace(mime) ? "image/png" : mime.Trim();
             var b64 = Convert.ToBase64String(data);
             return $"data:{safeType};base64,{b64}";
         }

@@ -107,5 +107,28 @@
             // Fallback stable-ish prefix
             return $"ORD-{Guid.NewGuid():N}".Substring(0, 13);
         }
+
+        // ------------------------------------------------------------
+        // Utility helpers (kept consistent with other mappers)
+        // ------------------------------------------------------------
+
+        private static string NormalizeString(string? s)
+        {
+            return (s ?? string.Empty).Trim();
+        }
+
+        private static decimal NormalizeMoney(decimal amount)
+        {
+            return amount < 0 ? 0 : decimal.Round(amount, 2, MidpointRounding.AwayFromZero);
+        }
+
+        private static string? AsDataUrlOrNull(byte[]? data, string? mime)
+        {
+            if (data is not { Length: > 0 })
+                return null;
+            var safeMime = string.IsNullOrWhiteSpace(mime) ? "image/png" : mime.Trim();
+            var b64 = Convert.ToBase64String(data);
+            return $"data:{safeMime};base64,{b64}";
+        }
     }
 }
