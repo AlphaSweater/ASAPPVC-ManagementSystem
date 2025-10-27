@@ -16,3 +16,4 @@ jobs:
   call-reusable:
     name: 🚦 PR CI
     uses: ./.github/workflows/dotnet-ci.yaml
+    secrets: inherit
