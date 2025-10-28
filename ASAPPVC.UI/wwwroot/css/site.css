@@ -1,22 +1,91 @@
+/* ================================================================
+   ASAPPVC • site.css
+   Global styles, variables, and utility classes
+   --------------------------------------------------------------- */
+
+/* ------------------------------
+   Root Theme Tokens
+------------------------------ */
+:root {
+	/* Brand Fonts */
+	--font-base: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--font-heading: var(--font-base);
+	/* Brand Colors */
+	--sa-red-1: #d63a3a; /* start */
+	--sa-red-2: #b52e2e; /* mid */
+	--sa-red-3: #8f2424; /* end */
+	--sa-accent: #ff5252; /* highlights, pills, borders */
+	/* Deep Blue Mist Gradient */
+	--sa-blue-1: #244d7a;
+	--sa-blue-2: #1b3a63;
+	--sa-blue-3: #0f1b33;
+	/* Glass UI Tokens */
+	--glass-bg: rgba(255, 255, 255, 0.06);
+	--glass-border: rgba(255, 255, 255, 0.18);
+	--glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+	--glass-blur: 16px;
+	--glass-radius: 20px;
+	/* Text Colors */
+	--text-color: #e9eef8;
+	--text-muted: #a6b0c2;
+}
+
+/* ------------------------------
+   Global Typography + Layout
+------------------------------ */
 html {
-  font-size: 14px;
+	font-family: var(--font-base);
+	font-size: 14px;
+	position: relative;
+	min-height: 100%;
+	scroll-behavior: smooth;
+	color: var(--text-color);
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+	html {
+		font-size: 16px;
+	}
 }
 
 body {
-  margin-bottom: 60px;
+	margin: 0;
+	margin-bottom: 60px;
+	background: linear-gradient(135deg, var(--sa-blue-1) 0%, var(--sa-blue-2) 50%, var(--sa-blue-3) 100%);
+	background-attachment: fixed;
+	color: var(--text-color);
+}
+
+/* ------------------------------
+   Sidebar Gradient Helper
+------------------------------ */
+.sidebar {
+	background: linear-gradient(180deg, var(--sa-red-1) 0%, var(--sa-red-2) 50%, var(--sa-red-3) 100%);
+	box-shadow: 6px 0 24px rgba(0, 0, 0, 0.18);
+}
+
+/* ------------------------------
+   Buttons & Focus Styles
+------------------------------ */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+	box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* ------------------------------
+   Utility Helpers
+------------------------------ */
+.text-muted {
+	color: var(--text-muted) !important;
+}
+
+.bg-red-gradient {
+	background: linear-gradient(180deg, var(--sa-red-1) 0%, var(--sa-red-2) 50%, var(--sa-red-3) 100%);
+}
+
+.bg-blue-gradient {
+	background: linear-gradient(135deg, var(--sa-blue-1) 0%, var(--sa-blue-2) 50%, var(--sa-blue-3) 100%);
 }

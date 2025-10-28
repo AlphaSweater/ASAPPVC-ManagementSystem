@@ -4,131 +4,149 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.UI.Repositories
 {
-    public class ProductRepository(AppDbContext db) : BaseRepository<ProductModel>(db), IProductRepository
+    public class ProductRepository(AppDbContext db) : BaseRepository<Product>(db), IProductRepository
     {
-        // ---------- Domain-flavoured CRUD ----------
+        // ---------- Reads ----------
 
-        /// <summary>Add product only and save.</summary>
-        public async Task<ProductModel> AddProductAsync(ProductModel product, CancellationToken ct = default)
-        {
-            ArgumentNullException.ThrowIfNull(product);
-            var added = await AddAsync(product, ct);
-            await SaveAsync(ct);
-            return added;
-        }
-
-        /// <summary>
-        /// Add product + its component bridge rows in one save.
-        /// </summary>
-        public async Task<ProductModel> AddProductWithComponentsAsync(
-            ProductModel product,
-            IEnumerable<ProductComponentModel> components,
+        public async Task<Product?> GetByIdOrCodeAsync(
+            Guid? id = null,
+            string? code = null,
+            bool asNoTracking = true,
             CancellationToken ct = default)
         {
-            ArgumentNullException.ThrowIfNull(product);
-            ArgumentNullException.ThrowIfNull(components);
+            // Prefer Id lookups if any valid Guid provided
+            if (id.HasValue && id.Value != Guid.Empty)
+                return await GetByIdAsync(id.Value, asNoTracking, ct);
 
-            if (product.Id == Guid.Empty)
-                product.Id = Guid.NewGuid();
+            // Fallback to Code lookups if any non-blank string provided
+            if (!string.IsNullOrWhiteSpace(code))
+                return await GetByCodeAsync(code!, asNoTracking, ct);
 
-            await AddAsync(product, ct); // staged
+            // Neither provided => nothing to fetch
+            return null;
+        }
 
-            var rows = components as IList<ProductComponentModel> ?? components.ToList();
-            if (rows.Count > 0)
+        public async Task<Product?> GetByIdOrCodeWithComponentsAsync(
+            Guid? id = null,
+            string? code = null,
+            bool asNoTracking = true,
+            CancellationToken ct = default)
+        {
+            // Prefer Id lookups if any valid Guid provided
+            if (id.HasValue && id.Value != Guid.Empty)
             {
-                foreach (var r in rows)
-                    r.ProductId = product.Id; // normalize
-
-                await AddRangeToBridgeAsync(_db.ProductComponents, rows, ct);
+                var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+                return await query
+                    .Include(p => p.ProductComponents)
+                    .ThenInclude(pc => pc.Component)
+                    .FirstOrDefaultAsync(p => p.Id == id.Value, ct);
             }
 
-            await SaveAsync(ct);
-            return product;
+            // Fallback to Code lookups if any non-blank string provided
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+                return await query
+                    .Include(p => p.ProductComponents)
+                    .ThenInclude(pc => pc.Component)
+                    .FirstOrDefaultAsync(p => p.ProductCode == code, ct);
+            }
+
+            // Neither provided => nothing to fetch
+            return null;
         }
 
-        // Update + Save (fields only; does not touch components)
-        public async Task<bool> UpdateProductAsync(ProductModel product, CancellationToken ct = default)
+        public async Task<List<Product>> GetListByIdsOrCodesAsync(
+            IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+            bool asNoTracking = true,
+            CancellationToken ct = default)
         {
-            Update(product);
-            return await SaveAsync(ct) > 0;
+            // Prefer IDs when any valid Guid is present
+            var hasValidIds = ids?.Any(g => g != Guid.Empty) == true;
+            if (hasValidIds)
+                return await GetListByIdsAsync(ids!, asNoTracking, ct);
+
+            // Fallback to codes when any non-blank code is present
+            var hasValidCodes = codes?.Any(s => !string.IsNullOrWhiteSpace(s)) == true;
+            if (hasValidCodes)
+                return await GetListByCodesAsync(codes!, asNoTracking, ct);
+
+            // Neither provided => empty
+            return new List<Product>(0);
         }
 
-        // Delete + Save (also relies on cascade rules for bridge rows)
-        public async Task<bool> DeleteProductAsync(Guid id, CancellationToken ct = default)
+        public async Task<List<Product>> GetListByIdsOrCodesWithComponentsAsync(
+            IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+            bool asNoTracking = true,
+            CancellationToken ct = default)
         {
-            if (!await RemoveByIdAsync(id, ct))
-                return false;
-            return await SaveAsync(ct) > 0;
+            // Prefer IDs when any valid Guid is present
+            var hasValidIds = ids?.Any(g => g != Guid.Empty) == true;
+            if (hasValidIds)
+            {
+                var idSet = ids!.Where(g => g != Guid.Empty).ToHashSet();
+                var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+                return await query
+                    .Where(p => idSet.Contains(p.Id))
+                    .Include(p => p.ProductComponents)
+                    .ThenInclude(pc => pc.Component)
+                    .OrderBy(p => p.ProductCode)
+                    .ToListAsync(ct);
+            }
+
+            // Fallback to codes when any non-blank code is present
+            var hasValidCodes = codes?.Any(s => !string.IsNullOrWhiteSpace(s)) == true;
+            if (hasValidCodes)
+            {
+                var codeSet = codes!.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+                return await query
+                    .Where(p => codeSet.Contains(p.ProductCode))
+                    .Include(p => p.ProductComponents)
+                    .ThenInclude(pc => pc.Component)
+                    .OrderBy(p => p.ProductCode)
+                    .ToListAsync(ct);
+            }
+
+            // Neither provided => empty
+            return new List<Product>(0);
         }
 
-        // Replace the entire component set for a product (delete old, add new) + Save
-        public async Task<bool> ReplaceComponentsAsync(Guid productId, IEnumerable<ProductComponentModel> components, CancellationToken ct = default)
+        public async Task<List<Product>> GetListAsync(bool asNoTracking = true, CancellationToken ct = default)
         {
-            ArgumentNullException.ThrowIfNull(components);
+            var list = await ListAsync(asNoTracking, ct);
+            return list.OrderBy(p => p.ProductCode).ToList();
+        }
 
-            // Delete existing
-            var existing = await _db.ProductComponents
-                .Where(pp => pp.ProductId == productId)
+        public async Task<List<Product>> GetListWithComponentsAsync(bool asNoTracking = true, CancellationToken ct = default)
+        {
+            var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+            return await query
+                .Include(p => p.ProductComponents)
+                .ThenInclude(pc => pc.Component)
+                .OrderBy(p => p.ProductCode)
                 .ToListAsync(ct);
-
-            if (existing.Count > 0)
-                _db.ProductComponents.RemoveRange(existing);
-
-            // Add new (normalize productId just in case)
-            var rows = components.ToList();
-            foreach (var r in rows)
-                r.ProductId = productId;
-            if (rows.Count > 0)
-                await _db.ProductComponents.AddRangeAsync(rows, ct);
-
-            return await SaveAsync(ct) > 0;
         }
 
-        // ---------- Reads with small interpretations ----------
+        // ---------- Search ----------
 
-        public Task<ProductModel?> GetWithComponentsAsync(Guid id, CancellationToken ct = default)
-        {
-            return _set.AsNoTracking()
-                           .Include(p => p.ProductComponents)
-                             .ThenInclude(pp => pp.Component)
-                           .FirstOrDefaultAsync(p => p.Id == id, ct);
-        }
-
-        public Task<List<ProductModel>> ListOrderedByNameAsync(CancellationToken ct = default)
-        {
-            return _set.AsNoTracking()
-                           .OrderBy(p => p.Name)
-                           .ToListAsync(ct);
-        }
-
-        public Task<ProductModel?> GetByProductCodeAsync(string productCode, CancellationToken ct = default)
-        {
-            return FirstOrDefaultAsync(p => p.ProductCode == productCode, asNoTracking: true, ct);
-        }
-
-        public Task<List<ProductModel>> SearchAsync(string term, CancellationToken ct = default)
+        public Task<List<Product>> SearchAsync(string term, bool asNoTracking = true, CancellationToken ct = default)
         {
             term = (term ?? string.Empty).Trim();
             if (term.Length == 0)
-                return ListOrderedByNameAsync(ct);
+            {
+                // When no term, return full list ordered by ComponentCode (align with new default list behavior)
+                return GetListAsync(asNoTracking, ct);
+            }
 
-            return _set.AsNoTracking()
-                       .Where(p =>
-                           EF.Functions.Like(p.Name, $"%{term}%") ||
-                           EF.Functions.Like(p.ProductCode, $"%{term}%"))
+            // Simple contains search on Name/ComponentCode; push to DB with tracking control
+            var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+            return query.Where(p => EF.Functions.Like(p.Name, $"%{term}%")
+                                || EF.Functions.Like(p.ProductCode, $"%{term}%"))
                        .OrderBy(p => p.Name)
                        .ToListAsync(ct);
-        }
-
-        // ---------- Utility ----------
-
-        public Task<List<ComponentModel>> GetComponentsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
-        {
-            ArgumentNullException.ThrowIfNull(ids);
-            var list = ids as ICollection<Guid> ?? ids.ToArray();
-            if (list.Count == 0)
-                return Task.FromResult(new List<ComponentModel>());
-            return _db.Components.Where(p => list.Contains(p.Id)).AsNoTracking().ToListAsync(ct);
         }
     }
 }

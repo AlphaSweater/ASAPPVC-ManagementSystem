@@ -1,4 +1,5 @@
 ﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.General;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +12,17 @@ namespace ASAPPVC.UI.Data
         public DbSet<CustomerModel> Customers { get; set; }
 
         // Components Table
-        public DbSet<ComponentModel> Components { get; set; }
+        public DbSet<Component> Components { get; set; }
 
         // Products and ProductComponents Bridge Tables
-        public DbSet<ProductModel> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
 
-        public DbSet<ProductComponentModel> ProductComponents { get; set; }
+        public DbSet<ProductComponent> ProductComponents { get; set; }
 
         // Orders and OrderProducts Bridge Tables
-        public DbSet<OrderModel> Orders { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
-        public DbSet<OrderProductModel> OrderProducts { get; set; }
+        public DbSet<OrderProduct> OrderProducts { get; set; }
 
         // CodeCounters Table for generating sequential codes
         public DbSet<CodeCounters> CodeCounters { get; set; }
@@ -30,35 +31,49 @@ namespace ASAPPVC.UI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProductComponentModel>()
+            modelBuilder.Entity<ProductComponent>()
                 .HasOne(pp => pp.Product)
                 .WithMany(p => p.ProductComponents)
                 .HasForeignKey(pp => pp.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ProductComponentModel>()
+            // Explicitly map the relationship to Component.ProductComponents to avoid EF creating a shadow FK (ComponentId1)
+            modelBuilder.Entity<ProductComponent>()
                 .HasOne(pp => pp.Component)
-                .WithMany()
+                .WithMany(c => c.ProductComponents)
                 .HasForeignKey(pp => pp.ComponentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<OrderModel>()
+            modelBuilder.Entity<Order>()
                 .HasOne(o => o.Customer)
                 .WithMany()
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<OrderProductModel>()
+            modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Order)
                 .WithMany(o => o.OrderProducts)
                 .HasForeignKey(op => op.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<OrderProductModel>()
+            modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Product)
                 .WithMany()
                 .HasForeignKey(op => op.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Minimal owned-type configuration for AppImage on Product and Component
+            modelBuilder.Entity<Product>().OwnsOne(p => p.Image, b =>
+            {
+                b.Property(i => i.ContentType).HasMaxLength(64);
+                b.Property(i => i.Sha256).HasMaxLength(64);
+            });
+
+            modelBuilder.Entity<Component>().OwnsOne(c => c.Image, b =>
+            {
+                b.Property(i => i.ContentType).HasMaxLength(64);
+                b.Property(i => i.Sha256).HasMaxLength(64);
+            });
         }
     }
 }

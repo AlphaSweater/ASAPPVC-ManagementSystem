@@ -1,6 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Customer;
 using ASAPPVC.UI.Repositories;
+using ASAPPVC.UI.ViewModels.Customer;
 
 namespace ASAPPVC.UI.Services
 {

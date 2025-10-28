@@ -1,0 +1,40 @@
+﻿@{
+	ViewData["Title"] = "Warehouse • Dashboard";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/warehouse/WarehouseDashboard.css" asp-append-version="true" />
+}
+
+<div class="viewport">
+	<div class="container">
+		<!-- Header -->
+		<header class="header">
+			<div>
+				<h1 class="title">Warehouse Dashboard</h1>
+				<p class="subtitle">Quick actions for inventory operations</p>
+			</div>
+		</header>
+
+		<!-- Actions -->
+		<section class="actions-grid">
+			<a class="action-card action-stock" asp-controller="StockTake" asp-action="StockTake">
+
+				<img class="icon" src="~/assets/icons/clipboard-pen-line.svg" asp-append-version="true" alt="Back" width="20" height="20" />
+				<div class="text">
+					<h2>Stock Take</h2>
+					<p>Count and reconcile on-hand quantities.</p>
+				</div>
+				<span class="btn btn-primary">Open</span>
+			</a>
+
+			<a class="action-card action-receive" asp-controller="Inventory" asp-action="AddProductGet">
+				<div class="text">
+					<h2>Receive Shipment</h2>
+					<p>Log new deliveries and update inventory.</p>
+				</div>
+				<span class="btn btn-accent">Open</span>
+			</a>
+		</section>
+	</div>
+</div>

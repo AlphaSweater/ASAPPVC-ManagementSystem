@@ -20,20 +20,24 @@
 		public bool Ok { get; }
 		public string? Error { get; }
 
-		private Result(bool ok, string? error = null) {
+		private Result(bool ok, string? error = null)
+		{
 			(Ok, Error) = (ok, error);
 		}
 
 		// Factory helpers
-		public static Result Success() {
+		public static Result Success()
+		{
 			return new(true);
 		}
 
-		public static Result Fail(string error) {
+		public static Result Fail(string error)
+		{
 			return new(false, error ?? "Unknown error");
 		}
 
-		public override string ToString() {
+		public override string ToString()
+		{
 			return Ok ? "Success" : $"Fail({Error})";
 		}
 	}
@@ -58,20 +62,24 @@
 		public T? Value { get; }
 		public string? Error { get; }
 
-		private Result(bool ok, T? value = default, string? error = null) {
+		private Result(bool ok, T? value = default, string? error = null)
+		{
 			(Ok, Value, Error) = (ok, value, error);
 		}
 
 		// Factory helpers
-		public static Result<T> Success(T value) {
+		public static Result<T> Success(T value)
+		{
 			return new(true, value);
 		}
 
-		public static Result<T> Fail(string error) {
+		public static Result<T> Fail(string error)
+		{
 			return new(false, default, error ?? "Unknown error");
 		}
 
-		public override string ToString() {
+		public override string ToString()
+		{
 			return Ok ? $"Success({Value})" : $"Fail({Error})";
 		}
 	}

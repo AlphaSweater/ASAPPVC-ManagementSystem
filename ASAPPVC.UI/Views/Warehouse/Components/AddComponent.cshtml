@@ -1,0 +1,146 @@
+﻿@model global::ASAPPVC.UI.Models.CreateComponentVm
+@{
+	ViewData["Title"] = "Add New Component";
+	ViewData["ShowBackPageName"] = true;
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
+}
+
+<div class="page">
+	@await Html.PartialAsync("_BackButton")
+
+	<div class="" role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Capture a new stock component with image, cost, and storage details.</p>
+			</div>
+
+			<div class="card-actions">
+				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost">
+					🏷️ Components
+				</a>
+			</div>
+		</header>
+
+		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
+
+		<form asp-controller="Components"
+			  asp-action="AddComponent"
+			  method="post"
+			  enctype="multipart/form-data"
+			  novalidate>
+			@Html.AntiForgeryToken()
+
+			<div class="card-body">
+				<!-- Image panel -->
+				<section class="media-panel">
+					<h2 class="sr-only">Component Image</h2>
+
+					<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
+						<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Preview" />
+						<div class="dropzone-overlay">
+							📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span>
+						</div>
+					</label>
+
+					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
+					<span asp-validation-for="Image" class="field-error"></span>
+				</section>
+
+				<!-- Fields -->
+				<section class="fields-panel">
+					<div class="form-grid">
+						<div class="form-field half">
+							<label asp-for="Name" class="label"></label>
+							<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" />
+							<span asp-validation-for="Name" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
+							<label asp-for="StorageLocation" class="label"></label>
+							<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" />
+							<span asp-validation-for="StorageLocation" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
+							<label asp-for="UnitCost" class="label"></label>
+							<div class="input-group">
+								<span class="prefix">R</span>
+								<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
+							</div>
+							<span asp-validation-for="UnitCost" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
+							<label asp-for="CurrentAmount" class="label"></label>
+							<input asp-for="CurrentAmount" class="input" type="number" min="0" placeholder="e.g. 100" />
+							<span asp-validation-for="CurrentAmount" class="field-error"></span>
+						</div>
+
+						<div class="form-field full">
+							<label asp-for="Unit" class="label"></label>
+							<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.UI.Models.Enums.Unit>()"></select>
+							<span asp-validation-for="Unit" class="field-error"></span>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary bg-red-gradient">Save Component</button>
+						<button type="reset" class="btn btn-ghost">Reset</button>
+					</div>
+				</section>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		(() => {
+			const input = document.getElementById('imageFile');
+			const preview = document.getElementById('previewImg');
+			const zone = document.getElementById('dropzone');
+
+			const previewFile = file => {
+				if (!file || !file.type.startsWith('image/')) return;
+				const reader = new FileReader();
+				reader.onload = e => preview.src = e.target.result;
+				reader.readAsDataURL(file);
+			};
+
+			input.addEventListener('change', () => previewFile(input.files[0]));
+
+			['dragenter', 'dragover'].forEach(evt =>
+				zone.addEventListener(evt, e => {
+					e.preventDefault();
+					zone.classList.add('is-dragover');
+				})
+			);
+
+			['dragleave', 'drop'].forEach(evt =>
+				zone.addEventListener(evt, e => {
+					e.preventDefault();
+					zone.classList.remove('is-dragover');
+				})
+			);
+
+			zone.addEventListener('drop', e => {
+				const file = e.dataTransfer?.files?.[0];
+				if (file) {
+					input.files = e.dataTransfer.files;
+					previewFile(file);
+				}
+			});
+
+			zone.addEventListener('keydown', e => {
+				if (['Enter', ' '].includes(e.key)) {
+					e.preventDefault();
+					input.click();
+				}
+			});
+		})();
+	</script>
+}

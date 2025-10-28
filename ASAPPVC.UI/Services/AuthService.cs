@@ -1,6 +1,6 @@
 ﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.ViewModels.Auth;
 using ASAPPVC.UI.Repositories;
+using ASAPPVC.UI.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 
 namespace ASAPPVC.UI.Services

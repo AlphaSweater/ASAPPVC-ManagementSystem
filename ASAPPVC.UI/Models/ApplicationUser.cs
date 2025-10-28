@@ -1,4 +1,4 @@
-using ASAPPVC.UI.Models.ViewModels.Auth;
+using ASAPPVC.UI.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -37,12 +37,5 @@ namespace ASAPPVC.UI.Models
                 EmailConfirmed = emailConfirmed
             };
         }
-    }
-
-    public enum RoleType
-    {
-        Admin,
-        WarehouseManager,
-        Unassigned
     }
 }

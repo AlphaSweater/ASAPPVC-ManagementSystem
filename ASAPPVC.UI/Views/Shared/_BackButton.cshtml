@@ -1,0 +1,27 @@
+@{
+	var showPageName = ViewData["ShowBackPageName"] as bool? ?? false;
+	var customBackUrl = ViewData["BackUrl"] as string;
+	var customBackText = ViewData["BackText"] as string ?? "Back";
+}
+
+<link rel="stylesheet" href="~/css/views/shared/_BackButton.css" asp-append-version="true" />
+
+<a href="@(customBackUrl ?? "javascript:void(0);")"
+   class="back-button-link"
+   data-use-history="@(string.IsNullOrEmpty(customBackUrl) ? "true" : "false")"
+   data-show-page-name="@showPageName.ToString().ToLower()">
+	<!-- Inline SVG so it inherits color via `currentColor` -->
+	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="back-icon" aria-hidden="true">
+		<path d="M6 6L2 10l4 4M18 10H2" />
+	</svg>
+	<div class="back-text-area">
+		<span class="back-text">@customBackText</span>
+		@if (showPageName)
+		{
+			<span class="back-page-name"></span>
+		}
+	</div>
+
+</a>
+
+<script src="~/js/views/shared/_BackButton.js" asp-append-version="true"></script>

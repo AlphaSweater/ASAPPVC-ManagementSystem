@@ -1,0 +1,73 @@
+﻿@using System.Linq
+@using ASAPPVC.UI.ViewModels.Warehouse
+@model ManageComponentsVm
+
+@{
+	ViewData["Title"] = "Inventory";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/warehouse/components/ManageComponents.css" asp-append-version="true" />
+}
+
+<div class="viewport">
+	<div class="content-container">
+		<div class="page-header">
+			<h2 class="main-title">Components</h2>
+		</div>
+
+		<div class="toolbar">
+			<form class="search-form" asp-controller="Components" asp-action="Search" method="get">
+				<input class="input" type="text" name="term" placeholder="Search by component name or location..." value="@Model.SearchQuery" />
+				<button type="submit" class="btn btn-secondary">Search</button>
+			</form>
+			<a class="btn btn-primary" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
+		</div>
+
+		<section class="table-section">
+			<table class="table">
+				<thead>
+					<tr>
+						<th style="width:110px;">Code</th>
+						<th>Component Name</th>
+						<th>Location</th>
+						<th>Unit Price</th>
+						<th>Stock</th>
+						<th style="width:200px; text-align:center;">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model != null && Model.HasComponents)
+					{
+						foreach (var p in Model.Components)
+						{
+							<tr>
+								<td>@p.ComponentCode</td>
+								<td>@p.Name</td>
+								<td>@p.StorageLocation</td>
+								<td>@($"R {p.UnitCost:0.00}")</td>
+								<td>@p.CurrentAmount</td>
+								<td>
+									<div class="actions">
+										<a class="btn btn-secondary btn-sm"
+										   asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
+										<a class="btn btn-primary btn-sm"
+										   asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
+									</div>
+								</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<td colspan="6" style="text-align:center; padding:40px; color: var(--text-muted);">
+								No components found.
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</section>
+	</div>
+</div>

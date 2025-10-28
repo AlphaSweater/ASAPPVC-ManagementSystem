@@ -1,106 +1,347 @@
-﻿using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models;
+using ASAPPVC.UI.Models.Enums;
 using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Models.ViewModels.Inventory.Product;
 using ASAPPVC.UI.Repositories;
+using ASAPPVC.UI.Utils;
 
 namespace ASAPPVC.UI.Services
 {
-    public class ProductService(IProductRepository productRepository, IComponentRepository componentRepository) : IProductService
+    public class ProductService(
+        IProductRepository productRepository,
+        IComponentRepository componentRepository,
+        IProductMapper productMapper) : IProductService
     {
-        private readonly IProductRepository _productRepository = productRepository;
+        private readonly IProductRepository _products = productRepository;
+        private readonly IComponentRepository _components = componentRepository;
+        private readonly IProductMapper _mapper = productMapper;
 
-        private readonly IComponentRepository _componentRepository = componentRepository;
+        // ---------- Input validation + normalization helpers ----------
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        /// <summary>
-        /// Creates a product from the provided view model. Returns (Ok, Error, ProductId).
-        /// </summary>
-        public async Task<(bool Ok, string? Error, Guid? ProductId)> CreateAsync(CreateProductViewModel vm, CancellationToken ct = default) {
-            // Basic validation — fail fast.
-            if (string.IsNullOrWhiteSpace(vm.ProductName))
-                return (false, "Product name is required.", null);
+        private static Result ValidateCreateVm(CreateProductVm? vm)
+        {
+            if (vm is null)
+                return Result.Fail("Create view model is required.");
+            if (string.IsNullOrWhiteSpace(vm.Name))
+                return Result.Fail("Product name is required.");
             if (string.IsNullOrWhiteSpace(vm.Description))
-                return (false, "Description is required.", null);
+                return Result.Fail("Product description is required.");
+            if (vm.Price <= 0)
+                return Result.Fail("Product price must be greater than zero.");
+            if (vm.Components is null || vm.Components.Count == 0)
+                return Result.Fail("A product requires at least one component.");
 
-            // Build the Product
-            var product = vm.ToDomain();
-
-            await AttachImageIfPresentAsync(product, vm, ct);
-
-            var addedProduct = await _productRepository.AddProductAsync(product, ct);
-            return (true, null, addedProduct?.Id);
-        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        /// <summary>Get product including its components.</summary>
-        public async Task<ProductModel?> GetAsync(Guid id, CancellationToken ct = default) {
-            return await _productRepository.GetWithComponentsAsync(id, ct);
-        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        /// <summary>List products ordered by name.</summary>
-        public async Task<List<ProductModel>> ListAsync(CancellationToken ct = default) {
-            return await _productRepository.ListOrderedByNameAsync(ct);
-        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        // Helpers
-
-        /// <summary>Σ(component.UnitCost × quantity) across requested components.</summary>
-        private static decimal CalculateComponentsTotalCost(List<ProductComponentViewModel> productComponents, List<ComponentModel> allComponents) {
-            // Handle empty lists early.
-            if (productComponents.Count == 0 || allComponents.Count == 0)
-                return 0m;
-
-            // Lookup by ID for repeated access.
-            var componentLookup = allComponents.ToDictionary(c => c.Id);
-
-            decimal totalCost = 0m;
-
-            // Straight loop for clarity; TryGetValue avoids KeyNotFound.
-            foreach (var productComponent in productComponents) {
-                if (componentLookup.TryGetValue(productComponent.ComponentId, out var component))
-                    totalCost += component.UnitCost * productComponent.Quantity;
+            // Validate component entries
+            foreach (var comp in vm.Components)
+            {
+                if (comp.ComponentId == Guid.Empty)
+                    return Result.Fail("All components must have valid IDs.");
+                if (comp.QuantityRequired <= 0)
+                    return Result.Fail("Component quantities must be greater than zero.");
             }
 
-            return totalCost;
+            return Result.Success();
         }
 
-        /// <summary>
-        /// Creates a ProductModel using the base price plus calculated parts total.
-        /// </summary>
-        private static ProductModel BuildProductFromVm(CreateProductViewModel vm, decimal partsTotalCost) {
-            return new ProductModel
+        private static Result ValidateEditVm(EditProductVm? vm)
+        {
+            if (vm is null)
+                return Result.Fail("Edit view model is required.");
+            if (vm.Id == Guid.Empty)
+                return Result.Fail("Product ID is required.");
+            if (string.IsNullOrWhiteSpace(vm.Name))
+                return Result.Fail("Product name is required.");
+            if (string.IsNullOrWhiteSpace(vm.Description))
+                return Result.Fail("Product description is required.");
+            if (string.IsNullOrWhiteSpace(vm.ProductCode))
+                return Result.Fail("Product code is required.");
+            if (vm.Price <= 0)
+                return Result.Fail("Product price must be greater than zero.");
+            if (vm.Components is null || vm.Components.Count == 0)
+                return Result.Fail("A product requires at least one component.");
+
+            // Validate component entries
+            foreach (var comp in vm.Components)
             {
-                Name = vm.ProductName!.Trim(),
-                Price = vm.BasePrice + partsTotalCost,
-                Description = vm.Description!.Trim()
-            };
+                if (comp.ComponentId == Guid.Empty)
+                    return Result.Fail("All components must have valid IDs.");
+                if (comp.QuantityRequired <= 0)
+                    return Result.Fail("Component quantities must be greater than zero.");
+            }
+
+            return Result.Success();
         }
 
-        /// <summary>
-        /// Maps view-model component lines to bridge entities (ProductComponentModel).
-        /// ProductId is assigned by repository when saving the aggregate.
-        /// </summary>
-        private static List<ProductComponentModel> BuildComponentRows(List<ProductComponentViewModel> productComponents) {
-            return productComponents.Select(pc => new ProductComponentModel
+        private static void Normalize(CreateProductVm vm)
+        {
+            vm.Name = vm.Name.Trim();
+            vm.Description = vm.Description.Trim();
+            if (!string.IsNullOrWhiteSpace(vm.ProductCode))
+                vm.ProductCode = vm.ProductCode.Trim();
+        }
+
+        private static void Normalize(EditProductVm vm)
+        {
+            vm.Name = vm.Name.Trim();
+            vm.Description = vm.Description.Trim();
+            vm.ProductCode = vm.ProductCode.Trim();
+        }
+
+        // ---------- Build component unit lookup helper ----------
+
+        private async Task<IDictionary<Guid, Unit>> BuildComponentUnitLookupAsync(
+            IEnumerable<Guid> componentIds,
+            CancellationToken ct)
+        {
+            var distinctIds = componentIds.Where(id => id != Guid.Empty).Distinct().ToList();
+            if (distinctIds.Count == 0)
+                return new Dictionary<Guid, Unit>();
+
+            var components = await _components.GetListByIdsAsync(distinctIds, asNoTracking: true, ct);
+            return components.ToDictionary(c => c.Id, c => c.Unit);
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Creates a new product from view model
+        public async Task<Result<Product>> CreateAsync(CreateProductVm vm, CancellationToken ct = default)
+        {
+            var validation = ValidateCreateVm(vm);
+            if (!validation.Ok)
+                return Result<Product>.Fail(validation.Error!);
+
+            Normalize(vm);
+
+            try
             {
-                // Repository will normalize ProductId when adding the product with components,
-                // so we don't assign ProductId here to avoid confusion.
-                ComponentId = pc.ComponentId,
-                Quantity = pc.Quantity
-            }).ToList();
+                // Build unit lookup for components
+                var componentIds = vm.Components.Select(c => c.ComponentId).ToList();
+                var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
+
+                // Verify all components exist
+                var missingIds = componentIds.Where(id => !unitLookup.ContainsKey(id)).ToList();
+                if (missingIds.Any())
+                    return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
+
+                // Map VM to domain entity (mapper handles code generation and component mapping and image processing)
+                var product = await _mapper.FromCreateVmAsync(vm, unitLookup, ct);
+
+                // Persist
+                var added = await _products.AddAsync(product, ct);
+                await _products.SaveAsync(ct);
+
+                return Result<Product>.Success(added);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                return Result<Product>.Fail("Operation was canceled.");
+            }
+            catch (Exception ex)
+            {
+                return Result<Product>.Fail($"Failed to create product: {ex.Message}");
+            }
         }
 
-        /// <summary>
-        /// Copies image from the posted file to the product entity if present.
-        /// </summary>
-        private static async Task AttachImageIfPresentAsync(ProductModel product, CreateProductViewModel vm, CancellationToken ct) {
-            if (vm.ImageFile is { Length: > 0 }) {
-                using var ms = new MemoryStream();
-                await vm.ImageFile.CopyToAsync(ms, ct);
-                product.ImageBytes = ms.ToArray();
-                product.ImageContentType = vm.ImageFile.ContentType;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Updates an existing product from edit view model
+        public async Task<Result<Product>> UpdateAsync(EditProductVm vm, CancellationToken ct = default)
+        {
+            var validation = ValidateEditVm(vm);
+            if (!validation.Ok)
+                return Result<Product>.Fail(validation.Error!);
+
+            Normalize(vm);
+
+            try
+            {
+                // Fetch existing product with components (tracking enabled for update)
+                var existing = await _products.GetByIdOrCodeWithComponentsAsync(vm.Id, null, asNoTracking: false, ct: ct);
+                if (existing is null)
+                    return Result<Product>.Fail("Product not found.");
+
+                // Check if code changed and conflicts with another product
+                if (existing.ProductCode != vm.ProductCode)
+                {
+                    var existsResult = await ExistsAsync(vm.ProductCode, excludeId: vm.Id, ct);
+                    if (!existsResult.Ok)
+                        return Result<Product>.Fail($"Failed to check product code existence: {existsResult.Error}");
+
+                    if (existsResult.Value)
+                        return Result<Product>.Fail($"Product code '{vm.ProductCode}' is already in use.");
+                }
+
+                // Build unit lookup for components
+                var componentIds = vm.Components.Select(c => c.ComponentId).ToList();
+                var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
+
+                // Verify all components exist
+                var missingIds = componentIds.Where(id => !unitLookup.ContainsKey(id)).ToList();
+                if (missingIds.Any())
+                    return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
+
+                // Apply changes via mapper (handles component reconciliation and image processing)
+                await _mapper.ApplyEditVmAsync(existing, vm, unitLookup, ct);
+
+                // Persist changes
+                _products.Update(existing);
+                await _products.SaveAsync(ct);
+
+                return Result<Product>.Success(existing);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                return Result<Product>.Fail("Operation was canceled.");
+            }
+            catch (Exception ex)
+            {
+                return Result<Product>.Fail($"Failed to update product: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves a single product detail (mapped to detail VM)
+        public async Task<Result<ProductDetailVm>> GetDetailAsync(
+            Guid? id = null,
+            string? code = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                var product = await _products.GetByIdOrCodeWithComponentsAsync(id, code, asNoTracking: false, ct);
+                if (product is null)
+                    return Result<ProductDetailVm>.Fail("Product not found.");
+
+                var detailVm = _mapper.ToDetailVm(product, includeImageDataUrl: true);
+                return Result<ProductDetailVm>.Success(detailVm);
+            }
+            catch (Exception ex)
+            {
+                return Result<ProductDetailVm>.Fail($"Failed to retrieve product detail: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves a single product entity (raw domain model)
+        public async Task<Result<Product>> GetDomainAsync(
+            Guid? id = null,
+            string? code = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                var product = await _products.GetByIdOrCodeAsync(id, code, asNoTracking: false, ct);
+                if (product is null)
+                    return Result<Product>.Fail("Product not found.");
+
+                return Result<Product>.Success(product);
+            }
+            catch (Exception ex)
+            {
+                return Result<Product>.Fail($"Failed to retrieve product: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves full product list (mapped to list VMs)
+        public async Task<Result<List<ProductListVm>>> ListAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var products = await _products.GetListAsync(asNoTracking: true, ct: ct);
+                var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
+                return Result<List<ProductListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ProductListVm>>.Fail($"Failed to list products: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves multiple products by IDs or codes (mapped to list VMs)
+        public async Task<Result<List<ProductListVm>>> GetListByIdsOrCodesAsync(
+        IEnumerable<Guid>? ids = null,
+            IEnumerable<string>? codes = null,
+    CancellationToken ct = default)
+        {
+            try
+            {
+                var filteredIds = ids?.Where(g => g != Guid.Empty);
+                var filteredCodes = codes?.Where(s => !string.IsNullOrWhiteSpace(s));
+
+                var products = await _products.GetListByIdsOrCodesAsync(filteredIds, filteredCodes, asNoTracking: true, ct: ct);
+                var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
+                return Result<List<ProductListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ProductListVm>>.Fail($"Failed to retrieve products: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Searches products by term (name/code contains, case-insensitive)
+        public async Task<Result<List<ProductListVm>>> SearchAsync(string? term, CancellationToken ct = default)
+        {
+            try
+            {
+                term ??= string.Empty;
+                var products = await _products.SearchAsync(term, asNoTracking: true, ct: ct);
+                var listVms = products.Select(p => _mapper.ToListVm(p)).ToList();
+                return Result<List<ProductListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ProductListVm>>.Fail($"Failed to search products: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Deletes a product by ID
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken ct = default)
+        {
+            if (id == Guid.Empty)
+                return Result.Fail("Product ID is required.");
+
+            try
+            {
+                var removed = await _products.RemoveByIdAsync(id, ct);
+                if (!removed)
+                    return Result.Fail("Product not found.");
+
+                await _products.SaveAsync(ct);
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail($"Failed to delete product: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Checks if a product code already exists (useful for validation)
+        public async Task<Result<bool>> ExistsAsync(
+            string code,
+            Guid? excludeId = null,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Result<bool>.Fail("Product code is required.");
+
+            try
+            {
+                var product = await _products.GetByCodeAsync(code.Trim(), asNoTracking: true, ct);
+
+                if (product is null)
+                    return Result<bool>.Success(false);
+
+                // If we're excluding an ID (for update scenarios), check if it's the same product
+                if (excludeId.HasValue && product.Id == excludeId.Value)
+                    return Result<bool>.Success(false);
+
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Fail($"Failed to check product existence: {ex.Message}");
             }
         }
     }
