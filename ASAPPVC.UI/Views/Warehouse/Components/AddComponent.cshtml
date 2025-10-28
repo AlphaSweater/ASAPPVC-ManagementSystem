@@ -8,27 +8,25 @@
 	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
 }
 
-<div class="viewport">
+<div class="page">
 	@await Html.PartialAsync("_BackButton")
 
-	<div class="glass-card" role="region" aria-labelledby="page-title">
-		<!-- Header -->
-		<header class="card-header">
-			<div class="card-title-wrap">
-				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-				<p class="card-subtitle">Capture a new stock component with image, cost and storage details.</p>
+	<!-- Stronger glass so it stands apart from the blue bg -->
+	<div class="card glass glass card--page" role="region" aria-labelledby="page-title">
+		<header class="card__header">
+			<div>
+				<h1 id="page-title" class="card__title">@ViewData["Title"]</h1>
+				<p class="card__subtitle">Capture a new stock component with image, cost and storage details.</p>
 			</div>
 
-			<div class="card-actions">
-				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost" title="Go to Components">
-					<span class="btn-icon" aria-hidden="true">🏷️</span>
-					Components
+			<div class="card__actions">
+				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost">
+					<span aria-hidden="true">🏷️</span> Components
 				</a>
 			</div>
 		</header>
 
-		<!-- Validation Summary -->
-		<div class="validation-summary" asp-validation-summary="ModelOnly" data-valmsg-summary="true" aria-live="polite"></div>
+		<div class="validation-summary" asp-validation-summary="ModelOnly" aria-live="polite"></div>
 
 		<form id="addComponentForm"
 			  asp-controller="Components"
@@ -38,9 +36,10 @@
 			  novalidate>
 			@Html.AntiForgeryToken()
 
-			<div class="content-grid">
-				<!-- LEFT: Image -->
-				<section class="uploader" aria-labelledby="img-label">
+			<!-- 2-column body (image left, fields right) -->
+			<div class="fx-row fx-nowrap fx-gap-lg card__body">
+				<!-- LEFT: image pane (fixed, compact) -->
+				<section class="pane-media" aria-labelledby="img-label">
 					<h2 id="img-label" class="sr-only">Component Image</h2>
 
 					<label for="imageFile" class="dropzone" tabindex="0" id="dropzone"
@@ -55,12 +54,7 @@
 						</div>
 					</label>
 
-					<input id="imageFile"
-						   asp-for="Image"
-						   type="file"
-						   accept="image/*"
-						   class="file-input"
-						   aria-label="Choose component image" />
+					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
 					<span asp-validation-for="Image" class="field-error"></span>
 
 					<button type="button" class="btn btn-ghost w-100" onclick="document.getElementById('imageFile').click();">
@@ -68,52 +62,46 @@
 					</button>
 				</section>
 
-				<!-- RIGHT: Fields -->
-				<section class="fields">
-					<div class="field">
-						<label asp-for="Name" class="label"></label>
-						<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" autocomplete="off" autofocus />
-						<span asp-validation-for="Name" class="field-error"></span>
-					</div>
-
-					<div class="field">
-						<label asp-for="StorageLocation" class="label"></label>
-						<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" autocomplete="off" />
-						<span asp-validation-for="StorageLocation" class="field-error"></span>
-					</div>
-
-					<div class="field">
-						<label asp-for="UnitCost" class="label"></label>
-						<div class="input-affix">
-							<span class="affix" aria-hidden="true">R</span>
-							<input asp-for="UnitCost"
-								   class="input"
-								   step="0.01"
-								   inputmode="decimal"
-								   placeholder="e.g. 15.50" />
+				<!-- RIGHT: fields pane -->
+				<section class="pane-fields">
+					<div class="fields-grid">
+						<div class="field half">
+							<label asp-for="Name" class="label"></label>
+							<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" autocomplete="off" autofocus />
+							<span asp-validation-for="Name" class="field-error"></span>
 						</div>
-						<span asp-validation-for="UnitCost" class="field-error"></span>
-					</div>
 
-					<div class="field">
-						<label asp-for="CurrentAmount" class="label"></label>
-						<input asp-for="CurrentAmount" class="input" type="number" min="0" placeholder="e.g. 100" />
-						<span asp-validation-for="CurrentAmount" class="field-error"></span>
-					</div>
+						<div class="field half">
+							<label asp-for="StorageLocation" class="label"></label>
+							<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" autocomplete="off" />
+							<span asp-validation-for="StorageLocation" class="field-error"></span>
+						</div>
 
-					<div class="field full">
-						<label asp-for="Unit" class="label"></label>
-						<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.UI.Models.Enums.Unit>()"></select>
-						<span asp-validation-for="Unit" class="field-error"></span>
+						<div class="field half">
+							<label asp-for="UnitCost" class="label"></label>
+							<div class="input-affix">
+								<span class="affix" aria-hidden="true">R</span>
+								<input asp-for="UnitCost" class="input" step="0.01" value="" inputmode="decimal" placeholder="15.50" />
+							</div>
+							<span asp-validation-for="UnitCost" class="field-error"></span>
+						</div>
+
+						<div class="field half">
+							<label asp-for="CurrentAmount" class="label"></label>
+							<input asp-for="CurrentAmount" class="input" type="number" min="0" placeholder="e.g. 100" />
+							<span asp-validation-for="CurrentAmount" class="field-error"></span>
+						</div>
+
+						<div class="field full">
+							<label asp-for="Unit" class="label"></label>
+							<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.UI.Models.Enums.Unit>()"></select>
+							<span asp-validation-for="Unit" class="field-error"></span>
+						</div>
 					</div>
 
 					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">
-							Save Component
-						</button>
-						<button type="reset" class="btn btn-ghost">
-							Reset
-						</button>
+						<button type="submit" class="btn btn-primary">Save Component</button>
+						<button type="reset" class="btn btn-ghost">Reset</button>
 					</div>
 				</section>
 			</div>
@@ -135,13 +123,11 @@
 				reader.readAsDataURL(file);
 			}
 
-			// Click/Change
 			fileInput.addEventListener('change', () => {
 				const f = fileInput.files?.[0];
 				previewFile(f);
 			});
 
-			// Drag & drop
 			['dragenter', 'dragover'].forEach(evt =>
 				dropzone.addEventListener(evt, e => {
 					e.preventDefault(); e.stopPropagation();
@@ -162,7 +148,6 @@
 				}
 			});
 
-			// Keyboard open
 			dropzone.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();

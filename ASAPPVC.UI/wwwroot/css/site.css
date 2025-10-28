@@ -16,9 +16,9 @@
 	--sa-red-3: #8f2424; /* end */
 	--sa-accent: #ff5252; /* highlights, pills, borders */
 	/* Deep Blue Mist Gradient */
-	--sa-blue-1: #0f1b33;
+	--sa-blue-1: #244d7a;
 	--sa-blue-2: #1b3a63;
-	--sa-blue-3: #244d7a;
+	--sa-blue-3: #0f1b33;
 	/* Glass UI Tokens */
 	--glass-bg: rgba(255, 255, 255, 0.08);
 	--glass-border: rgba(255, 255, 255, 0.18);
