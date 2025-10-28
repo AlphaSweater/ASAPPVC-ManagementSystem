@@ -36,16 +36,31 @@ namespace ASAPPVC.UI.Models
     //-----------------------------------------------\\
     // Create form (used in POST / add product)
     //-----------------------------------------------\\
-    public sealed class ProductComponentFormVm
+    public sealed class ProductComponentFormVm : IValidatableObject
     {
-        [Required]
+        private const decimal MaxQuantity = 1_000_000_000_000m;
+        private const decimal MinQuantity = 0m;
+
+        [Required(ErrorMessage = "Component is required.")]
         public Guid ComponentId { get; set; }
 
-        // Use decimal for consistency with Unit (supports fractional units)
-        [Range(typeof(decimal), "0.0001", "79228162514264337593543950334", ErrorMessage = "Quantity must be greater than 0.")]
+        // Use decimal for consistency with Unit
         public decimal Quantity { get; set; } = 1m;
 
         // Mark a persisted line for deletion on edit
         public bool Remove { get; set; } = false;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Quantity <= MinQuantity)
+            {
+                yield return new ValidationResult($"Quantity must be greater than {MinQuantity:N0}.", new[] { nameof(Quantity) });
+            }
+
+            if (Quantity >= MaxQuantity)
+            {
+                yield return new ValidationResult($"Quantity must be less than {MaxQuantity:N0}.", new[] { nameof(Quantity) });
+            }
+        }
     }
 }
