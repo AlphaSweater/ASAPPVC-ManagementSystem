@@ -12,9 +12,12 @@ namespace ASAPPVC.UI.Models.Enums
         // cache attribute instances per enum value + attribute type
         private static readonly ConcurrentDictionary<string, Attribute?> _attrCache = new();
 
-        private static string BuildKey(Enum value, Type attrType)
+        private static string BuildKey(Enum? value, Type attrType)
         {
-            return string.Concat(value.GetType().FullName, "|", value.ToString(), "|", attrType.FullName);
+            var typeName = value?.GetType().FullName ?? "<null>";
+            var valueName = value?.ToString() ?? "<null>";
+            var attrTypeName = attrType.FullName ?? attrType.Name;
+            return string.Concat(typeName, "|", valueName, "|", attrTypeName);
         }
 
         /// <summary>
@@ -25,6 +28,7 @@ namespace ASAPPVC.UI.Models.Enums
         {
             if (value == null)
                 return null;
+
             var key = BuildKey(value, typeof(TAttr));
             var obj = _attrCache.GetOrAdd(key, k =>
             {
@@ -40,7 +44,7 @@ namespace ASAPPVC.UI.Models.Enums
         /// Returns defaultValue when attribute or property not found or when conversion fails.
         /// Property name matching is case-insensitive.
         /// </summary>
-        public static T GetAttributePropertyOrDefault<TAttr, T>(this Enum value, string propertyName, T defaultValue = default) where TAttr : Attribute
+        public static T GetAttributePropertyOrDefault<TAttr, T>(this Enum value, string propertyName, T defaultValue = default!) where TAttr : Attribute
         {
             if (value == null || string.IsNullOrWhiteSpace(propertyName))
                 return defaultValue;
@@ -75,7 +79,7 @@ namespace ASAPPVC.UI.Models.Enums
         /// Convenience: extract attribute-derived value using a typed extractor function.
         /// Returns defaultValue when the attribute is missing.
         /// </summary>
-        public static T GetAttributeValueOrDefault<TAttr, T>(this Enum value, Func<TAttr, T> extractor, T defaultValue = default) where TAttr : Attribute
+        public static T GetAttributeValueOrDefault<TAttr, T>(this Enum value, Func<TAttr, T> extractor, T defaultValue = default!) where TAttr : Attribute
         {
             if (value == null)
                 return defaultValue;

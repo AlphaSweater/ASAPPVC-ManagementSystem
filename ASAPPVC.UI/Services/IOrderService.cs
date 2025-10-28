@@ -11,28 +11,28 @@ using ASAPPVC.UI.Utils;
 public interface IOrderService
 {
     /// <summary>
-    /// Creates a new order from the supplied view model.
+    /// Creates a new order from the supplied form view model.
     /// The service validates input, maps the VM to a domain entity using the order mapper,
     /// verifies customer and product existence, and delegates persistence to the repository.
     /// </summary>
-    /// <param name="vm">Create view model containing order details. Must not be null.</param>
+    /// <param name="vm">Form view model containing order details. Must not be null.</param>
     /// <returns>
     /// A <see cref="Result{T}"/> carrying the created <see cref="Order"/> on success
     /// or an error message on failure.
     /// </returns>
-    Task<Result<Order>> CreateAsync(CreateOrderVm vm, CancellationToken ct = default);
+    Task<Result<Order>> CreateAsync(OrderFormVm vm, CancellationToken ct = default);
 
     /// <summary>
-    /// Updates an existing order from the supplied edit view model.
-    /// The service validates input, fetches the existing order, applies the edit VM using the mapper,
+    /// Updates an existing order from the supplied form view model.
+    /// The service validates input, fetches the existing order, applies the form VM using the mapper,
     /// and saves changes to the repository.
     /// </summary>
-    /// <param name="vm">Edit view model containing updated order details. Must not be null.</param>
+    /// <param name="vm">Form view model containing updated order details. Must not be null.</param>
     /// <returns>
     /// A <see cref="Result{T}"/> carrying the updated <see cref="Order"/> on success
     /// or an error message on failure.
     /// </returns>
-    Task<Result<Order>> UpdateAsync(EditOrderVm vm, CancellationToken ct = default);
+    Task<Result<Order>> UpdateAsync(OrderFormVm vm, CancellationToken ct = default);
 
     /// <summary>
     /// Retrieves a single order by its internal identifier.

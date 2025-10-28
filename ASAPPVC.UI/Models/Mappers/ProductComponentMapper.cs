@@ -11,13 +11,12 @@ namespace ASAPPVC.UI.Models.Mappers
         // Domain → VM
         // ------------------------------------------------------------
 
-        public ProductComponentVm ToVm(ProductComponent productComponent)
+        public ProductComponentVm ToBridgeVm(ProductComponent productComponent)
         {
             ArgumentNullException.ThrowIfNull(productComponent);
 
             return new ProductComponentVm
             {
-                Id = productComponent.Id,
                 ProductId = productComponent.ProductId,
                 ComponentId = productComponent.ComponentId,
                 ComponentCode = productComponent.Component?.ComponentCode ?? string.Empty,
@@ -28,19 +27,19 @@ namespace ASAPPVC.UI.Models.Mappers
             };
         }
 
-        public List<ProductComponentVm> ToVms(IEnumerable<ProductComponent> items)
+        public List<ProductComponentVm> ToBridgeVms(IEnumerable<ProductComponent> items)
         {
             if (items is null)
                 return new();
 
-            return items.Select(ToVm).ToList();
+            return items.Select(ToBridgeVm).ToList();
         }
 
         // ------------------------------------------------------------
-        // Create VM → Domain
+        // Create from form VMs → Domain
         // ------------------------------------------------------------
 
-        public ProductComponent FromCreateVm(Guid productId, CreateProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public ProductComponent FromCreateBridgeVm(Guid productId, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(vm);
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
@@ -50,64 +49,63 @@ namespace ASAPPVC.UI.Models.Mappers
                 ProductId = productId,
                 ComponentId = vm.ComponentId,
                 Unit = ResolveUnit(componentUnitLookup, vm.ComponentId),
-                QuantityRequired = NormalizeQuantity(vm.QuantityRequired)
+                QuantityRequired = NormalizeQuantity(vm.Quantity)
             };
         }
 
-        public List<ProductComponent> FromCreateVms(Guid productId, IEnumerable<CreateProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> FromCreateBridgeVms(Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
-            return (items ?? Enumerable.Empty<CreateProductComponentVm>())
+            return (items ?? Enumerable.Empty<ProductComponentFormVm>())
+                .Where(i => !i.Remove) // drop lines marked for removal
                 .GroupBy(i => i.ComponentId)
-                .Select(g => new CreateProductComponentVm
+                .Select(g => new ProductComponentFormVm
                 {
                     ComponentId = g.Key,
-                    QuantityRequired = g.Sum(x => x.QuantityRequired)
+                    Quantity = g.Sum(x => x.Quantity)
                 })
-                .Select(vm => FromCreateVm(productId, vm, componentUnitLookup))
+                .Select(vm => FromCreateBridgeVm(productId, vm, componentUnitLookup))
                 .ToList();
         }
 
         // ------------------------------------------------------------
-        // Edit VM → Domain (apply to existing)
+        // Apply (update existing collection in-place)
         // ------------------------------------------------------------
 
-        public void ApplyEditVm(ProductComponent target, EditProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public void ApplyUpdateBridgeVm(ProductComponent target, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
-            var componentChanged = target.ComponentId != vm.ComponentId;
-
             target.ComponentId = vm.ComponentId;
-            target.QuantityRequired = NormalizeQuantity(vm.QuantityRequired);
-
-            if (componentChanged || target.Unit == default)
-                target.Unit = ResolveUnit(componentUnitLookup, vm.ComponentId);
+            target.Unit = ResolveUnit(componentUnitLookup, vm.ComponentId);
+            target.QuantityRequired = NormalizeQuantity(vm.Quantity);
         }
 
-        public List<ProductComponent> ApplyEditVms(IEnumerable<ProductComponent> existingComponents, IEnumerable<EditProductComponentVm> editVms, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> ApplyUpdateBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             var existingByComponent = (existingComponents ?? Enumerable.Empty<ProductComponent>())
                 .ToDictionary(x => x.ComponentId, x => x);
 
-            return (editVms ?? Enumerable.Empty<EditProductComponentVm>())
-                .GroupBy(vm => vm.ComponentId)
-                .Select(g => new EditProductComponentVm
+            return (items ?? Enumerable.Empty<ProductComponentFormVm>())
+                .Where(i => !i.Remove) // drop lines marked for removal
+                .GroupBy(i => i.ComponentId)
+                .Select(g => new ProductComponentFormVm
                 {
                     ComponentId = g.Key,
-                    QuantityRequired = g.Sum(x => x.QuantityRequired)
+                    Quantity = g.Sum(x => x.Quantity)
                 })
                 .Select(vm =>
                 {
                     var line = existingByComponent.TryGetValue(vm.ComponentId, out var existing)
                         ? existing
-                        : new ProductComponent();
-                    ApplyEditVm(line, vm, componentUnitLookup);
+                        : new ProductComponent { ProductId = productId };
+
+                    ApplyUpdateBridgeVm(line, vm, componentUnitLookup);
                     return line;
                 })
                 .ToList();

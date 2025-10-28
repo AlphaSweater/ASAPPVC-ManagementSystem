@@ -43,7 +43,7 @@ namespace ASAPPVC.UI.Controllers
         //handles the submission of the add order form
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrder(CreateOrderVm vm, CancellationToken ct)
+        public async Task<IActionResult> AddOrder(OrderFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
@@ -118,16 +118,15 @@ namespace ASAPPVC.UI.Controllers
             ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
 
             var order = orderResult.Value;
-            var vm = new EditOrderVm
+            var vm = new OrderFormVm
             {
                 Id = order.Id,
                 OrderCode = order.OrderCode,
                 CustomerId = order.CustomerId,
                 OrderDate = order.OrderDate,
                 OrderStatus = order.OrderStatus,
-                Products = order.OrderProducts.Select(op => new EditOrderProductVm
+                Products = order.OrderProducts.Select(op => new OrderProductFormVm
                 {
-                    OrderProductId = op.Id,
                     ProductId = op.ProductId,
                     Quantity = op.Quantity
                 }).ToList()
@@ -140,7 +139,7 @@ namespace ASAPPVC.UI.Controllers
         //handles the submission of the edit order form
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditOrder(EditOrderVm vm, CancellationToken ct)
+        public async Task<IActionResult> EditOrder(OrderFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {

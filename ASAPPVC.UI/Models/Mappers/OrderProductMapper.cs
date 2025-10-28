@@ -9,13 +9,12 @@ namespace ASAPPVC.UI.Models.Mappers
         // Domain → VM
         // ------------------------------------------------------------
 
-        public OrderProductVm ToVm(OrderProduct orderProduct)
+        public OrderProductVm ToBridgeVm(OrderProduct orderProduct)
         {
             ArgumentNullException.ThrowIfNull(orderProduct);
 
             return new OrderProductVm
             {
-                Id = orderProduct.Id,
                 OrderId = orderProduct.OrderId,
                 ProductId = orderProduct.ProductId,
                 ProductCode = orderProduct.Product?.ProductCode ?? string.Empty,
@@ -25,19 +24,19 @@ namespace ASAPPVC.UI.Models.Mappers
             };
         }
 
-        public List<OrderProductVm> ToVms(IEnumerable<OrderProduct> items)
+        public List<OrderProductVm> ToBridgeVms(IEnumerable<OrderProduct> items)
         {
             if (items is null)
                 return new();
 
-            return items.Select(ToVm).ToList();
+            return items.Select(ToBridgeVm).ToList();
         }
 
         // ------------------------------------------------------------
         // Create VM → Domain
         // ------------------------------------------------------------
 
-        public OrderProduct FromCreateVm(Guid orderId, CreateOrderProductVm vm)
+        public OrderProduct FromCreateBridgeVm(Guid orderId, OrderProductFormVm vm)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -49,16 +48,17 @@ namespace ASAPPVC.UI.Models.Mappers
             };
         }
 
-        public List<OrderProduct> FromCreateVms(Guid orderId, IEnumerable<CreateOrderProductVm> items)
+        public List<OrderProduct> FromCreateBridgeVms(Guid orderId, IEnumerable<OrderProductFormVm> items)
         {
-            return (items ?? Enumerable.Empty<CreateOrderProductVm>())
+            return (items ?? Enumerable.Empty<OrderProductFormVm>())
+            .Where(i => !i.Remove) // drop lines marked for removal
             .GroupBy(i => i.ProductId)
-            .Select(g => new CreateOrderProductVm
+            .Select(g => new OrderProductFormVm
             {
                 ProductId = g.Key,
                 Quantity = g.Sum(x => x.Quantity)
             })
-            .Select(vm => FromCreateVm(orderId, vm))
+            .Select(vm => FromCreateBridgeVm(orderId, vm))
             .ToList();
         }
 
@@ -66,26 +66,24 @@ namespace ASAPPVC.UI.Models.Mappers
         // Edit VM → Domain (apply to existing)
         // ------------------------------------------------------------
 
-        public void ApplyEditVm(OrderProduct target, EditOrderProductVm vm)
+        public void ApplyUpdateBridgeVm(OrderProduct target, OrderProductFormVm vm)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
 
             target.ProductId = vm.ProductId;
             target.Quantity = NormalizeQuantity(vm.Quantity);
-
-            // No other fields to update on OrderProduct; price is taken from Product when mapping to VM.
-            // If product changed, the associated Product navigation may be stale and should be reloaded by caller if needed.
         }
 
-        public List<OrderProduct> ApplyEditVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<EditOrderProductVm> editVms)
+        public List<OrderProduct> ApplyUpdateBridgeVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<OrderProductFormVm> editVms)
         {
             var existingByProduct = (existingProducts ?? Enumerable.Empty<OrderProduct>())
             .ToDictionary(x => x.ProductId, x => x);
 
-            return (editVms ?? Enumerable.Empty<EditOrderProductVm>())
+            return (editVms ?? Enumerable.Empty<OrderProductFormVm>())
+            .Where(i => !i.Remove) // drop lines marked for removal
             .GroupBy(vm => vm.ProductId)
-            .Select(g => new EditOrderProductVm
+            .Select(g => new OrderProductFormVm
             {
                 ProductId = g.Key,
                 Quantity = g.Sum(x => x.Quantity)
@@ -96,7 +94,7 @@ namespace ASAPPVC.UI.Models.Mappers
                      ? existing
                      : new OrderProduct();
 
-                ApplyEditVm(line, vm);
+                ApplyUpdateBridgeVm(line, vm);
                 return line;
             })
             .ToList();

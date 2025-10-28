@@ -14,7 +14,7 @@ namespace ASAPPVC.UI.Services
 
         // ---------- Input validation + normalization helpers ----------
 
-        private static Result ValidateCreateVm(CreateComponentVm? vm)
+        private static Result ValidateCreateVm(ComponentFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Create view model is required.");
@@ -30,7 +30,7 @@ namespace ASAPPVC.UI.Services
             return Result.Success();
         }
 
-        private static Result ValidateEditVm(EditComponentVm? vm)
+        private static Result ValidateEditVm(ComponentFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
@@ -50,7 +50,7 @@ namespace ASAPPVC.UI.Services
             return Result.Success();
         }
 
-        private static void Normalize(CreateComponentVm vm)
+        private static void Normalize(ComponentFormVm vm)
         {
             vm.Name = vm.Name.Trim();
             vm.StorageLocation = vm.StorageLocation.Trim();
@@ -58,16 +58,9 @@ namespace ASAPPVC.UI.Services
                 vm.ComponentCode = vm.ComponentCode.Trim();
         }
 
-        private static void Normalize(EditComponentVm vm)
-        {
-            vm.Name = vm.Name.Trim();
-            vm.StorageLocation = vm.StorageLocation.Trim();
-            vm.ComponentCode = vm.ComponentCode.Trim();
-        }
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Creates a new component from view model
-        public async Task<Result<Component>> CreateAsync(CreateComponentVm vm, CancellationToken ct = default)
+        public async Task<Result<Component>> CreateAsync(ComponentFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateCreateVm(vm);
             if (!validation.Ok)
@@ -98,7 +91,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Updates an existing component from edit view model
-        public async Task<Result<Component>> UpdateAsync(EditComponentVm vm, CancellationToken ct = default)
+        public async Task<Result<Component>> UpdateAsync(ComponentFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateEditVm(vm);
             if (!validation.Ok)
@@ -116,7 +109,7 @@ namespace ASAPPVC.UI.Services
                 // Check if code changed and conflicts with another component
                 if (existing.ComponentCode != vm.ComponentCode)
                 {
-                    var existsResult = await ExistsAsync(vm.ComponentCode, excludeId: vm.Id, ct);
+                    var existsResult = await ExistsAsync(vm.ComponentCode!, excludeId: vm.Id, ct);
                     if (!existsResult.Ok)
                         return Result<Component>.Fail($"Failed to check component code existence: {existsResult.Error}");
 
@@ -125,7 +118,7 @@ namespace ASAPPVC.UI.Services
                 }
 
                 // Apply changes via mapper (handles image processing if new image uploaded)
-                await _mapper.ApplyEditVmAsync(existing, vm, ct);
+                await _mapper.ApplyUpdateVmAsync(existing, vm, ct);
 
                 // Persist changes
                 _components.Update(existing);

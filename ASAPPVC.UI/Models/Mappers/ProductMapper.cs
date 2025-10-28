@@ -8,8 +8,9 @@ namespace ASAPPVC.UI.Models.Mappers
     /// </summary>
     public class ProductMapper(
         IProductComponentMapper productComponentMapper,
-    ICodeGenerationService? codeGenerationService = null,
-     IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IProductMapper
+        ICodeGenerationService? codeGenerationService = null,
+        IImageService? imageService = null)
+        : MapperBase(codeGenerationService, imageService), IProductMapper
     {
         private readonly IProductComponentMapper _productComponentMapper = productComponentMapper ?? throw new ArgumentNullException(nameof(productComponentMapper));
 
@@ -43,7 +44,7 @@ namespace ASAPPVC.UI.Models.Mappers
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var components = _productComponentMapper.ToVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+            var components = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
 
             return new ProductDetailVm
             {
@@ -61,10 +62,10 @@ namespace ASAPPVC.UI.Models.Mappers
         }
 
         // ------------------------------------------------------------
-        // ViewModels → Domain
+        // ViewModels → Domain (Create / Update)
         // ------------------------------------------------------------
 
-        public async Task<Product> FromCreateVmAsync(CreateProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -80,75 +81,69 @@ namespace ASAPPVC.UI.Models.Mappers
             };
 
             // Process image upload if provided
-            if (vm.ImageData is { Length: > 0 } && !string.IsNullOrWhiteSpace(vm.ImageType))
+            if (vm.Image is not null)
             {
                 if (ImageService is null)
                     throw new InvalidOperationException("Image service is not available.");
 
-                var processed = await ImageService.ProcessBytesAsync(vm.ImageData, vm.ImageType, ct);
+                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
                     throw new InvalidOperationException(processed.Error);
 
                 product.Image = processed.Value!.ToAppImage();
             }
 
-            // Lines via shared mapper (handles duplicate merge + unit resolution).
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            product.ProductComponents = _productComponentMapper.FromCreateVms(
-        product.Id,
-                 vm.Components ?? Enumerable.Empty<CreateProductComponentVm>(),
-             lookup);
+            product.ProductComponents = _productComponentMapper.FromCreateBridgeVms(product.Id, vm.Components ?? Enumerable.Empty<ProductComponentFormVm>(), lookup);
 
             return product;
         }
 
-        public async Task ApplyEditVmAsync(Product target, EditProductVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> ApplyUpdateVmAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
         {
-            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);
-            if (target.Id != vm.Id)
+            if (existing.Id != vm.Id)
                 throw new InvalidOperationException("Mismatched product Id.");
 
-            target.ProductCode = NormalizeString(vm.ProductCode);
-            target.Name = NormalizeString(vm.Name);
-            target.Description = NormalizeString(vm.Description);
-            target.Price = NormalizeMoney(vm.Price);
+            existing.ProductCode = NormalizeString(vm.ProductCode);
+            existing.Name = NormalizeString(vm.Name);
+            existing.Description = NormalizeString(vm.Description);
+            existing.Price = NormalizeMoney(vm.Price);
 
             // Image semantics:
-            // null   → leave unchanged
-            // empty  → clear
+            // null → leave unchanged
+            // empty → clear
             // filled → replace
-            if (vm.ImageData is null)
+            if (vm.Image is null)
             {
                 // leave as-is
             }
-            else if (vm.ImageData.Length == 0)
+            else if (vm.Image.Length == 0)
             {
-                target.Image = null;
+                existing.Image = null;
             }
-            else if (!string.IsNullOrWhiteSpace(vm.ImageType))
+            else
             {
                 if (ImageService is null)
                     throw new InvalidOperationException("Image service is not available.");
 
-                var processed = await ImageService.ProcessBytesAsync(vm.ImageData, vm.ImageType, ct);
+                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
                     throw new InvalidOperationException(processed.Error);
 
-                target.Image = processed.Value!.ToAppImage();
+                existing.Image = processed.Value!.ToAppImage();
             }
 
             // Simple modifiers
-            target.Category = vm.Category;
-            target.Material = vm.Material;
-            target.Colour = vm.Colour;
+            existing.Category = vm.Category;
+            existing.Material = vm.Material;
+            existing.Colour = vm.Colour;
 
-            // Delegate edit-line mapping to shared mapper (null-safe on both sides).
-            var existingLines = target.ProductComponents ?? Enumerable.Empty<ProductComponent>();
-            var editLines = vm.Components ?? Enumerable.Empty<EditProductComponentVm>();
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
+            existing.ProductComponents = _productComponentMapper.FromCreateBridgeVms(existing.Id, vm.Components ?? Enumerable.Empty<ProductComponentFormVm>(), lookup);
 
-            target.ProductComponents = _productComponentMapper.ApplyEditVms(existingLines, editLines, lookup);
+            return existing;
         }
     }
 }

@@ -30,29 +30,14 @@ namespace ASAPPVC.UI.Models.Mappers
         ComponentDetailVm ToDetailVm(Component component, int? usedInProductsCount = null, bool includeImageDataUrl = true);
 
         /// <summary>
-        /// Materialize a new Component from Create VM. Trims/normalizes input.
-        /// This operation may process an uploaded image and is therefore async.
-        /// <br/>
-        /// <br/><b>Examples:</b>
-        /// <code>
-        /// Create → Domain
-        /// var comp = await _mapper.FromCreateVmAsync(createVm, ct);
-        /// await _components.AddAsync(comp, ct);
-        /// </code>
+        /// Creates a new Component from a ComponentFormVm. This may process an uploaded image.
         /// </summary>
-        Task<Component> FromCreateVmAsync(CreateComponentVm vm, CancellationToken ct = default);
+        Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default);
 
         /// <summary>
-        /// Apply edits from Edit VM to an existing Component (in-place).
-        /// This operation may process an uploaded image and is therefore async.
-        /// <br/>
-        /// <br/><b>Examples:</b>
-        /// <code>
-        /// Edit → Apply
-        /// await _mapper.ApplyEditVmAsync(existing, editVm, ct);
-        /// await _repo.SaveAsync(ct);
-        /// </code>
+        /// Applies an update to an existing Component using a ComponentFormVm. This may process an uploaded image.
+        /// Returns the modified existing entity.
         /// </summary>
-        Task ApplyEditVmAsync(Component target, EditComponentVm vm, CancellationToken ct = default);
+        Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default);
     }
 }

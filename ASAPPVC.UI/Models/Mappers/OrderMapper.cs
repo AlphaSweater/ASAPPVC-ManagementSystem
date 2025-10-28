@@ -23,7 +23,7 @@ namespace ASAPPVC.UI.Models.Mappers
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
 
             var itemCount = lines.Sum(x => x.Quantity);
-            var total = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
+            var total = lines.Sum(x => (x.Product?.Price ??0m) * x.Quantity);
 
             return new OrderListVm
             {
@@ -43,11 +43,11 @@ namespace ASAPPVC.UI.Models.Mappers
             ArgumentNullException.ThrowIfNull(order);
 
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
-            var products = includeProducts ? _orderProductMapper.ToVms(lines) : new List<OrderProductVm>();
+            var products = includeProducts ? _orderProductMapper.ToBridgeVms(lines) : new List<OrderProductVm>();
 
             var itemCount = lines.Sum(x => x.Quantity);
-            var subtotal = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
-            var tax = 0m; // keep zero for now — compute later if needed
+            var subtotal = lines.Sum(x => (x.Product?.Price ??0m) * x.Quantity);
+            var tax =0m; // keep zero for now — compute later if needed
             var grand = subtotal + tax;
 
             return new OrderDetailVm
@@ -71,7 +71,7 @@ namespace ASAPPVC.UI.Models.Mappers
         // Create ViewModel → Domain
         // ------------------------------------------------------------
 
-        public Order FromCreateVm(CreateOrderVm vm)
+        public Order FromFormVm(OrderFormVm vm)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -83,9 +83,42 @@ namespace ASAPPVC.UI.Models.Mappers
                 OrderStatus = vm.OrderStatus
             };
 
-            order.OrderProducts = _orderProductMapper.FromCreateVms(order.Id, vm.Products ?? Enumerable.Empty<CreateOrderProductVm>());
+            // Use the bridge create helper and current form VM type
+            order.OrderProducts = _orderProductMapper.FromCreateBridgeVms(order.Id, vm.Products ?? Enumerable.Empty<OrderProductFormVm>());
 
             return order;
+        }
+
+        // ------------------------------------------------------------
+        // Update existing domain entity from Edit VM
+        // ------------------------------------------------------------
+
+        public Order ApplyFormVm(Order existing, OrderFormVm vm)
+        {
+            ArgumentNullException.ThrowIfNull(existing);
+            ArgumentNullException.ThrowIfNull(vm);
+
+            if (existing.Id != vm.Id)
+                throw new InvalidOperationException("Mismatched order Id.");
+
+            // Scalars
+            existing.OrderCode = NormalizeString(vm.OrderCode);
+            existing.CustomerId = vm.CustomerId;
+            existing.OrderDate = vm.OrderDate ?? existing.OrderDate;
+            existing.OrderStatus = vm.OrderStatus;
+
+            // Merge/update bridge lines using the dedicated mapper helper
+            var updatedLines = _orderProductMapper.ApplyUpdateBridgeVms(existing.OrderProducts ?? new List<OrderProduct>(), vm.Products ?? Enumerable.Empty<OrderProductFormVm>());
+
+            // Ensure correct OrderId on all lines and replace collection
+            foreach (var line in updatedLines)
+            {
+                line.OrderId = existing.Id;
+            }
+
+            existing.OrderProducts = updatedLines;
+
+            return existing;
         }
     }
 }

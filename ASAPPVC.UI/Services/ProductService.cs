@@ -17,7 +17,7 @@ namespace ASAPPVC.UI.Services
 
         // ---------- Input validation + normalization helpers ----------
 
-        private static Result ValidateCreateVm(CreateProductVm? vm)
+        private static Result ValidateCreateVm(ProductFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Create view model is required.");
@@ -35,14 +35,14 @@ namespace ASAPPVC.UI.Services
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
-                if (comp.QuantityRequired <= 0)
+                if (comp.Quantity <= 0)
                     return Result.Fail("Component quantities must be greater than zero.");
             }
 
             return Result.Success();
         }
 
-        private static Result ValidateEditVm(EditProductVm? vm)
+        private static Result ValidateEditVm(ProductFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
@@ -64,26 +64,19 @@ namespace ASAPPVC.UI.Services
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
-                if (comp.QuantityRequired <= 0)
+                if (comp.Quantity <= 0)
                     return Result.Fail("Component quantities must be greater than zero.");
             }
 
             return Result.Success();
         }
 
-        private static void Normalize(CreateProductVm vm)
+        private static void Normalize(ProductFormVm vm)
         {
             vm.Name = vm.Name.Trim();
             vm.Description = vm.Description.Trim();
             if (!string.IsNullOrWhiteSpace(vm.ProductCode))
                 vm.ProductCode = vm.ProductCode.Trim();
-        }
-
-        private static void Normalize(EditProductVm vm)
-        {
-            vm.Name = vm.Name.Trim();
-            vm.Description = vm.Description.Trim();
-            vm.ProductCode = vm.ProductCode.Trim();
         }
 
         // ---------- Build component unit lookup helper ----------
@@ -102,7 +95,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Creates a new product from view model
-        public async Task<Result<Product>> CreateAsync(CreateProductVm vm, CancellationToken ct = default)
+        public async Task<Result<Product>> CreateAsync(ProductFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateCreateVm(vm);
             if (!validation.Ok)
@@ -142,7 +135,7 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Updates an existing product from edit view model
-        public async Task<Result<Product>> UpdateAsync(EditProductVm vm, CancellationToken ct = default)
+        public async Task<Result<Product>> UpdateAsync(ProductFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateEditVm(vm);
             if (!validation.Ok)
@@ -160,7 +153,7 @@ namespace ASAPPVC.UI.Services
                 // Check if code changed and conflicts with another product
                 if (existing.ProductCode != vm.ProductCode)
                 {
-                    var existsResult = await ExistsAsync(vm.ProductCode, excludeId: vm.Id, ct);
+                    var existsResult = await ExistsAsync(vm.ProductCode!, excludeId: vm.Id, ct);
                     if (!existsResult.Ok)
                         return Result<Product>.Fail($"Failed to check product code existence: {existsResult.Error}");
 
@@ -178,7 +171,7 @@ namespace ASAPPVC.UI.Services
                     return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
 
                 // Apply changes via mapper (handles component reconciliation and image processing)
-                await _mapper.ApplyEditVmAsync(existing, vm, unitLookup, ct);
+                await _mapper.ApplyUpdateVmAsync(existing, vm, unitLookup, ct);
 
                 // Persist changes
                 _products.Update(existing);
@@ -258,9 +251,9 @@ namespace ASAPPVC.UI.Services
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves multiple products by IDs or codes (mapped to list VMs)
         public async Task<Result<List<ProductListVm>>> GetListByIdsOrCodesAsync(
-        IEnumerable<Guid>? ids = null,
+            IEnumerable<Guid>? ids = null,
             IEnumerable<string>? codes = null,
-    CancellationToken ct = default)
+            CancellationToken ct = default)
         {
             try
             {

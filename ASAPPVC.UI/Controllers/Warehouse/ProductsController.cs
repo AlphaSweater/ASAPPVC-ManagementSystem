@@ -41,12 +41,12 @@ namespace ASAPPVC.UI.Controllers.Warehouse
             var result = await _components.ListAsync(ct);
             var componentList = result.Ok && result.Value is not null ? result.Value : new List<ComponentListVm>();
             ViewData["Components"] = componentList;
-            return View(AddProductViewName, new CreateProductVm());
+            return View(AddProductViewName, new ProductFormVm());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProduct(CreateProductVm vm, CancellationToken ct)
+        public async Task<IActionResult> AddProduct(ProductFormVm vm, CancellationToken ct)
         {
             // If a file was uploaded via the form input named 'ImageFile', read it into the VM
             if (HttpContext.Request?.Form?.Files?.Count > 0)
@@ -56,8 +56,6 @@ namespace ASAPPVC.UI.Controllers.Warehouse
                 {
                     using var ms = new MemoryStream();
                     await file.CopyToAsync(ms, ct);
-                    vm.ImageData = ms.ToArray();
-                    vm.ImageType = file.ContentType;
                 }
             }
 

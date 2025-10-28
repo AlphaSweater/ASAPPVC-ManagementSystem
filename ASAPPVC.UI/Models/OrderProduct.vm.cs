@@ -16,7 +16,6 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class OrderProductVm
     {
-        public Guid Id { get; init; }
         public Guid OrderId { get; init; }
         public Guid ProductId { get; init; }
 
@@ -30,13 +29,13 @@ namespace ASAPPVC.UI.Models
     }
 
     //-----------------------------------------------\\
-    // Create form (used in POST / create order)
+    // Upsert form (used for both Add and Edit order lines)
     //-----------------------------------------------\\
     /// <summary>
-    /// Product line entry used when creating an order. Represents the selected product and quantity.<br/>
-    /// Use as items of <see cref="CreateOrderVm.Products"/> when submitting a new order.<br/>
+    /// Unified form view model used when adding or editing a product line in an order.
+    /// If <see cref="OrderProductId"/> is null → Add; if it has value → Edit.
     /// </summary>
-    public sealed class CreateOrderProductVm
+    public sealed class OrderProductFormVm : IValidatableObject
     {
         [Display(Name = "Product")]
         [Required(ErrorMessage = "Product is required.")]
@@ -46,28 +45,32 @@ namespace ASAPPVC.UI.Models
         [Required(ErrorMessage = "Quantity is required.")]
         [Range(1, 999999, ErrorMessage = "Quantity must be at least 1.")]
         public int Quantity { get; set; } = 1;
-    }
 
-    //-----------------------------------------------\\
-    // Edit form (used in PUT / update order)
-    //-----------------------------------------------\\
-    /// <summary>
-    /// Product line entry used when editing an order.<br/>
-    /// Includes the bridge entity Id for persistence tracking.<br/>
-    /// Use as items of <see cref="EditOrderVm.Products"/> when updating an existing order.<br/>
-    /// </summary>
-    public sealed class EditOrderProductVm
-    {
-        /// <summary>Existing bridge entity Id if persisted (null for newly added lines).</summary>
-        public Guid? OrderProductId { get; set; }
+        // Optional: pre-fetched product data for display (not posted)
+        public string? ProductName { get; init; }
 
-        [Display(Name = "Product")]
-        [Required(ErrorMessage = "Product is required.")]
-        public Guid ProductId { get; set; }
+        public decimal? UnitPrice { get; init; }
 
-        [Display(Name = "Quantity")]
-        [Required(ErrorMessage = "Quantity is required.")]
-        [Range(1, 999999, ErrorMessage = "Quantity must be at least 1.")]
-        public int Quantity { get; set; } = 1;
+        // Mark for removal (for edit mode)
+        public bool Remove { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Ensure a valid product is selected
+            if (ProductId == Guid.Empty)
+            {
+                yield return new ValidationResult(
+                    "A valid product must be selected.",
+                    new[] { nameof(ProductId) });
+            }
+
+            // Ensure quantity makes sense
+            if (Quantity <= 0)
+            {
+                yield return new ValidationResult(
+                    "Quantity must be greater than 0.",
+                    new[] { nameof(Quantity) });
+            }
+        }
     }
 }

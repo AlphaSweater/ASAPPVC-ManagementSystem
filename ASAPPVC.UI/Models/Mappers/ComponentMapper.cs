@@ -1,11 +1,15 @@
 ﻿using ASAPPVC.UI.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.UI.Models.Mappers
 {
     /// <summary>
-    /// Implementation of <see cref="IComponentMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
+    /// Maps between Component domain entities and ViewModels (list/detail/form).
     /// </summary>
-    public class ComponentMapper(ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IComponentMapper
+    public class ComponentMapper(
+        ICodeGenerationService? codeGenerationService = null,
+        IImageService? imageService = null)
+        : MapperBase(codeGenerationService, imageService), IComponentMapper
     {
         // ------------------------------------------------------------
         // Domain → ViewModels
@@ -25,7 +29,9 @@ namespace ASAPPVC.UI.Models.Mappers
                 UnitCost = component.UnitCost,
                 StorageLocation = component.StorageLocation,
                 HasImage = component.Image?.Data is { Length: > 0 },
-                ThumbUrl = component.Image?.Data is { Length: > 0 } ? $"/components/{component.Id}/image/thumb" : null,
+                ThumbUrl = component.Image?.Data is { Length: > 0 }
+                    ? $"/components/{component.Id}/image/thumb"
+                    : null,
             };
         }
 
@@ -51,16 +57,21 @@ namespace ASAPPVC.UI.Models.Mappers
                 StorageLocation = component.StorageLocation,
                 UsedInProductsCount = count,
                 HasImage = component.Image?.Data is { Length: > 0 },
-                ImageUrl = component.Image?.Data is { Length: > 0 } ? $"/components/{component.Id}/image" : null,
+                ImageUrl = component.Image?.Data is { Length: > 0 }
+                    ? $"/components/{component.Id}/image"
+                    : null,
                 ImageEtag = component.Image?.Sha256
             };
         }
 
         // ------------------------------------------------------------
-        // ViewModels → Domain
+        // ViewModel (Upsert) → Domain
         // ------------------------------------------------------------
 
-        public async Task<Component> FromCreateVmAsync(CreateComponentVm vm, CancellationToken ct = default)
+        /// <summary>
+        /// Creates a new Component from a ComponentFormVm.
+        /// </summary>
+        public async Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -76,47 +87,54 @@ namespace ASAPPVC.UI.Models.Mappers
 
             if (vm.Image is not null)
             {
-                if (ImageService is null)
-                    throw new InvalidOperationException("Image service is not available.");
-
-                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                EnsureImageService();
+                var processed = await ImageService!.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
-                    throw new InvalidOperationException(processed.Error);
-
+                    throw new ValidationException(processed.Error);
                 entity.Image = processed.Value!.ToAppImage();
             }
 
             return entity;
         }
 
-        public async Task ApplyEditVmAsync(Component target, EditComponentVm vm, CancellationToken ct = default)
+        /// <summary>
+        /// Applies an update to an existing Component using a ComponentFormVm.
+        /// </summary>
+        public async Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default)
         {
-            // Validate and apply synchronous fields
-            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);
-            if (target.Id != vm.Id)
+            if (vm.Id is null || existing.Id != vm.Id.Value)
                 throw new InvalidOperationException("Mismatched component Id.");
 
-            target.ComponentCode = NormalizeString(vm.ComponentCode);
-            target.Name = NormalizeString(vm.Name);
-            target.Unit = vm.Unit;
-            target.CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount;
-            target.UnitCost = NormalizeMoney(vm.UnitCost);
-            target.StorageLocation = NormalizeString(vm.StorageLocation);
+            existing.ComponentCode = NormalizeString(vm.ComponentCode ?? existing.ComponentCode);
+            existing.Name = NormalizeString(vm.Name);
+            existing.Unit = vm.Unit;
+            existing.CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount;
+            existing.UnitCost = NormalizeMoney(vm.UnitCost);
+            existing.StorageLocation = NormalizeString(vm.StorageLocation);
 
-            // Handle optional image processing asynchronously
             if (vm.Image is not null)
             {
-                if (ImageService is null)
-                    throw new InvalidOperationException("Image service is not available.");
-
-                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                EnsureImageService();
+                var processed = await ImageService!.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
-                    throw new InvalidOperationException(processed.Error);
-
-                target.Image = processed.Value!.ToAppImage(); // replace existing
+                    throw new ValidationException(processed.Error);
+                existing.Image = processed.Value!.ToAppImage(); // replace existing
             }
             // If vm.Image is null -> keep current image as-is.
+
+            return existing;
+        }
+
+        // ------------------------------------------------------------
+        // Helpers
+        // ------------------------------------------------------------
+
+        private void EnsureImageService()
+        {
+            if (ImageService is null)
+                throw new InvalidOperationException("Image service is not available.");
         }
     }
 }

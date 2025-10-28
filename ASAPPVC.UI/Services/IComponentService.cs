@@ -20,7 +20,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> carrying the created <see cref="Component"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<Component>> CreateAsync(CreateComponentVm vm, CancellationToken ct = default);
+        Task<Result<Component>> CreateAsync(ComponentFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Updates an existing component from the supplied edit view model.
@@ -32,7 +32,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> carrying the updated <see cref="Component"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<Component>> UpdateAsync(EditComponentVm vm, CancellationToken ct = default);
+        Task<Result<Component>> UpdateAsync(ComponentFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves a single component by its internal identifier or by its human-friendly code.
