@@ -42,7 +42,7 @@ namespace ASAPPVC.UI.Models
         public Guid ComponentId { get; set; }
 
         // Use decimal for consistency with Unit (supports fractional units)
-        [Range(typeof(decimal), "0.0001", "79228162514264337593543950335", ErrorMessage = "Quantity must be greater than 0.")]
+        [Range(typeof(decimal), "0.0001", "79228162514264337593543950334", ErrorMessage = "Quantity must be greater than 0.")]
         public decimal Quantity { get; set; } = 1m;
 
         // Mark a persisted line for deletion on edit
