@@ -11,8 +11,8 @@
 <div class="page">
 	@await Html.PartialAsync("_BackButton")
 
-	<!-- Stronger glass so it stands apart from the blue bg -->
-	<div class="card glass glass card--page" role="region" aria-labelledby="page-title">
+	<!-- Glass card -->
+	<div class="card glass card--page" role="region" aria-labelledby="page-title">
 		<header class="card__header">
 			<div>
 				<h1 id="page-title" class="card__title">@ViewData["Title"]</h1>
@@ -36,9 +36,9 @@
 			  novalidate>
 			@Html.AntiForgeryToken()
 
-			<!-- 2-column body (image left, fields right) -->
-			<div class="fx-row fx-nowrap fx-gap-lg card__body">
-				<!-- LEFT: image pane (fixed, compact) -->
+			<!-- Body: two columns -->
+			<div class="card__body layout-row">
+				<!-- LEFT: image -->
 				<section class="pane-media" aria-labelledby="img-label">
 					<h2 id="img-label" class="sr-only">Component Image</h2>
 
@@ -56,13 +56,9 @@
 
 					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
 					<span asp-validation-for="Image" class="field-error"></span>
-
-					<button type="button" class="btn btn-ghost w-100" onclick="document.getElementById('imageFile').click();">
-						Choose Image
-					</button>
 				</section>
 
-				<!-- RIGHT: fields pane -->
+				<!-- RIGHT: fields -->
 				<section class="pane-fields">
 					<div class="fields-grid">
 						<div class="field half">
@@ -134,12 +130,14 @@
 					dropzone.classList.add('is-dragover');
 				})
 			);
+
 			['dragleave', 'drop'].forEach(evt =>
 				dropzone.addEventListener(evt, e => {
 					e.preventDefault(); e.stopPropagation();
 					dropzone.classList.remove('is-dragover');
 				})
 			);
+
 			dropzone.addEventListener('drop', e => {
 				const file = e.dataTransfer?.files?.[0];
 				if (file) {

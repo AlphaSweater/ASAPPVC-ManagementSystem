@@ -1,31 +1,32 @@
 ﻿/* ================================================================
-   AddComponent • two-column, framework-proof
+   AddComponent • two-column, glass card
+   Notes:
+   - Uses existing design tokens: --glass-border, --text-color, --text-muted, --sa-accent
+   - Visuals preserved; selectors consolidated; utilities simplified
    --------------------------------------------------------------- */
 
+/* Page container */
 .page {
 	display: block;
 }
 
-/* Card (glass comes from site.css; we add only spacing/shape) */
+/* Card */
 .card {
-	border-radius: var(--glass-radius);
 	overflow: clip;
 }
 
 .card--page {
 	width: 100%;
-	max-width: 1200px;
 	margin: 0 0 24px 0;
 }
 
 /* Header */
 .card__header {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
+	justify-content: space-between;
 	padding: 20px 28px;
 	border-bottom: 1px solid var(--glass-border);
-	background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0));
 }
 
 .card__title {
@@ -45,52 +46,48 @@
 	gap: 10px;
 }
 
-/* BODY — use our own flex utilities to avoid Bootstrap/Grid overrides */
+/* Body */
 .card__body {
-	padding: 22px 28px;
+	padding: 24px 32px;
 }
 
-/* Flex utilities (force with !important to beat framework collisions) */
-.fx-row {
-	display: flex !important;
+/* Layout: row with gap */
+.layout-row {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	gap: 28px;
 }
 
-.fx-nowrap {
-	flex-wrap: nowrap !important;
-}
-
-.fx-gap-lg {
-	gap: 24px !important;
-}
-
-/* LEFT: media pane — hard cap to avoid “giant” dropzone */
+/* LEFT: media pane */
 .pane-media {
-	flex: 0 0 280px; /* fixed column */
-	max-width: 280px; /* never exceed */
+	flex: 0 0 260px;
+	max-width: 260px;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
-/* Compact square preview */
+/* Dropzone + preview */
 .dropzone {
 	position: relative;
 	width: 100%;
-	height: 280px; /* explicit size — no growing */
+	height: 260px;
 	border: 1px dashed var(--glass-border);
-	border-radius: 14px;
+	border-radius: 16px;
 	background: rgba(255,255,255,.06);
 	display: grid;
 	place-items: center;
 	overflow: hidden;
 	cursor: pointer;
 	outline: none;
-	transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+	transition: border-color .2s, background-color .2s, transform .2s, box-shadow .25s;
 }
 
 	.dropzone:hover {
-		background: rgba(255,255,255,.12);
-		border-color: rgba(255,255,255,.34);
+		background: rgba(255,255,255,.09);
+		border-color: rgba(255,255,255,.35);
+		box-shadow: 0 6px 20px rgba(0,0,0,.25);
 	}
 
 	.dropzone.is-dragover {
@@ -105,6 +102,7 @@
 		height: 100%;
 		object-fit: cover;
 		border-radius: inherit;
+		opacity: .96;
 	}
 
 .dz-overlay {
@@ -121,6 +119,11 @@
 	font-size: 13px;
 }
 
+/* Hide native input */
+.file-input {
+	display: none;
+}
+
 /* RIGHT: fields pane */
 .pane-fields {
 	flex: 1 1 auto;
@@ -130,7 +133,7 @@
 	gap: 18px;
 }
 
-/* Two-up rows using flex (no grid required) */
+/* Fields grid */
 .fields-grid {
 	display: flex;
 	flex-wrap: wrap;
@@ -157,15 +160,16 @@
 	color: var(--text-muted);
 }
 
+/* Inputs (text + select share same look) */
 .input, select.input {
-	height: 44px;
-	border-radius: 12px;
+	height: 42px;
+	border-radius: 10px;
 	padding: 0 12px;
 	background: rgba(255,255,255,.06);
-	border: 1px solid rgba(255,255,255,.28);
+	border: 1px solid rgba(255,255,255,.22);
 	color: var(--text-color);
 	outline: none;
-	transition: .15s ease;
+	transition: background .2s, border-color .2s, box-shadow .2s;
 }
 
 	.input::placeholder {
@@ -173,21 +177,19 @@
 	}
 
 	.input:focus {
-		background: rgba(255,255,255,.12);
-		border-color: rgba(255,255,255,.38);
-		box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+		background: rgba(255,255,255,.10);
+		border-color: rgba(255,255,255,.45);
+		box-shadow: 0 0 0 3px rgba(255,255,255,.08);
 	}
 
-/* Currency prefix */
+/* Currency affix */
 .input-affix {
 	position: relative;
 }
 
 	.input-affix .affix {
 		position: absolute;
-		left: 10px;
-		top: 0;
-		bottom: 0;
+		inset: 0 auto 0 10px;
 		display: flex;
 		align-items: center;
 		font-weight: 700;
@@ -198,23 +200,27 @@
 		padding-left: 28px;
 	}
 
-/* Validation + actions */
-.validation-summary {
-	margin: 10px 28px 0;
+/* Validation */
+.validation-summary,
+.field-error {
 	color: #ffb3b3;
+}
+
+.validation-summary {
+	margin: 10px 32px 0;
 	font-size: 14px;
 }
 
 .field-error {
-	color: #ffb3b3;
 	font-size: 12px;
 }
 
+/* Actions */
 .form-actions {
+	margin-top: 16px;
 	display: flex;
 	justify-content: flex-end;
 	gap: 12px;
-	padding-top: 4px;
 }
 
 .btn {
@@ -222,19 +228,22 @@
 	padding: 10px 16px;
 	font-weight: 700;
 	display: inline-flex;
+	align-items: center;
 	gap: 8px;
 	cursor: pointer;
-	transition: .15s ease;
+	transition: filter .15s, box-shadow .15s, background-color .15s, border-color .15s;
 }
 
 .btn-primary {
 	background: linear-gradient(180deg, var(--sa-accent), #ff6f73);
 	color: #fff;
-	box-shadow: 0 8px 20px rgba(255,82,82,.35);
+	border: none;
+	box-shadow: 0 0 12px rgba(255,82,82,.40);
 }
 
 	.btn-primary:hover {
-		filter: brightness(1.05);
+		filter: brightness(1.08);
+		box-shadow: 0 0 20px rgba(255,82,82,.55);
 	}
 
 .btn-ghost {
@@ -248,6 +257,7 @@
 		border-color: rgba(255,255,255,.34);
 	}
 
+/* Utilities */
 .w-100 {
 	width: 100%;
 }
@@ -258,14 +268,14 @@
 	height: 1px;
 	margin: -1px;
 	overflow: hidden;
-	clip: rect(0,0,0,0);
+	clip: rect(0 0 0 0);
 	border: 0;
 }
 
 /* Responsive: stack below 960px */
 @media (max-width: 960px) {
-	.fx-nowrap {
-		flex-wrap: wrap !important;
+	.layout-row {
+		flex-wrap: wrap;
 	}
 
 	.pane-media {
