@@ -1,27 +1,17 @@
 ﻿/* ================================================================
-   AddComponent • two-column, glass card
-   Notes:
-   - Uses existing design tokens: --glass-border, --text-color, --text-muted, --sa-accent
-   - Visuals preserved; selectors consolidated; utilities simplified
+   AddComponent • Glass form layout (dark blue friendly)
    --------------------------------------------------------------- */
 
-/* Page container */
+/* Page */
 .page {
 	display: block;
 }
 
-/* Card */
-.card {
-	overflow: clip;
-}
-
-.card--page {
-	width: 100%;
-	margin: 0 0 24px 0;
-}
+/* Card wrapper */
 
 /* Header */
-.card__header {
+.card-header {
+	background-color: transparent;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -29,46 +19,43 @@
 	border-bottom: 1px solid var(--glass-border);
 }
 
-.card__title {
+.card-title {
 	margin: 0;
-	font-weight: 800;
 	font-size: 26px;
+	font-weight: 800;
+	color: #fff;
 }
 
-.card__subtitle {
-	margin: 4px 0 0;
-	color: var(--text-muted);
+.card-subtitle {
+	margin-top: 4px;
 	font-size: 14px;
+	color: var(--text-muted);
 }
 
-.card__actions {
+.card-actions {
 	display: flex;
 	gap: 10px;
 }
 
-/* Body */
-.card__body {
+/* Card body */
+.card-body {
 	padding: 24px 32px;
-}
-
-/* Layout: row with gap */
-.layout-row {
 	display: flex;
 	flex-wrap: nowrap;
-	align-items: stretch;
+	align-items: flex-start;
 	gap: 28px;
 }
 
-/* LEFT: media pane */
-.pane-media {
+/* Media panel (left) */
+.media-panel {
 	flex: 0 0 260px;
-	max-width: 260px;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+	max-width: 260px;
 }
 
-/* Dropzone + preview */
+/* Dropzone */
 .dropzone {
 	position: relative;
 	width: 100%;
@@ -78,20 +65,19 @@
 	background: rgba(255,255,255,.06);
 	display: grid;
 	place-items: center;
-	overflow: hidden;
 	cursor: pointer;
-	outline: none;
-	transition: border-color .2s, background-color .2s, transform .2s, box-shadow .25s;
+	overflow: hidden;
+	transition: all 0.25s ease;
 }
 
 	.dropzone:hover {
-		background: rgba(255,255,255,.09);
+		background: rgba(255,255,255,.1);
 		border-color: rgba(255,255,255,.35);
 		box-shadow: 0 6px 20px rgba(0,0,0,.25);
 	}
 
 	.dropzone.is-dragover {
-		transform: scale(1.01);
+		transform: scale(1.02);
 		border-color: #fff;
 	}
 
@@ -105,7 +91,7 @@
 		opacity: .96;
 	}
 
-.dz-overlay {
+.dropzone-overlay {
 	position: relative;
 	z-index: 1;
 	display: inline-flex;
@@ -119,39 +105,38 @@
 	font-size: 13px;
 }
 
-/* Hide native input */
+/* File input hidden */
 .file-input {
 	display: none;
 }
 
-/* RIGHT: fields pane */
-.pane-fields {
+/* Fields panel (right) */
+.fields-panel {
 	flex: 1 1 auto;
-	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 18px;
 }
 
-/* Fields grid */
-.fields-grid {
+/* Grid */
+.form-grid {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 16px;
 }
 
-.field {
+.form-field {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
 
-	.field.half {
+	.form-field.half {
 		flex: 1 1 calc(50% - 8px);
 		min-width: 260px;
 	}
 
-	.field.full {
+	.form-field.full {
 		flex: 1 1 100%;
 	}
 
@@ -160,14 +145,15 @@
 	color: var(--text-muted);
 }
 
-/* Inputs (text + select share same look) */
-.input, select.input {
+/* Input base */
+.input,
+select.input {
 	height: 42px;
-	border-radius: 10px;
 	padding: 0 12px;
-	background: rgba(255,255,255,.06);
+	border-radius: 10px;
+	background: rgba(255,255,255,.08);
 	border: 1px solid rgba(255,255,255,.22);
-	color: var(--text-color);
+	color: #fff;
 	outline: none;
 	transition: background .2s, border-color .2s, box-shadow .2s;
 }
@@ -177,26 +163,28 @@
 	}
 
 	.input:focus {
-		background: rgba(255,255,255,.10);
+		background: rgba(255,255,255,.12);
 		border-color: rgba(255,255,255,.45);
 		box-shadow: 0 0 0 3px rgba(255,255,255,.08);
 	}
 
-/* Currency affix */
-.input-affix {
+/* Input with currency prefix */
+.input-group {
 	position: relative;
 }
 
-	.input-affix .affix {
+	.input-group .prefix {
 		position: absolute;
-		inset: 0 auto 0 10px;
+		left: 10px;
+		top: 0;
+		bottom: 0;
 		display: flex;
 		align-items: center;
 		font-weight: 700;
-		opacity: .9;
+		color: rgba(255,255,255,.9);
 	}
 
-	.input-affix .input {
+	.input-group .input {
 		padding-left: 28px;
 	}
 
@@ -215,7 +203,7 @@
 	font-size: 12px;
 }
 
-/* Actions */
+/* Form buttons */
 .form-actions {
 	margin-top: 16px;
 	display: flex;
@@ -225,20 +213,19 @@
 
 .btn {
 	border-radius: 999px;
-	padding: 10px 16px;
+	padding: 10px 18px;
 	font-weight: 700;
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
 	cursor: pointer;
-	transition: filter .15s, box-shadow .15s, background-color .15s, border-color .15s;
+	transition: all .2s ease;
 }
 
 .btn-primary {
-	background: linear-gradient(180deg, var(--sa-accent), #ff6f73);
 	color: #fff;
 	border: none;
-	box-shadow: 0 0 12px rgba(255,82,82,.40);
+	box-shadow: 0 0 12px rgba(255,82,82,.4);
 }
 
 	.btn-primary:hover {
@@ -249,19 +236,16 @@
 .btn-ghost {
 	background: transparent;
 	border: 1px solid var(--glass-border);
-	color: var(--text-color);
+	color: #fff;
 }
 
 	.btn-ghost:hover {
 		background: rgba(255,255,255,.08);
 		border-color: rgba(255,255,255,.34);
+		color: #fff;
 	}
 
-/* Utilities */
-.w-100 {
-	width: 100%;
-}
-
+/* Accessibility helpers */
 .sr-only {
 	position: absolute !important;
 	width: 1px;
@@ -272,20 +256,19 @@
 	border: 0;
 }
 
-/* Responsive: stack below 960px */
+/* Responsive */
 @media (max-width: 960px) {
-	.layout-row {
+	.card-body {
 		flex-wrap: wrap;
 	}
 
-	.pane-media {
+	.media-panel {
 		flex: 1 1 100%;
 		max-width: 420px;
 	}
 
 	.dropzone {
-		width: 100%;
+		aspect-ratio: 4/3;
 		height: auto;
-		aspect-ratio: 4 / 3;
 	}
 }

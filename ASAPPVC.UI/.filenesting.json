@@ -40,12 +40,12 @@
                                                                               "ProductComponentMapper.cs":  [
                                                                                                                 "IProductComponentMapper.cs"
                                                                                                             ],
+                                                                              "BaseRepository.cs":  [
+                                                                                                        "IBaseRepository.cs"
+                                                                                                    ],
                                                                               "OrderProductMapper.cs":  [
                                                                                                             "IOrderProductMapper.cs"
                                                                                                         ],
-                                                                              "UserRepository.cs":  [
-                                                                                                        "IUserRepository.cs"
-                                                                                                    ],
                                                                               "CodeCountersRepository.cs":  [
                                                                                                                 "ICodeCountersRepository.cs"
                                                                                                             ],
@@ -67,8 +67,8 @@
                                                                               "CustomerRepository.cs":  [
                                                                                                             "ICustomerRepository.cs"
                                                                                                         ],
-                                                                              "BaseRepository.cs":  [
-                                                                                                        "IBaseRepository.cs"
+                                                                              "UserRepository.cs":  [
+                                                                                                        "IUserRepository.cs"
                                                                                                     ],
                                                                               "ProductRepository.cs":  [
                                                                                                            "IProductRepository.cs"
