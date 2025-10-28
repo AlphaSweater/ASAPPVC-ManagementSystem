@@ -1,4 +1,4 @@
-﻿@model global::ASAPPVC.UI.Models.CreateComponentVm
+﻿@model global::ASAPPVC.UI.Models.ComponentFormVm
 @{
 	ViewData["Title"] = "Add New Component";
 	ViewData["ShowBackPageName"] = true;
@@ -19,7 +19,7 @@
 			</div>
 
 			<div class="card-actions">
-				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost">
+				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">
 					🏷️ Components
 				</a>
 			</div>
@@ -27,7 +27,8 @@
 
 		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-		<form asp-controller="Components"
+		<form asp-area="Warehouse"
+			  asp-controller="Components"
 			  asp-action="AddComponent"
 			  method="post"
 			  enctype="multipart/form-data"

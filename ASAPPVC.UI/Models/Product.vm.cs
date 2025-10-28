@@ -30,9 +30,9 @@ namespace ASAPPVC.UI.Models
         // Distinct number of components linked to this product
         public int ComponentCount { get; init; }
 
-        // Enum modifiers (typed)
-        public Category Category { get; init; } = Category.None;
+        // Enum modifiers
 
+        public Category Category { get; init; } = Category.None;
         public Material Material { get; init; } = Material.None;
         public Colour Colour { get; init; } = Colour.None;
 
@@ -61,7 +61,7 @@ namespace ASAPPVC.UI.Models
 
         public bool HasImage { get; set; }
         public string? ImageUrl { get; init; }
-        public string? ImageEtag { get; init; }     // optional: SHA256 for cache busting
+        public string? ImageEtag { get; init; }
 
         // Enum modifiers
         public Category Category { get; init; } = Category.None;
@@ -77,13 +77,16 @@ namespace ASAPPVC.UI.Models
     // Create form (used in POST / add product)
     //-----------------------------------------------\\
     /// <summary>
-    /// Form view model used when creating a new product (POST).<br/>
-    /// Includes validation attributes for server-side model binding and a collection<br/>
-    /// of component entries. Use this VM for create forms and endpoints that accept<br/>
-    /// product creation data.<br/>
+    /// One form VM for both Add and Edit (Upsert).
+    /// If Id is null → Add; if Id has value → Edit.
     /// </summary>
-    public sealed class CreateProductVm
+    public sealed class ProductFormVm : IValidatableObject
     {
+        // Mode
+        public Guid? Id { get; set; }
+
+        public bool IsEdit => Id.HasValue;
+
         [Display(Name = "Product Code")]
         [StringLength(64)]
         public string? ProductCode { get; set; }
@@ -103,12 +106,13 @@ namespace ASAPPVC.UI.Models
         [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
         public string Description { get; set; } = string.Empty;
 
+        // Image upload
         [Display(Name = "Image (optional)")]
-        public byte[]? ImageData { get; set; }
+        public IFormFile? Image { get; set; }
 
-        public string? ImageType { get; set; }
+        public string? ExistingImageUrl { get; set; }
 
-        // Modifier selections
+        // Modifiers
         [Display(Name = "Category")]
         public Category Category { get; set; } = Category.None;
 
@@ -118,62 +122,28 @@ namespace ASAPPVC.UI.Models
         [Display(Name = "Colour")]
         public Colour Colour { get; set; } = Colour.None;
 
+        // Component lines
         [Display(Name = "Components")]
-        [MinLength(1, ErrorMessage = "A Product requires at least 1 Component")]
-        public List<CreateProductComponentVm> Components { get; set; } = new();
-    }
+        [MinLength(1, ErrorMessage = "A product requires at least one component.")]
+        public List<ProductComponentFormVm> Components { get; set; } = new();
 
-    //-----------------------------------------------\\
-    // Edit form (used in PUT / update product)
-    //-----------------------------------------------\\
-    /// <summary>
-    /// Form view model used when editing an existing product (PUT).<br/>
-    /// Includes the product Id and validation attributes for update binding.<br/>
-    /// Components include editable entries and may contain database ids for existing<br/>
-    /// associations. Use this VM for edit forms and update endpoints.<br/>
-    /// </summary>
-    public sealed class EditProductVm
-    {
-        [Required(ErrorMessage = "Product ID is required.")]
-        public Guid Id { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (IsEdit && string.IsNullOrWhiteSpace(ProductCode))
+            {
+                yield return new ValidationResult(
+                    "Product code is required when editing.",
+                    new[] { nameof(ProductCode) });
+            }
 
-        [Display(Name = "Product Code")]
-        [Required(ErrorMessage = "Product code is required.")]
-        [StringLength(64)]
-        public string ProductCode { get; set; } = string.Empty;
+            if (Components is { Count: > 0 })
+            {
+                for (int i = 0; i < Components.Count; i++)
+                {
+                    var c = Components[i];
 
-        [Display(Name = "Product Name")]
-        [Required(ErrorMessage = "Product name is required.")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Display(Name = "Unit Price")]
-        [Required(ErrorMessage = "Price is required.")]
-        [Range(0.01, 999999, ErrorMessage = "Price must be a positive amount.")]
-        public decimal Price { get; set; }
-
-        [Display(Name = "Description")]
-        [Required(ErrorMessage = "Description is required.")]
-        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
-        public string Description { get; set; } = string.Empty;
-
-        [Display(Name = "Image (optional)")]
-        public byte[]? ImageData { get; set; }
-
-        public string? ImageType { get; set; }
-
-        // Modifier selections
-        [Display(Name = "Category")]
-        public Category Category { get; set; } = Category.None;
-
-        [Display(Name = "Material")]
-        public Material Material { get; set; } = Material.None;
-
-        [Display(Name = "Colour")]
-        public Colour Colour { get; set; } = Colour.None;
-
-        [Display(Name = "Components")]
-        [MinLength(1)]
-        public List<EditProductComponentVm> Components { get; set; } = new();
+                }
+            }
+        }
     }
 }

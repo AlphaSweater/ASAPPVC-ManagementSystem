@@ -16,10 +16,8 @@
 <div class="viewport">
 	<div class="view-container">
 		<div class="header-section">
-			<a heref="javascript:void(0);" class="back-link" onclick="window.history.back();">
-				<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
-				Back
-			</a>
++ 			@{ ViewData["BackText"] = "Back"; }
++ 			@await Html.PartialAsync("_BackButton")
 			<h2 class="main-title">@vm!.Name</h2>
 		</div>
 
@@ -92,7 +90,8 @@
 		<!-- Footer Actions -->
 		<div class="actions">
 			<a class="btn btn-primary"
-			   asp-controller="Inventory"
+			   asp-area="Warehouse"
+			   asp-controller="Products"
 			   asp-action="EditProduct"
 			   asp-route-id="@vm.Id">Edit Product</a>
 		</div>

@@ -18,9 +18,16 @@ namespace ASAPPVC.UI.Models.Mappers
         OrderDetailVm ToDetailVm(Order order, bool includeProducts = true);
 
         /// <summary>
-        /// Builds an Order domain entity from a CreateOrderVm. Generates an order code
+        /// Builds an Order domain entity from the unified order form VM. Generates an order code
         /// if not supplied using the optional generator.
         /// </summary>
-        Order FromCreateVm(CreateOrderVm vm);
+        Order FromFormVm(OrderFormVm vm);
+
+        /// <summary>
+        /// Applies an upsert form VM to an existing Order domain entity.
+        /// Updates scalar fields and delegates product-line merging to <see cref="IOrderProductMapper"/>.
+        /// Returns the updated Order instance (same reference as <paramref name="existing"/>).
+        /// </summary>
+        Order ApplyFormVm(Order existing, OrderFormVm vm);
     }
 }

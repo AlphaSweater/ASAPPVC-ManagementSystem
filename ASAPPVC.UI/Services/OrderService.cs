@@ -18,7 +18,7 @@ namespace ASAPPVC.UI.Services
 
         // ---------- Input validation + normalization helpers ----------
 
-        private static Result ValidateCreateVm(CreateOrderVm? vm)
+        private static Result ValidateCreateVm(OrderFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Create view model is required.");
@@ -39,11 +39,11 @@ namespace ASAPPVC.UI.Services
             return Result.Success();
         }
 
-        private static Result ValidateEditVm(EditOrderVm? vm)
+        private static Result ValidateEditVm(OrderFormVm? vm)
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
-            if (vm.Id == Guid.Empty)
+            if (vm.Id is null || vm.Id == Guid.Empty)
                 return Result.Fail("Order ID is required.");
             if (string.IsNullOrWhiteSpace(vm.OrderCode))
                 return Result.Fail("Order code is required.");
@@ -64,7 +64,7 @@ namespace ASAPPVC.UI.Services
             return Result.Success();
         }
 
-        private static void Normalize(CreateOrderVm vm)
+        private static void NormalizeCreate(OrderFormVm vm)
         {
             // Ensure order date is set
             if (vm.OrderDate is null)
@@ -75,9 +75,10 @@ namespace ASAPPVC.UI.Services
                 vm.Notes = vm.Notes.Trim();
         }
 
-        private static void Normalize(EditOrderVm vm)
+        private static void NormalizeEdit(OrderFormVm vm)
         {
-            vm.OrderCode = vm.OrderCode.Trim();
+            if (vm.OrderCode is not null)
+                vm.OrderCode = vm.OrderCode.Trim();
 
             // Normalize notes if provided
             if (!string.IsNullOrWhiteSpace(vm.Notes))
@@ -86,13 +87,13 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Creates a new order from view model
-        public async Task<Result<Order>> CreateAsync(CreateOrderVm vm, CancellationToken ct = default)
+        public async Task<Result<Order>> CreateAsync(OrderFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateCreateVm(vm);
             if (!validation.Ok)
                 return Result<Order>.Fail(validation.Error!);
 
-            Normalize(vm);
+            NormalizeCreate(vm);
 
             try
             {
@@ -111,7 +112,7 @@ namespace ASAPPVC.UI.Services
                     return Result<Order>.Fail($"Some products do not exist: {string.Join(", ", missingIds)}");
 
                 // Map VM to domain entity (mapper handles code generation and order line creation)
-                var order = _mapper.FromCreateVm(vm);
+                var order = _mapper.FromFormVm(vm);
 
                 // Persist
                 var added = await _orders.AddAsync(order, ct);
@@ -131,25 +132,25 @@ namespace ASAPPVC.UI.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Updates an existing order from edit view model
-        public async Task<Result<Order>> UpdateAsync(EditOrderVm vm, CancellationToken ct = default)
+        public async Task<Result<Order>> UpdateAsync(OrderFormVm vm, CancellationToken ct = default)
         {
             var validation = ValidateEditVm(vm);
             if (!validation.Ok)
                 return Result<Order>.Fail(validation.Error!);
 
-            Normalize(vm);
+            NormalizeEdit(vm);
 
             try
             {
                 // Fetch existing order with details (tracking enabled for update)
-                var existing = await _orders.GetByIdOrCodeWithDetailsAsync(vm.Id, asNoTracking: false, ct: ct);
+                var existing = await _orders.GetByIdOrCodeWithDetailsAsync(vm.Id!.Value, asNoTracking: false, ct: ct);
                 if (existing is null)
                     return Result<Order>.Fail("Order not found.");
 
                 // Check if code changed and conflicts with another order
                 if (existing.OrderCode != vm.OrderCode)
                 {
-                    var conflictingOrder = await _orders.GetByCodeAsync(vm.OrderCode, asNoTracking: true, ct);
+                    var conflictingOrder = await _orders.GetByCodeAsync(vm.OrderCode!, asNoTracking: true, ct);
                     if (conflictingOrder is not null && conflictingOrder.Id != vm.Id)
                         return Result<Order>.Fail($"Order code '{vm.OrderCode}' is already in use.");
                 }
@@ -169,9 +170,9 @@ namespace ASAPPVC.UI.Services
                     return Result<Order>.Fail($"Some products do not exist: {string.Join(", ", missingIds)}");
 
                 // Apply changes to order
-                existing.OrderCode = vm.OrderCode;
+                existing.OrderCode = vm.OrderCode ?? existing.OrderCode;
                 existing.CustomerId = vm.CustomerId;
-                existing.OrderDate = vm.OrderDate;
+                existing.OrderDate = vm.OrderDate ?? existing.OrderDate;
                 existing.OrderStatus = vm.OrderStatus;
 
                 // Handle order products - remove old, add new
@@ -179,12 +180,12 @@ namespace ASAPPVC.UI.Services
                 existing.OrderProducts.Clear();
 
                 // Add updated products (mapper handles deduplication and normalization)
-                var newProducts = _mapper.FromCreateVm(new CreateOrderVm
+                var newProducts = _mapper.FromFormVm(new OrderFormVm
                 {
                     CustomerId = vm.CustomerId,
                     OrderDate = vm.OrderDate,
                     OrderStatus = vm.OrderStatus,
-                    Products = vm.Products.Select(p => new CreateOrderProductVm
+                    Products = vm.Products.Select(p => new OrderProductFormVm
                     {
                         ProductId = p.ProductId,
                         Quantity = p.Quantity

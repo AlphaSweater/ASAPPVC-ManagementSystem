@@ -10,33 +10,33 @@ namespace ASAPPVC.UI.Models.Mappers
         /// <summary>
         /// Converts a single OrderProduct to a view model.
         /// </summary>
-        OrderProductVm ToVm(OrderProduct orderProduct);
+        OrderProductVm ToBridgeVm(OrderProduct orderProduct);
 
         /// <summary>
         /// Converts a collection of OrderProduct entities to view models.
         /// </summary>
-        List<OrderProductVm> ToVms(IEnumerable<OrderProduct> items);
+        List<OrderProductVm> ToBridgeVms(IEnumerable<OrderProduct> items);
 
         /// <summary>
         /// Creates a new OrderProduct from a create view model.
         /// </summary>
-        OrderProduct FromCreateVm(Guid orderId, CreateOrderProductVm vm);
+        OrderProduct FromCreateBridgeVm(Guid orderId, OrderProductFormVm vm);
 
         /// <summary>
         /// Bulk helper: merges duplicates (by ProductId) and creates OrderProduct rows.
         /// Automatically sums quantities.
         /// </summary>
-        List<OrderProduct> FromCreateVms(Guid orderId, IEnumerable<CreateOrderProductVm> items);
+        List<OrderProduct> FromCreateBridgeVms(Guid orderId, IEnumerable<OrderProductFormVm> items);
 
         /// <summary>
         /// Applies an edit view model to an existing OrderProduct.
         /// </summary>
-        void ApplyEditVm(OrderProduct target, EditOrderProductVm vm);
+        void ApplyUpdateBridgeVm(OrderProduct target, OrderProductFormVm vm);
 
         /// <summary>
         /// Bulk helper: applies edit view models to existing order products.
         /// Updates existing lines, creates missing ones, and merges duplicates by ProductId.
         /// </summary>
-        List<OrderProduct> ApplyEditVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<EditOrderProductVm> editVms);
+        List<OrderProduct> ApplyUpdateBridgeVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<OrderProductFormVm> editVms);
     }
 }

@@ -36,12 +36,12 @@ namespace ASAPPVC.UI.Controllers.Warehouse
         [HttpGet]
         public IActionResult AddComponent()
         {
-            return View(AddComponentViewName, new CreateComponentVm());
+            return View(AddComponentViewName, new ComponentFormVm());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComponent(CreateComponentVm vm, CancellationToken ct)
+        public async Task<IActionResult> AddComponent(ComponentFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
                 return View(AddComponentViewName, vm);

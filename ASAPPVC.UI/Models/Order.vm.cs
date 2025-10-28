@@ -3,7 +3,7 @@
 namespace ASAPPVC.UI.Models
 {
     //-----------------------------------------------\\
-    //  Order ViewModels (Read + Write)
+    // Order ViewModels (Read + Write)
     //-----------------------------------------------\\
 
     //-----------------------------------------------\\
@@ -79,14 +79,24 @@ namespace ASAPPVC.UI.Models
     }
 
     //-----------------------------------------------\\
-    // Create form (used in POST / create order)
+    // Upsert form (used for both Create and Edit order)
     //-----------------------------------------------\\
     /// <summary>
-    /// Form view model used when creating a new order (POST).<br/>
-    /// Requires a customer and at least one product line.<br/>
+    /// One form VM for both Create (Add) and Edit (Upsert).
+    /// If Id is null → Create; if Id has value → Edit.
+    /// Implements custom validation for edit-mode requirements and line validation.
     /// </summary>
-    public sealed class CreateOrderVm
+    public sealed class OrderFormVm : IValidatableObject
     {
+        // Mode
+        public Guid? Id { get; set; }
+
+        public bool IsEdit => Id.HasValue;
+
+        [Display(Name = "Order Code")]
+        [StringLength(64)]
+        public string? OrderCode { get; set; }
+
         [Display(Name = "Customer")]
         [Required(ErrorMessage = "Customer is required.")]
         public Guid CustomerId { get; set; }
@@ -99,48 +109,30 @@ namespace ASAPPVC.UI.Models
 
         [Display(Name = "Products")]
         [MinLength(1, ErrorMessage = "An order requires at least 1 product line.")]
-        public List<CreateOrderProductVm> Products { get; set; } = new();
+        public List<OrderProductFormVm> Products { get; set; } = new();
 
         [Display(Name = "Notes (optional)")]
         [StringLength(500)]
         public string? Notes { get; set; }
-    }
 
-    //-----------------------------------------------\\
-    // Edit form (used in PUT / update order)
-    //-----------------------------------------------\\
-    /// <summary>
-    /// Form view model used when editing an existing order (PUT).<br/>
-    /// Includes Id, mutable status/date, and editable product lines (with bridge Ids).<br/>
-    /// </summary>
-    public sealed class EditOrderVm
-    {
-        [Required(ErrorMessage = "Order ID is required.")]
-        public Guid Id { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (IsEdit && string.IsNullOrWhiteSpace(OrderCode))
+            {
+                yield return new ValidationResult(
+                    "Order code is required when editing.",
+                    new[] { nameof(OrderCode) });
+            }
 
-        [Display(Name = "Order Code")]
-        [Required(ErrorMessage = "Order code is required.")]
-        [StringLength(64)]
-        public string OrderCode { get; set; } = string.Empty;
+            if (Products is { Count: > 0 })
+            {
+                for (int i = 0; i < Products.Count; i++)
+                {
+                    var p = Products[i];
 
-        [Display(Name = "Customer")]
-        [Required(ErrorMessage = "Customer is required.")]
-        public Guid CustomerId { get; set; }
-
-        [Display(Name = "Order Date")]
-        [Required(ErrorMessage = "Order date is required.")]
-        public DateTime OrderDate { get; set; }
-
-        [Display(Name = "Order Status")]
-        [Required(ErrorMessage = "Order status is required.")]
-        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
-
-        [Display(Name = "Products")]
-        [MinLength(1, ErrorMessage = "An order requires at least 1 product line.")]
-        public List<EditOrderProductVm> Products { get; set; } = new();
-
-        [Display(Name = "Notes (optional)")]
-        [StringLength(500)]
-        public string? Notes { get; set; }
+                    // Quantity validation is handled by [Range] attribute on OrderProductFormVm.Quantity
+                }
+            }
+        }
     }
 }

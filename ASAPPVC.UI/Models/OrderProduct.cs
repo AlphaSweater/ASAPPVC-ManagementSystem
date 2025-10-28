@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.UI.Models
 {
+    /// <summary>
+    /// Bridge entity linking an Order to many Products with a Quantity (per order).<br/>
+    /// Uses a composite key of OrderId and ProductId.
+    /// </summary>
     public class OrderProduct
     {
-        // Internal GUID primary key for safe relations
-        [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         // Foreign key to the order
         [Required, ForeignKey(nameof(Order))]
         public Guid OrderId { get; set; }

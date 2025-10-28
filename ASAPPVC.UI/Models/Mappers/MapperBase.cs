@@ -1,6 +1,6 @@
 using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Services;
 using ASAPPVC.UI.Models.General;
+using ASAPPVC.UI.Services;
 
 namespace ASAPPVC.UI.Models.Mappers
 {

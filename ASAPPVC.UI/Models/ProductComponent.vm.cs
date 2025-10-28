@@ -18,7 +18,6 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class ProductComponentVm
     {
-        public Guid Id { get; init; }
         public Guid ProductId { get; init; }
         public Guid ComponentId { get; init; }
 
@@ -37,41 +36,45 @@ namespace ASAPPVC.UI.Models
     //-----------------------------------------------\\
     // Create form (used in POST / add product)
     //-----------------------------------------------\\
-    /// <summary>
-    /// Component entry used within the create form. Represents the selected component and<br/>
-    /// the required quantity. Use as items of CreateProductVm.Components when creating products.<br/>
-    /// </summary>
-    public sealed class CreateProductComponentVm
+    public sealed class ProductComponentFormVm : IValidatableObject
     {
-        [Display(Name = "Component")]
-        [Required(ErrorMessage = "Component is required.")]
+        private const decimal MaxQuantity = 1_000_000_000_000m; // 1 trillion
+        private const decimal MinQuantity = 0m;
+
+        [Required]
         public Guid ComponentId { get; set; }
 
-        [Display(Name = "Quantity Required")]
-        [Required(ErrorMessage = "Quantity is required.")]
-        [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
-        public decimal QuantityRequired { get; set; }
-    }
+        // Use decimal for consistency with Unit (supports fractional units)
+        public decimal Quantity { get; set; } = 1m;
 
-    //-----------------------------------------------\\
-    // Edit form (used in PUT / update product)
-    //-----------------------------------------------\\
-    /// <summary>
-    /// Component entry used within the edit form. Includes an Id for the association (if persisted),<br/>
-    /// the selected component, and quantity. Use as items of EditProductVm.Components for updates.<br/>
-    /// </summary>
-    public sealed class EditProductComponentVm
-    {
-        /// <summary>Existing bridge entity Id if present (null for new entities on edit).</summary>
-        public Guid? ProductComponentId { get; set; }
+        // Mark a persisted line for deletion on edit
+        public bool Remove { get; set; } = false;
 
-        [Display(Name = "Component")]
-        [Required(ErrorMessage = "Component is required.")]
-        public Guid ComponentId { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // 1) ComponentId must not be empty
+            if (ComponentId == Guid.Empty)
+            {
+                yield return new ValidationResult(
+                    "Component is required.",
+                    new[] { nameof(ComponentId) });
+            }
 
-        [Display(Name = "Quantity Required")]
-        [Required(ErrorMessage = "Quantity is required.")]
-        [Range(0.01, 999999, ErrorMessage = "Quantity must be greater than zero.")]
-        public decimal QuantityRequired { get; set; }
+            // 2) Quantity must be greater than 0
+            if (Quantity <= MinQuantity)
+            {
+                yield return new ValidationResult(
+                    $"Quantity must be greater than {MinQuantity:N0}.",
+                    new[] { nameof(Quantity) });
+            }
+
+            // 3) Quantity must be less than 1 trillion
+            if (Quantity >= MaxQuantity)
+            {
+                yield return new ValidationResult(
+                    $"Quantity must be less than {MaxQuantity:N0}.",
+                    new[] { nameof(Quantity) });
+            }
+        }
     }
 }

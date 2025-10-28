@@ -11,9 +11,13 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   call-reusable:
-    name: 🚦 PR CI
+    name: "🚦 PR CI"
     uses: ./.github/workflows/dotnet-ci.yaml
+    permissions:
+      contents: read
+      pull-requests: read
     secrets: inherit

@@ -20,7 +20,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> carrying the created <see cref="Product"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<Product>> CreateAsync(CreateProductVm vm, CancellationToken ct = default);
+        Task<Result<Product>> CreateAsync(ProductFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Updates an existing product from the supplied edit view model.
@@ -32,7 +32,7 @@ namespace ASAPPVC.UI.Services
         /// A <see cref="Result{T}"/> carrying the updated <see cref="Product"/> on success
         /// or an error message on failure.
         /// </returns>
-        Task<Result<Product>> UpdateAsync(EditProductVm vm, CancellationToken ct = default);
+        Task<Result<Product>> UpdateAsync(ProductFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves a single product by its internal identifier or by its human-friendly code.

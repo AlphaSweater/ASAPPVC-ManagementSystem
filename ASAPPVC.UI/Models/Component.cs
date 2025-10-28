@@ -30,8 +30,8 @@ namespace ASAPPVC.UI.Models
         public decimal UnitCost { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue, ErrorMessage = "Current amount cannot be negative")]
-        public int CurrentAmount { get; set; }
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal CurrentAmount { get; set; }
 
         [Required]
         [MaxLength(50)]
