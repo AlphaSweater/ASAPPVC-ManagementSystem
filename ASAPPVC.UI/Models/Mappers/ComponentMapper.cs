@@ -80,7 +80,7 @@ namespace ASAPPVC.UI.Models.Mappers
                 ComponentCode = NormalizeCodeOrGenerate(vm.ComponentCode, "COMP"),
                 Name = NormalizeString(vm.Name),
                 Unit = vm.Unit,
-                CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount,
+                CurrentAmount = vm.CurrentAmount < 0m ? 0m : vm.CurrentAmount,
                 UnitCost = NormalizeMoney(vm.UnitCost),
                 StorageLocation = NormalizeString(vm.StorageLocation),
             };
@@ -110,7 +110,7 @@ namespace ASAPPVC.UI.Models.Mappers
             existing.ComponentCode = NormalizeString(vm.ComponentCode ?? existing.ComponentCode);
             existing.Name = NormalizeString(vm.Name);
             existing.Unit = vm.Unit;
-            existing.CurrentAmount = vm.CurrentAmount < 0 ? 0 : vm.CurrentAmount;
+            existing.CurrentAmount = vm.CurrentAmount < 0m ? 0m : vm.CurrentAmount;
             existing.UnitCost = NormalizeMoney(vm.UnitCost);
             existing.StorageLocation = NormalizeString(vm.StorageLocation);
 

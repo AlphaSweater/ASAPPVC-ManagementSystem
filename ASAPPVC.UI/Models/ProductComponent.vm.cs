@@ -38,13 +38,13 @@ namespace ASAPPVC.UI.Models
     //-----------------------------------------------\\
     public sealed class ProductComponentFormVm : IValidatableObject
     {
-        private const decimal MaxQuantity = 1_000_000_000_000m;
+        private const decimal MaxQuantity = 1_000_000_000_000m; // 1 trillion
         private const decimal MinQuantity = 0m;
 
-        [Required(ErrorMessage = "Component is required.")]
+        [Required]
         public Guid ComponentId { get; set; }
 
-        // Use decimal for consistency with Unit
+        // Use decimal for consistency with Unit (supports fractional units)
         public decimal Quantity { get; set; } = 1m;
 
         // Mark a persisted line for deletion on edit
@@ -52,14 +52,28 @@ namespace ASAPPVC.UI.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (Quantity <= MinQuantity)
+            // 1) ComponentId must not be empty
+            if (ComponentId == Guid.Empty)
             {
-                yield return new ValidationResult($"Quantity must be greater than {MinQuantity:N0}.", new[] { nameof(Quantity) });
+                yield return new ValidationResult(
+                    "Component is required.",
+                    new[] { nameof(ComponentId) });
             }
 
+            // 2) Quantity must be greater than 0
+            if (Quantity <= MinQuantity)
+            {
+                yield return new ValidationResult(
+                    $"Quantity must be greater than {MinQuantity:N0}.",
+                    new[] { nameof(Quantity) });
+            }
+
+            // 3) Quantity must be less than 1 trillion
             if (Quantity >= MaxQuantity)
             {
-                yield return new ValidationResult($"Quantity must be less than {MaxQuantity:N0}.", new[] { nameof(Quantity) });
+                yield return new ValidationResult(
+                    $"Quantity must be less than {MaxQuantity:N0}.",
+                    new[] { nameof(Quantity) });
             }
         }
     }

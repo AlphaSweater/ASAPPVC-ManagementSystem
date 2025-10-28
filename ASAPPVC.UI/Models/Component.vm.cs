@@ -20,7 +20,7 @@ namespace ASAPPVC.UI.Models
         public string ComponentCode { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public Unit Unit { get; init; }
-        public int CurrentAmount { get; init; }
+        public decimal CurrentAmount { get; init; }
         public decimal UnitCost { get; init; }
         public string StorageLocation { get; init; } = string.Empty;
 
@@ -46,7 +46,7 @@ namespace ASAPPVC.UI.Models
         public string ComponentCode { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public Unit Unit { get; init; }
-        public int CurrentAmount { get; init; }
+        public decimal CurrentAmount { get; init; }
         public decimal UnitCost { get; init; }
         public string StorageLocation { get; init; } = string.Empty;
 
@@ -70,6 +70,9 @@ namespace ASAPPVC.UI.Models
     /// </summary>
     public sealed class ComponentFormVm : IValidatableObject
     {
+        private const decimal MaxAmount = 1_000_000_000_000m;
+        private const decimal MinAmount = 0m;
+
         public Guid? Id { get; set; }
 
         // Mode
@@ -90,8 +93,7 @@ namespace ASAPPVC.UI.Models
 
         [Display(Name = "Current Amount")]
         [Required(ErrorMessage = "Current amount is required.")]
-        [Range(0, int.MaxValue, ErrorMessage = "Current amount cannot be negative.")]
-        public int CurrentAmount { get; set; }
+        public decimal CurrentAmount { get; set; }
 
         [Display(Name = "Unit Cost")]
         [Required(ErrorMessage = "Unit cost is required.")]
@@ -119,6 +121,45 @@ namespace ASAPPVC.UI.Models
                     "Component code is required when editing.",
                     new[] { nameof(ComponentCode) });
             }
+
+            // 2) CurrentAmount must be greater than 0
+            if (CurrentAmount <= 0m)
+            {
+                yield return new ValidationResult(
+                    "Current amount must be greater than 0.",
+                    new[] { nameof(CurrentAmount) });
+            }
+
+            // 3) CurrentAmount must be less than 1 trillion
+            if (CurrentAmount >= MaxAmount)
+            {
+                yield return new ValidationResult(
+                    $"Current amount must be less than {MaxAmount:N0}.",
+                    new[] { nameof(CurrentAmount) });
+            }
+
+            // 4) Integer-only units cannot have fractional amounts
+            if (IsIntegerOnlyUnit(Unit) && CurrentAmount != Math.Floor(CurrentAmount))
+            {
+                yield return new ValidationResult(
+                    "This unit does not allow fractional amounts.",
+                    new[] { nameof(CurrentAmount) });
+            }
+        }
+
+        /// <summary>
+        /// Determines if a unit requires integer-only values (countable items).
+        /// Metric/measurement units (meter, gram, liter, etc.) allow fractions.
+        /// </summary>
+        private static bool IsIntegerOnlyUnit(Unit unit)
+        {
+            return unit switch
+            {
+                Unit.Piece or Unit.Pair or Unit.Sheet or Unit.Bottle or Unit.Can or
+                     Unit.Tube or Unit.Pack or Unit.Set or Unit.Bag or Unit.Roll or
+                     Unit.Box or Unit.Pallet => true,
+                _ => false
+            };
         }
     }
 }
