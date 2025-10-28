@@ -33,9 +33,11 @@ jobs:
               head: `${context.repo.owner}:${branch}`
             });
             const run = prs.length === 0;
-            core.info(prs.length
-              ? `Open PR #${prs[0].number} for ${branch} → skip push CI (PR CI will run).`
-              : `No open PR for ${branch} → run push CI.`);
+            core.info(
+              prs.length
+                ? `Open PR #${prs[0].number} for ${branch} → skip push CI (PR CI will run).`
+                : `No open PR for ${branch} → run push CI.`
+            );
             core.setOutput('run_ci', run ? 'true' : 'false');
 
   call-reusable:
@@ -43,4 +45,7 @@ jobs:
     needs: preflight
     if: needs.preflight.outputs.run_ci == 'true'
     uses: ./.github/workflows/dotnet-ci.yaml
+    permissions:
+      contents: read
+      pull-requests: read
     secrets: inherit
