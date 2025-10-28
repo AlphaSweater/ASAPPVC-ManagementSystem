@@ -130,12 +130,7 @@ namespace ASAPPVC.UI.Models
                 {
                     var p = Products[i];
 
-                    if (p.Quantity <= 0)
-                    {
-                        yield return new ValidationResult(
-                            "Quantity must be at least 1.",
-                            new[] { $"{nameof(Products)}[{i}].{nameof(OrderProductFormVm.Quantity)}" });
-                    }
+                    // Quantity validation is handled by [Range] attribute on OrderProductFormVm.Quantity
                 }
             }
         }

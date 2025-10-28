@@ -56,21 +56,8 @@ namespace ASAPPVC.UI.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            // Ensure a valid product is selected
-            if (ProductId == Guid.Empty)
-            {
-                yield return new ValidationResult(
-                    "A valid product must be selected.",
-                    new[] { nameof(ProductId) });
-            }
-
             // Ensure quantity makes sense
-            if (Quantity <= 0)
-            {
-                yield return new ValidationResult(
-                    "Quantity must be greater than 0.",
-                    new[] { nameof(Quantity) });
-            }
+            // (Validation for Quantity <= 0 is already enforced by the [Range] attribute)
         }
     }
 }

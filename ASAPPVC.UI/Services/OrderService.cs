@@ -43,7 +43,7 @@ namespace ASAPPVC.UI.Services
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
-            if (vm.Id == Guid.Empty || vm.Id is null)
+            if (vm.Id is null || vm.Id == Guid.Empty)
                 return Result.Fail("Order ID is required.");
             if (string.IsNullOrWhiteSpace(vm.OrderCode))
                 return Result.Fail("Order code is required.");

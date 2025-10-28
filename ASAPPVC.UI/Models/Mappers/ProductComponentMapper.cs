@@ -58,7 +58,6 @@ namespace ASAPPVC.UI.Models.Mappers
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             return (items ?? Enumerable.Empty<ProductComponentFormVm>())
-                .Where(i => !i.Remove) // drop lines marked for removal
                 .GroupBy(i => i.ComponentId)
                 .Select(g => new ProductComponentFormVm
                 {

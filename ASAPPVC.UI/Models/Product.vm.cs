@@ -142,12 +142,6 @@ namespace ASAPPVC.UI.Models
                 {
                     var c = Components[i];
 
-                    if (c.Quantity <= 0)
-                    {
-                        yield return new ValidationResult(
-                            "Quantity must be at least 1.",
-                            new[] { $"{nameof(Components)}[{i}].{nameof(ProductComponentFormVm.Quantity)}" });
-                    }
                 }
             }
         }
