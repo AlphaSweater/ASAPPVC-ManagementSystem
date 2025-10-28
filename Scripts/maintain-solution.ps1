@@ -241,8 +241,10 @@ function Link-Assets-ForWebProject([string]$projectRoot) {
 
   $linked=@(); $skipped=@(); $removed=@(); $errors=@()
 
-  $views = Get-ChildItem -Path $viewsRoot -Filter '*.cshtml' -Recurse |
-           Where-Object { -not ($_.Name -like '_*.cshtml') }
+  # Include all views (previously we excluded names starting with '_').
+  # Some projects use leading-underscore view names like `_Layout.cshtml` with
+  # corresponding `_Layout.css`/`_Layout.js` files; include them so symlinks are created.
+  $views = Get-ChildItem -Path $viewsRoot -Filter '*.cshtml' -Recurse
 
   foreach ($v in $views) {
     $relFromViews = $v.FullName.Substring($viewsRoot.Length).TrimStart('\','/')
