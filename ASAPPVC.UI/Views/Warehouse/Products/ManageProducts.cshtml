@@ -17,7 +17,7 @@
 			<form class="search-form" onsubmit="event.preventDefault();">
 				<input class="input" type="text" placeholder="Search products..." />
 			</form>
-			<a class="btn btn-primary" asp-action="AddProductGet" asp-controller="Inventory">+ Add Product</a>
+			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
 		</div>
 
 		<section class="table-section">

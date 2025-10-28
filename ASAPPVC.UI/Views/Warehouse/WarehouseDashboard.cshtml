@@ -18,7 +18,7 @@
 
 		<!-- Actions -->
 		<section class="actions-grid">
-			<a class="action-card action-stock" asp-controller="StockTake" asp-action="StockTake">
+			<a class="action-card action-stock" asp-area="" asp-controller="Warehouse" asp-action="StockTake">
 
 				<img class="icon" src="~/assets/icons/clipboard-pen-line.svg" asp-append-version="true" alt="Back" width="20" height="20" />
 				<div class="text">
@@ -28,7 +28,7 @@
 				<span class="btn btn-primary">Open</span>
 			</a>
 
-			<a class="action-card action-receive" asp-controller="Inventory" asp-action="AddProductGet">
+			<a class="action-card action-receive" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">
 				<div class="text">
 					<h2>Receive Shipment</h2>
 					<p>Log new deliveries and update inventory.</p>

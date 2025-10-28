@@ -16,7 +16,7 @@
 <div class="viewport">
 	<div class="view-container">
 		<div class="header-section">
-			<a heref="javascript:void(0);" class="back-link" onclick="window.history.back();">
+			<a href="javascript:void(0);" class="back-link" onclick="window.history.back();">
 				<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
 				Back
 			</a>
@@ -54,7 +54,7 @@
 
 		<!-- Footer Actions -->
 		<div class="actions">
-			<a class="btn btn-primary" asp-controller="Components" asp-action="AddComponent" asp-route-id="@vm?.Id">Edit Component</a>
+			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@vm?.Id">Edit Component</a>
 		</div>
 	</div>
 </div>

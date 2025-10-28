@@ -17,11 +17,11 @@
 		</div>
 
 		<div class="toolbar">
-			<form class="search-form" asp-controller="Components" asp-action="Search" method="get">
+			<form class="search-form" asp-area="Warehouse" asp-controller="Components" asp-action="Search" method="get">
 				<input class="input" type="text" name="term" placeholder="Search by component name or location..." value="@Model.SearchQuery" />
 				<button type="submit" class="btn btn-secondary">Search</button>
 			</form>
-			<a class="btn btn-primary" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
+			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
 		</div>
 
 		<section class="table-section">
@@ -50,9 +50,9 @@
 								<td>
 									<div class="actions">
 										<a class="btn btn-secondary btn-sm"
-										   asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
+										   asp-area="Warehouse" asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
 										<a class="btn btn-primary btn-sm"
-										   asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
+										   asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
 									</div>
 								</td>
 							</tr>
