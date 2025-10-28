@@ -240,15 +240,22 @@ html, body {
 			transform: translateY(-50%) scaleY(1);
 		}
 
-.sb-caret {
-	font-size: 14px;
-	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* SVG chevron styling */
+.sb-chevron {
+	width: 18px;
+	height: 18px;
+	filter: brightness(0) invert(1);
 	opacity: 0.7;
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 	z-index: 1;
 }
 
-.sb-group[aria-expanded="true"] .sb-caret {
-	transform: rotate(180deg);
+.sb-toggle:hover .sb-chevron {
+	opacity: 1;
+}
+
+.sb-group[aria-expanded="true"] .sb-chevron {
+	transform: rotate(90deg);
 }
 
 .sb-group[aria-expanded="true"] {
@@ -274,7 +281,7 @@ html, body {
 	display: block;
 	color: var(--sb-text-secondary);
 	text-decoration: none;
-	padding: 10px 14px;
+	padding: 10px 14px 10px 24px;
 	margin: 2px 0;
 	border-radius: var(--sb-radius-sm);
 	font-size: var(--sb-font-sub); /* Slightly smaller for subitems */
@@ -298,26 +305,30 @@ html, body {
 		transform-origin: left;
 	}
 
+	/* SVG arrow for subitems */
 	.sb-subitem::after {
-		content: "›";
+		content: "";
 		position: absolute;
-		left: -20px;
+		left: 6px;
 		top: 50%;
 		transform: translateY(-50%);
+		width: 14px;
+		height: 14px;
+		background-image: url('/Assets/Icons/Chevrons/chevron-right.svg');
+		background-size: contain;
+		background-repeat: no-repeat;
+		filter: brightness(0) invert(1);
 		opacity: 0;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		font-size: 18px;
-		font-weight: 700;
 	}
 
 	.sb-subitem:hover {
 		background: var(--sb-hover-bg);
 		color: var(--sb-text-primary);
-		padding-left: 20px;
+		padding-left: 28px;
 	}
 
 		.sb-subitem:hover::after {
-			left: 6px;
 			opacity: 1;
 		}
 
@@ -332,7 +343,6 @@ html, body {
 		}
 
 		.sb-subitem.active::after {
-			left: 6px;
 			opacity: 0.6;
 		}
 

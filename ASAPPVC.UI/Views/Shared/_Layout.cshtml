@@ -64,12 +64,12 @@
 				</a>
 
 				<section class="sb-group" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
-					<a asp-controller="Warehouse" asp-action="Index"
+					<a asp-area="" asp-controller="Warehouse" asp-action="Index"
 					   class="sb-toggle @(isWarehouseOpen ? "active" : "")"
 					   aria-controls="grp-warehouse" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
 						<span class="sb-icon">🏭</span>
 						<span class="sb-label">Warehouse</span>
-						<span class="sb-caret">▾</span>
+						<img src="~/Assets/Icons/Chevrons/chevron-right.svg" alt="" class="sb-chevron" />
 					</a>
 
 					<div id="grp-warehouse" class="sb-subnav">
