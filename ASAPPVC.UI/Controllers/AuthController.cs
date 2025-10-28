@@ -6,39 +6,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController(IAuthService auth) : Controller
     {
-        //─────────── Dependencies ───────────\\
-        private readonly IAuthService _auth;
+        // Base path for auth views - keep view references centralized so they can be changed easily
+        private const string ViewRoot = "~/Views/Auth/";
 
-        //constructor
-        public AuthController(IAuthService auth)
-        {
-            _auth = auth;
-        }
+        // View path constants
+
+        private const string LoginViewName = ViewRoot + "Login.cshtml";
+        private const string RegisterViewName = ViewRoot + "Register.cshtml";
+
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Dependency injections
+
+        private readonly IAuthService _auth = auth;
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays the login view
         [AllowAnonymous]
-        [HttpGet]
-        public IActionResult Login()
+        public IActionResult Index()
         {
-            ViewData["HideNavbar"] = true;
-            return View();
+            return View(LoginViewName);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //method that allows users to log in
+        // method that allows users to log in
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
-            {
-                ViewData["HideNavbar"] = true;
-                return View(vm);
-            }
+                return View(LoginViewName, vm);
 
             var result = await _auth.LoginAsync(vm);
             if (result.Succeeded)
@@ -47,52 +45,47 @@ namespace ASAPPVC.UI.Controllers
                     : RedirectToAction("Index", "Home");
 
             ModelState.AddModelError(string.Empty, "Incorrect email or password.");
-            ViewData["HideNavbar"] = true;
-            return View(vm);
+            return View(LoginViewName, vm);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays the register view
+        // displays the register view
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Register()
         {
-            ViewData["HideNavbar"] = true;
-            return View();
+            return View(RegisterViewName);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //method that allows users to register
+        // method that allows users to register
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel vm)
         {
             if (!ModelState.IsValid)
-            {
-                ViewData["HideNavbar"] = true;
-                return View(vm);
-            }
+                return View(RegisterViewName, vm);
 
             var result = await _auth.RegisterAsync(vm);
             if (result.Succeeded)
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction(nameof(Index));
 
             foreach (var e in result.Errors)
                 ModelState.AddModelError(string.Empty, e.Description);
-            ViewData["HideNavbar"] = true;
-            return View(vm);
+
+            return View(RegisterViewName, vm);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //method that allows users to log out
+        // method that allows users to log out
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _auth.LogoutAsync();
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(nameof(Index));
         }
     }
 }

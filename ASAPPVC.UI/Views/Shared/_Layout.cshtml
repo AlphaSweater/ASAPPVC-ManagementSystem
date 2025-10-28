@@ -1,25 +1,32 @@
 ﻿@using System
 @using System.Linq
 @functions {
-	// Reusable active-route helper: supports exact matches and prefix matches (e.g., "products" opens for "products/index").
-	public static bool IsActive(string current, params string[] routes)
-		=> routes.Any(r => current.Equals(r, StringComparison.OrdinalIgnoreCase)
-						|| current.StartsWith(r + "/", StringComparison.OrdinalIgnoreCase));
+	// Simplified active-route helper: matches by controller (and optionally area)
+	public static bool IsActive(string currentArea, string currentController, string? targetArea, string targetController)
+	{
+		// Match area (or both empty)
+		var areaMatch = string.Equals(currentArea, targetArea ?? "", StringComparison.OrdinalIgnoreCase);
+
+		// Match controller
+		var controllerMatch = string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase);
+
+		return areaMatch && controllerMatch;
+	}
 }
 
 @{
-	// Route context
+	// Route context - now includes area support
+	var area = (ViewContext.RouteData.Values["area"]?.ToString() ?? "").Trim();
 	var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").Trim();
 	var action = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").Trim();
-	var current = $"{controller}/{action}".ToLowerInvariant();
 
 	// Hide sidebar for certain routes or if explicitly requested
-	var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Auth/Login" };
+	var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Auth/Login", "Auth/Register" };
 	var explicitHide = ViewData["HideNavbar"] is bool b && b;
 	var hideSidebar = explicitHide || excludedRoutes.Contains($"{controller}/{action}");
 
-	// Accordion open-state: consider Warehouse open if we are on these controllers
-	var isWarehouseOpen = IsActive(current, "products", "warehouse", "components");
+	// Accordion open-state: Warehouse area should be open
+	var isWarehouseOpen = area.Equals("Warehouse", StringComparison.OrdinalIgnoreCase) || controller.Equals("Warehouse", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,8 +36,8 @@
 	<title>@ViewData["Title"] - ASAPPVC.UI</title>
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/ASAPPVC.UI.styles.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/shared/_Layout.css" asp-append-version="true" />
+	@RenderSection("Styles", required: false)
 </head>
 
 <body class="@(hideSidebar ? "no-sidebar" : "has-sidebar")">
@@ -46,30 +53,36 @@
 			</div>
 
 			<nav class="sb-nav">
-				<a class="sb-item @(IsActive(current, "home/index") ? "active" : "")" asp-controller="Home" asp-action="Index">
+				<a class="sb-item @(IsActive(area, controller, null, "Home") ? "active" : "")"
+				   asp-area="" asp-controller="Home" asp-action="Index">
 					<span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
 				</a>
 
-				<a class="sb-item @(IsActive(current, "customer/viewcustomer") ? "active" : "")" asp-controller="Customer" asp-action="ViewCustomer">
+				<a class="sb-item @(IsActive(area, controller, null, "Customer") ? "active" : "")"
+				   asp-area="" asp-controller="Customer" asp-action="ViewCustomer">
 					<span class="sb-icon">👥</span><span class="sb-label">Manage Customers</span>
 				</a>
 
 				<section class="sb-group" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
-					<button type="button" class="sb-toggle" aria-controls="grp-warehouse" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
+					<a asp-controller="Warehouse" asp-action="Index"
+					   class="sb-toggle @(isWarehouseOpen ? "active" : "")"
+					   aria-controls="grp-warehouse" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
 						<span class="sb-icon">🏭</span>
-						<span class="sb-label">Manage Warehouse</span>
+						<span class="sb-label">Warehouse</span>
 						<span class="sb-caret">▾</span>
-					</button>
+					</a>
 
 					<div id="grp-warehouse" class="sb-subnav">
-						<a class="sb-subitem @(IsActive(current, "warehouse/index") ? "active" : "")" asp-controller="Warehouse" asp-action="Index">Warehouse Dashboard</a>
-						<a class="sb-subitem @(IsActive(current, "products/index", "products/viewproduct", "products/addproduct") ? "active" : "")" asp-controller="Products" asp-action="Index">Manage Products</a>
-						<a class="sb-subitem @(IsActive(current, "components/index", "components/viewcomponent", "components/addcomponent") ? "active" : "")" asp-controller="Components" asp-action="Index">Manage Components</a>
+						<a class="sb-subitem @(IsActive(area, controller, "Warehouse", "Products") ? "active" : "")"
+						   asp-area="Warehouse" asp-controller="Products" asp-action="Index">Manage Products</a>
+						<a class="sb-subitem @(IsActive(area, controller, "Warehouse", "Components") ? "active" : "")"
+						   asp-area="Warehouse" asp-controller="Components" asp-action="Index">Manage Components</a>
 					</div>
 				</section>
 
-				<a class="sb-item @(IsActive(current, "order/vieworders") ? "active" : "")" asp-controller="Order" asp-action="ViewOrders">
-					<span class="sb-icon">🚚</span><span class="sb-label">Manage Order</span>
+				<a class="sb-item @(IsActive(area, controller, null, "Order") ? "active" : "")"
+				   asp-area="" asp-controller="Order" asp-action="ViewOrders">
+					<span class="sb-icon">🚚</span><span class="sb-label">Manage Orders</span>
 				</a>
 			</nav>
 		</aside>
@@ -87,64 +100,7 @@
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
-
-	<script>
-		(function () {
-		  // --------- Accordion with auto-height (no persistence) ----------
-		  document.querySelectorAll('.sb-group').forEach(group => {
-			const btn = group.querySelector('.sb-toggle');
-			const panel = group.querySelector('.sb-subnav');
-			if (!btn || !panel) return;
-
-			function setHeight(open) {
-			  panel.style.maxHeight = open ? (panel.scrollHeight + 'px') : '0px';
-			}
-
-			// Initialize from server-provided aria-expanded
-			const initiallyOpen = group.getAttribute('aria-expanded') === 'true';
-			setHeight(initiallyOpen);
-			btn.setAttribute('aria-expanded', initiallyOpen ? 'true' : 'false');
-
-			// Allow manual toggle (only for the current page session)
-			btn.addEventListener('click', () => {
-			  const nowOpen = group.getAttribute('aria-expanded') !== 'true';
-			  group.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-			  btn.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-			  setHeight(nowOpen);
-			});
-
-			// Recalculate height on resize if open
-			window.addEventListener('resize', () => {
-			  if (group.getAttribute('aria-expanded') === 'true') {
-				setHeight(true);
-			  }
-			});
-		  });
-
-		  // --------- Mobile burger & overlay toggle ----------
-		  const body = document.body;
-		  const burger = document.querySelector('.sb-burger');
-		  const overlay = document.querySelector('.sb-overlay');
-		  const sidebar = document.getElementById('sidebar');
-
-		  function setSidebarOpen(open) {
-			body.classList.toggle('sidebar--open', open);
-			if (overlay) overlay.hidden = !open;
-			if (burger) burger.setAttribute('aria-expanded', String(open));
-		  }
-
-		  if (burger && overlay && sidebar) {
-			burger.addEventListener('click', () => {
-			  const open = !body.classList.contains('sidebar--open');
-			  setSidebarOpen(open);
-			});
-			overlay.addEventListener('click', () => setSidebarOpen(false));
-			document.addEventListener('keydown', (e) => {
-			  if (e.key === 'Escape') setSidebarOpen(false);
-			});
-		  }
-		})();
-	</script>
+	<script src="~/js/views/shared/_Layout.js" asp-append-version="true"></script>
 
 	@await RenderSectionAsync("Scripts", required: false)
 </body>

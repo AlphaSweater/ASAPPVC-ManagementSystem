@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers.Warehouse
 {
+    [Area("Warehouse")]
     [Authorize]
     public class ComponentsController(IComponentService components) : Controller
     {
@@ -14,9 +15,9 @@ namespace ASAPPVC.UI.Controllers.Warehouse
         // Component view paths - reuse WarehouseController.ViewRoot
         public const string ViewRoot = WarehouseController.ViewRoot + "Components/";
 
-        private const string ManageComponentsViewName = ViewRoot + "ManageComponents";
-        private const string ViewComponentViewName = ViewRoot + "ViewComponent";
-        private const string AddComponentViewName = ViewRoot + "AddComponent";
+        private const string ManageComponentsViewName = ViewRoot + "ManageComponents.cshtml";
+        private const string ViewComponentViewName = ViewRoot + "ViewComponent.cshtml";
+        private const string AddComponentViewName = ViewRoot + "AddComponent.cshtml";
 
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken ct)

@@ -1,9 +1,11 @@
-﻿@model List<ASAPPVC.UI.Models.Product>
+﻿@model ASAPPVC.UI.ViewModels.Warehouse.ManageProductsVm
 @{
 	ViewData["Title"] = "Products";
 }
 
-<link rel="stylesheet" href="~/css/Views/Inventory/products/ViewProductInventory.css" asp-append-version="true" />
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
+}
 
 <div class="viewport">
 	<div class="content-container">
@@ -25,12 +27,12 @@
 						<th>Product</th>
 						<th>Description</th>
 						<th class="text-right" style="width:150px;">Price</th>
-						<th class="text-right" style="width:120px;"># Parts</th>
+						<th class="text-right" style="width:120px;"># Components</th>
 						<th style="width:200px; text-align:center;">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
-					@if (Model == null || !Model.Any())
+					@if (Model == null || !Model.HasProducts)
 					{
 						<tr>
 							<td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">
@@ -40,20 +42,20 @@
 					}
 					else
 					{
-						foreach (var p in Model)
+						foreach (var product in Model.Products)
 						{
-							var partsCount = p.ProductComponents?.Count ?? 0;
+							var componentCount = product.ComponentCount;
 							<tr>
-								<td>@p.Name</td>
-								<td>@p.Description</td>
-								<td class="text-right">@p.Price.ToString("C")</td>
-								<td class="text-right">@partsCount</td>
+								<td>@product.Name</td>
+								<td>@product.Description</td>
+								<td class="text-right">@product.Price.ToString("C")</td>
+								<td class="text-right">@componentCount</td>
 								<td>
 									<div class="actions">
 										<a class="btn btn-secondary btn-sm"
-										   asp-controller="Inventory" asp-action="ViewProduct" asp-route-id="@p.Id">View</a>
+										   asp-area="Warehouse" asp-controller="Products" asp-action="ViewProduct" asp-route-id="@product.Id">View</a>
 										<a class="btn btn-primary btn-sm"
-										   asp-controller="Inventory" asp-action="EditProduct" asp-route-id="@p.Id">Edit</a>
+										   asp-area="Warehouse" asp-controller="Products" asp-action="EditProduct" asp-route-id="@product.Id">Edit</a>
 									</div>
 								</td>
 							</tr>

@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers.Warehouse
 {
+    [Authorize]
     public class WarehouseController : Controller
     {
         // Base path for warehouse views - append view file names or subfolders to this
         public const string ViewRoot = "~/Views/Warehouse/";
 
         // View path constants
-        private const string WarehouseDashboardViewName = ViewRoot + "WarehouseDashboard";
 
-        private const string StockTakeViewName = ViewRoot + "StockTake";
+        private const string WarehouseDashboardViewName = ViewRoot + "WarehouseDashboard.cshtml";
+        private const string StockTakeViewName = ViewRoot + "StockTake.cshtml";
 
         // Show warehouse dashboard - GET
         [HttpGet]

@@ -20,7 +20,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Extensions\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="wwwroot\Assets\Icons\Chevrons\" />
 	  <Folder Include="wwwroot\Assets\Icons\Arrows\" />

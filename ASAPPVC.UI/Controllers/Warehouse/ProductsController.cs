@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.UI.Controllers.Warehouse
 {
+    [Area("Warehouse")]
     [Authorize]
     public class ProductsController(IProductService products, IComponentService components) : Controller
     {
@@ -15,9 +16,9 @@ namespace ASAPPVC.UI.Controllers.Warehouse
         // Products view paths - reuse WarehouseController.ViewRoot
         public const string ViewRoot = WarehouseController.ViewRoot + "Products/";
 
-        private const string ManageProductsViewName = ViewRoot + "ManageProducts";
-        private const string ViewProductViewName = ViewRoot + "ViewProduct";
-        private const string AddProductViewName = ViewRoot + "AddProduct";
+        private const string ManageProductsViewName = ViewRoot + "ManageProducts.cshtml";
+        private const string ViewProductViewName = ViewRoot + "ViewProduct.cshtml";
+        private const string AddProductViewName = ViewRoot + "AddProduct.cshtml";
 
         // Views the products main page
         [HttpGet]
