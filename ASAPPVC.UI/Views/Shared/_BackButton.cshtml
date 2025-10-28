@@ -1,0 +1,24 @@
+@{
+	var showPageName = ViewData["ShowBackPageName"] as bool? ?? false;
+	var customBackUrl = ViewData["BackUrl"] as string;
+	var customBackText = ViewData["BackText"] as string ?? "Back";
+}
+
+<link rel="stylesheet" href="~/css/views/shared/_BackButton.css" asp-append-version="true" />
+
+<a href="@(customBackUrl ?? "javascript:void(0);")"
+   class="back-button-link"
+   data-use-history="@(string.IsNullOrEmpty(customBackUrl) ? "true" : "false")"
+   data-show-page-name="@showPageName.ToString().ToLower()">
+	<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
+	<div class="back-text-area">
+		<span class="back-text">@customBackText</span>
+		@if (showPageName)
+		{
+			<span class="back-page-name"></span>
+		}
+	</div>
+
+</a>
+
+<script src="~/js/views/shared/_BackButton.js" asp-append-version="true"></script>

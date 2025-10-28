@@ -65,6 +65,9 @@ namespace ASAPPVC.UI
             // ============================================
             services.AddControllersWithViews();
 
+            // Add in-memory caching
+            services.AddMemoryCache();
+
             // ============================================
             // Options configuration
             // ============================================

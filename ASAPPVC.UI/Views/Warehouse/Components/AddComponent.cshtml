@@ -1,18 +1,19 @@
 ﻿@model global::ASAPPVC.UI.Models.CreateComponentVm
 @{
 	ViewData["Title"] = "Add New Component";
+	ViewData["ShowBackPageName"] = true;
 }
 
-<link rel="stylesheet" href="~/css/Views/Inventory/components/AddComponent.css" asp-append-version="true" />
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
+}
 
 <div class="viewport">
+	@await Html.PartialAsync("_BackButton")
 	<div class="form-container">
 		<!-- HEADER SECTION -->
 		<div class="form-header-section">
-			<a heref="javascript:void(0);" class="back-link" onclick="window.history.back();">
-				<img src="~/assets/icons/arrows/arrow-left.svg" asp-append-version="true" alt="Back" width="20" height="20" />
-				Back
-			</a>
+
 			<h2 class="main-title">@ViewData["Title"]</h2>
 		</div>
 
