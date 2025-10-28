@@ -1,0 +1,292 @@
+﻿:root {
+	--sb-w: 240px;
+}
+
+/* Base */
+html, body {
+	height: 100%;
+	margin: 0;
+	font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+/* ----------------------------- */
+/* Sidebar + Brand + Navigation  */
+/* ----------------------------- */
+
+.sidebar {
+	position: fixed;
+	inset: 0 auto 0 0;
+	width: var(--sb-w);
+	display: flex;
+	flex-direction: column;
+	background: linear-gradient(180deg, #d63a3a 0%, #b52e2e 50%, #8f2424 100%);
+	box-shadow: 6px 0 24px rgba(0,0,0,.18);
+	z-index: 1000;
+	transition: transform .25s ease; /* enables mobile slide-in */
+}
+
+.sb-brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 16px;
+}
+
+	.sb-brand img {
+		width: 34px;
+		height: 34px;
+		object-fit: contain;
+		border-radius: 8px;
+	}
+
+	.sb-brand .name {
+		color: #fff;
+		font-weight: 800;
+		letter-spacing: .02em;
+	}
+
+.sb-nav {
+	display: flex;
+	flex-direction: column;
+	padding: 8px;
+	overflow-y: auto;
+}
+
+/* ----------------------------- */
+/* Top-level links                */
+/* ----------------------------- */
+
+.sb-item {
+	position: relative;
+	display: grid;
+	grid-template-columns: 28px 1fr; /* FIXED: was '28px1fr' */
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	margin: 4px 6px;
+	color: #ffffffcc;
+	text-decoration: none;
+	border-radius: 10px;
+	transition: background .15s ease, color .15s ease;
+}
+
+	.sb-item .sb-icon {
+		font-size: 18px;
+	}
+
+	.sb-item .sb-label {
+		font-weight: 600;
+		letter-spacing: .01em;
+	}
+
+	.sb-item:hover {
+		background: rgba(255,255,255,0.12);
+		color: #fff;
+	}
+
+	.sb-item.active {
+		background: rgba(255,255,255,0.18);
+		color: #fff;
+	}
+
+		.sb-item.active::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 8px;
+			bottom: 8px;
+			width: 4px;
+			border-radius: 2px;
+			background: #fff;
+		}
+
+/* ----------------------------- */
+/* Accordion groups               */
+/* ----------------------------- */
+
+.sb-group {
+	margin: 4px 6px;
+}
+
+.sb-toggle {
+	display: grid;
+	grid-template-columns: 28px 1fr auto;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	width: 100%;
+	margin: 0;
+	border: 0;
+	border-radius: 10px;
+	background: transparent;
+	color: #ffffffcc;
+	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
+	transition: background .15s ease, color .15s ease;
+}
+
+	.sb-toggle:hover {
+		background: rgba(255,255,255,0.12);
+		color: #fff;
+	}
+
+.sb-caret {
+	transition: transform .15s ease;
+}
+
+.sb-group[aria-expanded="true"] .sb-caret {
+	transform: rotate(180deg);
+}
+
+/* Subnav uses JS for smooth auto-height. This CSS is the baseline. */
+.sb-subnav {
+	overflow: hidden;
+	max-height: 0;
+	transition: max-height .2s ease;
+	margin-left: 34px;
+}
+
+/* Fallback if JS didn’t run: allow opening (not animated as smoothly) */
+/* Comment out the next rule if you want JS to be the sole controller. */
+/* .sb-group[aria-expanded="true"] .sb-subnav { max-height: 999px; } */
+
+.sb-subitem {
+	display: block;
+	color: #ffffffcc;
+	text-decoration: none;
+	padding: 8px 10px;
+	margin: 4px 0;
+	border-radius: 8px;
+	transition: background .15s ease, color .15s ease;
+}
+
+	.sb-subitem:hover {
+		background: rgba(255,255,255,0.12);
+		color: #fff;
+	}
+
+	.sb-subitem.active {
+		background: rgba(255,255,255,0.18);
+		color: #fff;
+	}
+
+/* ----------------------------- */
+/* Main content                   */
+/* ----------------------------- */
+
+.main {
+	min-height: 100%;
+	padding: 20px;
+	transition: margin-left .2s ease;
+}
+
+.has-sidebar .main {
+	margin-left: var(--sb-w);
+}
+
+.no-sidebar .main {
+	margin-left: 0;
+}
+
+/* ----------------------------- */
+/* Mobile header + burger         */
+/* ----------------------------- */
+
+.sb-mobilebar {
+	display: none; /* becomes visible under 900px */
+	position: sticky;
+	top: 0;
+	z-index: 1100;
+	height: 52px;
+	padding: 0 12px;
+	background: #fff;
+	border-bottom: 1px solid rgba(0,0,0,.08);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.sb-burger {
+	border: 0;
+	background: transparent;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.sb-mobile-title {
+	font-weight: 700;
+	letter-spacing: .01em;
+}
+
+/* ----------------------------- */
+/* Mobile overlay                 */
+/* ----------------------------- */
+
+.sb-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,.35);
+	z-index: 999;
+}
+
+	/* [hidden] utility respected by the HTML attribute */
+	.sb-overlay[hidden] {
+		display: none !important;
+	}
+
+/* ----------------------------- */
+/* Responsive behavior            */
+/* ----------------------------- */
+
+@media (max-width: 900px) {
+	:root {
+		--sb-w: 280px; /* a touch wider for finger targets */
+	}
+
+	/* Show the mobile header */
+	.sb-mobilebar {
+		display: flex;
+	}
+
+	/* No static offset on mobile; sidebar becomes overlay drawer */
+	.has-sidebar .main {
+		margin-left: 0;
+	}
+
+	/* Sidebar is off-canvas by default */
+	.sidebar {
+		transform: translateX(-100%);
+	}
+
+	/* When body gets .sidebar--open (via JS), slide it in */
+	.sidebar--open .sidebar {
+		transform: translateX(0);
+	}
+
+	/* Keep full labels in drawer */
+	.sb-item {
+		grid-template-columns: 28px 1fr;
+		justify-items: start;
+	}
+
+	.sb-label {
+		display: inline;
+	}
+}
+
+/* ----------------------------- */
+/* Motion accessibility           */
+/* ----------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.sidebar,
+	.sb-item,
+	.sb-subnav,
+	.sb-toggle,
+	.sb-caret,
+	.main {
+		transition: none !important;
+	}
+}
