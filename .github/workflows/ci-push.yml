@@ -43,3 +43,4 @@ jobs:
     needs: preflight
     if: needs.preflight.outputs.run_ci == 'true'
     uses: ./.github/workflows/dotnet-ci.yaml
+    secrets: inherit
