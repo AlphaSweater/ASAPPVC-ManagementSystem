@@ -10,90 +10,165 @@
 
 <div class="viewport">
 	@await Html.PartialAsync("_BackButton")
-	<div class="form-container">
-		<!-- HEADER SECTION -->
-		<div class="form-header-section">
 
-			<h2 class="main-title">@ViewData["Title"]</h2>
-		</div>
+	<div class="glass-card" role="region" aria-labelledby="page-title">
+		<!-- Header -->
+		<header class="card-header">
+			<div class="card-title-wrap">
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Capture a new stock component with image, cost and storage details.</p>
+			</div>
+
+			<div class="card-actions">
+				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost" title="Go to Components">
+					<span class="btn-icon" aria-hidden="true">🏷️</span>
+					Components
+				</a>
+			</div>
+		</header>
+
+		<!-- Validation Summary -->
+		<div class="validation-summary" asp-validation-summary="ModelOnly" data-valmsg-summary="true" aria-live="polite"></div>
 
 		<form id="addComponentForm"
 			  asp-controller="Components"
 			  asp-action="AddComponent"
 			  method="post"
-			  enctype="multipart/form-data">
+			  enctype="multipart/form-data"
+			  novalidate>
 			@Html.AntiForgeryToken()
-			<div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px; text-align:center;"></div>
 
-			<div class="form-layout-grid">
-				<!-- Left: Image Upload -->
-				<div class="image-upload-section">
-					<div class="image-box" onclick="document.getElementById('imageFile').click();">
-						<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Component Image Preview" />
-					</div>
-					<button type="button" class="btn btn-secondary" onclick="document.getElementById('imageFile').click();">
-						Upload Image
+			<div class="content-grid">
+				<!-- LEFT: Image -->
+				<section class="uploader" aria-labelledby="img-label">
+					<h2 id="img-label" class="sr-only">Component Image</h2>
+
+					<label for="imageFile" class="dropzone" tabindex="0" id="dropzone"
+						   aria-describedby="drop-hint" aria-label="Upload image by clicking or dropping a file">
+						<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Image preview" />
+						<div class="dz-overlay">
+							<div class="dz-icon" aria-hidden="true">📷</div>
+							<div class="dz-text">
+								<strong>Drop an image</strong> or <span class="link">choose a file</span>
+								<div id="drop-hint" class="dz-hint">PNG, JPG, WEBP — up to ~5MB</div>
+							</div>
+						</div>
+					</label>
+
+					<input id="imageFile"
+						   asp-for="Image"
+						   type="file"
+						   accept="image/*"
+						   class="file-input"
+						   aria-label="Choose component image" />
+					<span asp-validation-for="Image" class="field-error"></span>
+
+					<button type="button" class="btn btn-ghost w-100" onclick="document.getElementById('imageFile').click();">
+						Choose Image
 					</button>
-					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="hidden-file-input" />
-					<span asp-validation-for="Image" class="text-danger"></span>
-				</div>
+				</section>
 
-				<!-- Right: Form -->
-				<div class="form-fields-grid">
-					<div class="group">
+				<!-- RIGHT: Fields -->
+				<section class="fields">
+					<div class="field">
 						<label asp-for="Name" class="label"></label>
-						<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" />
-						<span asp-validation-for="Name" class="text-danger"></span>
+						<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" autocomplete="off" autofocus />
+						<span asp-validation-for="Name" class="field-error"></span>
 					</div>
 
-					<div class="group">
+					<div class="field">
 						<label asp-for="StorageLocation" class="label"></label>
-						<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" />
-						<span asp-validation-for="StorageLocation" class="text-danger"></span>
+						<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" autocomplete="off" />
+						<span asp-validation-for="StorageLocation" class="field-error"></span>
 					</div>
 
-					<div class="group">
+					<div class="field">
 						<label asp-for="UnitCost" class="label"></label>
-						<input asp-for="UnitCost" class="input" step="0.01" inputmode="decimal" placeholder="e.g. 15.50" />
-						<span asp-validation-for="UnitCost" class="text-danger"></span>
+						<div class="input-affix">
+							<span class="affix" aria-hidden="true">R</span>
+							<input asp-for="UnitCost"
+								   class="input"
+								   step="0.01"
+								   inputmode="decimal"
+								   placeholder="e.g. 15.50" />
+						</div>
+						<span asp-validation-for="UnitCost" class="field-error"></span>
 					</div>
 
-					<div class="group">
+					<div class="field">
 						<label asp-for="CurrentAmount" class="label"></label>
-						<input asp-for="CurrentAmount" class="input" type="number" placeholder="e.g. 100" />
-						<span asp-validation-for="CurrentAmount" class="text-danger"></span>
+						<input asp-for="CurrentAmount" class="input" type="number" min="0" placeholder="e.g. 100" />
+						<span asp-validation-for="CurrentAmount" class="field-error"></span>
 					</div>
 
-					<div class="group">
+					<div class="field full">
 						<label asp-for="Unit" class="label"></label>
 						<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.UI.Models.Enums.Unit>()"></select>
-						<span asp-validation-for="Unit" class="text-danger"></span>
+						<span asp-validation-for="Unit" class="field-error"></span>
 					</div>
 
-					<div class="actions">
-						<button type="submit" class="btn btn-primary">Save Component</button>
-						<button type="reset" class="btn btn-secondary">Reset</button>
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">
+							Save Component
+						</button>
+						<button type="reset" class="btn btn-ghost">
+							Reset
+						</button>
 					</div>
-				</div>
+				</section>
 			</div>
 		</form>
 	</div>
 </div>
 
-<script>
-	(() => {
-		const input = document.getElementById('imageFile');
-		const img = document.getElementById('previewImg');
+@section Scripts {
+	<script>
+		(() => {
+			const fileInput = document.getElementById('imageFile');
+			const previewImg = document.getElementById('previewImg');
+			const dropzone = document.getElementById('dropzone');
 
-		if (input && img) {
-			input.addEventListener('change', () => {
-				const f = input.files && input.files[0];
-				if (!f) return;
-
+			function previewFile(file) {
+				if (!file || !file.type?.startsWith('image/')) return;
 				const reader = new FileReader();
-				reader.onload = e => { img.src = e.target.result; };
-				reader.readAsDataURL(f);
+				reader.onload = e => { previewImg.src = e.target.result; };
+				reader.readAsDataURL(file);
+			}
+
+			// Click/Change
+			fileInput.addEventListener('change', () => {
+				const f = fileInput.files?.[0];
+				previewFile(f);
 			});
-		}
-	})();
-</script>
+
+			// Drag & drop
+			['dragenter', 'dragover'].forEach(evt =>
+				dropzone.addEventListener(evt, e => {
+					e.preventDefault(); e.stopPropagation();
+					dropzone.classList.add('is-dragover');
+				})
+			);
+			['dragleave', 'drop'].forEach(evt =>
+				dropzone.addEventListener(evt, e => {
+					e.preventDefault(); e.stopPropagation();
+					dropzone.classList.remove('is-dragover');
+				})
+			);
+			dropzone.addEventListener('drop', e => {
+				const file = e.dataTransfer?.files?.[0];
+				if (file) {
+					fileInput.files = e.dataTransfer.files;
+					previewFile(file);
+				}
+			});
+
+			// Keyboard open
+			dropzone.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					fileInput.click();
+				}
+			});
+		})();
+	</script>
+}

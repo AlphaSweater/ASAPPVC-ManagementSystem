@@ -4,28 +4,21 @@
 	// Simplified active-route helper: matches by controller (and optionally area)
 	public static bool IsActive(string currentArea, string currentController, string? targetArea, string targetController)
 	{
-		// Match area (or both empty)
 		var areaMatch = string.Equals(currentArea, targetArea ?? "", StringComparison.OrdinalIgnoreCase);
-
-		// Match controller
 		var controllerMatch = string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase);
-
 		return areaMatch && controllerMatch;
 	}
 }
 
 @{
-	// Route context - now includes area support
 	var area = (ViewContext.RouteData.Values["area"]?.ToString() ?? "").Trim();
 	var controller = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").Trim();
 	var action = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").Trim();
 
-	// Hide sidebar for certain routes or if explicitly requested
 	var excludedRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Auth/Login", "Auth/Register" };
 	var explicitHide = ViewData["HideNavbar"] is bool b && b;
 	var hideSidebar = explicitHide || excludedRoutes.Contains($"{controller}/{action}");
 
-	// Accordion open-state: Warehouse area should be open
 	var isWarehouseOpen = area.Equals("Warehouse", StringComparison.OrdinalIgnoreCase) || controller.Equals("Warehouse", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
@@ -34,9 +27,21 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] - ASAPPVC.UI</title>
+
+	<!-- Fonts for site.css (Montserrat) -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+	<!-- Vendor -->
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+	<!-- Global foundation (colors, gradients, typography, glass) -->
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+	<!-- Layout-only styling (positions, spacing, sidebar width, overlays, etc.) -->
 	<link rel="stylesheet" href="~/css/views/shared/_Layout.css" asp-append-version="true" />
+
 	@RenderSection("Styles", required: false)
 </head>
 

@@ -1,4 +1,10 @@
-﻿:root {
+﻿/* ================================================================
+   _Layout.css
+   Layout-only styling: structure, spacing, motion, overlays.
+   (No global fonts/colors/backgrounds — those live in site.css)
+   --------------------------------------------------------------- */
+
+:root {
 	--sb-w: 260px;
 	--sb-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	--sb-hover-bg: rgba(255, 255, 255, 0.08);
@@ -9,20 +15,15 @@
 	--sb-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
 	--sb-radius: 12px;
 	--sb-radius-sm: 8px;
-	--sb-font-main: 14px; /* uniform main nav font size */
-	--sb-font-sub: 13px; /* slightly smaller for subitems */
+	--sb-font-main: 14px;
+	--sb-font-sub: 13px;
 	--sb-line-height: 1.25;
 }
 
-/* Base */
-html, body {
-	height: 100%;
-	margin: 0;
-	font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-}
+/* Do NOT set fonts or page background here (site.css controls that) */
 
 /* ----------------------------- */
-/* Sidebar + Brand + Navigation  */
+/* Sidebar container & brand     */
 /* ----------------------------- */
 
 .sidebar {
@@ -31,7 +32,7 @@ html, body {
 	width: var(--sb-w);
 	display: flex;
 	flex-direction: column;
-	background: linear-gradient(180deg, #d63a3a 0%, #b52e2e 50%, #8f2424 100%);
+	/* Sidebar background/gradient is provided by site.css (.sidebar) */
 	box-shadow: var(--sb-shadow-lg);
 	z-index: 1000;
 	transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -60,6 +61,10 @@ html, body {
 		letter-spacing: 0.02em;
 	}
 
+/* ----------------------------- */
+/* Navigation                    */
+/* ----------------------------- */
+
 .sb-nav {
 	display: flex;
 	flex-direction: column;
@@ -67,30 +72,26 @@ html, body {
 	overflow-y: auto;
 	gap: 2px;
 }
-
 	/* Custom scrollbar for sidebar */
 	.sb-nav::-webkit-scrollbar {
 		width: 6px;
 	}
 
 	.sb-nav::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0, 0.1);
+		background: rgba(0,0,0,0.1);
 		border-radius: 3px;
 	}
 
 	.sb-nav::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.2);
+		background: rgba(255,255,255,0.2);
 		border-radius: 3px;
 	}
 
 		.sb-nav::-webkit-scrollbar-thumb:hover {
-			background: rgba(255, 255, 255, 0.3);
+			background: rgba(255,255,255,0.3);
 		}
 
-/* ----------------------------- */
-/* Top-level links          */
-/* ----------------------------- */
-
+/* Top-level links */
 .sb-item {
 	position: relative;
 	display: grid;
@@ -103,7 +104,7 @@ html, body {
 	text-decoration: none;
 	border-radius: var(--sb-radius);
 	transition: var(--sb-transition);
-	font-weight: 500;
+	font-weight: 600;
 	overflow: hidden;
 	font-size: var(--sb-font-main);
 	line-height: var(--sb-line-height);
@@ -124,22 +125,20 @@ html, body {
 
 	.sb-item .sb-icon {
 		font-size: 20px;
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: transform .3s cubic-bezier(.4,0,.2,1);
 		z-index: 1;
 	}
 
 	.sb-item .sb-label {
-		font-weight: 600;
-		letter-spacing: 0.01em;
 		z-index: 1;
-		font-size: inherit; /* inherit from .sb-item for consistency */
+		font-size: inherit;
 		line-height: inherit;
+		letter-spacing: .01em;
 	}
 
-/* Ensure accordion header labels match main nav size */
 .sb-toggle,
 .sb-toggle .sb-label {
-	font-size: var(--sb-font-main); /* Match top-level items */
+	font-size: var(--sb-font-main);
 	line-height: var(--sb-line-height);
 }
 
@@ -166,10 +165,7 @@ html, body {
 		transform: scale(1.05);
 	}
 
-/* ----------------------------- */
-/* Accordion groups    */
-/* ----------------------------- */
-
+/* Accordion groups */
 .sb-group {
 	margin: 2px 0;
 	border-radius: var(--sb-radius);
@@ -189,8 +185,7 @@ html, body {
 	border-radius: var(--sb-radius);
 	background: transparent;
 	color: var(--sb-text-secondary);
-	font-weight: 600;
-	font-size: 14px;
+	font-weight: 700;
 	text-align: left;
 	text-decoration: none;
 	cursor: pointer;
@@ -213,7 +208,7 @@ html, body {
 
 	.sb-toggle .sb-icon {
 		font-size: 20px;
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: transform .3s cubic-bezier(.4,0,.2,1);
 		z-index: 1;
 	}
 
@@ -240,13 +235,12 @@ html, body {
 			transform: translateY(-50%) scaleY(1);
 		}
 
-/* SVG chevron styling */
 .sb-chevron {
 	width: 18px;
 	height: 18px;
 	filter: brightness(0) invert(1);
 	opacity: 0.7;
-	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+	transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease;
 	z-index: 1;
 }
 
@@ -262,11 +256,11 @@ html, body {
 	background: rgba(0, 0, 0, 0.08);
 }
 
-/* Subnav uses JS for smooth auto-height */
+/* Subnav */
 .sb-subnav {
 	overflow: hidden;
 	max-height: 0;
-	transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+	transition: max-height .3s cubic-bezier(.4,0,.2,1), opacity .3s ease;
 	margin: 0 0 0 38px;
 	padding: 0 0 8px 0;
 	opacity: 0;
@@ -284,10 +278,9 @@ html, body {
 	padding: 10px 14px 10px 24px;
 	margin: 2px 0;
 	border-radius: var(--sb-radius-sm);
-	font-size: var(--sb-font-sub); /* Slightly smaller for subitems */
-	font-weight: 500;
+	font-size: var(--sb-font-sub);
+	font-weight: 600;
 	transition: var(--sb-transition);
-	overflow: hidden;
 	line-height: 1.2;
 }
 
@@ -301,11 +294,10 @@ html, body {
 		height: 50%;
 		border-radius: 0 2px 2px 0;
 		background: var(--sb-text-primary);
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: transform .3s cubic-bezier(.4,0,.2,1);
 		transform-origin: left;
 	}
 
-	/* SVG arrow for subitems */
 	.sb-subitem::after {
 		content: "";
 		position: absolute;
@@ -319,7 +311,7 @@ html, body {
 		background-repeat: no-repeat;
 		filter: brightness(0) invert(1);
 		opacity: 0;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: all .3s cubic-bezier(.4,0,.2,1);
 	}
 
 	.sb-subitem:hover {
@@ -335,7 +327,7 @@ html, body {
 	.sb-subitem.active {
 		background: var(--sb-active-bg);
 		color: var(--sb-text-primary);
-		font-weight: 600;
+		font-weight: 700;
 	}
 
 		.sb-subitem.active::before {
@@ -343,17 +335,19 @@ html, body {
 		}
 
 		.sb-subitem.active::after {
-			opacity: 0.6;
+			opacity: .6;
 		}
 
 /* ----------------------------- */
-/* Main content      */
+/* Main content container        */
 /* ----------------------------- */
 
 .main {
 	min-height: 100%;
 	padding: 24px;
-	transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: margin-left .3s cubic-bezier(.4,0,.2,1);
+	/* Let site's body gradient show through */
+	background: transparent;
 }
 
 .has-sidebar .main {
@@ -365,7 +359,7 @@ html, body {
 }
 
 /* ----------------------------- */
-/* Mobile header + burger         */
+/* Mobile header + burger        */
 /* ----------------------------- */
 
 .sb-burger {
@@ -376,17 +370,17 @@ html, body {
 	cursor: pointer;
 	padding: 8px;
 	border-radius: 8px;
-	transition: background 0.2s ease;
+	transition: background .2s ease;
 	position: fixed;
 	top: 12px;
 	left: 12px;
 	z-index: 1101;
-	color: #333;
+	color: #fff; /* readable over dark blue body bg from site.css */
 	display: none;
 }
 
 	.sb-burger:hover {
-		background: rgba(0, 0, 0, 0.05);
+		background: rgba(255, 255, 255, 0.08);
 	}
 
 	.sb-burger:active {
@@ -394,7 +388,7 @@ html, body {
 	}
 
 /* ----------------------------- */
-/* Mobile overlay       */
+/* Mobile overlay                */
 /* ----------------------------- */
 
 .sb-overlay {
@@ -403,7 +397,7 @@ html, body {
 	background: rgba(0, 0, 0, 0.5);
 	z-index: 999;
 	backdrop-filter: blur(2px);
-	transition: opacity 0.3s ease;
+	transition: opacity .3s ease;
 }
 
 	.sb-overlay[hidden] {
@@ -411,7 +405,7 @@ html, body {
 	}
 
 /* ----------------------------- */
-/* Responsive behavior        */
+/* Responsive behavior           */
 /* ----------------------------- */
 
 @media (max-width: 900px) {
@@ -435,14 +429,10 @@ html, body {
 	.sidebar--open .sidebar {
 		transform: translateX(0);
 	}
-
-	.sb-item {
-		grid-template-columns: 24px 1fr;
-	}
 }
 
 /* ----------------------------- */
-/* Motion accessibility           */
+/* Motion accessibility          */
 /* ----------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
