@@ -1,5 +1,9 @@
-﻿@{
+@{
     ViewData["Title"] = "Transactions";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
 }
 
 <style>
@@ -226,82 +230,91 @@
     }
 </style>
 
-<div class="viewport">
-    <div class="view-container">
-        <header class="header-section">
-            <h2 class="main-title">Transactions</h2>
+<div class="page">
+    @await Html.PartialAsync("_BackButton")
+
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">Transactions</h1>
+                <p class="card-subtitle">Search and review financial transactions.</p>
+            </div>
         </header>
 
-        <!-- Toolbar / Filters -->
-        <div class="toolbar">
-            <div class="filters">
-                <input class="input" type="text" placeholder="Search by party, reference…" style="min-width: 240px;" />
-                <select class="input">
-                    <option>All Types</option>
-                    <option>Sale</option>
-                    <option>Purchase</option>
-                    <option>Return</option>
-                    <option>Adjustment</option>
-                </select>
-                <input class="input" type="date" placeholder="yyyy/mm/dd" />
-                <span class="date-separator">to</span>
-                <input class="input" type="date" placeholder="yyyy/mm/dd" />
-            </div>
-            <button type="button" class="btn btn-primary">Search</button>
-        </div>
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <!-- Toolbar / Filters -->
+                <div class="toolbar">
+                    <div class="filters">
+                        <input class="input" type="text" placeholder="Search by party, reference…" style="min-width: 240px;" />
+                        <select class="input">
+                            <option>All Types</option>
+                            <option>Sale</option>
+                            <option>Purchase</option>
+                            <option>Return</option>
+                            <option>Adjustment</option>
+                        </select>
+                        <input class="input" type="date" placeholder="yyyy/mm/dd" />
+                        <span class="date-separator">to</span>
+                        <input class="input" type="date" placeholder="yyyy/mm/dd" />
+                    </div>
+                    <button type="button" class="btn btn-primary">Search</button>
+                </div>
 
-        <!-- Table -->
-        <section class="table-section">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width:110px;">ID</th>
-                        <th style="width:140px;">Date</th>
-                        <th>Party</th>
-                        <th style="width:130px;">Type</th>
-                        <th style="width:160px;">Reference</th>
-                        <th style="width:140px;" class="align-right">Amount</th>
-                        <th style="width:120px; text-align:center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Sample Rows -->
-                    <tr>
-                        <td>9001</td>
-                        <td>2025-03-04</td>
-                        <td>ABC Builders</td>
-                        <td>Sale</td>
-                        <td>INV-10231</td>
-                        <td class="align-right">R 1,780.00</td>
-                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
-                    </tr>
-                    <tr>
-                        <td>9002</td>
-                        <td>2025-03-03</td>
-                        <td>PipeWare Ltd.</td>
-                        <td>Purchase</td>
-                        <td>PO-8842</td>
-                        <td class="align-right">- R 950.00</td>
-                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
-                    </tr>
-                    <tr>
-                        <td>9003</td>
-                        <td>2025-03-01</td>
-                        <td>XYZ Retail</td>
-                        <td>Return</td>
-                        <td>RET-2205</td>
-                        <td class="align-right">- R 120.00</td>
-                        <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+                <!-- Table -->
+                <section class="table-section">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px;">ID</th>
+                                <th style="width:140px;">Date</th>
+                                <th>Party</th>
+                                <th style="width:130px;">Type</th>
+                                <th style="width:160px;">Reference</th>
+                                <th style="width:140px;" class="align-right">Amount</th>
+                                <th style="width:120px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sample Rows -->
+                            <tr>
+                                <td>9001</td>
+                                <td>2025-03-04</td>
+                                <td>ABC Builders</td>
+                                <td>Sale</td>
+                                <td>INV-10231</td>
+                                <td class="align-right">R 1,780.00</td>
+                                <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>9002</td>
+                                <td>2025-03-03</td>
+                                <td>PipeWare Ltd.</td>
+                                <td>Purchase</td>
+                                <td>PO-8842</td>
+                                <td class="align-right">- R 950.00</td>
+                                <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>9003</td>
+                                <td>2025-03-01</td>
+                                <td>XYZ Retail</td>
+                                <td>Return</td>
+                                <td>RET-2205</td>
+                                <td class="align-right">- R 120.00</td>
+                                <td style="text-align:center;"><a href="#" class="btn btn-outline">View</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
 
-        <!-- Pagination -->
-        <div class="pagination-controls">
-            <button type="button" class="btn btn-outline">← Previous</button>
-            <div class="page-info">Page 1 of 20</div>
-            <button type="button" class="btn btn-outline">Next →</button>
+                <!-- Pagination -->
+                <div class="pagination-controls">
+                    <button type="button" class="btn btn-outline">← Previous</button>
+                    <div class="page-info">Page 1 of 20</div>
+                    <button type="button" class="btn btn-outline">Next →</button>
+                </div>
+            </section>
         </div>
     </div>
 </div>

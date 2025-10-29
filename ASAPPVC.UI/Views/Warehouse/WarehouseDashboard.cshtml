@@ -1,40 +1,109 @@
-﻿@{
-	ViewData["Title"] = "Warehouse • Dashboard";
+@{
+    ViewData["Title"] = "Warehouse • Dashboard";
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/warehouse/WarehouseDashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/warehouse/WarehouseDashboard.css" asp-append-version="true" />
 }
 
-<div class="viewport">
-	<div class="container">
-		<!-- Header -->
-		<header class="header">
-			<div>
-				<h1 class="title">Warehouse Dashboard</h1>
-				<p class="subtitle">Quick actions for inventory operations</p>
-			</div>
-		</header>
+<div class="page">
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">Warehouse Dashboard</h1>
+                <p class="card-subtitle">Quick actions and key stats</p>
+            </div>
+        </header>
 
-		<!-- Actions -->
-		<section class="actions-grid">
-			<a class="action-card action-stock" asp-area="" asp-controller="Warehouse" asp-action="StockTake">
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <!-- KPIs -->
+                <section class="kpis-grid" aria-label="Key statistics">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Products</div>
+                        <div class="kpi-value">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Components</div>
+                        <div class="kpi-value">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Open Orders</div>
+                        <div class="kpi-value">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Low Stock</div>
+                        <div class="kpi-value">—</div>
+                    </div>
+                </section>
 
-				<img class="icon" src="~/assets/icons/clipboard-pen-line.svg" asp-append-version="true" alt="Back" width="20" height="20" />
-				<div class="text">
-					<h2>Stock Take</h2>
-					<p>Count and reconcile on-hand quantities.</p>
-				</div>
-				<span class="btn btn-primary">Open</span>
-			</a>
+                <!-- Actions -->
+                <section class="actions-grid">
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Products" asp-action="Index">
+                        <div class="icon">📦</div>
+                        <div class="text">
+                            <h2>Manage Products</h2>
+                            <p>Browse, edit, and view product catalog.</p>
+                        </div>
+                        <span class="btn btn-primary">Open</span>
+                    </a>
 
-			<a class="action-card action-receive" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">
-				<div class="text">
-					<h2>Receive Shipment</h2>
-					<p>Log new deliveries and update inventory.</p>
-				</div>
-				<span class="btn btn-accent">Open</span>
-			</a>
-		</section>
-	</div>
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Components" asp-action="Index">
+                        <div class="icon">🏷️</div>
+                        <div class="text">
+                            <h2>Manage Components</h2>
+                            <p>Track inventory parts and locations.</p>
+                        </div>
+                        <span class="btn btn-primary">Open</span>
+                    </a>
+
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">
+                        <div class="icon">➕</div>
+                        <div class="text">
+                            <h2>Add Product</h2>
+                            <p>Create a new product and link components.</p>
+                        </div>
+                        <span class="btn btn-accent">Create</span>
+                    </a>
+
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent">
+                        <div class="icon">➕</div>
+                        <div class="text">
+                            <h2>Add Component</h2>
+                            <p>Capture a new inventory component.</p>
+                        </div>
+                        <span class="btn btn-accent">Create</span>
+                    </a>
+
+                    <a class="action-card" asp-area="" asp-controller="Warehouse" asp-action="StockTake">
+                        <div class="icon">🧭</div>
+                        <div class="text">
+                            <h2>Stock Take</h2>
+                            <p>Count and reconcile on-hand quantities.</p>
+                        </div>
+                        <span class="btn btn-primary">Start</span>
+                    </a>
+
+                    <a class="action-card" asp-area="" asp-controller="Order" asp-action="ViewOrders">
+                        <div class="icon">🗂️</div>
+                        <div class="text">
+                            <h2>View Orders</h2>
+                            <p>See all orders and their status.</p>
+                        </div>
+                        <span class="btn btn-primary">Open</span>
+                    </a>
+
+                    <a class="action-card" asp-area="" asp-controller="Order" asp-action="AddOrder">
+                        <div class="icon">🧾</div>
+                        <div class="text">
+                            <h2>Create Order</h2>
+                            <p>Place a new customer order.</p>
+                        </div>
+                        <span class="btn btn-accent">Create</span>
+                    </a>
+                </section>
+            </section>
+        </div>
+    </div>
 </div>
