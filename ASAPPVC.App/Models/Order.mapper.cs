@@ -38,7 +38,7 @@ namespace ASAPPVC.App.Models
         /// Updates scalar fields and delegates product-line merging to <see cref="IOrderProductMapper"/>.
         /// Returns the updated Order instance (same reference as <paramref name="existing"/>).
         /// </summary>
-        Order ApplyFormVm(Order existing, OrderFormVm vm);
+        Order ApplyUpdate(Order existing, OrderFormVm vm);
     }
 
     #endregion Interface
@@ -152,7 +152,7 @@ namespace ASAPPVC.App.Models
         // Update existing domain entity from Edit VM
         // ------------------------------------------------------------
 
-        public Order ApplyFormVm(Order existing, OrderFormVm vm)
+        public Order ApplyUpdate(Order existing, OrderFormVm vm)
         {
             ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);

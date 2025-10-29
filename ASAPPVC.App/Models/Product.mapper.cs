@@ -48,7 +48,7 @@ namespace ASAPPVC.App.Models
         /// <summary>
         /// Applies an update to an existing Product from a ProductFormVm and returns the modified entity.
         /// </summary>
-        Task<Product> ApplyUpdateVmAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
+        Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
     }
 
     #endregion Interface
@@ -166,7 +166,7 @@ namespace ASAPPVC.App.Models
             return product;
         }
 
-        public async Task<Product> ApplyUpdateVmAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);

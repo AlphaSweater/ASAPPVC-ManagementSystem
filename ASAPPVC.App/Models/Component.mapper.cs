@@ -15,7 +15,7 @@ namespace ASAPPVC.App.Models
 
         Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default);
 
-        Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default);
+        Task<Component> ApplyUpdateAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default);
 
         // Added: map domain entity to form VM for edit/create prefilling
         ComponentFormVm ToFormVm(Component component);
@@ -163,7 +163,7 @@ namespace ASAPPVC.App.Models
         /// Applies an update to an existing Component using a ComponentFormVm.
         /// This may process an uploaded image. Returns the modified existing entity.
         /// </summary>
-        public async Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default)
+        public async Task<Component> ApplyUpdateAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);

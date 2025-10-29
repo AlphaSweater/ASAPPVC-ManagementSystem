@@ -244,34 +244,8 @@ namespace ASAPPVC.App.Services
                 if (missingIds.Any())
                     return Result<Order>.Fail($"Some products do not exist: {string.Join(", ", missingIds)}");
 
-                // Apply changes to order
-                existing.OrderCode = vm.OrderCode ?? existing.OrderCode;
-                existing.CustomerId = vm.CustomerId;
-                existing.OrderDate = vm.OrderDate ?? existing.OrderDate;
-                existing.OrderStatus = vm.OrderStatus;
-
-                // Handle order products - remove old, add new
-                // Clear existing products
-                existing.OrderProducts.Clear();
-
-                // Add updated products (mapper handles deduplication and normalization)
-                var newProducts = _mapper.FromFormVm(new OrderFormVm
-                {
-                    CustomerId = vm.CustomerId,
-                    OrderDate = vm.OrderDate,
-                    OrderStatus = vm.OrderStatus,
-                    Products = vm.Products.Select(p => new OrderProductVm
-                    {
-                        ProductId = p.ProductId,
-                        Quantity = p.Quantity
-                    }).ToList()
-                }).OrderProducts;
-
-                foreach (var product in newProducts)
-                {
-                    product.OrderId = existing.Id; // Ensure correct order ID
-                    existing.OrderProducts.Add(product);
-                }
+                // Apply changes via mapper (handles property updates and OrderProducts reconciliation)
+                _mapper.ApplyUpdate(existing, vm);
 
                 // Persist changes
                 _orders.Update(existing);

@@ -243,7 +243,7 @@ namespace ASAPPVC.App.Services
                 }
 
                 // Apply changes via mapper (handles image processing if new image uploaded)
-                await _mapper.ApplyUpdateVmAsync(existing, vm, ct);
+                await _mapper.ApplyUpdateAsync(existing, vm, ct);
 
                 // Persist changes
                 _components.Update(existing);

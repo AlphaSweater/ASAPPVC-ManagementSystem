@@ -284,7 +284,7 @@ namespace ASAPPVC.App.Services
                     return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
 
                 // Apply changes via mapper (handles component reconciliation and image processing)
-                await _mapper.ApplyUpdateVmAsync(existing, vm, unitLookup, ct);
+                await _mapper.ApplyUpdateAsync(existing, vm, unitLookup, ct);
 
                 // Persist changes
                 _products.Update(existing);
