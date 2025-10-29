@@ -30,72 +30,71 @@
         <form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
-            <div class="card-body">
-                <div class="form-layout-grid">
-
-                    <!-- Right: Image on top, fields beneath -->
-                    <section class="fields-panel">
-                        <section class="media-panel">
-                            <div class="image-box" onclick="document.getElementById('imageFile').click();">
-                                <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
-                            </div>
-                            <!-- CHANGED: Updated button class from btn-ghost to btn-primary for styling -->
-                            <button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
-                            <input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
-                        </section>
-
-                        <div class="form-fields-grid">
-                            <div class="form-field full">
-                                <label asp-for="Name" class="label"></label>
-                                <input asp-for="Name" class="input" placeholder="Enter product name" />
-                                <span asp-validation-for="Name" class="field-error"></span>
-                            </div>
-                            <div class="form-field full">
-                                <label asp-for="Price" class="label"></label>
-                                <input asp-for="Price" class="input" step="0.01" placeholder="e.g. R299.99" />
-                                <span asp-validation-for="Price" class="field-error"></span>
-                            </div>
-                            <div class="form-field full">
-                                <label asp-for="Description" class="label"></label>
-                                <textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
-                                <span asp-validation-for="Description" class="field-error"></span>
-                            </div>
+            <div class="card-body add-product-body">
+                <!-- Top Section: Image and Form Fields Side by Side -->
+                <div class="form-layout">
+                    <!-- Left: Image Upload -->
+                    <div class="form-image">
+                        <div class="image-box" onclick="document.getElementById('imageFile').click();">
+                            <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
                         </div>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
+                        <input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+                    </div>
 
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Save Product</button>
-                            <button type="reset" class="btn btn-ghost">Reset</button>
+                    <!-- Right: Form Fields -->
+                    <div class="form-fields">
+                        <div class="form-field">
+                            <label asp-for="Name" class="label"></label>
+                            <input asp-for="Name" class="input" placeholder="Enter product name" />
+                            <span asp-validation-for="Name" class="field-error"></span>
                         </div>
-                    </section>
+                        <div class="form-field">
+                            <label asp-for="Price" class="label"></label>
+                            <input asp-for="Price" class="input" step="0.01" placeholder="e.g. R299.99" />
+                            <span asp-validation-for="Price" class="field-error"></span>
+                        </div>
+                        <div class="form-field">
+                            <label asp-for="Description" class="label"></label>
+                            <textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
+                            <span asp-validation-for="Description" class="field-error"></span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Left: Large parts table -->
-                    <section>
-                        <div class="parts-card">
-                            <div class="parts-header">
-                                <h3>Components in this Product</h3>
-                                <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
-                            </div>
-                            <table class="parts-table" id="partsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Part</th>
-                                        <th style="width:100px; text-align:center;">Quantity</th>
-                                        <th class="align-right" style="width:120px;">Unit Price</th>
-                                        <th class="align-right" style="width:120px;">Subtotal</th>
-                                        <th style="width:60px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="partsTbody"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="align-right">Grand Total:</td>
-                                        <td class="align-right grand-total" id="grandTotal">R0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                <!-- Components Table -->
+                <div class="components-section">
+                    <div class="parts-card">
+                        <div class="parts-header">
+                            <h3>Components in this Product</h3>
+                            <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
                         </div>
-                    </section>
+                        <table class="parts-table" id="partsTable">
+                            <thead>
+                                <tr>
+                                    <th>Part</th>
+                                    <th style="width:100px; text-align:center;">Quantity</th>
+                                    <th class="align-right" style="width:120px;">Unit Price</th>
+                                    <th class="align-right" style="width:120px;">Subtotal</th>
+                                    <th style="width:60px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="partsTbody"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="align-right">Grand Total:</td>
+                                    <td class="align-right grand-total" id="grandTotal">R0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Form Actions at Bottom -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                    <button type="reset" class="btn btn-ghost">Reset</button>
                 </div>
             </div>
         </form>
