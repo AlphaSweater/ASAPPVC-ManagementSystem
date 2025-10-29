@@ -1,0 +1,128 @@
+﻿/* =======================================================
+   FancyTables · clean, modern, easy to use
+   ======================================================= */
+
+:root {
+	--ft-border: rgba(255, 255, 255, 0.2);
+	--ft-header-bg: rgba(0, 0, 0, 0.15);
+	--ft-row-hover: rgba(255, 255, 255, 0.08);
+	--ft-row-zebra: rgba(255, 255, 255, 0.04);
+	--ft-radius: 10px;
+	--ft-text: var(--text-light, #fff);
+	--ft-text-muted: var(--text-muted, rgba(255,255,255,0.7));
+}
+
+/* Wrapper for scroll & rounding */
+.fancy-wrap {
+	overflow-x: auto;
+	border-radius: var(--ft-radius);
+}
+
+/* Core table */
+.fancy-table {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	color: var(--ft-text-muted);
+	min-width: 700px;
+}
+
+	/* Base cell styling */
+	.fancy-table th,
+	.fancy-table td {
+		padding: 14px 16px;
+		border-bottom: 1px solid var(--ft-border);
+		text-align: left;
+		vertical-align: middle;
+		white-space: nowrap; /* prevent breaking by default */
+	}
+
+	/* Header */
+	.fancy-table thead th {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--ft-text);
+		background-color: var(--ft-header-bg);
+		backdrop-filter: blur(6px);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	/* Allow name column to expand and wrap */
+	.fancy-table td.ft-name {
+		white-space: normal;
+	}
+
+	/* Hover + zebra */
+	.fancy-table tbody tr {
+		transition: background-color 0.2s ease;
+	}
+
+		.fancy-table tbody tr:hover {
+			background-color: var(--ft-row-hover);
+		}
+
+.fancy-table--zebra tbody tr:nth-child(odd) {
+	background-color: var(--ft-row-zebra);
+}
+
+/* Column utilities */
+.ft-left {
+	text-align: left !important;
+}
+
+.ft-center {
+	text-align: center !important;
+}
+
+.ft-right {
+	text-align: right !important;
+}
+
+.ft-number,
+.ft-money {
+	text-align: right !important;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+/* Code column utility: bold, left-aligned, no wrap, monospace */
+.ft-code {
+	font-weight: 700;
+	text-align: left !important;
+	white-space: nowrap !important;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+}
+
+/* Grow / Shrink utilities
+ - Use `.ft-grow` on a `th`/`td` to let that column take remaining space (similar to flex:1)
+ - Use `.ft-shrink` to force the column to collapse to its content (similar to flex:0)
+ Notes: these work with the table's normal layout. For best results, apply
+ `.ft-grow` to a single column (like the main name/description column).
+*/
+.fancy-table th.ft-grow,
+.fancy-table td.ft-grow {
+	/* Allow this column to take available space */
+	width: 100%;
+	min-width: 0; /* allow it to shrink when container is narrower */
+	white-space: normal; /* allow wrapping inside */
+}
+
+.fancy-table th.ft-shrink,
+.fancy-table td.ft-shrink {
+	/* Force minimal width based on content */
+	white-space: nowrap;
+	width: 1%; /* small width that's allowed to grow to content size */
+}
+
+.ft-actions {
+	align-items: !important;
+	text-align: center !important;
+}
+
+/* Actions layout */
+.actions {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+}

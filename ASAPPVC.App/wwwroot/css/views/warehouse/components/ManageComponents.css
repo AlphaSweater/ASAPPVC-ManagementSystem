@@ -92,9 +92,10 @@ html, body {
 
 /* ---------- Action Buttons (reused from customer form) ---------- */
 .actions {
-	display: flex;
+	display: inline-flex;
 	justify-content: center;
-	gap: 8px; /* Reduced gap for table actions */
+	align-items: center;
+	gap: 8px;
 	white-space: nowrap;
 }
 
@@ -148,39 +149,3 @@ html, body {
 .table-section {
 	overflow-x: auto;
 }
-
-.table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-	.table th, .table td {
-		padding: 14px 16px;
-		text-align: left;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-	}
-
-	.table thead th {
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--text-light);
-		background-color: rgba(0, 0, 0, 0.15);
-	}
-
-	.table tbody tr {
-		transition: background-color 0.2s ease;
-	}
-
-		.table tbody tr:hover {
-			background-color: rgba(255, 255, 255, 0.08);
-		}
-
-	.table td {
-		font-size: 15px;
-		color: var(--text-muted);
-	}
-
-		.table td:first-child {
-			color: var(--text-light);
-			font-weight: 600;
-		}

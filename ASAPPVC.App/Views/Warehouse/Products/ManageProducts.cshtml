@@ -1,83 +1,92 @@
 @using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
-    ViewData["Title"] = "Products";
+	ViewData["Title"] = "Products";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/fancy-tables.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
 }
 
 <div class="page">
-    @await Html.PartialAsync("_BackButton")
+	@await Html.PartialAsync("_BackButton")
 
-    <div role="region" aria-labelledby="page-title">
-        <header class="card-header">
-            <div>
-                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-                <p class="card-subtitle">Browse, search and manage products in your catalog.</p>
-            </div>
-            <div class="card-actions">
-                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
-            </div>
-        </header>
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Browse, search and manage products in your catalog.</p>
+			</div>
+			<div class="card-actions">
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
+			</div>
+		</header>
 
-        <div class="card-body">
-            <section class="fields-panel" style="width:100%">
-                <div class="form-grid">
-                    <div class="form-field full">
-                        <form class="search-form" onsubmit="event.preventDefault();">
-                            <input class="input" type="text" placeholder="Search products..." />
-                        </form>
-                    </div>
-                </div>
+		<div class="card-body">
+			<section class="fields-panel full-width">
+				<form class="search-form"
+					  asp-area="Warehouse"
+					  asp-controller="Products"
+					  asp-action="Search"
+					  method="get">
+					<input class="input" type="text" name="term" placeholder="Search products by name or code..." value="@Model.SearchQuery" />
+					<button type="submit" class="btn btn-ghost">Search</button>
+				</form>
 
-                <section class="table-section">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Description</th>
-                                <th class="text-right" style="width:150px;">Price</th>
-                                <th class="text-right" style="width:120px;"># Components</th>
-                                <th style="width:200px; text-align:center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model == null || !Model.HasProducts)
-                            {
-                                <tr>
-                                    <td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">
-                                        No products found.
-                                    </td>
-                                </tr>
-                            }
-                            else
-                            {
-                                foreach (var product in Model.Products)
-                                {
-                                    var componentCount = product.ComponentCount;
-                                    <tr>
-                                        <td>@product.Name</td>
-                                        <td>@product.Description</td>
-                                        <td class="text-right">@product.Price.ToString("C")</td>
-                                        <td class="text-right">@componentCount</td>
-                                        <td>
-                                            <div class="actions">
-                                                <a class="btn btn-ghost btn-sm"
-                                                   asp-area="Warehouse" asp-controller="Products" asp-action="ViewProduct" asp-route-id="@product.Id">View</a>
-                                                <a class="btn btn-primary btn-sm"
-                                                   asp-area="Warehouse" asp-controller="Products" asp-action="EditProduct" asp-route-id="@product.Id">Edit</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </section>
-            </section>
-        </div>
-    </div>
+				<section class="table-section">
+					<div class="fancy-wrap">
+						<table class="fancy-table">
+							<thead>
+								<tr>
+									<th class="ft-left ft-shrink">Product Code</th>
+									<th class="ft-left ft-grow">Product</th>
+									<th class="ft-left ft-grow">Description</th>
+									<th class="ft-right ft-shrink">Price</th>
+									<th class="ft-center ft-shrink"># Components</th>
+									<th class="ft-actions ft-shrink">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								@if (Model is { HasProducts: true })
+								{
+									foreach (var product in Model.Products)
+									{
+										<tr>
+											<td class="ft-code ft-shrink">@product.ProductCode</td>
+											<td class="ft-left ft-grow ft-name">@product.Name</td>
+											<td class="ft-left ft-grow">@product.Description</td>
+											<td class="ft-money ft-shrink">@product.DisplayPrice</td>
+											<td class="ft-center ft-shrink">@product.ComponentCount</td>
+											<td class="ft-actions ft-shrink">
+												<div class="actions">
+													<a class="btn btn-secondary btn-sm"
+													   asp-area="Warehouse"
+													   asp-controller="Products"
+													   asp-action="ViewProduct"
+													   asp-route-id="@product.Id">View</a>
+													<a class="btn btn-primary btn-sm"
+													   asp-area="Warehouse"
+													   asp-controller="Products"
+													   asp-action="EditProduct"
+													   asp-route-id="@product.Id">Edit</a>
+												</div>
+											</td>
+										</tr>
+									}
+								}
+								else
+								{
+									<tr>
+										<td colspan="6" class="ft-center" style="padding:40px; color:var(--text-muted);">No products found.</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</section>
+		</div>
+	</div>
 </div>
