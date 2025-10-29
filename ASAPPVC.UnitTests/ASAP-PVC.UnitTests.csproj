@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ASAPPVC.UI\ASAPPVC.UI.csproj" />
+    <ProjectReference Include="..\ASAPPVC.UI\ASAP-PVC.App.csproj" />
   </ItemGroup>
 
 </Project>
