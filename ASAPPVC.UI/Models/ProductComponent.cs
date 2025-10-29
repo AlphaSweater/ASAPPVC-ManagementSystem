@@ -1,8 +1,8 @@
-﻿using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.App.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     /// <summary>
     /// Bridge entity linking a Product to many Components with a required Quantity (per set).<br/>

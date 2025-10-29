@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models.General;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models.General;
+using ASAPPVC.App.Services;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     internal static class ImageMapper
     {

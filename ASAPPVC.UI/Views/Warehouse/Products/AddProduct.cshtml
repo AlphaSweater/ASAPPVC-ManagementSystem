@@ -1,8 +1,8 @@
-﻿@using ASAPPVC.UI.Models
-@model ASAPPVC.UI.Models.ProductFormVm
+﻿@using ASAPPVC.App.Models
+@model ASAPPVC.App.Models.ProductFormVm
 @{
 	ViewData["Title"] = "Add New Product";
-	var components = ViewData["Components"] as List<ASAPPVC.UI.Models.Component>;
+	var components = ViewData["Components"] as List<Component>;
 }
 
 @section Styles {
@@ -117,7 +117,7 @@
 			const grandEl = document.getElementById('grandTotal');
 
 			// Serialize server-side components into JS array (ids are GUID strings)
-			const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((components != null) ? components : new List<ASAPPVC.UI.Models.Component>()));
+			const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((components != null) ? components : new List<Component>()));
 
 			const formatMoney = (n) => `R ${Number(n ||0).toFixed(2)}`;
 

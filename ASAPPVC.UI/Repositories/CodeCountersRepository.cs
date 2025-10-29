@@ -1,8 +1,8 @@
-using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.App.Data;
+using ASAPPVC.App.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     /// <summary>
     /// Atomic counter repository for code generation.

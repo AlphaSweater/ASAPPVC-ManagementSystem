@@ -1,9 +1,9 @@
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Utils;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Mappers;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Utils;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     public class OrderService(
         IOrderRepository orderRepository,

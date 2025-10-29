@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Utils
+﻿namespace ASAPPVC.App.Utils
 {
 	/// <summary>
 	/// Universal lightweight result wrapper for service and repository operations.

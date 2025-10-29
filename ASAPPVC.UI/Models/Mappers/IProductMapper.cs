@@ -1,6 +1,6 @@
-using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.App.Models.Enums;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Converts between <see cref="Product"/> domain entities and their ViewModels

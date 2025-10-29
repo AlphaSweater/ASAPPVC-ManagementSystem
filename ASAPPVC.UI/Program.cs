@@ -1,12 +1,12 @@
-using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
+using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Mappers;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI
+namespace ASAPPVC.App
 {
     public class Program
     {

@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.ViewModels.Warehouse
+﻿namespace ASAPPVC.App.ViewModels.Warehouse
 {
     public class WarehouseDashVm
     {

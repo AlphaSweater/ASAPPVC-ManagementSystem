@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.App.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.ViewModels.Auth
+namespace ASAPPVC.App.ViewModels.Auth
 {
     public class RegisterViewModel
     {

@@ -1,10 +1,10 @@
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Auth;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 
-namespace ASAPPVC.UI.Data
+namespace ASAPPVC.App.Data
 {
     public static class DbSeeder
     {

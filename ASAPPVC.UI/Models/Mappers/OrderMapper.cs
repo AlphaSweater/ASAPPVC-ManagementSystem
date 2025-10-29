@@ -1,6 +1,6 @@
-using ASAPPVC.UI.Services;
+using ASAPPVC.App.Services;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Implementation of <see cref="IOrderMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
@@ -23,7 +23,7 @@ namespace ASAPPVC.UI.Models.Mappers
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
 
             var itemCount = lines.Sum(x => x.Quantity);
-            var total = lines.Sum(x => (x.Product?.Price ??0m) * x.Quantity);
+            var total = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
 
             return new OrderListVm
             {
@@ -46,8 +46,8 @@ namespace ASAPPVC.UI.Models.Mappers
             var products = includeProducts ? _orderProductMapper.ToBridgeVms(lines) : new List<OrderProductVm>();
 
             var itemCount = lines.Sum(x => x.Quantity);
-            var subtotal = lines.Sum(x => (x.Product?.Price ??0m) * x.Quantity);
-            var tax =0m; // keep zero for now — compute later if needed
+            var subtotal = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
+            var tax = 0m; // keep zero for now — compute later if needed
             var grand = subtotal + tax;
 
             return new OrderDetailVm

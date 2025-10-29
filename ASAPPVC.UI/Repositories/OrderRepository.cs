@@ -1,8 +1,8 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
+﻿using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     public class OrderRepository(AppDbContext db) : BaseRepository<Order>(db), IOrderRepository
     {

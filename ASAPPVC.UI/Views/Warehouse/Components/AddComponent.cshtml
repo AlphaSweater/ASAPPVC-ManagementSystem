@@ -1,4 +1,4 @@
-﻿@model global::ASAPPVC.UI.Models.ComponentFormVm
+﻿@model global::ASAPPVC.App.Models.ComponentFormVm
 @{
 	ViewData["Title"] = "Add New Component";
 	ViewData["ShowBackPageName"] = true;
@@ -83,7 +83,7 @@
 
 						<div class="form-field full">
 							<label asp-for="Unit" class="label"></label>
-							<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.UI.Models.Enums.Unit>()"></select>
+							<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.App.Models.Enums.Unit>()"></select>
 							<span asp-validation-for="Unit" class="field-error"></span>
 						</div>
 					</div>

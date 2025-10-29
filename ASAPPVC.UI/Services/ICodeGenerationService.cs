@@ -1,7 +1,7 @@
-using ASAPPVC.UI.Models.General;
-using ASAPPVC.UI.Utils;
+using ASAPPVC.App.Models.General;
+using ASAPPVC.App.Utils;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     /// <summary>
     /// Service contract for generating unique, checksummed codes for various entity types.

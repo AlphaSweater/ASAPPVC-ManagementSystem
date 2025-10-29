@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Models.Enums
+﻿namespace ASAPPVC.App.Models.Enums
 {
     // Example: local attribute definition for this enum file. Consumers can define their own attribute
     // with any property names; backend helpers will read them dynamically by name.

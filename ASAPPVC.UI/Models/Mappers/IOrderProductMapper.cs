@@ -1,4 +1,4 @@
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Converts between <see cref="OrderProduct"/> bridge entities and their ViewModels

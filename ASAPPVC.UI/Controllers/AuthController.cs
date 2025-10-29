@@ -1,10 +1,10 @@
 ﻿// Controllers/AuthController.cs
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Auth;
+using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.App.Controllers
 {
     public class AuthController(IAuthService auth) : Controller
     {

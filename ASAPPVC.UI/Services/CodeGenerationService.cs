@@ -1,10 +1,10 @@
-﻿using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Models.General;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Utils;
+﻿using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Models.General;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Utils;
 using System.Text;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     /// <summary>
     /// Generates unique, checksummed codes for Products, Components, Orders, and PickingSlips.

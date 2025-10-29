@@ -1,8 +1,7 @@
-using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Models.General;
-using ASAPPVC.UI.Services;
+using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Services;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Base class for all mappers, providing shared normalization and helper methods.

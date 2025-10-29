@@ -1,10 +1,10 @@
-﻿using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Models.General;
+﻿using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Models.General;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     [Index(nameof(ProductCode), IsUnique = true)]
     public class Product

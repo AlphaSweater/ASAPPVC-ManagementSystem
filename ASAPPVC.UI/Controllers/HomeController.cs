@@ -1,9 +1,9 @@
-using System.Diagnostics;
 using ASAPPVC.UI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.App.Controllers
 {
     [Authorize]
     public class HomeController : Controller
@@ -31,4 +31,5 @@ namespace ASAPPVC.UI.Controllers
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

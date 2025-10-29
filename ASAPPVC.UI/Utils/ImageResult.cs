@@ -1,7 +1,7 @@
-using ASAPPVC.UI.Models.General;
+using ASAPPVC.App.Models.General;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Utils
+namespace ASAPPVC.App.Utils
 {
     /// <summary>
     /// Helper for returning image file results with proper caching headers.

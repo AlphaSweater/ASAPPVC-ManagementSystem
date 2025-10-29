@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     //-----------------------------------------------\\
     // Order ViewModels (Read + Write)
@@ -115,6 +116,35 @@ namespace ASAPPVC.UI.Models
         [StringLength(500)]
         public string? Notes { get; set; }
 
+        // Lookup collections for form UI
+        // Holds lightweight product list view models that can be added to the order
+        public List<ProductListVm> AvailableProducts { get; set; } = new();
+
+        // Holds customers for selection in the form
+        public List<CustomerModel> AvailableCustomers { get; set; } = new();
+
+        // Parameterless constructor (kept for model binding)
+        public OrderFormVm() { }
+
+        // Convenience constructor to initialize lookup collections and sensible defaults
+        public OrderFormVm(IEnumerable<ProductListVm>? availableProducts, IEnumerable<CustomerModel>? availableCustomers)
+        {
+            AvailableProducts = availableProducts?.ToList() ?? new List<ProductListVm>();
+            AvailableCustomers = availableCustomers?.ToList() ?? new List<CustomerModel>();
+            OrderDate = DateTime.Now;
+            Products = new List<OrderProductFormVm>();
+        }
+
+        // Static factory for creating a new form pre-populated with lookups
+        public static OrderFormVm CreateNew(IEnumerable<ProductListVm>? availableProducts = null, IEnumerable<CustomerModel>? availableCustomers = null)
+        {
+            return new OrderFormVm(availableProducts, availableCustomers)
+            {
+                Id = null,
+                OrderStatus = OrderStatus.Pending
+            };
+        }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (IsEdit && string.IsNullOrWhiteSpace(OrderCode))
@@ -129,8 +159,6 @@ namespace ASAPPVC.UI.Models
                 for (int i = 0; i < Products.Count; i++)
                 {
                     var p = Products[i];
-
-                    // Quantity validation is handled by [Range] attribute on OrderProductFormVm.Quantity
                 }
             }
         }

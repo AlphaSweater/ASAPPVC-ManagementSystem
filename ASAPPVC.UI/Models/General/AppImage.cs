@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Models.General
+﻿namespace ASAPPVC.App.Models.General
 {
     /// <summary>Binary image stored in DB as part of an aggregate (owned by a parent row).</summary>
     public sealed class AppImage

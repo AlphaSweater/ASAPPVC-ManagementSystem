@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.App.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     //-----------------------------------------------\\
     //  ProductComponent ViewModels (Read + Write)

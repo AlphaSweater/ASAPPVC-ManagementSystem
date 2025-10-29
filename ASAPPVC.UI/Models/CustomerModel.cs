@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     public class CustomerModel
     {

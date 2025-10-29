@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     [Index(nameof(OrderCode), IsUnique = true)]
     public class Order

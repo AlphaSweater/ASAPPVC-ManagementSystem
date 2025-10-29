@@ -1,9 +1,9 @@
-﻿using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Customer;
+﻿using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Customer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.App.Controllers
 {
     [Authorize]
     public class CustomerController : Controller

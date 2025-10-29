@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Maps between Component domain entities and ViewModels (list/detail/form).

@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.App.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     //-----------------------------------------------\\
     //  Product ViewModels (Read + Write)
@@ -141,7 +141,6 @@ namespace ASAPPVC.UI.Models
                 for (int i = 0; i < Components.Count; i++)
                 {
                     var c = Components[i];
-
                 }
             }
         }

@@ -1,10 +1,10 @@
-using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Utils;
+using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI.Controllers.Images
+namespace ASAPPVC.App.Controllers.Images
 {
     /// <summary>
     /// Serves component images with clean routing and ETag caching.

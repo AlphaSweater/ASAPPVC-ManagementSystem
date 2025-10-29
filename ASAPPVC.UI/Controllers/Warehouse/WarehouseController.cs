@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers.Warehouse
+namespace ASAPPVC.App.Controllers.Warehouse
 {
     [Authorize]
     public class WarehouseController : Controller

@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Utils;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Utils;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     /// <summary>
     /// Service contract for component-related business logic.

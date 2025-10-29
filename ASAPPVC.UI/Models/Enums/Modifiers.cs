@@ -1,4 +1,4 @@
-namespace ASAPPVC.UI.Models.Enums
+namespace ASAPPVC.App.Models.Enums
 {
     // Local attribute used to annotate modifier enums with a code + display name.
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]

@@ -1,6 +1,6 @@
-using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.App.Models.Enums;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     public interface ICodeCountersRepository
     {

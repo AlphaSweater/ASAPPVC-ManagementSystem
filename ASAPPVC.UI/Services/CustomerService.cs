@@ -1,8 +1,8 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.ViewModels.Customer;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.ViewModels.Customer;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     public class CustomerService(ICustomerRepository repo) : ICustomerService
     {

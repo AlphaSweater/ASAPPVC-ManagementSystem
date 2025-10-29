@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace ASAPPVC.UI.Models.Enums
+namespace ASAPPVC.App.Models.Enums
 {
     /// <summary>
     /// Generic helpers to read custom attributes on enum members and access their properties via reflection.

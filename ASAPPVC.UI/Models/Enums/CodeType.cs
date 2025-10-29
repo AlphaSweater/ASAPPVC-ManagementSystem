@@ -1,4 +1,4 @@
-namespace ASAPPVC.UI.Models.Enums
+namespace ASAPPVC.App.Models.Enums
 {
     /// <summary>
     /// Types of generated codes used across the application.

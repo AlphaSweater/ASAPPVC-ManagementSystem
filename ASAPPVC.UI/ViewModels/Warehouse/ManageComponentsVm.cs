@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Models;
+﻿using ASAPPVC.App.Models;
 
-namespace ASAPPVC.UI.ViewModels.Warehouse
+namespace ASAPPVC.App.ViewModels.Warehouse
 {
     /// <summary>
     /// View model for the Manage Components view.

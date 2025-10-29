@@ -1,7 +1,6 @@
-﻿@{
+﻿@using ASAPPVC.App.Models
+@{
 	ViewData["Title"] = "Add Order";
-	var customers = ViewData["Customers"] as List<ASAPPVC.UI.Models.CustomerModel> ?? new();
-	var products = ViewData["Products"] as List<ASAPPVC.UI.Models.Product> ?? new();
 }
 
 <link rel="stylesheet" href="~/css/Views/Order/AddOrder.css" asp-append-version="true" />

@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Utils;
+﻿using ASAPPVC.App.Utils;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     public interface IImageService
     {

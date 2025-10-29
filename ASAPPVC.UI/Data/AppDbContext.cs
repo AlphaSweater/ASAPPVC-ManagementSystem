@@ -1,10 +1,10 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.General;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.General;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ASAPPVC.UI.Data
+namespace ASAPPVC.App.Data
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
     {

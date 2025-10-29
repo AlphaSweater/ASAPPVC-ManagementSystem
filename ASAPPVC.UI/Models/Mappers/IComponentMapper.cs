@@ -1,4 +1,4 @@
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Maps between Component domain entities and their ViewModels.

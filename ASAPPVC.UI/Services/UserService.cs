@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.Services
+﻿namespace ASAPPVC.App.Services
 {
     public class UserService : IUserService
     {

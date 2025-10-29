@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     public interface IBaseRepository<T> where T : class
     {

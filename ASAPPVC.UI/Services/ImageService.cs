@@ -1,4 +1,4 @@
-﻿using ASAPPVC.UI.Utils;
+﻿using ASAPPVC.App.Utils;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Cryptography;
 
-namespace ASAPPVC.UI.Services
+namespace ASAPPVC.App.Services
 {
     public sealed class ImageService(IOptions<ImageServiceOptions> options) : IImageService
     {

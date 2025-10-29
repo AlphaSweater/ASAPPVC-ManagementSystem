@@ -1,8 +1,8 @@
-using ASAPPVC.UI.ViewModels.Auth;
+using ASAPPVC.App.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     // Identity user with Guid key and merged profile fields
     public class ApplicationUser : IdentityUser<Guid>

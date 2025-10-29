@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.UI.Models.Enums
+namespace ASAPPVC.App.Models.Enums
 {
     /// <summary>
     /// Application role types.

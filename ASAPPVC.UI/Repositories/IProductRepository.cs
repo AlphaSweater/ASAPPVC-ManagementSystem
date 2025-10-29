@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Models;
+﻿using ASAPPVC.App.Models;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     /// <summary>
     /// Repository interface for product-specific operations.

@@ -1,8 +1,8 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.App.Controllers
 {
     public class OrderController : Controller
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ASAPPVC.UI.Models
+namespace ASAPPVC.App.Models
 {
     /// <summary>
     /// Bridge entity linking an Order to many Products with a Quantity (per order).<br/>

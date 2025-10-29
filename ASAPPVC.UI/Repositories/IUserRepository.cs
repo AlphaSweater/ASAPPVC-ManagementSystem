@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Models;
+﻿using ASAPPVC.App.Models;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     // Inherit common CRUD and Save contract from IBaseRepository<T>
     public interface IUserRepository : IBaseRepository<ApplicationUser>

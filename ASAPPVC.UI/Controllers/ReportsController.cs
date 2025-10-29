@@ -1,7 +1,7 @@
 using ASAPPVC.UI.ViewModels.Reports;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers
+namespace ASAPPVC.App.Controllers
 {
     public class ReportsController : Controller
     {

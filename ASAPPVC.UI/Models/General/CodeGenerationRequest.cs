@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Models.Enums;
+﻿using ASAPPVC.App.Models.Enums;
 
-namespace ASAPPVC.UI.Models.General
+namespace ASAPPVC.App.Models.General
 {
     /// <summary>
     /// Strongly-typed request for code generation.

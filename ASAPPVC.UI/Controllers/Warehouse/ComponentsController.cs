@@ -1,10 +1,10 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Warehouse;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Warehouse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASAPPVC.UI.Controllers.Warehouse
+namespace ASAPPVC.App.Controllers.Warehouse
 {
     [Area("Warehouse")]
     [Authorize]

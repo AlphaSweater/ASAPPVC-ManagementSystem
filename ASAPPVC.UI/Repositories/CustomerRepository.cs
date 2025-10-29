@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
+﻿using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     public class CustomerRepository(AppDbContext db) : BaseRepository<CustomerModel>(db), ICustomerRepository
     {

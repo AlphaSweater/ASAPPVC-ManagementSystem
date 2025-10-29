@@ -1,7 +1,7 @@
-using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Services;
+using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Services;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Implementation of <see cref="IProductMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.

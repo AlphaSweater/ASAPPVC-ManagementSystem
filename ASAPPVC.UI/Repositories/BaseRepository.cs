@@ -1,8 +1,8 @@
-using ASAPPVC.UI.Data;
+using ASAPPVC.App.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace ASAPPVC.UI.Repositories
+namespace ASAPPVC.App.Repositories
 {
     public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
     {

@@ -1,6 +1,6 @@
-using ASAPPVC.UI.Models.Enums;
+using ASAPPVC.App.Models.Enums;
 
-namespace ASAPPVC.UI.Models.Mappers
+namespace ASAPPVC.App.Models.Mappers
 {
     /// <summary>
     /// Implementation of <see cref="IProductComponentMapper"/>.

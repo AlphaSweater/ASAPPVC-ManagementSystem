@@ -1,4 +1,4 @@
-﻿namespace ASAPPVC.UI.ViewModels.Reports
+﻿namespace ASAPPVC.App.ViewModels.Reports
 {
     public class PickingSlipViewModel
     {
@@ -22,26 +22,30 @@
         public DateTime GeneratedDateTime { get; set; }
 
         // Constructor with dummy data
-        public PickingSlipViewModel() {
+        public PickingSlipViewModel()
+        {
             PickingSlipNumber = "PS-000123";
             OrderNumber = "ORD-45782";
             CreatedDateTime = new DateTime(2025, 10, 22, 14, 6, 0);
             Priority = "Standard";
             LogoPath = "/Assets/Images/Logos/asap-pvc-logo.png";
 
-            From = new FromInfo {
+            From = new FromInfo
+            {
                 Company = "ASAPPVC (Pty) Ltd",
                 Warehouse = "Killarney Gardens",
                 Contact = "info@asappvc.co.za"
             };
 
-            For = new ForInfo {
+            For = new ForInfo
+            {
                 Client = "GreenTech Projects",
                 ProjectSite = "Midrand Solar Farm",
                 Contact = "Sipho Ndlovu • +27 82 555 0199"
             };
 
-            Order = new OrderInfo {
+            Order = new OrderInfo
+            {
                 OrderNumber = "ORD-45782",
                 Created = new DateTime(2025, 10, 22, 13, 52, 0),
                 PickBy = new DateTime(2025, 10, 23, 10, 0, 0)
