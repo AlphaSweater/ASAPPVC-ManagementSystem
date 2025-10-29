@@ -19,55 +19,12 @@
         font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
-    body {
-        background-color: #0d47a1; /* Deep blue fallback/base */
-        background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-        color: var(--text-light);
-        position: relative;
-        overflow-x: hidden;
-        background-attachment: fixed;
-    }
-
     /* --- Universal Reset for Better Layout Control --- */
     * {
         box-sizing: border-box;
     }
 
-    /* ---------- Decorative Background Shapes ---------- */
-    body::before, body::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(150px);
-        opacity: 0.6;
-        z-index: -1;
-    }
-
-    body::before {
-        background: var(--primary-blue);
-        width: 350px;
-        height: 350px;
-        top: -80px;
-        left: -120px;
-    }
-
-    body::after {
-        background: var(--primary-red);
-        width: 400px;
-        height: 400px;
-        bottom: -150px;
-        right: -180px;
-    }
-
-    .main {
-        padding: 0 !important;
-    }
-
-    .dashboard-page {
-        padding: 24px;
-        min-height: 100vh;
-    }
-
+   
     /* ===== Header Row ===== */
     .head {
         margin-bottom: 24px;
