@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --primary-red: #d62828;
     --hover-red: #e03a3a;
     --primary-blue: #0d47a1;
@@ -15,45 +15,7 @@
     box-sizing: border-box;
 }
 
-html, body {
-    height: 100%;
-    margin: 0;
-    font-family: "Segoe UI",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    color: var(--text-light);
-}
-
-body {
-    background: #0d47a1;
-    background-image: linear-gradient(120deg,var(--primary-blue) 0%, var(--primary-red) 100%);
-    background-attachment: fixed;
-    overflow-x: hidden;
-    position: relative;
-}
-
-    body::before, body::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(150px);
-        opacity: .6;
-        z-index: -1;
-    }
-
-    body::before {
-        background: var(--primary-blue);
-        width: 350px;
-        height: 350px;
-        top: -80px;
-        left: -120px;
-    }
-
-    body::after {
-        background: var(--primary-red);
-        width: 400px;
-        height: 400px;
-        bottom: -150px;
-        right: -180px;
-    }
+html, body { height: 100%; }
 
 .viewport {
     min-height: 100vh;

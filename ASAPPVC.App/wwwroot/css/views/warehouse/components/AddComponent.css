@@ -1,6 +1,14 @@
-﻿/* ================================================================
+/* ================================================================
    AddComponent • Glass form layout (dark blue friendly)
    --------------------------------------------------------------- */
+
+/* Tokens to match Add Product */
+:root {
+    --primary-red: #d62828;
+    --hover-red: #e03a3a;
+    --text-light: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.8);
+}
 
 /* Page */
 .page {
@@ -203,47 +211,86 @@ select.input {
 	font-size: 12px;
 }
 
-/* Form buttons */
+/* ---------- Buttons ---------- */
 .form-actions {
-	margin-top: 16px;
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
 }
 
 .btn {
-	border-radius: 999px;
-	padding: 10px 18px;
-	font-weight: 700;
+	height: 44px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 16px;
+	cursor: pointer;
+	border: none;
+	transition: all .2s ease;
+	text-decoration: none;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	cursor: pointer;
-	transition: all .2s ease;
+	justify-content: center;
 }
 
+	.btn:active {
+		transform: scale(0.98);
+	}
+
+	/* Specific sizes for table buttons */
+	.btn.btn-sm {
+		height: 36px;
+		padding: 0 16px;
+		font-size: 14px;
+	}
+
 .btn-primary {
-	color: #fff;
-	border: none;
-	box-shadow: 0 0 12px rgba(255,82,82,.4);
+	background: var(--primary-red);
+	color: var(--text-light);
 }
 
 	.btn-primary:hover {
-		filter: brightness(1.08);
-		box-shadow: 0 0 20px rgba(255,82,82,.55);
+		background: var(--hover-red);
 	}
 
-.btn-ghost {
+.btn-secondary {
 	background: transparent;
-	border: 1px solid var(--glass-border);
-	color: #fff;
+	color: var(--text-light);
+	border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-	.btn-ghost:hover {
-		background: rgba(255,255,255,.08);
-		border-color: rgba(255,255,255,.34);
-		color: #fff;
+	.btn-secondary:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
 	}
+
+.btn-remove {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+    .btn-remove:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--text-light);
+    }
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+    .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.6);
+        color: var(--text-light);
+    }
 
 /* Accessibility helpers */
 .sr-only {

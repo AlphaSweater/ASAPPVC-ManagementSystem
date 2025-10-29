@@ -17,41 +17,9 @@ html, body {
     margin: 0;
     font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     position: relative;
-    /* The robust centering solution */
     display: grid;
     place-items: center;
 }
-
-body {
-    background-color: #1c3d72; /* Fallback color */
-    background-image: linear-gradient(120deg, var(--primary-red) 0%, var(--primary-blue) 100%);
-}
-
-    /* ---------- Decorative Background Shapes ---------- */
-    body::before, body::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(150px);
-        opacity: 0.6;
-        /* z-index removed from here to fix layering */
-    }
-
-    body::before {
-        background: var(--primary-red);
-        width: 350px;
-        height: 350px;
-        top: -80px;
-        left: -120px;
-    }
-
-    body::after {
-        background: var(--primary-blue);
-        width: 400px;
-        height: 400px;
-        bottom: -150px;
-        right: -180px;
-    }
 
 /* ---------- Glassmorphism Card ---------- */
 .login-card {

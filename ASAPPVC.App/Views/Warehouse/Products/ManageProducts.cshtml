@@ -1,69 +1,83 @@
-﻿@using ASAPPVC.App.ViewModels.Warehouse
+@using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
-	ViewData["Title"] = "Products";
+    ViewData["Title"] = "Products";
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
 }
 
-<div class="viewport">
-	<div class="content-container">
-		<div class="page-header">
-			<h2 class="main-title">Products</h2>
-		</div>
+<div class="page">
+    @await Html.PartialAsync("_BackButton")
 
-		<div class="toolbar">
-			<form class="search-form" onsubmit="event.preventDefault();">
-				<input class="input" type="text" placeholder="Search products..." />
-			</form>
-			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
-		</div>
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+                <p class="card-subtitle">Browse, search and manage products in your catalog.</p>
+            </div>
+            <div class="card-actions">
+                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
+            </div>
+        </header>
 
-		<section class="table-section">
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Product</th>
-						<th>Description</th>
-						<th class="text-right" style="width:150px;">Price</th>
-						<th class="text-right" style="width:120px;"># Components</th>
-						<th style="width:200px; text-align:center;">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					@if (Model == null || !Model.HasProducts)
-					{
-						<tr>
-							<td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">
-								No products found.
-							</td>
-						</tr>
-					}
-					else
-					{
-						foreach (var product in Model.Products)
-						{
-							var componentCount = product.ComponentCount;
-							<tr>
-								<td>@product.Name</td>
-								<td>@product.Description</td>
-								<td class="text-right">@product.Price.ToString("C")</td>
-								<td class="text-right">@componentCount</td>
-								<td>
-									<div class="actions">
-										<a class="btn btn-secondary btn-sm"
-										   asp-area="Warehouse" asp-controller="Products" asp-action="ViewProduct" asp-route-id="@product.Id">View</a>
-										<a class="btn btn-primary btn-sm"
-										   asp-area="Warehouse" asp-controller="Products" asp-action="EditProduct" asp-route-id="@product.Id">Edit</a>
-									</div>
-								</td>
-							</tr>
-						}
-					}
-				</tbody>
-			</table>
-		</section>
-	</div>
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <form class="search-form" onsubmit="event.preventDefault();">
+                            <input class="input" type="text" placeholder="Search products..." />
+                        </form>
+                    </div>
+                </div>
+
+                <section class="table-section">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Description</th>
+                                <th class="text-right" style="width:150px;">Price</th>
+                                <th class="text-right" style="width:120px;"># Components</th>
+                                <th style="width:200px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model == null || !Model.HasProducts)
+                            {
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                                        No products found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var product in Model.Products)
+                                {
+                                    var componentCount = product.ComponentCount;
+                                    <tr>
+                                        <td>@product.Name</td>
+                                        <td>@product.Description</td>
+                                        <td class="text-right">@product.Price.ToString("C")</td>
+                                        <td class="text-right">@componentCount</td>
+                                        <td>
+                                            <div class="actions">
+                                                <a class="btn btn-ghost btn-sm"
+                                                   asp-area="Warehouse" asp-controller="Products" asp-action="ViewProduct" asp-route-id="@product.Id">View</a>
+                                                <a class="btn btn-primary btn-sm"
+                                                   asp-area="Warehouse" asp-controller="Products" asp-action="EditProduct" asp-route-id="@product.Id">Edit</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+        </div>
+    </div>
 </div>

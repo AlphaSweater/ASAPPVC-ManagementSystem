@@ -17,8 +17,7 @@ public class CodeGenerationServiceTests
         _sut = new CodeGenerationService(_counters.Object);
     }
 
-    // ---------------- Product Code -----------------
-
+    // ---------------- Product: Generate without category ----------------
     [Fact]
     public async Task GenerateProductCode_WithoutCategory_ReturnsCorrectFormat()
     {
@@ -36,6 +35,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PRD-\d{4}-[A-Z0-9]$"); // e.g., PRD-0042-X
     }
 
+    // ---------------- Product: Generate with category ----------------
     [Fact]
     public async Task GenerateProductCode_WithCategory_IncludesCategory()
     {
@@ -53,6 +53,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PRD-WIN-\d{4}-[A-Z0-9]$"); // e.g., PRD-WIN-0015-X
     }
 
+    // ---------------- Product: Generate with version ----------------
     [Fact]
     public async Task GenerateProductCode_WithVersion_IncludesVersion()
     {
@@ -70,6 +71,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PRD-\d{4}-V03-[A-Z0-9]$"); // e.g., PRD-0007-V03-X
     }
 
+    // ---------------- Product: Generate with category and version ----------------
     [Fact]
     public async Task GenerateProductCode_WithCategoryAndVersion_IncludesBoth()
     {
@@ -87,8 +89,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PRD-DRR-\d{4}-V12-[A-Z0-9]$"); // e.g., PRD-DRR-0099-V12-X
     }
 
-    // ---------------- Component Code ----------------
-
+    // ---------------- Component: Generate without category ----------------
     [Fact]
     public async Task GenerateComponentCode_WithoutCategory_ReturnsCorrectFormat()
     {
@@ -106,6 +107,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^CMP-\d{5}-[A-Z0-9]$"); // e.g., CMP-00123-X
     }
 
+    // ---------------- Component: Generate with category ----------------
     [Fact]
     public async Task GenerateComponentCode_WithCategory_IncludesCategory()
     {
@@ -123,8 +125,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^CMP-HNG-\d{5}-[A-Z0-9]$"); // e.g., CMP-HNG-00456-X
     }
 
-    // ---------------- Order Code (Period Key) ----------------
-
+    // ---------------- Order: Uses period key from timestamp ----------------
     [Fact]
     public async Task GenerateOrderCode_UsesPeriodKeyFromTimestamp()
     {
@@ -144,6 +145,7 @@ public class CodeGenerationServiceTests
         _counters.Verify(r => r.IncrementAndGetAsync(CodeType.Order, "202403", CancellationToken.None), Times.Once);
     }
 
+    // ---------------- Order: Different months use different counters ----------------
     [Fact]
     public async Task GenerateOrderCode_DifferentMonths_UseDifferentCounters()
     {
@@ -167,8 +169,7 @@ public class CodeGenerationServiceTests
         _counters.Verify(r => r.IncrementAndGetAsync(CodeType.Order, "202402", CancellationToken.None), Times.Once);
     }
 
-    // ---------------- Picking Slip ----------------
-
+    // ---------------- PickingSlip: With related order and version ----------------
     [Fact]
     public async Task GeneratePickingSlipCode_WithOrderAndVersion_ReturnsCorrectFormat()
     {
@@ -191,6 +192,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PSL-ORD0042-V01-[A-Z0-9]$");
     }
 
+    // ---------------- PickingSlip: Missing related code fails ----------------
     [Fact]
     public async Task GeneratePickingSlipCode_WithoutRelatedCode_Fails()
     {
@@ -205,6 +207,7 @@ public class CodeGenerationServiceTests
         result.Error.Should().Be("RelatedCode is required for PickingSlip generation.");
     }
 
+    // ---------------- PickingSlip: Missing version fails ----------------
     [Fact]
     public async Task GeneratePickingSlipCode_WithoutVersion_Fails()
     {
@@ -223,8 +226,7 @@ public class CodeGenerationServiceTests
         result.Error.Should().Be("Version is required for PickingSlip generation.");
     }
 
-    // ---------------- Counter Increment Behavior ----------------
-
+    // ---------------- Counter: Calls repository to increment counter ----------------
     [Fact]
     public async Task GenerateCode_CallsRepositoryToIncrementCounter()
     {
@@ -242,6 +244,7 @@ public class CodeGenerationServiceTests
         _counters.VerifyNoOtherCalls();
     }
 
+    // ---------------- Counter: Increments on each call ----------------
     [Fact]
     public async Task GenerateMultipleCodes_IncrementsCounterEachTime()
     {
@@ -264,8 +267,7 @@ public class CodeGenerationServiceTests
         _counters.Verify(r => r.IncrementAndGetAsync(CodeType.Product, null, CancellationToken.None), Times.Exactly(3));
     }
 
-    // ---------------- Checksum ----------------
-
+    // ---------------- Checksum: Validates generated code ----------------
     [Fact]
     public async Task ValidateChecksum_ForGeneratedCode_IsTrue()
     {
@@ -283,6 +285,7 @@ public class CodeGenerationServiceTests
         isValid.Should().BeTrue();
     }
 
+    // ---------------- Checksum: Detects tampered checksum ----------------
     [Fact]
     public async Task ValidateChecksum_TamperedChecksum_IsFalse()
     {
@@ -306,6 +309,7 @@ public class CodeGenerationServiceTests
         _sut.ValidateChecksum(tampered).Should().BeFalse("modified checksum should fail validation");
     }
 
+    // ---------------- Checksum: Invalid formats return false ----------------
     [Fact]
     public void ValidateChecksum_InvalidFormats_ReturnFalse()
     {
@@ -315,8 +319,7 @@ public class CodeGenerationServiceTests
         _sut.ValidateChecksum("PRD-0001-AB").Should().BeFalse();  // Multi-char checksum
     }
 
-    // ---------------- Error Handling ----------------
-
+    // ---------------- Error Handling: Repository exception returns failure ----------------
     [Fact]
     public async Task GenerateCode_WhenRepositoryThrows_ReturnsFailure()
     {
@@ -332,6 +335,7 @@ public class CodeGenerationServiceTests
         result.Error.Should().Contain("Database connection failed");
     }
 
+    // ---------------- Error Handling: Invalid version returns failure ----------------
     [Fact]
     public async Task GenerateCode_WithInvalidVersion_ReturnsFailure()
     {

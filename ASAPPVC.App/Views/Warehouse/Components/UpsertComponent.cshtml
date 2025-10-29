@@ -1,4 +1,4 @@
-﻿@model ASAPPVC.App.Models.ComponentFormVm
+@model ASAPPVC.App.Models.ComponentFormVm
 @{
 	var isEdit = Model?.IsEdit == true;
 	ViewData["Title"] = isEdit ? "Edit Component" : "Add New Component";
@@ -11,6 +11,7 @@
 }
 
 @section Styles {
+	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
 }
 
@@ -109,7 +110,7 @@
 					</div>
 
 					<div class="form-actions">
-						<button type="submit" class="btn btn-primary bg-red-gradient">
+						<button type="submit" class="btn btn-primary">
 							@(isEdit ? "Save Changes" : "Save Component")
 						</button>
 						<button type="reset" class="btn btn-ghost">Reset</button>

@@ -1,100 +1,112 @@
-﻿@using ASAPPVC.App.Models
+@using ASAPPVC.App.Models
 @model ProductDetailVm
 @{
-	ViewData["Title"] = "View Product";
-	ProductDetailVm vm = Model!;
+    ViewData["Title"] = "View Product";
+    ProductDetailVm vm = Model!;
 
-	// Determine the image source, using a placeholder if no image exists.
-	var imgSrc = (vm != null && vm.HasImage && !string.IsNullOrWhiteSpace(vm.ImageUrl))
-		? vm.ImageUrl
-		: "/Assets/Images/placeholder.png";
+    // Determine the image source, using a placeholder if no image exists.
+    var imgSrc = (vm != null && vm.HasImage && !string.IsNullOrWhiteSpace(vm.ImageUrl))
+        ? vm.ImageUrl
+        : "/Assets/Images/placeholder.png";
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/warehouse/products/ViewProduct.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/warehouse/products/ViewProduct.css" asp-append-version="true" />
 }
 
-<div class="viewport">
-	<div class="view-container">
-		<div class="header-section">
-+ 			@{ ViewData["BackText"] = "Back"; }
-+ 			@await Html.PartialAsync("_BackButton")
-			<h2 class="main-title">@vm!.Name</h2>
-		</div>
+<div class="page">
+    @{ ViewData["BackText"] = "Back"; }
+    @await Html.PartialAsync("_BackButton")
 
-		<div class="details-layout-grid">
-			<!-- Image Column -->
-			<div class="image-col">
-				<div class="image-box">
-					<img src="@imgSrc" alt="Product Image" />
-				</div>
-			</div>
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">@vm!.Name</h1>
+                <p class="card-subtitle">Product details and cost breakdown.</p>
+            </div>
+            <div class="card-actions">
+                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="ManageProducts">Back to Products</a>
+            </div>
+        </header>
 
-			<!-- Details Column -->
-			<div class="info-col">
-				<div class="info-pair">
-					<div class="label">Product Price</div>
-					<div class="value price">@vm.Price.ToString("C")</div>
-				</div>
-				<div class="info-pair">
-					<div class="label">Description</div>
-					<div class="value">@(string.IsNullOrEmpty(vm.Description) ? "No description provided." : vm.Description)</div>
-				</div>
-			</div>
-		</div>
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <div class="details-layout-grid">
+                    <!-- Image Column -->
+                    <div class="image-col">
+                        <div class="image-box">
+                            <img src="@imgSrc" alt="Product Image" />
+                        </div>
+                    </div>
 
-		<!-- Components in this Product -->
-		<section class="parts-section">
-			<h3>Components in this Product</h3>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Component Name</th>
-						<th class="align-right" style="width:120px;">Quantity</th>
-						<th class="align-right" style="width:140px;">Unit Price</th>
-						<th class="align-right" style="width:140px;">Subtotal</th>
-					</tr>
-				</thead>
-				<tbody>
-					@if (vm.Components != null && vm.Components.Any())
-					{
-						decimal grandTotal = 0;
-						foreach (var line in vm.Components)
-						{
-							var unitCost = line.UnitCost;
-							var subtotal = unitCost * line.Quantity;
-							grandTotal += subtotal;
-							<tr>
-								<td>@line.ComponentName</td>
-								<td class="align-right">@line.Quantity</td>
-								<td class="align-right">@unitCost.ToString("C")</td>
-								<td class="align-right">@subtotal.ToString("C")</td>
-							</tr>
-						}
-						<tr class="grand-total-row">
-							<td colspan="3" class="align-right">Total Cost of Components:</td>
-							<td class="align-right">@grandTotal.ToString("C")</td>
-						</tr>
-					}
-					else
-					{
-						<tr>
-							<td colspan="4" style="text-align:center; padding:24px; color: var(--text-muted);">
-								No Components are linked to this product.
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</section>
+                    <!-- Details Column -->
+                    <div class="info-col">
+                        <div class="info-pair">
+                            <div class="label">Product Price</div>
+                            <div class="value price">@vm.Price.ToString("C")</div>
+                        </div>
+                        <div class="info-pair">
+                            <div class="label">Description</div>
+                            <div class="value">@(string.IsNullOrEmpty(vm.Description) ? "No description provided." : vm.Description)</div>
+                        </div>
+                    </div>
+                </div>
 
-		<!-- Footer Actions -->
-		<div class="actions">
-			<a class="btn btn-primary"
-			   asp-area="Warehouse"
-			   asp-controller="Products"
-			   asp-action="EditProduct"
-			   asp-route-id="@vm.Id">Edit Product</a>
-		</div>
-	</div>
+                <!-- Components in this Product -->
+                <section class="parts-section">
+                    <h3>Components in this Product</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Component Name</th>
+                                <th class="align-right" style="width:120px;">Quantity</th>
+                                <th class="align-right" style="width:140px;">Unit Price</th>
+                                <th class="align-right" style="width:140px;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (vm.Components != null && vm.Components.Any())
+                            {
+                                decimal grandTotal = 0;
+                                foreach (var line in vm.Components)
+                                {
+                                    var unitCost = line.UnitCost;
+                                    var subtotal = unitCost * line.QuantityRequired;
+                                    grandTotal += subtotal;
+                                    <tr>
+                                        <td>@line.ComponentName</td>
+                                        <td class="align-right">@line.QuantityRequired</td>
+                                        <td class="align-right">@unitCost.ToString("C")</td>
+                                        <td class="align-right">@subtotal.ToString("C")</td>
+                                    </tr>
+                                }
+                                <tr class="grand-total-row">
+                                    <td colspan="3" class="align-right">Total Cost of Components:</td>
+                                    <td class="align-right">@grandTotal.ToString("C")</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align:center; padding:24px; color: var(--text-muted);">
+                                        No Components are linked to this product.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Footer Actions -->
+                <div class="actions">
+                    <a class="btn btn-primary"
+                       asp-area="Warehouse"
+                       asp-controller="Products"
+                       asp-action="EditProduct"
+                       asp-route-id="@vm.Id">Edit Product</a>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,57 @@
+/* Professional form enhancements: cohesive spacing, focus states, readable grouping */
+
+/* Layout helpers around existing structure */
+.card-body .fields-panel { gap: 22px; }
+.form-grid { gap: 20px 18px; }
+.form-field.full, .group.full-width { grid-column: 1 / -1; }
+
+/* Labels */
+.label { font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: .01em; }
+
+/* Inputs */
+.input, select.input, textarea.input {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.28);
+  color: #fff;
+  border-radius: 10px;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.input:hover, select.input:hover, textarea.input:hover { border-color: rgba(255,255,255,.42); }
+.input:focus, select.input:focus, textarea.input:focus { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); box-shadow: 0 0 0 3px rgba(255,255,255,.10); }
+textarea.input { min-height: 110px; padding: 12px; }
+
+/* Validation */
+.validation-summary { margin: 8px 0 0 0; color: #ffd1d1; }
+.field-error { color: #ffd1d1; font-size: 12px; }
+
+/* Sections and cards */
+.parts-card, .products-card, .wizard .card {
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.15);
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgba(0,0,0,.22);
+}
+.parts-header { margin-bottom: 12px; }
+.parts-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+
+/* Tables */
+.table, .parts-table { width: 100%; border-collapse: collapse; }
+.table th, .table td, .parts-table th, .parts-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,.18); }
+.table thead th, .parts-table thead th { background: rgba(255,255,255,.08); color: #fff; font-weight: 700; font-size: 13px; }
+
+/* Buttons */
+.btn { border-radius: 999px; padding: 10px 18px; font-weight: 800; }
+.btn-primary { background: linear-gradient(90deg, #ff5252, #ff6b6b); border: none; box-shadow: 0 8px 22px rgba(255,82,82,.35); }
+.btn-primary:hover { filter: brightness(1.08); box-shadow: 0 12px 28px rgba(255,82,82,.45); }
+.btn-ghost { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.22); }
+.btn-ghost:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.34); }
+
+/* Image upload blocks */
+.image-box, .dropzone { border: 1px dashed rgba(255,255,255,.28); background: rgba(255,255,255,.06); }
+.image-box:hover, .dropzone:hover { border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.10); }
+
+/* Wizard footer alignment */
+.wizard .footer { display: flex; justify-content: center; gap: 12px; }
+
+/* Responsive refinements */
+@media (max-width: 960px) { .card-body { flex-wrap: wrap; } }
