@@ -39,7 +39,8 @@
                             <div class="image-box" onclick="document.getElementById('imageFile').click();">
                                 <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
                             </div>
-                            <button type="button" class="btn btn-ghost" onclick="document.getElementById('imageFile').click();">Upload Image</button>
+                            <!-- CHANGED: Updated button class from btn-ghost to btn-primary for styling -->
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
                             <input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
                         </section>
 
@@ -95,8 +96,6 @@
                             </table>
                         </div>
                     </section>
-
-                   
                 </div>
             </div>
         </form>
@@ -126,13 +125,12 @@
             const addRowBtn = document.getElementById('addRowBtn');
             const grandEl = document.getElementById('grandTotal');
 
-            // Serialize server-side components into JS array (ids are GUID strings)
             const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(components ?? new List<ASAPPVC.UI.Models.ComponentListVm>()));
 
             const formatMoney = (n) => `R ${Number(n || 0).toFixed(2)}`;
 
             function updateTotals() {
-                let grandTotal =0;
+                let grandTotal = 0;
                 Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
                     const sel = tr.querySelector('.part-select');
                     const qtyInput = tr.querySelector('.qty-input');
@@ -141,7 +139,7 @@
 
                     if (!sel || !qtyInput || !unitPriceCell || !subtotalCell) return;
 
-                    const selectedPartId = sel.value; // GUID string or empty
+                    const selectedPartId = sel.value;
                     const quantity = parseFloat(qtyInput.value) || 0;
                     const part = partsData.find(p => p.Id === selectedPartId);
 
@@ -162,7 +160,6 @@
             function renumberIndexes() {
                 Array.from(tbody.querySelectorAll('tr')).forEach((tr, i) => {
                     tr.querySelectorAll('[name]').forEach(input => {
-                        // Replace any numeric index inside brackets with the new index
                         input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
                     });
                 });
@@ -188,7 +185,10 @@
                     <td class="align-right subtotal">R0.00</td>
                     <td style="text-align:center;">
                         <button type="button" class="btn btn-remove">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="002020" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M6.285.22a.75.750011.06.06L8.942.02l3.72-.72a.75.75001.98.98l-.723.722.021.59a.75.75001-1.061.06L11.068.94l-3.72.72a.75.75001-.98-.98l.72-3.72L2.224.94A.75.750013.283.88l3.005-3.665z" clip-rule="evenodd"/></svg>
+                            <!-- CHANGED: Replaced the old SVG with a trash can icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                     </td>
                 `;
@@ -211,7 +211,6 @@
                 updateTotals();
             });
 
-            // Add one row to start with when the page loads (only if there are components to select)
             if (Array.isArray(partsData) && partsData.length > 0) {
                 createRow();
                 updateTotals();
