@@ -32,34 +32,6 @@
 
             <div class="card-body">
                 <div class="form-layout-grid">
-                    <!-- Left: Large parts table -->
-                    <section>
-                        <div class="parts-card">
-                            <div class="parts-header">
-                                <h3>Components in this Product</h3>
-                                <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
-                            </div>
-                            <table class="parts-table" id="partsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Part</th>
-                                        <th style="width:100px; text-align:center;">Quantity</th>
-                                        <th class="align-right" style="width:120px;">Unit Price</th>
-                                        <th class="align-right" style="width:120px;">Subtotal</th>
-                                        <th style="width:60px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="partsTbody"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="align-right">Grand Total:</td>
-                                        <td class="align-right grand-total" id="grandTotal">R0.00</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </section>
 
                     <!-- Right: Image on top, fields beneath -->
                     <section class="fields-panel">
@@ -94,6 +66,37 @@
                             <button type="reset" class="btn btn-ghost">Reset</button>
                         </div>
                     </section>
+
+                    <!-- Left: Large parts table -->
+                    <section>
+                        <div class="parts-card">
+                            <div class="parts-header">
+                                <h3>Components in this Product</h3>
+                                <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
+                            </div>
+                            <table class="parts-table" id="partsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Part</th>
+                                        <th style="width:100px; text-align:center;">Quantity</th>
+                                        <th class="align-right" style="width:120px;">Unit Price</th>
+                                        <th class="align-right" style="width:120px;">Subtotal</th>
+                                        <th style="width:60px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="partsTbody"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="align-right">Grand Total:</td>
+                                        <td class="align-right grand-total" id="grandTotal">R0.00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </section>
+
+                   
                 </div>
             </div>
         </form>

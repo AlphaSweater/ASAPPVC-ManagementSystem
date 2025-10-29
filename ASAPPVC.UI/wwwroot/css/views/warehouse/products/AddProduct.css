@@ -65,7 +65,7 @@ html, body { height: 100%; }
 /* ---------- Form Grid Layout ---------- */
 .form-layout-grid {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr 4fr;
     gap: 28px;
     align-items: start;
 }
@@ -133,7 +133,18 @@ select.input option {
 /* ---------- Image Upload ---------- */
 .image-upload-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px; }
 
-.image-box { width: 220px; aspect-ratio: 1 / 1; border-radius: 14px; border: 1px dashed rgba(255,255,255,.28); background: rgba(255,255,255,.06); display: grid; place-items: center; overflow: hidden; cursor: pointer; transition: background .2s, border-color .2s, box-shadow .2s; }
+.image-box { 
+    width: 220px; 
+    aspect-ratio: 1 / 1; 
+    border-radius: 14px; 
+    border: 1px dashed rgba(255,255,255,.28); 
+    background: rgba(255,255,255,.06); 
+    display: grid; 
+    place-items: center; 
+    overflow: hidden; 
+    cursor: pointer; 
+    transition: background .2s, border-color .2s, box-shadow .2s; }
+
 .image-box:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255,255,255,.42);
