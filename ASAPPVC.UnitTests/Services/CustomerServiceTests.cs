@@ -4,6 +4,10 @@ using ASAPPVC.UI.Services;
 using ASAPPVC.UI.ViewModels.Customer;
 using FluentAssertions;
 using Moq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace ASAPPVC.UnitTests.Services
 {
@@ -30,11 +34,13 @@ namespace ASAPPVC.UnitTests.Services
                 Company = " Co "
             };
 
+            // Return the same CustomerModel that the service passes into AddAsync
             _repo.Setup(r => r.AddAsync(It.IsAny<CustomerModel>(), It.IsAny<CancellationToken>()))
-                 .Returns(Task.CompletedTask);
+                 .Returns((CustomerModel c, CancellationToken ct) => Task.FromResult(c));
 
+            // SaveAsync returns an int (rows affected) -> return a completed int task
             _repo.Setup(r => r.SaveAsync(It.IsAny<CancellationToken>()))
-                 .Returns(Task.CompletedTask);
+                 .ReturnsAsync(1);
 
             // Act
             var (ok, error, customer) = await _sut.CreateAsync(vm);
