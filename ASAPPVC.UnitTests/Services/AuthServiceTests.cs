@@ -1,7 +1,6 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Auth;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

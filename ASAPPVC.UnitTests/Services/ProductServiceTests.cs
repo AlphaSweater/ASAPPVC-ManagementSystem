@@ -1,7 +1,6 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using FluentAssertions;
 using Moq;
 

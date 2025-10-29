@@ -1,7 +1,5 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Enums;
-using ASAPPVC.UI.Repositories;
+﻿using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +29,7 @@ namespace ASAPPVC.UnitTests.Repositories
             var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", Name = "Panel", Price = 10m, Description = "Desc" };
 
             var pc = new ProductComponent { ComponentId = comp.Id, ProductId = product.Id, QuantityRequired = 2m, Unit = Unit.Piece };
-            
+
             // set navigation properties so EF will wire them if tracked
             product.ProductComponents = new List<ProductComponent> { pc };
             pc.Component = comp;

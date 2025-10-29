@@ -1,7 +1,6 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using FluentAssertions;
 using Moq;
 
@@ -40,7 +39,7 @@ namespace ASAPPVC.UnitTests.Services
             };
 
             _customers.Setup(c => c.GetByIdAsync(vm.CustomerId, true, It.IsAny<System.Threading.CancellationToken>()))
-                      .ReturnsAsync((CustomerModel?)null);
+                      .ReturnsAsync((Customer?)null);
 
             var res = await _sut.CreateAsync(vm);
             res.Ok.Should().BeFalse();

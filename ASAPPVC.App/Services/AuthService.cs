@@ -1,5 +1,4 @@
 ﻿using ASAPPVC.App.Models;
-using ASAPPVC.App.Repositories;
 using ASAPPVC.App.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
 
@@ -25,13 +24,10 @@ namespace ASAPPVC.App.Services
 
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        private readonly IUserRepository _userRepository;
-
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserRepository userRepository)
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _userRepository = userRepository;
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

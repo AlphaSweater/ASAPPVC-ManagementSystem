@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
+﻿using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

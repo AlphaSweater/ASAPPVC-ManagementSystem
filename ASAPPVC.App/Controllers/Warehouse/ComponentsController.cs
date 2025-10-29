@@ -43,36 +43,53 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
         // GET /Warehouse/Components/details/{identifier}
         // {identifier} may be a GUID (Id) or a human-friendly code (ComponentCode).
+        // If both id and code are provided, id takes precedence for lookup.
         [HttpGet("Details/{identifier}")]
-        public async Task<IActionResult> Details(string identifier, CancellationToken ct)
+        public async Task<IActionResult> Details(string identifier, [FromQuery] Guid? id, CancellationToken ct)
         {
             identifier = (identifier ?? string.Empty).Trim();
+            
+            // Prioritize the query parameter id if provided
+            if (id.HasValue)
+            {
+                var result = await _components.GetDetailAsync(id: id.Value, code: null, ct: ct);
+                if (!result.Ok || result.Value is null)
+                    return GoIndexWithError(result.Error ?? "Component not found.");
+
+                return View(DetailsViewName, result.Value);
+            }
+            
+            // Fall back to identifier parsing
             if (identifier.Length == 0)
                 return GoIndexWithError("Component not found.");
 
-            var isGuid = Guid.TryParse(identifier, out var id);
-            var result = await _components.GetDetailAsync(
-                id: isGuid ? id : null,
+            var isGuid = Guid.TryParse(identifier, out var parsedId);
+            var lookupResult = await _components.GetDetailAsync(
+                id: isGuid ? parsedId : null,
                 code: isGuid ? null : identifier,
                 ct: ct
             );
 
-            if (!result.Ok || result.Value is null)
-                return GoIndexWithError(result.Error ?? "Component not found.");
+            if (!lookupResult.Ok || lookupResult.Value is null)
+                return GoIndexWithError(lookupResult.Error ?? "Component not found.");
 
-            return View(DetailsViewName, result.Value);
+            return View(DetailsViewName, lookupResult.Value);
         }
 
         // GET /Warehouse/Components/AddNew         -> create
-        // GET /Warehouse/Components/Edit/{code}    -> edit by code
+        // GET /Warehouse/Components/Edit/{code}?id={guid}    -> edit by code (with optional id for validation)
         [HttpGet("AddNew")]
         [HttpGet("Edit/{code}")]
-        public async Task<IActionResult> Upsert(string? code, CancellationToken ct)
+        public async Task<IActionResult> Upsert(string? code, [FromQuery] Guid? id, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(code))
                 return View(UpsertViewName, new ComponentFormVm());
 
-            var result = await _components.GetFormAsync(code: code.Trim(), ct: ct);
+            // Prioritize id lookup if provided, otherwise use code
+            var result = id.HasValue
+                ? await _components.GetFormAsync(id: id.Value, ct: ct)
+                : await _components.GetFormAsync(code: code.Trim(), ct: ct);
+ 
             if (!result.Ok || result.Value is null)
                 return GoIndexWithError(result.Error ?? "Component not found.");
 

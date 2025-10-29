@@ -1,70 +1,107 @@
-@model ASAPPVC.App.Models.ComponentDetailVm
+@using ASAPPVC.App.Models;
+@model ComponentDetailVm
 @{
-    ViewData["Title"] = "View Component";
-    var vm = Model;
+	ViewData["Title"] = "Component Details";
 
-    // Determine the image source, using a placeholder if no image exists.
-    var imgSrc = (vm != null && vm.HasImage && !string.IsNullOrWhiteSpace(vm.ImageUrl))
-        ? vm.ImageUrl
-        : "/Assets/Images/placeholder.png";
+	// Determine the image source, using a placeholder if no image exists.
+	var imageSource = (Model != null && Model.HasImage && !string.IsNullOrWhiteSpace(Model.ImageUrl))
+		? Model.ImageUrl
+		: "/Assets/Images/placeholder.png";
+
+	// Calculate total stock value
+	var totalStockValue = Model != null ? (Model.UnitCost * Model.CurrentAmount) : 0m;
+	
+	// Determine the identifier for URLs - prefer code for readability, fallback to ID
+	var urlIdentifier = !string.IsNullOrWhiteSpace(Model?.ComponentCode) 
+		? Model.ComponentCode 
+		: Model?.Id.ToString() ?? string.Empty;
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/views/warehouse/components/ViewComponent.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/components/ViewComponent.css" asp-append-version="true" />
 }
 
 <div class="page">
-    @{ ViewData["BackText"] = "Back"; }
-    @await Html.PartialAsync("_BackButton")
+	@{
+		ViewData["BackText"] = "Back";
+	}
+	@await Html.PartialAsync("_BackButton")
 
-    <div role="region" aria-labelledby="page-title">
-        <header class="card-header">
-            <div>
-                <h1 id="page-title" class="card-title">@vm?.Name</h1>
-                <p class="card-subtitle">Component details and stock info.</p>
-            </div>
-            <div class="card-actions">
-                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Components" asp-action="ManageComponents">Back to Components</a>
-            </div>
-        </header>
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@Model?.Name</h1>
+				<p class="card-subtitle">Component details and stock info.</p>
+			</div>
+			<div class="card-actions">
+				<a class="btn btn-ghost"
+				   asp-area="Warehouse"
+				   asp-controller="Components"
+				   asp-action="Index">
+					Back to Components
+				</a>
+			</div>
+		</header>
 
-        <div class="card-body">
-            <section class="fields-panel" style="width:100%">
-                <div class="details-layout-grid">
-                    <!-- Image Column -->
-                    <div class="image-col">
-                        <div class="image-box">
-                            <img src="@imgSrc" alt="Component Image" />
-                        </div>
-                    </div>
+		<div class="card-body">
+			<section class="fields-panel" style="width:100%">
+				<div class="details-layout-grid">
+					<!-- Image Column -->
+					<div class="image-col">
+						<div class="image-box">
+							<img src="@imageSource" alt="@Model?.Name Component Image" />
+						</div>
+					</div>
 
-                    <!-- Details Column -->
-                    <div class="info-grid">
-                        <div class="info-pair">
-                            <div class="label">Storage Location</div>
-                            <div class="value">@vm?.StorageLocation</div>
-                        </div>
-                        <div class="info-pair">
-                            <div class="label">Current Stock</div>
-                            <div class="value">@vm?.CurrentAmount</div>
-                        </div>
-                        <div class="info-pair">
-                            <div class="label">Cost Per Unit</div>
-                            <div class="value">@(vm != null ? vm.UnitCost.ToString("C") : string.Empty)</div>
-                        </div>
-                        <div class="info-pair">
-                            <div class="label">Total Stock Value</div>
-                            <div class="value">@(vm != null ? (vm.UnitCost * vm.CurrentAmount).ToString("C") : string.Empty)</div>
-                        </div>
-                    </div>
-                </div>
+					<!-- Details Column -->
+					<div class="info-grid">
+						<div class="info-pair">
+							<div class="label">Component Code</div>
+							<div class="value">@Model?.ComponentCode</div>
+						</div>
+						<div class="info-pair">
+							<div class="label">Unit of Measurement</div>
+							<div class="value">@Model?.Unit</div>
+						</div>
+						<div class="info-pair">
+							<div class="label">Storage Location</div>
+							<div class="value">@Model?.StorageLocation</div>
+						</div>
+						<div class="info-pair">
+							<div class="label">Current Stock</div>
+							<div class="value">@Model?.CurrentAmount</div>
+						</div>
+						<div class="info-pair">
+							<div class="label">Cost Per Unit</div>
+							<div class="value">@(Model?.UnitCost.ToString("C") ?? string.Empty)</div>
+						</div>
+						<div class="info-pair">
+							<div class="label">Total Stock Value</div>
+							<div class="value">@totalStockValue.ToString("C")</div>
+						</div>
+						@if (Model?.UsedInProductsCount > 0)
+						{
+							<div class="info-pair">
+								<div class="label">Used in Products</div>
+								<div class="value">@Model.UsedInProductsCount product(s)</div>
+							</div>
+						}
+					</div>
+				</div>
 
-                <!-- Footer Actions -->
-                <div class="actions">
-                    <a class="btn btn-primary" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@vm?.Id">Edit Component</a>
-                </div>
-            </section>
-        </div>
-    </div>
+				<!-- Footer Actions -->
+				<div class="actions">
+					<a class="btn btn-primary"
+					   asp-area="Warehouse"
+					   asp-controller="Components"
+					   asp-action="Edit"
+					   asp-route-code="@urlIdentifier"
+					   asp-route-id="@Model?.Id">
+						Edit Component
+					</a>
+				</div>
+			</section>
+		</div>
+	</div>
 </div>

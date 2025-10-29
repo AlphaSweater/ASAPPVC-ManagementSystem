@@ -1,13 +1,9 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Customer;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Customer;
 using FluentAssertions;
 using Moq;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ASAPPVC.UnitTests.Services
 {
@@ -36,8 +32,8 @@ namespace ASAPPVC.UnitTests.Services
             };
 
             // Return the same CustomerModel that the service passes into AddAsync
-            _repo.Setup(r => r.AddAsync(It.IsAny<CustomerModel>(), It.IsAny<CancellationToken>()))
-                 .Returns((CustomerModel c, CancellationToken ct) => Task.FromResult(c));
+            _repo.Setup(r => r.AddAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()))
+                 .Returns((Customer c, CancellationToken ct) => Task.FromResult(c));
 
             // SaveAsync returns an int (rows affected) -> return a completed int task
             _repo.Setup(r => r.SaveAsync(It.IsAny<CancellationToken>()))
@@ -61,7 +57,7 @@ namespace ASAPPVC.UnitTests.Services
         public async Task ListAsync_ReturnsRepositoryList()
         {
             // Arrange
-            var list = new List<CustomerModel> { new CustomerModel { Id = System.Guid.NewGuid(), Name = "A", Surname = "B" } };
+            var list = new List<Customer> { new Customer { Id = System.Guid.NewGuid(), Name = "A", Surname = "B" } };
             _repo.Setup(r => r.ListAsync(It.IsAny<System.Threading.CancellationToken>())).ReturnsAsync(list);
 
             // Act
