@@ -1,219 +1,219 @@
 @using ASAPPVC.App.Models
-@model ASAPPVC.App.Models.ProductFormVm
+@model ProductFormVm
 @{
-    ViewData["Title"] = "Add New Product";
-    var components = ViewData["Components"] as List<ASAPPVC.UI.Models.ComponentListVm>;
+	ViewData["Title"] = "Add New Product";
+	var components = ViewData["Components"] as List<ComponentListVm>;
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/views/warehouse/products/AddProduct.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/products/AddProduct.css" asp-append-version="true" />
 }
 
 <div class="page">
-    @await Html.PartialAsync("_BackButton")
+	@await Html.PartialAsync("_BackButton")
 
-    <div role="region" aria-labelledby="page-title">
-        <header class="card-header">
-            <div>
-                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-                <p class="card-subtitle">Create a new product, set price and link components.</p>
-            </div>
-            <div class="card-actions">
-                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="ManageProducts">Products</a>
-            </div>
-        </header>
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Create a new product, set price and link components.</p>
+			</div>
+			<div class="card-actions">
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="ManageProducts">Products</a>
+			</div>
+		</header>
 
-        <div class="validation-summary" asp-validation-summary="ModelOnly"></div>
+		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-        <form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct" method="post" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
+		<form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct" method="post" enctype="multipart/form-data">
+			@Html.AntiForgeryToken()
 
-            <div class="card-body add-product-body">
-                <!-- Top Section: Image and Form Fields Side by Side -->
-                <div class="form-layout">
-                    <!-- Left: Image Upload -->
-                    <div class="form-image">
-                        <div class="image-box" onclick="document.getElementById('imageFile').click();">
-                            <img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
-                        <input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
-                    </div>
+			<div class="card-body add-product-body">
+				<!-- Top Section: Image and Form Fields Side by Side -->
+				<div class="form-layout">
+					<!-- Left: Image Upload -->
+					<div class="form-image">
+						<div class="image-box" onclick="document.getElementById('imageFile').click();">
+							<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Product Image Preview" />
+						</div>
+						<button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
+						<input id="imageFile" name="ImageFile" type="file" accept="image/*" class="hidden-file-input" />
+					</div>
 
-                    <!-- Right: Form Fields -->
-                    <div class="form-fields">
-                        <div class="form-field">
-                            <label asp-for="Name" class="label"></label>
-                            <input asp-for="Name" class="input" placeholder="Enter product name" />
-                            <span asp-validation-for="Name" class="field-error"></span>
-                        </div>
-                        <div class="form-field">
-                            <label asp-for="Price" class="label"></label>
-                            <input asp-for="Price" class="input" step="0.01" placeholder="e.g. R299.99" />
-                            <span asp-validation-for="Price" class="field-error"></span>
-                        </div>
-                        <div class="form-field">
-                            <label asp-for="Description" class="label"></label>
-                            <textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
-                            <span asp-validation-for="Description" class="field-error"></span>
-                        </div>
-                    </div>
-                </div>
+					<!-- Right: Form Fields -->
+					<div class="form-fields">
+						<div class="form-field">
+							<label asp-for="Name" class="label"></label>
+							<input asp-for="Name" class="input" placeholder="Enter product name" />
+							<span asp-validation-for="Name" class="field-error"></span>
+						</div>
+						<div class="form-field">
+							<label asp-for="Price" class="label"></label>
+							<input asp-for="Price" class="input" step="0.01" placeholder="e.g. R299.99" />
+							<span asp-validation-for="Price" class="field-error"></span>
+						</div>
+						<div class="form-field">
+							<label asp-for="Description" class="label"></label>
+							<textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
+							<span asp-validation-for="Description" class="field-error"></span>
+						</div>
+					</div>
+				</div>
 
-                <!-- Components Table -->
-                <div class="components-section">
-                    <div class="parts-card">
-                        <div class="parts-header">
-                            <h3>Components in this Product</h3>
-                            <button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
-                        </div>
-                        <table class="parts-table" id="partsTable">
-                            <thead>
-                                <tr>
-                                    <th>Part</th>
-                                    <th style="width:100px; text-align:center;">Quantity</th>
-                                    <th class="align-right" style="width:120px;">Unit Price</th>
-                                    <th class="align-right" style="width:120px;">Subtotal</th>
-                                    <th style="width:60px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="partsTbody"></tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="align-right">Grand Total:</td>
-                                    <td class="align-right grand-total" id="grandTotal">R0.00</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
+				<!-- Components Table -->
+				<div class="components-section">
+					<div class="parts-card">
+						<div class="parts-header">
+							<h3>Components in this Product</h3>
+							<button type="button" class="btn btn-primary btn-sm" id="addRowBtn">+ Add Part</button>
+						</div>
+						<table class="parts-table" id="partsTable">
+							<thead>
+								<tr>
+									<th>Part</th>
+									<th style="width:100px; text-align:center;">Quantity</th>
+									<th class="align-right" style="width:120px;">Unit Price</th>
+									<th class="align-right" style="width:120px;">Subtotal</th>
+									<th style="width:60px;"></th>
+								</tr>
+							</thead>
+							<tbody id="partsTbody"></tbody>
+							<tfoot>
+								<tr>
+									<td colspan="3" class="align-right">Grand Total:</td>
+									<td class="align-right grand-total" id="grandTotal">R0.00</td>
+									<td></td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
 
-                <!-- Form Actions at Bottom -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Save Product</button>
-                    <button type="reset" class="btn btn-ghost">Reset</button>
-                </div>
-            </div>
-        </form>
-    </div>
+				<!-- Form Actions at Bottom -->
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Save Product</button>
+					<button type="reset" class="btn btn-ghost">Reset</button>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 
 @section Scripts {
-    <script>
-        (function () {
-            // --- Image preview logic ---
-            const fileInput = document.getElementById('imageFile');
-            const preview = document.getElementById('previewImg');
-            if (fileInput) {
-                fileInput.addEventListener('change', function () {
-                    const f = this.files && this.files[0];
-                    if (!f) return;
-                    const reader = new FileReader();
-                    reader.onload = e => preview.src = e.target.result;
-                    reader.readAsDataURL(f);
-                });
-                const imgBox = document.querySelector('.image-box');
-                imgBox?.addEventListener('click', () => fileInput.click());
-            }
+	<script>
+		(function () {
+			// --- Image preview logic ---
+			const fileInput = document.getElementById('imageFile');
+			const preview = document.getElementById('previewImg');
+			if (fileInput) {
+				fileInput.addEventListener('change', function () {
+					const f = this.files && this.files[0];
+					if (!f) return;
+					const reader = new FileReader();
+					reader.onload = e => preview.src = e.target.result;
+					reader.readAsDataURL(f);
+				});
+				const imgBox = document.querySelector('.image-box');
+				imgBox?.addEventListener('click', () => fileInput.click());
+			}
 
-            // --- Parts dynamic table logic ---
-            const tbody = document.getElementById('partsTbody');
-            const addRowBtn = document.getElementById('addRowBtn');
-            const grandEl = document.getElementById('grandTotal');
+			// --- Parts dynamic table logic ---
+			const tbody = document.getElementById('partsTbody');
+			const addRowBtn = document.getElementById('addRowBtn');
+			const grandEl = document.getElementById('grandTotal');
 
-            const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(components ?? new List<ASAPPVC.UI.Models.ComponentListVm>()));
+			const partsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(components ?? new List<ComponentListVm>()));
 
-            const formatMoney = (n) => `R ${Number(n || 0).toFixed(2)}`;
+			const formatMoney = (n) => `R ${Number(n || 0).toFixed(2)}`;
 
-            function updateTotals() {
-                let grandTotal = 0;
-                Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-                    const sel = tr.querySelector('.part-select');
-                    const qtyInput = tr.querySelector('.qty-input');
-                    const unitPriceCell = tr.querySelector('.unit-price');
-                    const subtotalCell = tr.querySelector('.subtotal');
+			function updateTotals() {
+				let grandTotal = 0;
+				Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+					const sel = tr.querySelector('.part-select');
+					const qtyInput = tr.querySelector('.qty-input');
+					const unitPriceCell = tr.querySelector('.unit-price');
+					const subtotalCell = tr.querySelector('.subtotal');
 
-                    if (!sel || !qtyInput || !unitPriceCell || !subtotalCell) return;
+					if (!sel || !qtyInput || !unitPriceCell || !subtotalCell) return;
 
-                    const selectedPartId = sel.value;
-                    const quantity = parseFloat(qtyInput.value) || 0;
-                    const part = partsData.find(p => p.Id === selectedPartId);
+					const selectedPartId = sel.value;
+					const quantity = parseFloat(qtyInput.value) || 0;
+					const part = partsData.find(p => p.Id === selectedPartId);
 
-                    let unitPrice = 0;
-                    if (part) {
-                        unitPrice = Number(part.UnitCost) || 0;
-                    }
+					let unitPrice = 0;
+					if (part) {
+						unitPrice = Number(part.UnitCost) || 0;
+					}
 
-                    const subtotal = unitPrice * quantity;
-                    grandTotal += subtotal;
+					const subtotal = unitPrice * quantity;
+					grandTotal += subtotal;
 
-                    unitPriceCell.textContent = formatMoney(unitPrice);
-                    subtotalCell.textContent = formatMoney(subtotal);
-                });
-                grandEl.textContent = formatMoney(grandTotal);
-            }
+					unitPriceCell.textContent = formatMoney(unitPrice);
+					subtotalCell.textContent = formatMoney(subtotal);
+				});
+				grandEl.textContent = formatMoney(grandTotal);
+			}
 
-            function renumberIndexes() {
-                Array.from(tbody.querySelectorAll('tr')).forEach((tr, i) => {
-                    tr.querySelectorAll('[name]').forEach(input => {
-                        input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
-                    });
-                });
-            }
+			function renumberIndexes() {
+				Array.from(tbody.querySelectorAll('tr')).forEach((tr, i) => {
+					tr.querySelectorAll('[name]').forEach(input => {
+						input.name = input.name.replace(/\[\d+\]/g, `[${i}]`);
+					});
+				});
+			}
 
-            function createRow() {
-                const index = tbody.rows.length;
-                const tr = tbody.insertRow();
+			function createRow() {
+				const index = tbody.rows.length;
+				const tr = tbody.insertRow();
 
-                const optionsHtml = partsData.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('');
+				const optionsHtml = partsData.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('');
 
-                tr.innerHTML = `
-                    <td>
-                        <select name="Components[${index}].ComponentId" class="input part-select">
-                            <option value="">-- Select part --</option>
-                            ${optionsHtml}
-                        </select>
-                    </td>
-                    <td style="text-align:center;">
-                        <input class="input qty-input" type="number" name="Components[${index}].Quantity" value="1" min="0.01" step="0.01" />
-                    </td>
-                    <td class="align-right unit-price">R0.00</td>
-                    <td class="align-right subtotal">R0.00</td>
-                    <td style="text-align:center;">
-                        <button type="button" class="btn btn-remove">
-                            <!-- CHANGED: Replaced the old SVG with a trash can icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </td>
-                `;
+				tr.innerHTML = `
+					<td>
+						<select name="Components[${index}].ComponentId" class="input part-select">
+							<option value="">-- Select part --</option>
+							${optionsHtml}
+						</select>
+					</td>
+					<td style="text-align:center;">
+						<input class="input qty-input" type="number" name="Components[${index}].Quantity" value="1" min="0.01" step="0.01" />
+					</td>
+					<td class="align-right unit-price">R0.00</td>
+					<td class="align-right subtotal">R0.00</td>
+					<td style="text-align:center;">
+						<button type="button" class="btn btn-remove">
+							<!-- CHANGED: Replaced the old SVG with a trash can icon -->
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+								<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+							</svg>
+						</button>
+					</td>
+				`;
 
-                const sel = tr.querySelector('.part-select');
-                const qty = tr.querySelector('.qty-input');
-                const removeBtn = tr.querySelector('.btn-remove');
+				const sel = tr.querySelector('.part-select');
+				const qty = tr.querySelector('.qty-input');
+				const removeBtn = tr.querySelector('.btn-remove');
 
-                sel.addEventListener('change', updateTotals);
-                qty.addEventListener('input', updateTotals);
-                removeBtn.addEventListener('click', () => {
-                    tr.remove();
-                    renumberIndexes();
-                    updateTotals();
-                });
-            }
+				sel.addEventListener('change', updateTotals);
+				qty.addEventListener('input', updateTotals);
+				removeBtn.addEventListener('click', () => {
+					tr.remove();
+					renumberIndexes();
+					updateTotals();
+				});
+			}
 
-            addRowBtn.addEventListener('click', () => {
-                createRow();
-                updateTotals();
-            });
+			addRowBtn.addEventListener('click', () => {
+				createRow();
+				updateTotals();
+			});
 
-            if (Array.isArray(partsData) && partsData.length > 0) {
-                createRow();
-                updateTotals();
-            }
-        })();
-    </script>
+			if (Array.isArray(partsData) && partsData.length > 0) {
+				createRow();
+				updateTotals();
+			}
+		})();
+	</script>
 }

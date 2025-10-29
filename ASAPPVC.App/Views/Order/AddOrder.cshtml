@@ -4,88 +4,88 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Views/Order/AddOrder.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/Views/Order/AddOrder.css" asp-append-version="true" />
 }
 
 <div class="page">
-    @await Html.PartialAsync("_BackButton")
+	@await Html.PartialAsync("_BackButton")
 
-    <div role="region" aria-labelledby="page-title">
-        <header class="card-header">
-            <div>
-                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-                <p class="card-subtitle">Create a new customer order and add products with quantities.</p>
-            </div>
-            <div class="card-actions">
-                <a asp-action="ViewOrders" class="btn btn-ghost">📦 Orders</a>
-            </div>
-        </header>
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Create a new customer order and add products with quantities.</p>
+			</div>
+			<div class="card-actions">
+				<a asp-action="ViewOrders" class="btn btn-ghost">📦 Orders</a>
+			</div>
+		</header>
 
-        <div class="validation-summary" asp-validation-summary="ModelOnly"></div>
+		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-        <form id="add-order-form" asp-action="AddOrder" method="post">
-            @Html.AntiForgeryToken()
+		<form id="add-order-form" asp-action="AddOrder" method="post">
+			@Html.AntiForgeryToken()
 
-            <div class="card-body">
-                <section class="fields-panel" style="width:100%">
-                    <div class="form-grid">
-                        <div class="form-field full">
-                            <label class="label" for="customer-select">Customer</label>
-                            <select id="customer-select" name="customerId" class="input" required>
-                                <option value="">-- Choose a customer --</option>
-                                @foreach (var c in customers)
-                                {
-                                    <option value="@c.Id">@c.Name @c.Surname (@c.Email)</option>
-                                }
-                            </select>
-                        </div>
+			<div class="card-body">
+				<section class="fields-panel" style="width:100%">
+					<div class="form-grid">
+						<div class="form-field full">
+							<label class="label" for="customer-select">Customer</label>
+							<select id="customer-select" name="customerId" class="input" required>
+								<option value="">-- Choose a customer --</option>
+								@foreach (var customer in Model.AvailableCustomers)
+								{
+									<option value="@customer.Id">@customer.Name @customer.Surname (@customer.Email)</option>
+								}
+							</select>
+						</div>
 
-                        <div class="form-field full">
-                            <label class="label">Add Products to Order</label>
-                            <div class="add-product-section">
-                                <div class="form-field half">
-                                    <select id="product-select" class="input">
-                                        <option value="">-- Select a product --</option>
-                                        @foreach (var p in products)
-                                        {
-                                            <option value="@p.Id" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="form-field half">
-                                    <input id="quantity-input" type="number" class="input quantity-input" value="1" min="1" aria-label="Quantity">
-                                </div>
-                                <button type="button" id="add-product-btn" class="btn btn-primary">Add</button>
-                            </div>
-                        </div>
+						<div class="form-field full">
+							<label class="label">Add Products to Order</label>
+							<div class="add-product-section">
+								<div class="form-field half">
+									<select id="product-select" class="input">
+										<option value="">-- Select a product --</option>
+										@foreach (var product in Model.AvailableProducts)
+										{
+											<option value="@product.Id" data-price="@product.Price.ToString("F2")" data-name="@product.Name">@product.Name — @product.Price.ToString("C")</option>
+										}
+									</select>
+								</div>
+								<div class="form-field half">
+									<input id="quantity-input" type="number" class="input quantity-input" value="1" min="1" aria-label="Quantity">
+								</div>
+								<button type="button" id="add-product-btn" class="btn btn-primary">Add</button>
+							</div>
+						</div>
 
-                        <div class="form-field full">
-                            <div id="order-items-hidden-inputs"></div>
-                            <div id="order-items-container"></div>
-                        </div>
+						<div class="form-field full">
+							<div id="order-items-hidden-inputs"></div>
+							<div id="order-items-container"></div>
+						</div>
 
-                        <div class="form-field half">
-                            <label class="label" for="status-select">Status</label>
-                            <select id="status-select" name="orderStatus" class="input">
-                                <option>Pending</option>
-                                <option>Processing</option>
-                                <option>Completed</option>
-                                <option>Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
+						<div class="form-field half">
+							<label class="label" for="status-select">Status</label>
+							<select id="status-select" name="orderStatus" class="input">
+								<option>Pending</option>
+								<option>Processing</option>
+								<option>Completed</option>
+								<option>Cancelled</option>
+							</select>
+						</div>
+					</div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Create Order</button>
-                        <a asp-action="ViewOrders" class="btn btn-ghost">Back to List</a>
-                    </div>
-                </section>
-            </div>
-        </form>
-    </div>
+					<div class="form-actions">
+						<button type="submit" class="btn btn-primary">Create Order</button>
+						<a asp-action="ViewOrders" class="btn btn-ghost">Back to List</a>
+					</div>
+				</section>
+			</div>
+		</form>
+	</div>
 </div>
 
 @section Scripts {
-    <script src="~/Views/Order/AddOrder.js"></script>
+	<script src="~/Views/Order/AddOrder.js"></script>
 }
