@@ -70,7 +70,7 @@ jobs:
             /d:sonar.exclusions="**/wwwroot/**,**/*.generated.cs,**/bin/**,**/obj/**"
 
       # One pass: restore+build+test (parallel) + coverage + TRX
-      - name: ✅ Test (parallel) with coverage
+      - name: 🧪 Build & Run Tests
         run: |
           dotnet test --configuration Release \
             --logger "trx;LogFileName=tests.trx" \
