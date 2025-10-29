@@ -35,7 +35,7 @@ namespace ASAPPVC.UI.Models
     /// Unified form view model used when adding or editing a product line in an order.
     /// If <see cref="OrderProductId"/> is null → Add; if it has value → Edit.
     /// </summary>
-    public sealed class OrderProductFormVm : IValidatableObject
+    public sealed class OrderProductFormVm
     {
         [Display(Name = "Product")]
         [Required(ErrorMessage = "Product is required.")]
@@ -53,11 +53,5 @@ namespace ASAPPVC.UI.Models
 
         // Mark for removal (for edit mode)
         public bool Remove { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            // Ensure quantity makes sense
-            // (Validation for Quantity <= 0 is already enforced by the [Range] attribute)
-        }
     }
 }
