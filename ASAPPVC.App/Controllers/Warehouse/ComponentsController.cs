@@ -30,7 +30,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
             return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value));
         }
 
-        // GET /Warehouse/Components/search?term=...
+        // GET /Warehouse/Components/Search?term=...
         [HttpGet("Search")]
         public async Task<IActionResult> Search([FromQuery] string? term, CancellationToken ct)
         {
@@ -41,88 +41,95 @@ namespace ASAPPVC.App.Controllers.Warehouse
             return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value, searchQuery: term));
         }
 
-        // GET /Warehouse/Components/details/{identifier}
-        // {identifier} may be a GUID (Id) or a human-friendly code (ComponentCode).
-        // If both id and code are provided, id takes precedence for lookup.
-        [HttpGet("Details/{identifier}")]
-        public async Task<IActionResult> Details(string identifier, [FromQuery] Guid? id, CancellationToken ct)
+        // GET /Warehouse/Components/View/{id:guid}
+        [HttpGet("View/{id:guid}")]
+        public async Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
         {
-            identifier = (identifier ?? string.Empty).Trim();
-            
-            // Prioritize the query parameter id if provided
-            if (id.HasValue)
-            {
-                var result = await _components.GetDetailAsync(id: id.Value, code: null, ct: ct);
-                if (!result.Ok || result.Value is null)
-                    return GoIndexWithError(result.Error ?? "Component not found.");
+            var byId = await _components.GetDetailAsync(id: id, code: null, ct: ct);
+            if (!byId.Ok || byId.Value is null)
+                return GoIndexWithError(byId.Error ?? "Component not found.");
 
-                return View(DetailsViewName, result.Value);
-            }
-            
-            // Fall back to identifier parsing
-            if (identifier.Length == 0)
+            return View(DetailsViewName, byId.Value);
+        }
+
+        // GET /Warehouse/Components/View/{code}
+        [HttpGet("View/{code}")]
+        public async Task<IActionResult> DetailsByCode([FromRoute] string code, CancellationToken ct)
+        {
+            code = (code ?? string.Empty).Trim();
+            if (code.Length == 0)
                 return GoIndexWithError("Component not found.");
 
-            var isGuid = Guid.TryParse(identifier, out var parsedId);
-            var lookupResult = await _components.GetDetailAsync(
-                id: isGuid ? parsedId : null,
-                code: isGuid ? null : identifier,
-                ct: ct
-            );
+            var byCode = await _components.GetDetailAsync(id: null, code: code, ct: ct);
+            if (!byCode.Ok || byCode.Value is null)
+                return GoIndexWithError(byCode.Error ?? "Component not found.");
 
-            if (!lookupResult.Ok || lookupResult.Value is null)
-                return GoIndexWithError(lookupResult.Error ?? "Component not found.");
-
-            return View(DetailsViewName, lookupResult.Value);
+            return View(DetailsViewName, byCode.Value);
         }
 
-        // GET /Warehouse/Components/AddNew         -> create
-        // GET /Warehouse/Components/Edit/{code}?id={guid}    -> edit by code (with optional id for validation)
+        // --- Create ---
+
+        // GET /Warehouse/Components/AddNew
         [HttpGet("AddNew")]
-        [HttpGet("Edit/{code}")]
-        public async Task<IActionResult> Upsert(string? code, [FromQuery] Guid? id, CancellationToken ct)
+        public IActionResult AddNew()
         {
-            if (string.IsNullOrWhiteSpace(code))
-                return View(UpsertViewName, new ComponentFormVm());
-
-            // Prioritize id lookup if provided, otherwise use code
-            var result = id.HasValue
-                ? await _components.GetFormAsync(id: id.Value, ct: ct)
-                : await _components.GetFormAsync(code: code.Trim(), ct: ct);
- 
-            if (!result.Ok || result.Value is null)
-                return GoIndexWithError(result.Error ?? "Component not found.");
-
-            return View(UpsertViewName, result.Value);
+            return View(UpsertViewName, new ComponentFormVm());
         }
 
-        // POST /Warehouse/Components/upsert
+        // GET /Warehouse/Components/Edit/{id:guid}
+        [HttpGet("Edit/{id:guid}")]
+        public async Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
+        {
+            var byId = await _components.GetFormAsync(id: id, ct: ct);
+            if (!byId.Ok || byId.Value is null)
+                return GoIndexWithError(byId.Error ?? "Component not found.");
+
+            return View(UpsertViewName, byId.Value);
+        }
+
+        // GET /Warehouse/Components/Edit/{code}
+        [HttpGet("Edit/{code}")]
+        public async Task<IActionResult> EditByCode([FromRoute] string code, CancellationToken ct)
+        {
+            code = (code ?? string.Empty).Trim();
+            if (code.Length == 0)
+                return GoIndexWithError("Component not found.");
+
+            var byCode = await _components.GetFormAsync(code: code, ct: ct);
+            if (!byCode.Ok || byCode.Value is null)
+                return GoIndexWithError(byCode.Error ?? "Component not found.");
+
+            return View(UpsertViewName, byCode.Value);
+        }
+
+        // --- Save (create or update) ---
+
+        // POST /Warehouse/Components/Upsert
         [HttpPost("Upsert")]
         public async Task<IActionResult> Upsert([FromForm] ComponentFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
                 return View(UpsertViewName, vm);
 
-            var operation = vm.IsEdit
+            var op = vm.IsEdit
                 ? await _components.UpdateAsync(vm, ct)
                 : await _components.CreateAsync(vm, ct);
 
-            if (!operation.Ok || operation.Value is null)
+            if (!op.Ok || op.Value is null)
             {
-                ModelState.AddModelError(string.Empty, operation.Error ?? (vm.IsEdit ? "Unable to update component." : "Unable to create component."));
+                ModelState.AddModelError(string.Empty, op.Error ?? (vm.IsEdit ? "Unable to update component." : "Unable to create component."));
                 return View(UpsertViewName, vm);
             }
 
-            var saved = operation.Value;
+            var saved = op.Value;
             TempData["AlertMessage"] = vm.IsEdit
                 ? $"Component '{saved.Name}' updated."
                 : $"Component '{saved.Name}' created.";
 
-            var identifier = string.IsNullOrWhiteSpace(saved.ComponentCode)
-                ? saved.Id.ToString()
-                : saved.ComponentCode;
-
-            return RedirectToAction(nameof(Details), new { identifier });
+            // Prefer friendly code when available
+            return !string.IsNullOrWhiteSpace(saved.ComponentCode)
+                ? RedirectToAction(nameof(DetailsByCode), new { code = saved.ComponentCode })
+                : RedirectToAction(nameof(DetailsById), new { id = saved.Id });
         }
 
         // Centralized: set error + go back to index
