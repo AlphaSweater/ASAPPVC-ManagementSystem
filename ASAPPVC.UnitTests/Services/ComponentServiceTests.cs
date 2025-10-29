@@ -18,6 +18,7 @@ namespace ASAPPVC.UnitTests.Services
             _sut = new ComponentService(_repo.Object, _mapper.Object);
         }
 
+        // ---------------- Create: Invalid VM ----------------
         [Fact]
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
@@ -32,6 +33,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().NotBeNull();
         }
 
+        // ---------------- Create: Valid (calls mapper + repo) ----------------
         [Fact]
         public async Task CreateAsync_Valid_CallsMapperAndRepository_ReturnsCreated()
         {
@@ -55,6 +57,7 @@ namespace ASAPPVC.UnitTests.Services
             _repo.Verify(r => r.SaveAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        // ---------------- Exists: Empty code validation ----------------
         [Fact]
         public async Task ExistsAsync_EmptyCode_ReturnsFailure()
         {
@@ -63,6 +66,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().Contain("Component code is required");
         }
 
+        // ---------------- Exists: Component not found ----------------
         [Fact]
         public async Task ExistsAsync_ComponentNotFound_ReturnsFalse()
         {
@@ -74,6 +78,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Value.Should().BeFalse();
         }
 
+        // ---------------- Exists: Component found but excluded by id ----------------
         [Fact]
         public async Task ExistsAsync_ComponentFoundButExcluded_ReturnsFalse()
         {
@@ -87,6 +92,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Value.Should().BeFalse();
         }
 
+        // ---------------- Exists: Component found returns true ----------------
         [Fact]
         public async Task ExistsAsync_ComponentFound_ReturnsTrue()
         {

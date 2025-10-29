@@ -20,6 +20,7 @@ namespace ASAPPVC.UnitTests.Services
             _sut = new ImageService(Options.Create(_options));
         }
 
+        // ---------------- ProcessUpload: No file provided ----------------
         [Fact]
         public async Task ProcessUploadAsync_NoFile_ReturnsFail()
         {
@@ -33,6 +34,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Ok.Should().BeFalse();
         }
 
+        // ---------------- ProcessBytes: Empty data ----------------
         [Fact]
         public async Task ProcessBytesAsync_EmptyData_ReturnsFail()
         {
@@ -41,6 +43,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().Contain("Empty");
         }
 
+        // ---------------- ProcessBytes: Unsupported content type ----------------
         [Fact]
         public async Task ProcessBytesAsync_UnsupportedContentType_ReturnsFail()
         {

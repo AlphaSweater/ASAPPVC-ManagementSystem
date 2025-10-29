@@ -21,6 +21,7 @@ namespace ASAPPVC.UnitTests.Services
             _sut = new CustomerService(_repo.Object);
         }
 
+        // ---------------- Create: Trims and persists, returns created entity ----------------
         [Fact]
         public async Task CreateAsync_TrimsAndPersists_ReturnsTupleWithEntity()
         {
@@ -55,6 +56,7 @@ namespace ASAPPVC.UnitTests.Services
             customer.Email.Should().Be("a@b.com");
         }
 
+        // ---------------- List: Returns repository list unchanged ----------------
         [Fact]
         public async Task ListAsync_ReturnsRepositoryList()
         {

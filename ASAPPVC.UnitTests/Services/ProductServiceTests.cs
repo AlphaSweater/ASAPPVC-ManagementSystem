@@ -19,6 +19,7 @@ namespace ASAPPVC.UnitTests.Services
             _sut = new ProductService(_products.Object, _components.Object, _mapper.Object);
         }
 
+        // ---------------- Create: Invalid VM returns failure ----------------
         [Fact]
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
@@ -27,6 +28,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Ok.Should().BeFalse();
         }
 
+        // ---------------- Create: Missing components returns failure ----------------
         [Fact]
         public async Task CreateAsync_MissingComponents_ReturnsFailure()
         {
@@ -47,6 +49,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().Contain("Some components do not exist");
         }
 
+        // ---------------- Exists: Empty code validation ----------------
         [Fact]
         public async Task ExistsAsync_EmptyCode_ReturnsFailure()
         {

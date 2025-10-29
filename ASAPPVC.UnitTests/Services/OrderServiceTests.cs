@@ -20,6 +20,7 @@ namespace ASAPPVC.UnitTests.Services
             _sut = new OrderService(_orders.Object, _customers.Object, _products.Object, _mapper.Object);
         }
 
+        // ---------------- Create: Invalid view model returns failure ----------------
         [Fact]
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
@@ -28,6 +29,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Ok.Should().BeFalse();
         }
 
+        // ---------------- Create: Customer not found returns failure ----------------
         [Fact]
         public async Task CreateAsync_CustomerNotFound_ReturnsFailure()
         {
@@ -45,6 +47,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().Contain("does not exist");
         }
 
+        // ---------------- GetDetail: Empty id returns failure ----------------
         [Fact]
         public async Task GetDetailAsync_EmptyId_ReturnsFailure()
         {
@@ -53,6 +56,7 @@ namespace ASAPPVC.UnitTests.Services
             res.Error.Should().Contain("Order ID is required");
         }
 
+        // ---------------- Delete: Empty id returns failure ----------------
         [Fact]
         public async Task DeleteAsync_EmptyId_ReturnsFailure()
         {

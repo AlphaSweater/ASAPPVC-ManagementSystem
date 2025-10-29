@@ -32,7 +32,6 @@ namespace ASAPPVC.UnitTests.Services
         }
 
         // ---------------- Calls Sign In Manager ----------------
-
         [Fact]
         public async Task LoginAsync_CallsSignInManager_ReturnsResult()
         {
@@ -49,6 +48,7 @@ namespace ASAPPVC.UnitTests.Services
             _signInManager.Verify(s => s.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false), Times.Once);
         }
 
+        // ---------------- Register: Create fails (does not add role) ----------------
         [Fact]
         public async Task RegisterAsync_CreateFails_ReturnsFailureAndDoesNotAddRole()
         {
@@ -65,6 +65,7 @@ namespace ASAPPVC.UnitTests.Services
             _userManager.Verify(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Never);
         }
 
+        // ---------------- Register: Create succeeds + AddToRole succeeds ----------------
         [Fact]
         public async Task RegisterAsync_CreateSucceeds_AddToRoleSucceeds_ReturnsSuccess()
         {
@@ -83,6 +84,7 @@ namespace ASAPPVC.UnitTests.Services
             _userManager.Verify(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), vm.Role.ToString()), Times.Once);
         }
 
+        // ---------------- Register: AddToRole throws (rollback and return ProfileCreationFailed) ----------------
         [Fact]
         public async Task RegisterAsync_AddRoleThrows_RollsBackAndReturnsFailedWithProfileCreationCode()
         {
