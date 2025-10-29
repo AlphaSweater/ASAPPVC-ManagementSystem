@@ -3,6 +3,7 @@ using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Services;
 using ASAPPVC.App.ViewModels.Auth;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASAPPVC.App.Data
 {
@@ -15,6 +16,10 @@ namespace ASAPPVC.App.Data
         {
             using var scope = serviceProvider.CreateScope();
             var services = scope.ServiceProvider;
+
+            // Ensure database is migrated before attempting to use Identity tables
+            var db = services.GetRequiredService<AppDbContext>();
+            await db.Database.MigrateAsync();
 
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
