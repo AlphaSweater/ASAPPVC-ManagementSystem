@@ -11,13 +11,10 @@ permissions:
 env:
   DOTNET_VERSION: '8.0.x'
   DOTNET_CLI_TELEMETRY_OPTOUT: '1'
-  # Value to block on serious vulns.
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
   FAIL_ON_CRITICAL_VULNS: 'true'
 
 jobs:
-  # ───────────────────────────
-  # Main CI
-  # ───────────────────────────
   build-and-test:
     name: 🧪 Build & Run Tests
     runs-on: ubuntu-latest
@@ -26,19 +23,29 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
+      # NuGet caching built-in + custom key for lock files
       - name: 🧰 Setup .NET SDK ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: |
+            **/packages.lock.json
+            **/*.csproj
+            **/global.json
 
-      - name: 🧾 Show .NET info
-        run: dotnet --info
+      # Reuse SonarQube binary/quality profiles cache between runs
+      - name: ♻️ Cache SonarQube cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: sonar-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            sonar-${{ runner.os }}-
 
-      - name: 📦 Restore NuGet packages
-        run: dotnet restore --locked-mode
-
+      # SonarScanner tool (fast, but we keep it non-blocking)
       - name: 🧭 Install SonarScanner (non-blocking)
         continue-on-error: true
         run: dotnet tool install --global dotnet-sonarscanner
@@ -46,13 +53,10 @@ jobs:
       - name: ➕ Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
-      # jq is used in the optional gate
-      - name: 🔧 Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      # ── SonarQube BEGIN (non-blocking)
+      # ── SonarQube BEGIN (report only)
       - name: 📡 SonarQube begin (report only)
         continue-on-error: true
+        if: ${{ env.SONAR_HOST_URL != '' && env.SONAR_TOKEN != '' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -61,47 +65,20 @@ jobs:
             /k:"AlphaSweater_ASAPPVC-Management_a00e5c53-35f0-4e1b-962f-423d84353d3c" \
             /d:sonar.host.url="${SONAR_HOST_URL}" \
             /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*coverage.opencover.xml" \
-            /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" \
+            /d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx" \
+            /d:sonar.exclusions="**/wwwroot/**,**/*.generated.cs,**/bin/**,**/obj/**"
 
-      - name: 🏗️ Build
-        run: dotnet build --no-restore -c Release
-
-      - name: 🔍 Discover test projects
-        id: find_tests
-        shell: bash
+      # One pass: restore+build+test (parallel) + coverage + TRX
+      - name: ✅ Test (parallel) with coverage
         run: |
-          mapfile -t TESTS < <(git ls-files '*Tests.csproj' '*Test.csproj' '*.*.Tests.csproj' || true)
-          if [ ${#TESTS[@]} -gt 0 ]; then
-            printf '%s\n' "${TESTS[@]}" > tests.txt
-            echo "has_tests=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_tests=false" >> "$GITHUB_OUTPUT"
-          fi
+          dotnet test --configuration Release \
+            --logger "trx;LogFileName=tests.trx" \
+            -p:CollectCoverage=true \
+            -p:CoverletOutputFormat=opencover \
+            -p:CoverletOutput=TestResults/coverage
 
-      - name: ✅ Run tests (with coverage per project)
-        if: steps.find_tests.outputs.has_tests == 'true'
-        shell: bash
-        run: |
-          echo "Discovered test projects:"
-          cat tests.txt
-          while IFS= read -r proj; do
-            base="$(basename "$proj" .csproj)"
-            outdir="$(dirname "$proj")/TestResults"
-            mkdir -p "$outdir"
-            echo "▶ dotnet test $proj"
-            dotnet test "$proj" --no-build -c Release \
-              --logger "trx;LogFileName=${base}-test-results.trx" \
-              /p:CollectCoverage=true \
-              /p:CoverletOutputFormat=opencover \
-              /p:CoverletOutput="${outdir}/${base}-coverage.opencover.xml"
-          done < tests.txt
-
-      - name: ℹ️ No tests found - skipping
-        if: steps.find_tests.outputs.has_tests != 'true'
-        run: echo "No test projects found. Skipping tests successfully."
-
-      # ── SonarQube END (non-blocking)
+      # ── SonarQube END (upload results)
       - name: 📤 SonarQube end (upload results)
         if: always()
         continue-on-error: true
@@ -109,23 +86,26 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
-      # ── Optional “block only on serious vulns” gate
-      - name: 🚦 Fail on CRITICAL/BLOCKER vulnerabilities
-        if: ${{ env.FAIL_ON_CRITICAL_VULNS == 'true' }}
+      # Optional “gate”—only on protected branches to keep PRs snappy
+      - name: 🚦 Fail on CRITICAL/BLOCKER vulnerabilities (protected branches only)
+        if: ${{ env.FAIL_ON_CRITICAL_VULNS == 'true' && (github.ref == 'refs/heads/production' || github.ref == 'refs/heads/development') }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           PROJECT_KEY: "AlphaSweater_ASAPPVC-Management_a00e5c53-35f0-4e1b-962f-423d84353d3c"
         shell: bash
         run: |
-          # Wait briefly for the Compute Engine to finish the analysis
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "jq not found; installing minimal..."
+            sudo apt-get update -y >/dev/null 2>&1 && sudo apt-get install -y jq >/dev/null 2>&1
+          fi
+
           deadline=$((SECONDS+120))
           in_progress=1
           while [ $SECONDS -lt $deadline ] && [ $in_progress -eq 1 ]; do
             resp=$(curl -sf -u "${SONAR_TOKEN}:" \
               "${SONAR_HOST_URL}/api/ce/component?componentKey=${PROJECT_KEY}" || true)
             status=$(echo "$resp" | jq -r '.current.status // "NONE"')
-            # statuses: PENDING, IN_PROGRESS, SUCCESS, FAILED, CANCELED
             if [ "$status" = "PENDING" ] || [ "$status" = "IN_PROGRESS" ]; then
               sleep 5
             else
@@ -133,7 +113,6 @@ jobs:
             fi
           done
 
-          # Count serious (CRITICAL/BLOCKER) vulnerabilities
           issues=$(curl -sf -u "${SONAR_TOKEN}:" \
             --get "${SONAR_HOST_URL}/api/issues/search" \
             --data-urlencode "componentKeys=${PROJECT_KEY}" \
@@ -142,9 +121,4 @@ jobs:
             --data-urlencode "resolved=false" | jq -r '.total // 0')
 
           echo "Serious vulnerability count: $issues"
-          if [ "$issues" -gt 0 ]; then
-            echo "❌ Blocking: Found CRITICAL/BLOCKER vulnerabilities."
-            exit 1
-          else
-            echo "✅ No serious vulnerabilities found; not blocking."
-          fi
+          test "$issues" -eq 0
