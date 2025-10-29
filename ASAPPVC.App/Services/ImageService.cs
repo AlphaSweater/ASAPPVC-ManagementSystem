@@ -10,7 +10,18 @@ using System.Security.Cryptography;
 
 namespace ASAPPVC.App.Services
 {
-    public sealed class ImageService(IOptions<ImageServiceOptions> options) : IImageService
+    #region Interface
+
+    public interface IImageService
+    {
+        Task<Result<ImagePayload>> ProcessUploadAsync(IFormFile file, CancellationToken ct = default);
+
+        Task<Result<ImagePayload>> ProcessBytesAsync(byte[] data, string contentType, CancellationToken ct = default);
+    }
+
+    #endregion Interface
+
+    public class ImageService(IOptions<ImageServiceOptions> options) : IImageService
     {
         private readonly ImageServiceOptions _opt = options.Value;
 

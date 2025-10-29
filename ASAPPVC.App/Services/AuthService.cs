@@ -5,6 +5,19 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ASAPPVC.App.Services
 {
+    #region Interface
+
+    public interface IAuthService
+    {
+        Task<SignInResult> LoginAsync(LoginViewModel model);
+
+        Task<IdentityResult> RegisterAsync(RegisterViewModel model);
+
+        Task LogoutAsync();
+    }
+
+    #endregion Interface
+
     public class AuthService : IAuthService
     {
         //─────────── Dependencies ───────────\\

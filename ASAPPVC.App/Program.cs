@@ -1,6 +1,5 @@
 using ASAPPVC.App.Data;
 using ASAPPVC.App.Models;
-using ASAPPVC.App.Models.Mappers;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Services;
 using Microsoft.AspNetCore.Identity;
@@ -97,7 +96,6 @@ namespace ASAPPVC.App
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IComponentService, ComponentService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICustomerService, CustomerService>();
 
             // Mapper registrations

@@ -4,6 +4,17 @@ using ASAPPVC.App.ViewModels.Customer;
 
 namespace ASAPPVC.App.Services
 {
+    #region Interface
+
+    public interface ICustomerService
+    {
+        Task<(bool Ok, string? Error, Customer? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default);
+
+        Task<List<Customer>> ListAsync(CancellationToken ct = default);
+    }
+
+    #endregion Interface
+
     public class CustomerService(ICustomerRepository repo) : ICustomerService
     {
         private readonly ICustomerRepository _repo = repo;
