@@ -1,4 +1,4 @@
-﻿/* ---------- Root & Variables ---------- */
+/* ---------- Root & Variables ---------- */
 :root {
     --primary-red: #d62828;
     --primary-blue: #0d47a1;
@@ -12,46 +12,7 @@
     box-sizing: border-box;
 }
 
-html, body {
-    height: 100%;
-    margin: 0;
-    font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
-
-body {
-    background-color: #0d47a1;
-    background-image: linear-gradient(120deg, var(--primary-blue) 0%, var(--primary-red) 100%);
-    color: var(--text-light);
-    position: relative;
-    overflow-x: hidden;
-    background-attachment: fixed;
-}
-
-    /* ---------- Decorative Background Shapes ---------- */
-    body::before, body::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(150px);
-        opacity: 0.6;
-        z-index: -1;
-    }
-
-    body::before {
-        background: var(--primary-blue);
-        width: 350px;
-        height: 350px;
-        top: -80px;
-        left: -120px;
-    }
-
-    body::after {
-        background: var(--primary-red);
-        width: 400px;
-        height: 400px;
-        bottom: -150px;
-        right: -180px;
-    }
+html, body { height: 100%; }
 
 /* ---------- Main Content Layout ---------- */
 .viewport {
@@ -104,15 +65,19 @@ body {
 /* ---------- Form Grid Layout ---------- */
 .form-layout-grid {
     display: grid;
-    grid-template-columns: 2fr 5fr;
-    gap: 40px;
+    grid-template-columns: 3fr 1fr;
+    gap: 28px;
     align-items: start;
+}
+
+@media (max-width: 960px) {
+    .form-layout-grid { grid-template-columns: 1fr; }
 }
 
 .form-fields-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px 20px;
+    gap: 18px 16px;
 }
 
 /* ---------- Form Groups & Inputs ---------- */
@@ -126,22 +91,22 @@ body {
     }
 
 .label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-light);
-    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
 }
 
 .input, select.input {
-    height: 44px;
-    font-size: 16px;
+    height: 42px;
+    font-size: 15px;
     color: var(--text-light);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
     padding: 0 12px;
     outline: none;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
 textarea.input {
@@ -150,14 +115,9 @@ textarea.input {
     resize: vertical;
 }
 
-.input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
+.input::placeholder { color: rgba(255, 255, 255, 0.6); }
 
-.input:focus {
-    border-color: rgba(255, 255, 255, 0.7);
-    background: rgba(255, 255, 255, 0.1);
-}
+.input:focus { border-color: rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.12); box-shadow: 0 0 0 3px rgba(255,255,255,.10); }
 
 select.input option {
     background-color: var(--primary-blue);
@@ -171,33 +131,14 @@ select.input option {
 }
 
 /* ---------- Image Upload ---------- */
-.image-upload-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    margin-top: 10px;
+.image-upload-section { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px; }
+
+.image-box { width: 220px; aspect-ratio: 1 / 1; border-radius: 14px; border: 1px dashed rgba(255,255,255,.28); background: rgba(255,255,255,.06); display: grid; place-items: center; overflow: hidden; cursor: pointer; transition: background .2s, border-color .2s, box-shadow .2s; }
+.image-box:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255,255,255,.42);
+    box-shadow: 0 8px 24px rgba(0,0,0,.28);
 }
-
-.image-box {
-    width: 100%;
-    max-width: 240px;
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-    .image-box:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
     .image-box img {
         width: 100%;
         height: 100%;
@@ -209,21 +150,9 @@ select.input option {
 }
 
 /* ---------- Parts Collection Card ---------- */
-.parts-card {
-    grid-column: 1 / -1;
-    background: rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-top: 8px;
-}
+.parts-card { grid-column: 1 / -1; background: rgba(0,0,0,.15); border: 1px solid rgba(255,255,255,.22); border-radius: 14px; padding: 14px 16px; margin-top: 8px; box-shadow: 0 6px 22px rgba(0,0,0,.20); }
 
-.parts-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
+.parts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
     .parts-header h3 {
         font-size: 18px;
@@ -236,20 +165,8 @@ select.input option {
     border-collapse: collapse;
 }
 
-    .parts-table thead th {
-        text-align: left;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 0 8px 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        color: var(--text-muted);
-    }
-
-    .parts-table tbody td {
-        padding: 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
+    .parts-table thead th { text-align: left; font-size: 12px; font-weight: 700; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.25); color: #fff; background: rgba(255,255,255,.08); position: sticky; top: 0; z-index: 1; }
+    .parts-table tbody td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.15); }
     .parts-table tfoot td {
         padding: 12px 8px 0;
         font-weight: 600;
@@ -270,26 +187,10 @@ select.input option {
     text-align: right;
 }
 
-.grand-total {
-    font-size: 18px;
-    color: var(--text-light);
-}
+.grand-total { font-size: 18px; color: var(--text-light); font-weight: 800; }
 
 /* ---------- Buttons ---------- */
-.btn {
-    height: 44px;
-    padding: 0 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    transition: all .2s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+.btn { height: 40px; padding: 0 18px; border-radius: 999px; font-weight: 800; font-size: 14px; cursor: pointer; border: none; transition: all .2s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 
     .btn:active {
         transform: scale(0.98);
@@ -301,25 +202,11 @@ select.input option {
         font-size: 14px;
     }
 
-.btn-primary {
-    background: var(--primary-red);
-    color: var(--text-light);
-}
+.btn-primary { background: linear-gradient(90deg, #ff5252, #ff6b6b); color: var(--text-light); box-shadow: 0 8px 22px rgba(255,82,82,.35); }
+.btn-primary:hover { filter: brightness(1.08); box-shadow: 0 12px 28px rgba(255,82,82,.45); }
 
-    .btn-primary:hover {
-        background: var(--hover-red);
-    }
-
-.btn-secondary {
-    background: transparent;
-    color: var(--text-light);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.6);
-    }
+.btn-secondary { background: transparent; color: var(--text-light); border: 1px solid rgba(255,255,255,.32); }
+.btn-secondary:hover { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.5); }
 
 .btn-remove {
     background: rgba(255, 255, 255, 0.08);
@@ -336,10 +223,4 @@ select.input option {
         color: var(--text-light);
     }
 
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 32px;
-    grid-column: 1 / -1;
-}
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }

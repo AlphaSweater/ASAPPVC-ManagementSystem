@@ -1,4 +1,4 @@
-﻿:root {
+:root {
 	--primary-red: #c81e2b;
 	--primary-purple: #2e2454;
 	--text-light: #ffffff;
@@ -17,13 +17,6 @@ html, body {
 	height: 100%;
 	margin: 0;
 	font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
-
-body {
-	background-color: var(--primary-purple);
-	background-image: linear-gradient(145deg, var(--primary-purple)0%, var(--primary-red)100%);
-	color: var(--text-light);
-	background-attachment: fixed;
 }
 
 .viewport {

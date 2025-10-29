@@ -1,74 +1,84 @@
-﻿@{
+@{
 	ViewData["Title"] = "Stock Take • Wizard";
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/warehouse/stockTake/StockTake.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/StockTake.css" asp-append-version="true" />
 }
 
-<div class="viewport">
-	<div class="container">
-		<!-- Header -->
-		<div class="header">
+<div class="page">
+	@await Html.PartialAsync("_BackButton")
+
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
 			<div>
-				<h1 class="title">Stock Take — Wizard</h1>
+				<h1 id="page-title" class="card-title">Stock Take — Wizard</h1>
+				<p class="card-subtitle">Follow the steps to capture accurate counts.</p>
 			</div>
-			<div class="progress">Item 3 of 120</div>
-		</div>
+			<div class="card-actions">
+				<span class="btn btn-ghost" aria-live="polite">Item 3 of 120</span>
+			</div>
+		</header>
 
-		<div class="wizard">
-			<section>
-				<!-- Where to go -->
-				<div class="card">
-					<h3>Step 1 · Go to this location</h3>
-					<div class="loc-grid">
-						<div class="loc-code">Rack B · Bay 4 · Bin 03</div>
-						<div class="loc-tag">Zone: South · Aisle: B</div>
-					</div>
-					<div class="help" style="margin-top:8px;">Tip: Confirm the bin label matches exactly before counting.</div>
-				</div>
-
-				<!-- Identify product -->
-				<div class="card">
-					<h3>Step 2 · Identify the product</h3>
-					<div class="image-row">
-						<div class="img-box">
-							<img src="~/Assets/Images/placeholder.png" alt="Product image" />
-						</div>
-						<div class="meta">
-							<div class="field">
-								<div class="label">Part Name</div>
-								<div class="value">Stainless Steel Handle</div>
+		<div class="card-body">
+			<section class="fields-panel" style="width:100%">
+				<div class="wizard">
+					<section>
+						<!-- Where to go -->
+						<div class="card">
+							<h3>Step 1 · Go to this location</h3>
+							<div class="loc-grid">
+								<div class="loc-code">Rack B · Bay 4 · Bin 03</div>
+								<div class="loc-tag">Zone: South · Aisle: B</div>
 							</div>
-							<div class="field">
-								<div class="label">Code / SKU</div>
-								<div class="value">P-1038</div>
-							</div>
-							<div class="field">
-								<div class="label">Unit</div>
-								<div class="value">Each</div>
+							<div class="help" style="margin-top:8px;">Tip: Confirm the bin label matches exactly before counting.</div>
+						</div>
+
+						<!-- Identify product -->
+						<div class="card">
+							<h3>Step 2 · Identify the product</h3>
+							<div class="image-row">
+								<div class="img-box">
+									<img src="~/Assets/Images/placeholder.png" alt="Product image" />
+								</div>
+								<div class="meta">
+									<div class="field">
+										<div class="label">Part Name</div>
+										<div class="value">Stainless Steel Handle</div>
+									</div>
+									<div class="field">
+										<div class="label">Code / SKU</div>
+										<div class="value">P-1038</div>
+									</div>
+									<div class="field">
+										<div class="label">Unit</div>
+										<div class="value">Each</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
 
-				<!-- Enter count -->
-				<div class="card">
-					<h3>Step 3 · Enter counted quantity</h3>
-					<div class="count-grid">
-						<div>
-							<label class="label" for="CountedQuantity">Counted Quantity</label>
-							<input id="CountedQuantity" class="input" type="number" min="0" step="1" placeholder="e.g. 120" />
-							<div class="help">Type the number of units physically present in this bin.</div>
+						<!-- Enter count -->
+						<div class="card">
+							<h3>Step 3 · Enter counted quantity</h3>
+							<div class="count-grid">
+								<div>
+									<label class="label" for="CountedQuantity">Counted Quantity</label>
+									<input id="CountedQuantity" class="input" type="number" min="0" step="1" placeholder="e.g. 120" />
+									<div class="help">Type the number of units physically present in this bin.</div>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
 
-				<!-- Actions -->
-				<div class="footer">
-					<button class="btn btn-ghost" type="button" name="SubmitAction" value="Prev">Previous</button>
-					<button class="btn btn-primary" type="button" name="SubmitAction" value="Next">Next</button>
-					<button class="btn btn-ghost" type="button" name="SubmitAction" value="Finish">Finish</button>
+						<!-- Actions -->
+						<div class="footer">
+							<button class="btn btn-ghost" type="button" name="SubmitAction" value="Prev">Previous</button>
+							<button class="btn btn-primary" type="button" name="SubmitAction" value="Next">Next</button>
+							<button class="btn btn-ghost" type="button" name="SubmitAction" value="Finish">Finish</button>
+						</div>
+					</section>
 				</div>
 			</section>
 		</div>

@@ -1,82 +1,94 @@
-﻿@{
+@{
     ViewData["Title"] = "Create Customer";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
 }
 
 <link rel="stylesheet" href="~/css/Views/customer/CreateCustomer.css" asp-append-version="true" />
 
-<div class="viewport">
-    <div class="form-container">
-        <!-- HEADER SECTION UPDATED -->
-        <div class="form-header-section">
-            @{ ViewData["BackText"] = "Back to List"; }
-            @await Html.PartialAsync("_BackButton")
-            <h2 class="main-title">Create New Customer</h2>
-        </div>
+<div class="page">
+    @{ ViewData["BackText"] = "Back to List"; }
+    @await Html.PartialAsync("_BackButton")
+
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">Create New Customer</h1>
+                <p class="card-subtitle">Capture a new customer’s details.</p>
+            </div>
+        </header>
 
         <form asp-controller="Customer" asp-action="CreateCustomer" method="post" novalidate>
             @Html.AntiForgeryToken()
 
-            <div class="form-grid">
-                <div class="group">
-                    <label class="label">First Name</label>
-                    <input class="input" type="text" name="FirstName" placeholder="e.g. Jane" />
-                    @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["FirstName"]?.Errors[0]?.ErrorMessage</span>
-                    }
-                </div>
+            <div class="card-body">
+                <section class="fields-panel" style="width:100%">
+                    <div class="form-grid">
+                        <div class="form-field half">
+                            <label class="label">First Name</label>
+                            <input class="input" type="text" name="FirstName" placeholder="e.g. Jane" />
+                            @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["FirstName"]?.Errors[0]?.ErrorMessage</span>
+                            }
+                        </div>
 
-                <div class="group">
-                    <label class="label">Surname</label>
-                    <input class="input" type="text" name="LastName" placeholder="e.g. Doe" />
-                    @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["LastName"]?.Errors[0]?.ErrorMessage</span>
-                    }
-                </div>
+                        <div class="form-field half">
+                            <label class="label">Surname</label>
+                            <input class="input" type="text" name="LastName" placeholder="e.g. Doe" />
+                            @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["LastName"]?.Errors[0]?.ErrorMessage</span>
+                            }
+                        </div>
 
-                <div class="group">
-                    <label class="label">Phone Number</label>
-                    <input class="input" type="tel" name="PhoneNumber" placeholder="+27 82 555 1234" />
-                    <span class="help">Use country code (e.g. +27 for SA)</span>
-                    @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["PhoneNumber"]?.Errors[0]?.ErrorMessage</span>
-                    }
-                </div>
+                        <div class="form-field half">
+                            <label class="label">Phone Number</label>
+                            <input class="input" type="tel" name="PhoneNumber" placeholder="+27 82 555 1234" />
+                            <span class="help">Use country code (e.g. +27 for SA)</span>
+                            @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["PhoneNumber"]?.Errors[0]?.ErrorMessage</span>
+                            }
+                        </div>
 
-                <div class="group">
-                    <label class="label">Company (optional)</label>
-                    <input class="input" type="text" name="Company" placeholder="Company name" />
-                    @if (ViewData.ModelState["Company"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["Company"]?.Errors[0]?.ErrorMessage</span>
-                    }
-                </div>
+                        <div class="form-field half">
+                            <label class="label">Company (optional)</label>
+                            <input class="input" type="text" name="Company" placeholder="Company name" />
+                            @if (ViewData.ModelState["Company"]?.Errors.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["Company"]?.Errors[0]?.ErrorMessage</span>
+                            }
+                        </div>
 
-                <div class="group" style="grid-column:1 / -1;">
-                    <label class="label">Email</label>
-                    <input class="input" type="email" name="Email" placeholder="you@company.com" autocomplete="email" />
-                    @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
-                    {
-                        <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
-                    }
-                </div>
-            </div>
+                        <div class="form-field full">
+                            <label class="label">Email</label>
+                            <input class="input" type="email" name="Email" placeholder="you@company.com" autocomplete="email" />
+                            @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
+                            {
+                                <span class="text-danger">@ViewData.ModelState["Email"]?.Errors[0]?.ErrorMessage</span>
+                            }
+                        </div>
+                    </div>
 
-            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
-            {
-                <div class="text-danger" style="text-align:center; margin-top:20px;">
-                    @foreach (var e in ViewData.ModelState[string.Empty].Errors)
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
                     {
-                        @e.ErrorMessage <br />
+                        <div class="text-danger" style="text-align:center; margin-top:20px;">
+                            @foreach (var e in ViewData.ModelState[string.Empty].Errors)
+                            {
+                                @e.ErrorMessage <br />
+                            }
+                        </div>
                     }
-                </div>
-            }
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Save Customer</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Customer</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+                </section>
             </div>
         </form>
     </div>

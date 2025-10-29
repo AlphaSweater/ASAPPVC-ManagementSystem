@@ -1,58 +1,77 @@
-﻿@model List<ASAPPVC.UI.Models.CustomerModel>
+@model List<ASAPPVC.UI.Models.CustomerModel>
 @{
     ViewData["Title"] = "Customers";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+}
 
 <link rel="stylesheet" href="~/css/Views/customer/ViewCustomer.css" asp-append-version="true" />
 
-<div class="viewport">
-    <div class="list-container">
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <form class="search-form" asp-controller="Customers" asp-action="Index" method="get">
-                <input class="search-input" type="text" name="q" placeholder="Search customers..." value="@Context.Request.Query["q"]" />
-                <button class="btn btn-secondary" type="submit">Search</button>
-            </form>
-            <a href="@Url.Action("CreateCustomer", "Customer")" class="btn btn-primary">Create New Customer</a>
-        </div>
+<div class="page">
+    @await Html.PartialAsync("_BackButton")
 
-        <!-- Table -->
-        <section class="table-section">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>First name</th>
-                        <th>Last name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Company</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model == null || !Model.Any())
-                    {
-                        <tr>
-                            <td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted);">
-                                No customers found.
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        foreach (var c in Model)
-                        {
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+                <p class="card-subtitle">Browse and search your customers.</p>
+            </div>
+            <div class="card-actions">
+                <a href="@Url.Action("CreateCustomer", "Customer")" class="btn btn-ghost">+ New Customer</a>
+            </div>
+        </header>
+
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <form class="search-form" asp-controller="Customers" asp-action="Index" method="get">
+                            <input class="search-input input" type="text" name="q" placeholder="Search customers..." value="@Context.Request.Query["q"]" />
+                            <button class="btn btn-ghost" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <section class="table-section">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>@c.Name</td>
-                                <td>@c.Surname</td>
-                                <td>@c.PhoneNumber</td>
-                                <td>@c.Email</td>
-                                <td>@(string.IsNullOrWhiteSpace(c.Company) ? "—" : c.Company)</td>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Company</th>
                             </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </section>
+                        </thead>
+                        <tbody>
+                            @if (Model == null || !Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted);">
+                                        No customers found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var c in Model)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>@c.Surname</td>
+                                        <td>@c.PhoneNumber</td>
+                                        <td>@c.Email</td>
+                                        <td>@(string.IsNullOrWhiteSpace(c.Company) ? "—" : c.Company)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+        </div>
     </div>
 </div>
