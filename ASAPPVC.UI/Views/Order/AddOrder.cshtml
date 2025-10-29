@@ -1,4 +1,4 @@
-﻿@using ASAPPVC.App.Models
+﻿@model ASAPPVC.App.Models.OrderFormVm
 @{
 	ViewData["Title"] = "Add Order";
 }
@@ -18,9 +18,9 @@
 				<label class="form-label" for="customer-select">Customer</label>
 				<select id="customer-select" name="customerId" class="input" required>
 					<option value="">-- Choose a customer --</option>
-					@foreach (var c in customers)
+					@foreach (var customer in Model.AvailableCustomers)
 					{
-						<option value="@c.Id">@c.Name @c.Surname (@c.Email)</option>
+						<option value="@customer.Id">@customer.Name @customer.Surname (@customer.Email)</option>
 					}
 				</select>
 			</div>
@@ -31,9 +31,9 @@
 					<div class="form-group">
 						<select id="product-select" class="input">
 							<option value="">-- Select a product --</option>
-							@foreach (var p in products)
+							@foreach (var product in Model.AvailableProducts)
 							{
-								<option value="@p.Id" data-price="@p.Price.ToString("F2")" data-name="@p.Name">@p.Name — @p.Price.ToString("C")</option>
+								<option value="@product.Id" data-price="@product.Price.ToString("F2")" data-name="@product.Name">@product.Name — @product.Price.ToString("C")</option>
 							}
 						</select>
 					</div>

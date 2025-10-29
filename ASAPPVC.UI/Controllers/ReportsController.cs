@@ -1,4 +1,4 @@
-using ASAPPVC.UI.ViewModels.Reports;
+using ASAPPVC.App.ViewModels.Reports;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.App.Controllers

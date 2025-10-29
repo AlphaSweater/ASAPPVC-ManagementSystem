@@ -1,4 +1,4 @@
-﻿@model global::ASAPPVC.App.Models.ComponentDetailVm
+﻿@model ASAPPVC.App.Models.ComponentDetailVm
 @{
 	ViewData["Title"] = "View Component";
 	var vm = Model;
@@ -16,7 +16,9 @@
 <div class="viewport">
 	<div class="view-container">
 		<div class="header-section">
-			@{ ViewData["BackText"] = "Back"; }
+			@{
+				ViewData["BackText"] = "Back";
+			}
 			@await Html.PartialAsync("_BackButton")
 			<h2 class="main-title">@vm?.Name</h2>
 		</div>

@@ -1,5 +1,4 @@
-﻿@using ASAPPVC.App.Models
-@model Order
+﻿@model ASAPPVC.App.Models.OrderDetailVm
 @{
 	ViewData["Title"] = $"Order #{Model.OrderCode}";
 }
@@ -273,7 +272,7 @@
 		<div class="order-details-grid">
 			<div class="info-card">
 				<div class="label">Customer</div>
-				<div class="value">@Model.Customer?.Name @Model.Customer?.Surname</div>
+				<div class="value">@Model.CustomerName</div>
 			</div>
 			<div class="info-card">
 				<div class="label">Order Date</div>
@@ -288,7 +287,7 @@
 		<!-- Products -->
 		<section class="products-section">
 			<h3>Products in this Order</h3>
-			@if (Model.OrderProducts == null || !Model.OrderProducts.Any())
+			@if (Model.Products == null || !Model.Products.Any())
 			{
 				<p style="text-align:center; padding:40px; color: var(--text-muted);">
 					No products in this order.
@@ -299,40 +298,42 @@
 				<table class="table">
 					<thead>
 						<tr>
-							<th>Product</th>
+							<th>Product Code</th>
+							<th>Product Name</th>
 							<th class="text-end" style="width:90px;">Qty</th>
 							<th class="text-end" style="width:140px;">Unit Price</th>
-							<th class="text-end" style="width:160px;">Line Total</th>
+							<th class="text-end" style="width:160px;">Total Price</th>
 							<th style="width:160px; text-align:center;">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
 						@{
 							decimal grandTotal = 0;
-							foreach (var line in Model.OrderProducts)
+							foreach (var product in Model.Products)
 							{
-								var qty = line.Quantity;
-								var unit = line.Product?.Price ?? 0m;
-								var lineTotal = unit * qty;
-								grandTotal += lineTotal;
+								var qty = product.Quantity;
+								var unitPrice = product.UnitPrice;
+								var totalPrice = unitPrice * qty;
+								grandTotal += totalPrice;
 							}
 						}
-						@foreach (var line in Model.OrderProducts)
+						@foreach (var product in Model.Products)
 						{
-							var qty = line.Quantity;
-							var unit = line.Product?.Price ?? 0m;
-							var lineTotal = unit * qty;
+							var qty = product.Quantity;
+							var unitPrice = product.UnitPrice;
+							var totalPrice = unitPrice * qty;
 							<tr>
-								<td>@line.Product?.Name</td>
+								<td>@product.ProductCode</td>
+								<td>@product.ProductName</td>
 								<td class="text-end">@qty</td>
-								<td class="text-end">@unit.ToString("C")</td>
-								<td class="text-end">@lineTotal.ToString("C")</td>
+								<td class="text-end">@unitPrice.ToString("C")</td>
+								<td class="text-end">@totalPrice.ToString("C")</td>
 								<td>
 									<div class="actions">
 										<a class="btn btn-secondary btn-sm"
 										   asp-controller="Inventory"
 										   asp-action="ViewProduct"
-										   asp-route-id="@(line.ProductId)">
+										   asp-route-id="@(product.ProductId)">
 											View
 										</a>
 									</div>
@@ -341,7 +342,7 @@
 						}
 						<tr class="total-row">
 							<td colspan="3" class="text-end">Order Total:</td>
-							<td class="text-end">@((Model.OrderProducts?.Sum(op => (op.Product?.Price ?? 0m) * op.Quantity) ?? 0m).ToString("C"))</td>
+							<td class="text-end">@((Model.Products?.Sum(op => (op.UnitPrice) * op.Quantity) ?? 0m).ToString("C"))</td>
 							<td></td>
 						</tr>
 					</tbody>

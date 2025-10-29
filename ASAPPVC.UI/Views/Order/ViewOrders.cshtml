@@ -1,5 +1,4 @@
-﻿@using ASAPPVC.App.Models
-@model List<Order>
+﻿@model List<ASAPPVC.App.Models.OrderListVm>
 @{
 	ViewData["Title"] = "Orders";
 }
@@ -245,18 +244,18 @@
 					}
 					else
 					{
-						foreach (var o in Model)
+						foreach (var order in Model)
 						{
-							var count = o.OrderProducts?.Count ?? 0;
+							var count = order.ItemCount;
 							<tr>
-								<td>@o.OrderCode</td>
-								<td>@o.Customer?.Name @o.Customer?.Surname</td>
-								<td>@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-								<td>@o.OrderStatus</td>
+								<td>@order.OrderCode</td>
+								<td>@order.CustomerName</td>
+								<td>@order.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+								<td>@order.OrderStatus</td>
 								<td class="text-end">@count</td>
 								<td>
 									<div class="actions">
-										<a asp-action="ViewOrder" asp-route-id="@o.Id" class="btn btn-secondary btn-sm">View</a>
+										<a asp-action="ViewOrder" asp-route-id="@order.Id" class="btn btn-secondary btn-sm">View</a>
 									</div>
 								</td>
 							</tr>

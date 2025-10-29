@@ -1,4 +1,5 @@
 using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Models.General;
 using ASAPPVC.App.Services;
 
 namespace ASAPPVC.App.Models.Mappers
