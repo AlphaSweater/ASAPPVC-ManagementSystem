@@ -37,7 +37,7 @@ namespace ASAPPVC.UnitTests.Services
                 Name = "P",
                 Description = "D",
                 Price = 1m,
-                Components = new List<ProductComponentFormVm> { new() { ComponentId = compId, } }
+                Components = new List<ProductComponentVm> { new() { ComponentId = compId, } }
             };
 
             _components.Setup(c => c.GetListByIdsAsync(It.IsAny<IEnumerable<Guid>>(), true, It.IsAny<System.Threading.CancellationToken>()))

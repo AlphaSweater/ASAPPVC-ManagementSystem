@@ -1,5 +1,7 @@
 ﻿using ASAPPVC.App.Data;
 using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Repositories;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

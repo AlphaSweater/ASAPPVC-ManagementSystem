@@ -110,7 +110,6 @@ namespace ASAPPVC.App
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IComponentRepository, ComponentRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             var app = builder.Build();
