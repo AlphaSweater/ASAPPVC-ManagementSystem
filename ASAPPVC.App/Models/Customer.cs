@@ -2,7 +2,7 @@
 
 namespace ASAPPVC.App.Models
 {
-    public class CustomerModel
+    public class Customer
     {
         // Internal GUID primary key for safe relations
         [Key]

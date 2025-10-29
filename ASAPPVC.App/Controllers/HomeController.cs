@@ -1,4 +1,4 @@
-using ASAPPVC.App.Models;
+using ASAPPVC.App.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;

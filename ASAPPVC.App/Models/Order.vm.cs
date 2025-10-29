@@ -121,22 +121,22 @@ namespace ASAPPVC.App.Models
         public List<ProductListVm> AvailableProducts { get; set; } = new();
 
         // Holds customers for selection in the form
-        public List<CustomerModel> AvailableCustomers { get; set; } = new();
+        public List<Customer> AvailableCustomers { get; set; } = new();
 
         // Parameterless constructor (kept for model binding)
         public OrderFormVm() { }
 
         // Convenience constructor to initialize lookup collections and sensible defaults
-        public OrderFormVm(IEnumerable<ProductListVm>? availableProducts, IEnumerable<CustomerModel>? availableCustomers)
+        public OrderFormVm(IEnumerable<ProductListVm>? availableProducts, IEnumerable<Customer>? availableCustomers)
         {
             AvailableProducts = availableProducts?.ToList() ?? new List<ProductListVm>();
-            AvailableCustomers = availableCustomers?.ToList() ?? new List<CustomerModel>();
+            AvailableCustomers = availableCustomers?.ToList() ?? new List<Customer>();
             OrderDate = DateTime.Now;
             Products = new List<OrderProductFormVm>();
         }
 
         // Static factory for creating a new form pre-populated with lookups
-        public static OrderFormVm CreateNew(IEnumerable<ProductListVm>? availableProducts = null, IEnumerable<CustomerModel>? availableCustomers = null)
+        public static OrderFormVm CreateNew(IEnumerable<ProductListVm>? availableProducts = null, IEnumerable<Customer>? availableCustomers = null)
         {
             return new OrderFormVm(availableProducts, availableCustomers)
             {

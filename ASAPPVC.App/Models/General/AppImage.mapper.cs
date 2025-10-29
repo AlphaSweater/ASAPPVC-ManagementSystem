@@ -1,9 +1,8 @@
-﻿using ASAPPVC.App.Models.General;
-using ASAPPVC.App.Services;
+﻿using ASAPPVC.App.Services;
 
-namespace ASAPPVC.App.Models.Mappers
+namespace ASAPPVC.App.Models.General
 {
-    internal static class ImageMapper
+    internal static class AppImageMapper
     {
         public static AppImage ToAppImage(this ImagePayload p)
         {

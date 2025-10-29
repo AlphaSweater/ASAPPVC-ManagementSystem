@@ -1,10 +1,28 @@
-﻿using ASAPPVC.App.Services;
+﻿using ASAPPVC.App.Models.General;
+using ASAPPVC.App.Models.Mappers;
+using ASAPPVC.App.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASAPPVC.App.Models.Mappers
+namespace ASAPPVC.App.Models
 {
+    #region Interface
+
+    public interface IComponentMapper
+    {
+        ComponentListVm ToListVm(Component component);
+
+        ComponentDetailVm ToDetailVm(Component component, int? usedInProductsCount = null, bool includeImageDataUrl = true);
+
+        Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default);
+
+        Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default);
+    }
+
+    #endregion Interface
+
     /// <summary>
-    /// Maps between Component domain entities and ViewModels (list/detail/form).
+    /// Maps between Component domain entities and their ViewModels.
+    /// ViewModels (<see cref="CreateComponentVm"/>, <see cref="EditComponentVm"/>, <see cref="ComponentListVm"/>, <see cref="ComponentDetailVm"/>).
     /// </summary>
     public class ComponentMapper(
         ICodeGenerationService? codeGenerationService = null,
@@ -15,6 +33,15 @@ namespace ASAPPVC.App.Models.Mappers
         // Domain → ViewModels
         // ------------------------------------------------------------
 
+        /// <summary>
+        /// Convert a Component to a lightweight list VM.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → List
+        /// var list = components.Select(c => _mapper.ToListVm(c)).ToList();
+        /// </code>
+        /// </summary>
         public ComponentListVm ToListVm(Component component)
         {
             ArgumentNullException.ThrowIfNull(component);
@@ -30,21 +57,31 @@ namespace ASAPPVC.App.Models.Mappers
                 StorageLocation = component.StorageLocation,
                 HasImage = component.Image?.Data is { Length: > 0 },
                 ThumbUrl = component.Image?.Data is { Length: > 0 }
-                    ? $"/components/{component.Id}/image/thumb"
-                    : null,
+            ? $"/components/{component.Id}/image/thumb"
+            : null,
             };
         }
 
+        /// <summary>
+        /// Convert a Component to a detail VM.<br/>
+        /// If <paramref name="usedInProductsCount"/> is null, tries to infer from the reverse nav.
+        /// <br/>
+        /// <br/><b>Examples:</b>
+        /// <code>
+        /// Domain → Detail (with inferred usage count)
+        /// var detail = _mapper.ToDetailVm(component);
+        /// </code>
+        /// </summary>
         public ComponentDetailVm ToDetailVm(
-            Component component,
-            int? usedInProductsCount = null,
-            bool includeImageDataUrl = true)
+        Component component,
+        int? usedInProductsCount = null,
+        bool includeImageDataUrl = true)
         {
             ArgumentNullException.ThrowIfNull(component);
 
             var count = usedInProductsCount
-                        ?? component.ProductComponents?.Select(pc => pc.ProductId).Distinct().Count()
-                        ?? 0;
+            ?? component.ProductComponents?.Select(pc => pc.ProductId).Distinct().Count()
+            ?? 0;
 
             return new ComponentDetailVm
             {
@@ -58,8 +95,8 @@ namespace ASAPPVC.App.Models.Mappers
                 UsedInProductsCount = count,
                 HasImage = component.Image?.Data is { Length: > 0 },
                 ImageUrl = component.Image?.Data is { Length: > 0 }
-                    ? $"/components/{component.Id}/image"
-                    : null,
+            ? $"/components/{component.Id}/image"
+            : null,
                 ImageEtag = component.Image?.Sha256
             };
         }
@@ -70,6 +107,7 @@ namespace ASAPPVC.App.Models.Mappers
 
         /// <summary>
         /// Creates a new Component from a ComponentFormVm.
+        /// This may process an uploaded image.
         /// </summary>
         public async Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default)
         {
@@ -99,6 +137,7 @@ namespace ASAPPVC.App.Models.Mappers
 
         /// <summary>
         /// Applies an update to an existing Component using a ComponentFormVm.
+        /// This may process an uploaded image. Returns the modified existing entity.
         /// </summary>
         public async Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default)
         {

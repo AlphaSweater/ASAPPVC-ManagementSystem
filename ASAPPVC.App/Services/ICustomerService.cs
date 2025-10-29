@@ -5,8 +5,8 @@ namespace ASAPPVC.App.Services
 {
     public interface ICustomerService
     {
-        Task<(bool Ok, string? Error, CustomerModel? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default);
+        Task<(bool Ok, string? Error, Customer? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default);
 
-        Task<List<CustomerModel>> ListAsync(CancellationToken ct = default);
+        Task<List<Customer>> ListAsync(CancellationToken ct = default);
     }
 }

@@ -1,4 +1,4 @@
-namespace ASAPPVC.App.Models
+namespace ASAPPVC.App.ViewModels
 {
     public class ErrorViewModel
     {

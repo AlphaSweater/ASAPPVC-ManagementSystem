@@ -10,9 +10,9 @@ namespace ASAPPVC.App.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //creates a new customer in the database
-        public async Task<(bool Ok, string? Error, CustomerModel? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default)
+        public async Task<(bool Ok, string? Error, Customer? Customer)> CreateAsync(CreateCustomerViewModel vm, CancellationToken ct = default)
         {
-            var entity = new CustomerModel
+            var entity = new Customer
             {
                 Name = vm.FirstName.Trim(),
                 Surname = vm.LastName.Trim(),
@@ -29,7 +29,7 @@ namespace ASAPPVC.App.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //retrieves a list of customers from the database
-        public async Task<List<CustomerModel>> ListAsync(CancellationToken ct = default)
+        public async Task<List<Customer>> ListAsync(CancellationToken ct = default)
         {
             return await _repo.ListAsync(ct);
         }

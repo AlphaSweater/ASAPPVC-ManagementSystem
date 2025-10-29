@@ -14,7 +14,7 @@ namespace ASAPPVC.App.Data
 
         // Customers
 
-        public DbSet<CustomerModel> Customers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         // Warehouse items
 

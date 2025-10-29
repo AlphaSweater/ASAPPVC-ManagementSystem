@@ -23,7 +23,7 @@ namespace ASAPPVC.App.Models
         [Required]
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
-        public CustomerModel? Customer { get; set; }
+        public Customer? Customer { get; set; }
         public List<OrderProduct> OrderProducts { get; set; } = new();
     }
 
