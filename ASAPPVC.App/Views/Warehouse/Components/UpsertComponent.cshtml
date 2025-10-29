@@ -1,7 +1,13 @@
 ﻿@model ASAPPVC.App.Models.ComponentFormVm
 @{
-	ViewData["Title"] = "Add New Component";
+	var isEdit = Model?.IsEdit == true;
+	ViewData["Title"] = isEdit ? "Edit Component" : "Add New Component";
 	ViewData["ShowBackPageName"] = true;
+
+	string placeholder = Url.Content("~/Assets/Images/placeholder.png");
+	string startImg = !string.IsNullOrWhiteSpace(Model?.ExistingImageUrl)
+		? Model.ExistingImageUrl
+		: placeholder;
 }
 
 @section Styles {
@@ -15,7 +21,7 @@
 		<header class="card-header">
 			<div>
 				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-				<p class="card-subtitle">Capture a new stock component with image, cost, and storage details.</p>
+				<p class="card-subtitle">Capture or update a stock component with image, cost, and storage details.</p>
 			</div>
 
 			<div class="card-actions">
@@ -29,11 +35,17 @@
 
 		<form asp-area="Warehouse"
 			  asp-controller="Components"
-			  asp-action="AddComponent"
+			  asp-action="Upsert"
 			  method="post"
 			  enctype="multipart/form-data"
 			  novalidate>
 			@Html.AntiForgeryToken()
+
+			<!-- Upsert essentials -->
+			<input asp-for="Id" type="hidden" />
+			<input asp-for="IsEdit" type="hidden" value="@(isEdit ? "true" : "false")" />
+			<input asp-for="ComponentCode" type="hidden" />
+			<input asp-for="ExistingImageUrl" type="hidden" />
 
 			<div class="card-body">
 				<!-- Image panel -->
@@ -41,7 +53,7 @@
 					<h2 class="sr-only">Component Image</h2>
 
 					<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
-						<img id="previewImg" src="~/Assets/Images/placeholder.png" alt="Preview" />
+						<img id="previewImg" src="@startImg" alt="Preview" />
 						<div class="dropzone-overlay">
 							📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span>
 						</div>
@@ -49,6 +61,14 @@
 
 					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
 					<span asp-validation-for="Image" class="field-error"></span>
+
+					@* Optionally display read-only code on edit *@
+					@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
+					{
+						<div class="meta">
+							<small class="muted">Code: <strong>@Model.ComponentCode</strong></small>
+						</div>
+					}
 				</section>
 
 				<!-- Fields -->
@@ -89,7 +109,9 @@
 					</div>
 
 					<div class="form-actions">
-						<button type="submit" class="btn btn-primary bg-red-gradient">Save Component</button>
+						<button type="submit" class="btn btn-primary bg-red-gradient">
+							@(isEdit ? "Save Changes" : "Save Component")
+						</button>
 						<button type="reset" class="btn btn-ghost">Reset</button>
 					</div>
 				</section>
@@ -106,12 +128,13 @@
 			const zone = document.getElementById('dropzone');
 
 			const previewFile = file => {
-				if (!file || !file.type.startsWith('image/')) return;
+				if (!file || !file.type?.startsWith?.('image/')) return;
 				const reader = new FileReader();
 				reader.onload = e => preview.src = e.target.result;
 				reader.readAsDataURL(file);
 			};
 
+			// If we already have an existing image (server-set), keep it unless user selects a new one.
 			input.addEventListener('change', () => previewFile(input.files[0]));
 
 			['dragenter', 'dragover'].forEach(evt =>

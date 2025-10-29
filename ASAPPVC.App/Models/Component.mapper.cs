@@ -16,6 +16,9 @@ namespace ASAPPVC.App.Models
         Task<Component> FromCreateVmAsync(ComponentFormVm vm, CancellationToken ct = default);
 
         Task<Component> ApplyUpdateVmAsync(Component existing, ComponentFormVm vm, CancellationToken ct = default);
+
+        // Added: map domain entity to form VM for edit/create prefilling
+        ComponentFormVm ToFormVm(Component component);
     }
 
     #endregion Interface
@@ -98,6 +101,27 @@ namespace ASAPPVC.App.Models
             ? $"/components/{component.Id}/image"
             : null,
                 ImageEtag = component.Image?.Sha256
+            };
+        }
+
+        /// <summary>
+        /// Convert a Component to a ComponentFormVm for prefilling the create/edit form.
+        /// </summary>
+        public ComponentFormVm ToFormVm(Component component)
+        {
+            ArgumentNullException.ThrowIfNull(component);
+
+            return new ComponentFormVm
+            {
+                Id = component.Id,
+                ComponentCode = component.ComponentCode,
+                Name = component.Name,
+                Unit = component.Unit,
+                CurrentAmount = component.CurrentAmount,
+                UnitCost = component.UnitCost,
+                StorageLocation = component.StorageLocation,
+                // Provide existing image as data URL (if present) to show preview in edit forms
+                ExistingImageUrl = AsDataUrlOrNull(component.Image?.Data, component.Image?.ContentType)
             };
         }
 

@@ -260,7 +260,7 @@ namespace ASAPPVC.App.Services
                     CustomerId = vm.CustomerId,
                     OrderDate = vm.OrderDate,
                     OrderStatus = vm.OrderStatus,
-                    Products = vm.Products.Select(p => new OrderProductFormVm
+                    Products = vm.Products.Select(p => new OrderProductVm
                     {
                         ProductId = p.ProductId,
                         Quantity = p.Quantity

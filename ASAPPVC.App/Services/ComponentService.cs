@@ -62,6 +62,18 @@ namespace ASAPPVC.App.Services
         Task<Result<Component>> GetDomainAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
 
         /// <summary>
+        /// Retrieves a single component mapped to the form view model used for create/edit screens.
+        /// Useful when prefilling an edit form or preparing a blank create form.
+        /// </summary>
+        /// <param name="id">Optional internal GUID identifier of the component.</param>
+        /// <param name="code">Optional human-friendly component code.</param>
+        /// <returns>
+        /// A <see cref="Result{T}"/> containing the found <see cref="ComponentFormVm"/>, or a failure result
+        /// if the component does not exist or an error occurs.
+        /// </returns>
+        Task<Result<ComponentFormVm>> GetFormAsync(Guid? id = null, string? code = null, CancellationToken ct = default);
+
+        /// <summary>
         /// Retrieves the full list of components mapped to lightweight list view models.
         /// Suitable for display in tables, cards, or summary views.
         /// </summary>
@@ -268,6 +280,35 @@ namespace ASAPPVC.App.Services
             catch (Exception ex)
             {
                 return Result<ComponentDetailVm>.Fail($"Failed to retrieve component detail: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves a component mapped to the form VM (for create/edit screens)
+        public async Task<Result<ComponentFormVm>> GetFormAsync(
+            Guid? id = null,
+            string? code = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                // If no id/code provided, return an empty form VM ready for create
+                if (id == null && string.IsNullOrWhiteSpace(code))
+                {
+                    var empty = new ComponentFormVm();
+                    return Result<ComponentFormVm>.Success(empty);
+                }
+
+                var component = await _components.GetByIdOrCodeAsync(id, code, asNoTracking: true, ct);
+                if (component is null)
+                    return Result<ComponentFormVm>.Fail("Component not found.");
+
+                var formVm = _mapper.ToFormVm(component);
+                return Result<ComponentFormVm>.Success(formVm);
+            }
+            catch (Exception ex)
+            {
+                return Result<ComponentFormVm>.Fail($"Failed to retrieve component form: {ex.Message}");
             }
         }
 

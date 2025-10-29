@@ -62,11 +62,11 @@
 						foreach (var line in vm.Components)
 						{
 							var unitCost = line.UnitCost;
-							var subtotal = unitCost * line.QuantityRequired;
+							var subtotal = unitCost * line.Quantity;
 							grandTotal += subtotal;
 							<tr>
 								<td>@line.ComponentName</td>
-								<td class="align-right">@line.QuantityRequired</td>
+								<td class="align-right">@line.Quantity</td>
 								<td class="align-right">@unitCost.ToString("C")</td>
 								<td class="align-right">@subtotal.ToString("C")</td>
 							</tr>

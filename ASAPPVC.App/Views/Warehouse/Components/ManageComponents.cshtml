@@ -20,7 +20,7 @@
 				<input class="input" type="text" name="term" placeholder="Search by component name or location..." value="@Model.SearchQuery" />
 				<button type="submit" class="btn btn-secondary">Search</button>
 			</form>
-			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
+			<a class="btn btn-primary" asp-area="Warehouse" asp-controller="Components" asp-action="AddNew">+ Add New Component</a>
 		</div>
 
 		<section class="table-section">
@@ -38,20 +38,20 @@
 				<tbody>
 					@if (Model != null && Model.HasComponents)
 					{
-						foreach (var p in Model.Components)
+						foreach (var component in Model.Components)
 						{
 							<tr>
-								<td>@p.ComponentCode</td>
-								<td>@p.Name</td>
-								<td>@p.StorageLocation</td>
-								<td>@($"R {p.UnitCost:0.00}")</td>
-								<td>@p.CurrentAmount</td>
+								<td>@component.ComponentCode</td>
+								<td>@component.Name</td>
+								<td>@component.StorageLocation</td>
+								<td>@($"R {component.UnitCost:0.00}")</td>
+								<td>@component.CurrentAmount</td>
 								<td>
 									<div class="actions">
 										<a class="btn btn-secondary btn-sm"
-										   asp-area="Warehouse" asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
+										   asp-area="Warehouse" asp-controller="Components" asp-action="Details" asp-route-id="@component.ComponentCode">View</a>
 										<a class="btn btn-primary btn-sm"
-										   asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
+										   asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@component.Id">Edit</a>
 									</div>
 								</td>
 							</tr>

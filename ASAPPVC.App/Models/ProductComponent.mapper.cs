@@ -5,58 +5,51 @@ namespace ASAPPVC.App.Models
     #region Interface
 
     /// <summary>
-    /// Converts between <see cref="ProductComponent"/> bridge entities and their ViewModels.
-    /// Uses shared helpers for merging duplicate lines, normalizing quantities and resolving units.
+    /// Converts between <see cref="ProductComponent"/> bridge entities and their unified ViewModel.
+    /// Simplified mapper that uses a single VM type for both display and editing scenarios.
     /// </summary>
     public interface IProductComponentMapper
     {
         /// <summary>
-        /// Converts a single <see cref="ProductComponent"/> domain entity
-        /// into a read-only view model for use in product detail or summary views.
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// var vm = _mapper.ToVm(productComponent);
-        /// </code>
+        /// Converts a single ProductComponent domain entity into a view model.
+        /// Works for both display (detail view) and editing (form) scenarios.
         /// </summary>
         ProductComponentVm ToBridgeVm(ProductComponent productComponent);
 
         /// <summary>
-        /// Converts a collection of <see cref="ProductComponent"/> entities to read-only view models.
+        /// Converts a collection of ProductComponent entities to view models.
         /// Returns an empty list if <paramref name="items"/> is null.
-        /// <br/><br/><b>Example:</b>
-        /// <code>
-        /// var vmLines = _mapper.ToVms(product.ProductComponents);
-        /// </code>
         /// </summary>
         List<ProductComponentVm> ToBridgeVms(IEnumerable<ProductComponent> items);
 
         /// <summary>
-        /// Converts a single form VM into a domain ProductComponent.
+        /// Creates a new ProductComponent from a view model.
         /// </summary>
-        ProductComponent FromCreateBridgeVm(Guid productId, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup);
+        ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup);
 
         /// <summary>
-        /// Bulk helper: merges duplicates (by ComponentId), sums quantities and returns domain ProductComponent rows.
-        /// Used for both create and edit upsert operations.
+        /// Bulk create: merges duplicates (by ComponentId), sums quantities and returns ProductComponent rows.
+        /// Used for both create and update operations.
         /// </summary>
-        List<ProductComponent> FromCreateBridgeVms(Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup);
+        List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup);
 
         /// <summary>
-        /// Applies a single form VM to an existing ProductComponent (mutates the target).
+        /// Applies a view model to an existing ProductComponent (mutates the target).
         /// </summary>
-        void ApplyUpdateBridgeVm(ProductComponent target, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup);
+        void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup);
 
         /// <summary>
-        /// Bulk apply: updates existing ProductComponent rows in-place (preserving instances when possible),
-        /// creates missing rows and drops lines marked for removal. Returns the resulting collection to assign to the product.
+        /// Bulk update: updates existing ProductComponent rows in-place (preserving instances when possible),
+        /// creates missing rows and drops lines marked for removal.
         /// </summary>
-        List<ProductComponent> ApplyUpdateBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup);
+        List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup);
     }
 
     #endregion Interface
 
     /// <summary>
     /// Implementation of <see cref="IProductComponentMapper"/>.
+    /// Simplified to work with a single unified ProductComponentVm.
     /// </summary>
     public class ProductComponentMapper : IProductComponentMapper
     {
@@ -75,8 +68,9 @@ namespace ASAPPVC.App.Models
                 ComponentCode = productComponent.Component?.ComponentCode ?? string.Empty,
                 ComponentName = productComponent.Component?.Name ?? string.Empty,
                 Unit = productComponent.Unit,
-                QuantityRequired = productComponent.QuantityRequired,
-                UnitCost = productComponent.Component?.UnitCost ?? 0m
+                Quantity = productComponent.QuantityRequired,
+                UnitCost = productComponent.Component?.UnitCost ?? 0m,
+                Remove = false // Default for display/edit scenarios
             };
         }
 
@@ -89,10 +83,10 @@ namespace ASAPPVC.App.Models
         }
 
         // ------------------------------------------------------------
-        // Create from form VMs → Domain
+        // VM → Domain (upsert)
         // ------------------------------------------------------------
 
-        public ProductComponent FromCreateBridgeVm(Guid productId, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(vm);
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
@@ -106,26 +100,26 @@ namespace ASAPPVC.App.Models
             };
         }
 
-        public List<ProductComponent> FromCreateBridgeVms(Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
-            return (items ?? Enumerable.Empty<ProductComponentFormVm>())
+            return (items ?? Enumerable.Empty<ProductComponentVm>())
                 .GroupBy(i => i.ComponentId)
-                .Select(g => new ProductComponentFormVm
+                .Select(g => new ProductComponentVm
                 {
                     ComponentId = g.Key,
                     Quantity = g.Sum(x => x.Quantity)
                 })
-                .Select(vm => FromCreateBridgeVm(productId, vm, componentUnitLookup))
+                .Select(vm => FromBridgeVm(productId, vm, componentUnitLookup))
                 .ToList();
         }
 
         // ------------------------------------------------------------
-        // Apply (update existing collection in-place)
+        // Apply updates
         // ------------------------------------------------------------
 
-        public void ApplyUpdateBridgeVm(ProductComponent target, ProductComponentFormVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
@@ -136,17 +130,17 @@ namespace ASAPPVC.App.Models
             target.QuantityRequired = NormalizeQuantity(vm.Quantity);
         }
 
-        public List<ProductComponent> ApplyUpdateBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentFormVm> items, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
         {
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             var existingByComponent = (existingComponents ?? Enumerable.Empty<ProductComponent>())
                 .ToDictionary(x => x.ComponentId, x => x);
 
-            return (items ?? Enumerable.Empty<ProductComponentFormVm>())
-                .Where(i => !i.Remove) // drop lines marked for removal
+            return (items ?? Enumerable.Empty<ProductComponentVm>())
+                .Where(i => !i.Remove) // Drop lines marked for removal
                 .GroupBy(i => i.ComponentId)
-                .Select(g => new ProductComponentFormVm
+                .Select(g => new ProductComponentVm
                 {
                     ComponentId = g.Key,
                     Quantity = g.Sum(x => x.Quantity)
@@ -157,7 +151,7 @@ namespace ASAPPVC.App.Models
                         ? existing
                         : new ProductComponent { ProductId = productId };
 
-                    ApplyUpdateBridgeVm(line, vm, componentUnitLookup);
+                    ApplyUpdateToBridgeVm(line, vm, componentUnitLookup);
                     return line;
                 })
                 .ToList();

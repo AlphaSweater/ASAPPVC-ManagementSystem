@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using ASAPPVC.App.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.App.Models
 {
@@ -110,7 +110,7 @@ namespace ASAPPVC.App.Models
 
         [Display(Name = "Products")]
         [MinLength(1, ErrorMessage = "An order requires at least 1 product line.")]
-        public List<OrderProductFormVm> Products { get; set; } = new();
+        public List<OrderProductVm> Products { get; set; } = new();
 
         [Display(Name = "Notes (optional)")]
         [StringLength(500)]
@@ -124,7 +124,8 @@ namespace ASAPPVC.App.Models
         public List<Customer> AvailableCustomers { get; set; } = new();
 
         // Parameterless constructor (kept for model binding)
-        public OrderFormVm() { }
+        public OrderFormVm()
+        { }
 
         // Convenience constructor to initialize lookup collections and sensible defaults
         public OrderFormVm(IEnumerable<ProductListVm>? availableProducts, IEnumerable<Customer>? availableCustomers)
@@ -132,7 +133,7 @@ namespace ASAPPVC.App.Models
             AvailableProducts = availableProducts?.ToList() ?? new List<ProductListVm>();
             AvailableCustomers = availableCustomers?.ToList() ?? new List<Customer>();
             OrderDate = DateTime.Now;
-            Products = new List<OrderProductFormVm>();
+            Products = new List<OrderProductVm>();
         }
 
         // Static factory for creating a new form pre-populated with lookups

@@ -23,6 +23,11 @@ namespace ASAPPVC.App.Models
         OrderDetailVm ToDetailVm(Order order, bool includeProducts = true);
 
         /// <summary>
+        /// Converts an Order domain entity into an OrderFormVm for use in edit forms.
+        /// </summary>
+        OrderFormVm ToFormVm(Order order);
+
+        /// <summary>
         /// Builds an Order domain entity from the unified order form VM. Generates an order code
         /// if not supplied using the optional generator.
         /// </summary>
@@ -41,12 +46,15 @@ namespace ASAPPVC.App.Models
     /// <summary>
     /// Implementation of <see cref="IOrderMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
     /// </summary>
-    public class OrderMapper(
-        IOrderProductMapper orderProductMapper,
-        ICodeGenerationService? codeGenerationService = null,
-        IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IOrderMapper
+    public class OrderMapper : MapperBase, IOrderMapper
     {
-        private readonly IOrderProductMapper _orderProductMapper = orderProductMapper ?? throw new ArgumentNullException(nameof(orderProductMapper));
+        private readonly IOrderProductMapper _orderProductMapper;
+
+        public OrderMapper(IOrderProductMapper orderProductMapper, ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null)
+          : base(codeGenerationService, imageService)
+        {
+            _orderProductMapper = orderProductMapper ?? throw new ArgumentNullException(nameof(orderProductMapper));
+        }
 
         // ------------------------------------------------------------
         // Domain → ViewModels
@@ -79,7 +87,7 @@ namespace ASAPPVC.App.Models
             ArgumentNullException.ThrowIfNull(order);
 
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
-            var products = includeProducts ? _orderProductMapper.ToBridgeVms(lines) : new List<OrderProductVm>();
+            var products = includeProducts ? _orderProductMapper.ToVms(lines) : new List<OrderProductVm>();
 
             var itemCount = lines.Sum(x => x.Quantity);
             var subtotal = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
@@ -103,6 +111,21 @@ namespace ASAPPVC.App.Models
             };
         }
 
+        public OrderFormVm ToFormVm(Order order)
+        {
+            ArgumentNullException.ThrowIfNull(order);
+
+            return new OrderFormVm
+            {
+                Id = order.Id,
+                OrderCode = order.OrderCode,
+                CustomerId = order.CustomerId,
+                OrderDate = order.OrderDate,
+                OrderStatus = order.OrderStatus,
+                Products = _orderProductMapper.ToVms(order.OrderProducts ?? Enumerable.Empty<OrderProduct>())
+            };
+        }
+
         // ------------------------------------------------------------
         // Create ViewModel → Domain
         // ------------------------------------------------------------
@@ -119,8 +142,8 @@ namespace ASAPPVC.App.Models
                 OrderStatus = vm.OrderStatus
             };
 
-            // Use the bridge create helper and current form VM type
-            order.OrderProducts = _orderProductMapper.FromCreateBridgeVms(order.Id, vm.Products ?? Enumerable.Empty<OrderProductFormVm>());
+            // Use the simplified mapper
+            order.OrderProducts = _orderProductMapper.FromVms(order.Id, vm.Products ?? Enumerable.Empty<OrderProductVm>());
 
             return order;
         }
@@ -143,8 +166,8 @@ namespace ASAPPVC.App.Models
             existing.OrderDate = vm.OrderDate ?? existing.OrderDate;
             existing.OrderStatus = vm.OrderStatus;
 
-            // Merge/update bridge lines using the dedicated mapper helper
-            var updatedLines = _orderProductMapper.ApplyUpdateBridgeVms(existing.OrderProducts ?? new List<OrderProduct>(), vm.Products ?? Enumerable.Empty<OrderProductFormVm>());
+            // Merge/update bridge lines using the simplified mapper
+            var updatedLines = _orderProductMapper.ApplyVms(existing.OrderProducts ?? new List<OrderProduct>(), vm.Products ?? Enumerable.Empty<OrderProductVm>());
 
             // Ensure correct OrderId on all lines and replace collection
             foreach (var line in updatedLines)

@@ -3,55 +3,59 @@
 namespace ASAPPVC.App.Models
 {
     //-----------------------------------------------\\
-    //  OrderProduct ViewModels (Read + Write)
+    //  OrderProduct ViewModel (Unified)
     //-----------------------------------------------\\
 
-    //-----------------------------------------------\\
-    // Product inside an order (read-only view)
-    //-----------------------------------------------\\
     /// <summary>
-    /// Read-only representation of a product line inside an order detail view.<br/>
-    /// Contains display-friendly product info and computed totals for UI presentation.<br/>
-    /// Use this VM only for display purposes inside an <see cref="OrderDetailVm"/>; not for form binding.<br/>
+    /// Unified view model for OrderProduct that works for both display and editing.<br/>
+    /// When used in <see cref="OrderDetailVm"/>: shows read-only product line info with computed costs.<br/>
+    /// When used in <see cref="OrderFormVm"/>: binds editable quantity and removal flag.<br/>
+    /// Eliminates the need for separate FormVm and display-only VM types.
     /// </summary>
-    public sealed class OrderProductVm
+    public sealed class OrderProductVm : IValidatableObject
     {
+        // Core identifiers
         public Guid OrderId { get; init; }
-        public Guid ProductId { get; init; }
 
-        public string ProductCode { get; init; } = string.Empty;
-        public string ProductName { get; init; } = string.Empty;
-        public decimal UnitPrice { get; init; }
-        public int Quantity { get; init; }
-
-        /// <summary>Total cost for this line item (UnitPrice × Quantity).</summary>
-        public decimal TotalCost => UnitPrice * Quantity;
-    }
-
-    //-----------------------------------------------\\
-    // Upsert form (used for both Add and Edit order lines)
-    //-----------------------------------------------\\
-    /// <summary>
-    /// Unified form view model used when adding or editing a product line in an order.
-    /// If <see cref="OrderProductId"/> is null → Add; if it has value → Edit.
-    /// </summary>
-    public sealed class OrderProductFormVm
-    {
         [Display(Name = "Product")]
         [Required(ErrorMessage = "Product is required.")]
         public Guid ProductId { get; set; }
 
+        // Display fields (populated from navigation properties)
+        public string ProductCode { get; init; } = string.Empty;
+        public string ProductName { get; init; } = string.Empty;
+        public decimal UnitPrice { get; init; }
+
+        // Editable quantity (used in both display and forms)
         [Display(Name = "Quantity")]
         [Required(ErrorMessage = "Quantity is required.")]
         [Range(1, 999999, ErrorMessage = "Quantity must be at least 1.")]
         public int Quantity { get; set; } = 1;
 
-        // Optional: pre-fetched product data for display (not posted)
-        public string? ProductName { get; init; }
-
-        public decimal? UnitPrice { get; init; }
-
-        // Mark for removal (for edit mode)
+        // Edit-only flag: mark for removal during updates
         public bool Remove { get; set; }
+
+        // Computed property for display
+        /// <summary>Total cost for this line item (UnitPrice × Quantity).</summary>
+        public decimal TotalCost => UnitPrice * Quantity;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // ProductId must not be empty
+            if (ProductId == Guid.Empty)
+            {
+                yield return new ValidationResult(
+                    "Product is required.",
+                    new[] { nameof(ProductId) });
+            }
+
+            // Quantity must be at least 1
+            if (Quantity < 1)
+            {
+                yield return new ValidationResult(
+                    "Quantity must be at least 1.",
+                    new[] { nameof(Quantity) });
+            }
+        }
     }
 }

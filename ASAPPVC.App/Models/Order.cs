@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ASAPPVC.App.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,14 +26,5 @@ namespace ASAPPVC.App.Models
 
         public Customer? Customer { get; set; }
         public List<OrderProduct> OrderProducts { get; set; } = new();
-    }
-
-    public enum OrderStatus
-    {
-        Pending,
-        Processing,
-        Shipped,
-        Completed,
-        Cancelled
     }
 }

@@ -74,7 +74,7 @@ namespace ASAPPVC.App.Models
     }
 
     //-----------------------------------------------\\
-    // Create form (used in POST / add product)
+    // Create/Edit form (unified upsert VM)
     //-----------------------------------------------\\
     /// <summary>
     /// One form VM for both Add and Edit (Upsert).
@@ -125,7 +125,7 @@ namespace ASAPPVC.App.Models
         // Component lines
         [Display(Name = "Components")]
         [MinLength(1, ErrorMessage = "A product requires at least one component.")]
-        public List<ProductComponentFormVm> Components { get; set; } = new();
+        public List<ProductComponentVm> Components { get; set; } = new();
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

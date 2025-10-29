@@ -125,7 +125,7 @@ namespace ASAPPVC.App.Controllers
                 CustomerId = order.CustomerId,
                 OrderDate = order.OrderDate,
                 OrderStatus = order.OrderStatus,
-                Products = order.OrderProducts.Select(op => new OrderProductFormVm
+                Products = order.OrderProducts.Select(op => new OrderProductVm
                 {
                     ProductId = op.ProductId,
                     Quantity = op.Quantity

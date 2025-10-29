@@ -36,6 +36,11 @@ namespace ASAPPVC.App.Models
         ProductDetailVm ToDetailVm(Product product, bool includeImageDataUrl = true);
 
         /// <summary>
+        /// Converts a Product domain entity into a ProductFormVm for use in edit forms.
+        /// </summary>
+        ProductFormVm ToFormVm(Product product);
+
+        /// <summary>
         /// Creates a new Product from a ProductFormVm.
         /// </summary>
         Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
@@ -51,11 +56,7 @@ namespace ASAPPVC.App.Models
     /// <summary>
     /// Implementation of <see cref="IProductMapper"/>. Inherits shared helpers from <see cref="MapperBase"/>.
     /// </summary>
-    public class ProductMapper(
-        IProductComponentMapper productComponentMapper,
-        ICodeGenerationService? codeGenerationService = null,
-        IImageService? imageService = null)
-        : MapperBase(codeGenerationService, imageService), IProductMapper
+    public class ProductMapper(IProductComponentMapper productComponentMapper, ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null) : MapperBase(codeGenerationService, imageService), IProductMapper
     {
         private readonly IProductComponentMapper _productComponentMapper = productComponentMapper ?? throw new ArgumentNullException(nameof(productComponentMapper));
 
@@ -106,6 +107,27 @@ namespace ASAPPVC.App.Models
             };
         }
 
+        public ProductFormVm ToFormVm(Product product)
+        {
+            ArgumentNullException.ThrowIfNull(product);
+
+            var components = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+
+            return new ProductFormVm
+            {
+                Id = product.Id,
+                ProductCode = product.ProductCode,
+                Name = product.Name,
+                Price = product.Price,
+                Description = product.Description,
+                ExistingImageUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image" : null,
+                Category = product.Category,
+                Material = product.Material,
+                Colour = product.Colour,
+                Components = components
+            };
+        }
+
         // ------------------------------------------------------------
         // ViewModels → Domain (Create / Update)
         // ------------------------------------------------------------
@@ -139,7 +161,7 @@ namespace ASAPPVC.App.Models
             }
 
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            product.ProductComponents = _productComponentMapper.FromCreateBridgeVms(product.Id, vm.Components ?? Enumerable.Empty<ProductComponentFormVm>(), lookup);
+            product.ProductComponents = _productComponentMapper.FromBridgeVms(product.Id, vm.Components ?? Enumerable.Empty<ProductComponentVm>(), lookup);
 
             return product;
         }
@@ -186,7 +208,7 @@ namespace ASAPPVC.App.Models
             existing.Colour = vm.Colour;
 
             var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            existing.ProductComponents = _productComponentMapper.FromCreateBridgeVms(existing.Id, vm.Components ?? Enumerable.Empty<ProductComponentFormVm>(), lookup);
+            existing.ProductComponents = _productComponentMapper.ApplyUpdateToBridgeVms(existing.ProductComponents, existing.Id, vm.Components ?? Enumerable.Empty<ProductComponentVm>(), lookup);
 
             return existing;
         }
