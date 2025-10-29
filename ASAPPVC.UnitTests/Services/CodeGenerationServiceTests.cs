@@ -17,7 +17,7 @@ public class CodeGenerationServiceTests
         _sut = new CodeGenerationService(_counters.Object);
     }
 
-    // ---------------- Product Code ----------------
+    // ---------------- Product Code -----------------
 
     [Fact]
     public async Task GenerateProductCode_WithoutCategory_ReturnsCorrectFormat()
