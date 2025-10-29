@@ -45,7 +45,7 @@ namespace ASAPPVC.App
             // ============================================
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Auth/Login";
+                options.LoginPath = "/Auth/Index";
 
                 // Cookie security & policy
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -54,7 +54,7 @@ namespace ASAPPVC.App
                 options.Cookie.SameSite = SameSiteMode.Strict;
 
                 // Session/timeouts
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
                 options.Cookie.MaxAge = null; // session-based cookie
             });
@@ -148,7 +148,7 @@ namespace ASAPPVC.App
             // Default route for non-area controllers
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Auth}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             // ============================================
             // Run application
