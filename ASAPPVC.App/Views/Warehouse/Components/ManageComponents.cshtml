@@ -1,0 +1,86 @@
+@using System.Linq
+@model ASAPPVC.App.ViewModels.Warehouse.ManageComponentsVm
+
+@{
+    ViewData["Title"] = "Manage Components";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/warehouse/components/ManageComponents.css" asp-append-version="true" />
+}
+
+<div class="page">
+    @await Html.PartialAsync("_BackButton")
+
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">Components</h1>
+                <p class="card-subtitle">Manage inventory components and stock levels.</p>
+            </div>
+            <div class="card-actions">
+                <a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent">+ Add New Component</a>
+            </div>
+        </header>
+
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <form class="search-form" asp-area="Warehouse" asp-controller="Components" asp-action="Search" method="get">
+                            <input class="input" type="text" name="term" placeholder="Search by component name or location..." value="@Model.SearchQuery" />
+                            <button type="submit" class="btn btn-ghost">Search</button>
+                        </form>
+                    </div>
+                </div>
+
+                <section class="table-section">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px;">Code</th>
+                                <th>Component Name</th>
+                                <th>Location</th>
+                                <th>Unit Price</th>
+                                <th>Stock</th>
+                                <th style="width:200px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.HasComponents)
+                            {
+                                foreach (var p in Model.Components)
+                                {
+                                    <tr>
+                                        <td>@p.ComponentCode</td>
+                                        <td>@p.Name</td>
+                                        <td>@p.StorageLocation</td>
+                                        <td>@($"R {p.UnitCost:0.00}")</td>
+                                        <td>@p.CurrentAmount</td>
+                                        <td>
+                                            <div class="actions">
+                                                <a class="btn btn-secondary btn-sm"
+                                                   asp-area="Warehouse" asp-controller="Components" asp-action="ViewComponent" asp-route-id="@p.Id">View</a>
+                                                <a class="btn btn-primary btn-sm"
+                                                   asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent" asp-route-id="@p.Id">Edit</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding:40px; color: var(--text-muted);">
+                                        No components found.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+        </div>
+    </div>
+</div>

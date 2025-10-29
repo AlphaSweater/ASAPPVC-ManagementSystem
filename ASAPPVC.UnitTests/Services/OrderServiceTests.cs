@@ -1,7 +1,6 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using FluentAssertions;
 using Moq;
 
@@ -24,7 +23,7 @@ namespace ASAPPVC.UnitTests.Services
         [Fact]
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
-            var vm = new ASAPPVC.UI.Models.OrderFormVm { CustomerId = Guid.Empty, Products = null };
+            var vm = new OrderFormVm { CustomerId = Guid.Empty, Products = null };
             var res = await _sut.CreateAsync(vm);
             res.Ok.Should().BeFalse();
         }
@@ -33,14 +32,14 @@ namespace ASAPPVC.UnitTests.Services
         [Fact]
         public async Task CreateAsync_CustomerNotFound_ReturnsFailure()
         {
-            var vm = new ASAPPVC.UI.Models.OrderFormVm
+            var vm = new OrderFormVm
             {
                 CustomerId = Guid.NewGuid(),
-                Products = new List<ASAPPVC.UI.Models.OrderProductFormVm> { new() { ProductId = Guid.NewGuid(), Quantity = 1 } }
+                Products = new List<OrderProductVm> { new() { ProductId = Guid.NewGuid(), Quantity = 1 } }
             };
 
             _customers.Setup(c => c.GetByIdAsync(vm.CustomerId, true, It.IsAny<System.Threading.CancellationToken>()))
-                      .ReturnsAsync((CustomerModel?)null);
+                      .ReturnsAsync((Customer?)null);
 
             var res = await _sut.CreateAsync(vm);
             res.Ok.Should().BeFalse();

@@ -1,6 +1,6 @@
-﻿using ASAPPVC.UI.Data;
-using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
+﻿using ASAPPVC.App.Data;
+using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,7 @@ namespace ASAPPVC.UnitTests.Repositories
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var customer = new CustomerModel { Id = Guid.NewGuid(), Name = "John", Surname = "Doe", PhoneNumber = "123", Email = "a@b.com" };
+            var customer = new Customer { Id = Guid.NewGuid(), Name = "John", Surname = "Doe", PhoneNumber = "123", Email = "a@b.com" };
             var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", Name = "Widget", Price = 5m, Description = "D" };
 
             var order = new Order { Id = Guid.NewGuid(), OrderCode = "ORD-001", CustomerId = customer.Id, OrderDate = DateTime.UtcNow, OrderStatus = default };

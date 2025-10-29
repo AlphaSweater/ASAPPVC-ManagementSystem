@@ -1,0 +1,273 @@
+﻿@using ASAPPVC.App.ViewModels.Reports
+@model PickingSlipViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Picking Slip • @Model.PickingSlipNumber</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="~/css/views/Reports/PickingSlip.css" />
+    <style>
+        @@page {
+            size: A4; /* 210mm × 297mm */
+            margin: 12mm;
+        }
+
+        @@top-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        @@bottom-center {
+            content: "";
+        }
+
+        @@page:left {
+            margin-left: 16mm;
+            margin-right: 10mm;
+        }
+
+        @@page:right {
+            margin-left: 10mm;
+            margin-right: 16mm;
+        }
+
+        @@media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tfoot {
+                display: table-footer-group;
+            }
+
+            .avoid-page-break {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .force-page-break {
+                break-after: page;
+                page-break-before: always;
+            }
+
+            table {
+                page-break-inside: auto;
+            }
+
+            tr, td, th {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- ===== Header ===== -->
+        <div class="report-header avoid-page-break">
+            <div class="company-logo">
+                <img src="@Model.LogoPath" alt="ASAPPVC" />
+            </div>
+            <div class="report-identity">
+
+                <div class="report-number monospace">@Model.PickingSlipNumber <span class="report-type-badge">Picking Slip</span></div>
+                <div class="report-metadata">
+                    Order <strong>#@Model.OrderNumber</strong> • Created <span class="monospace">@Model.CreatedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • Priority <span class="status-pill">@Model.Priority</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Top Info ===== -->
+        <div class="grid-three-columns avoid-page-break">
+            <!-- From -->
+            <div class="info-box">
+                <h3 class="info-box-title">From</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Company</div>
+                        <div class="field-value">@Model.From.Company</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Warehouse</div>
+                        <div class="field-value">@Model.From.Warehouse</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Contact</div>
+                        <div class="field-value">@Model.From.Contact</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For -->
+            <div class="info-box">
+                <h3 class="info-box-title">For</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Client</div>
+                        <div class="field-value">@Model.For.Client</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Project / Site</div>
+                        <div class="field-value">@Model.For.ProjectSite</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Contact</div>
+                        <div class="field-value">@Model.For.Contact</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order -->
+            <div class="info-box">
+                <h3 class="info-box-title">Order</h3>
+                <div class="info-fields">
+                    <div class="info-field">
+                        <div class="field-label">Order #</div>
+                        <div class="field-value monospace">@Model.Order.OrderNumber</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Created</div>
+                        <div class="field-value monospace">@Model.Order.Created.ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="field-label">Pick By</div>
+                        <div class="field-value monospace">@Model.Order.PickBy.ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </div>
+                <div class="flex-row-space-between qr-section">
+                    <div class="small-text">Scan to open order</div>
+                    <div class="qr-code-placeholder">QR</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Location Summary ===== -->
+        <div class="location-summary avoid-page-break">
+            <h3 class="summary-title">Location Summary (Aisle → Bin)</h3>
+            <div class="location-chips">
+                @foreach (var location in Model.LocationSummary)
+                {
+                    <span class="location-chip">@location</span>
+                }
+            </div>
+        </div>
+
+        <!-- ===== Parts Table ===== -->
+        <table class="parts-table">
+            <colgroup>
+                <col />
+                <col />
+                <col class="column-unit" />
+                <col class="column-number" />
+                <col class="column-location" />
+                <col class="column-picked" />
+                <col class="column-notes" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="column-product-part">Product / Part</th>
+                    <th>Description</th>
+                    <th class="text-center">Unit</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-center">Location</th>
+                    <th class="text-center">Picked</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+
+            @foreach (var group in Model.ProductGroups)
+            {
+                <!-- Product Group -->
+                <tbody class="product-group">
+                    <tr class="product-group-header">
+                        <td colspan="7">
+                            <div class="product-info">
+                                <span class="product-type-badge @(group.IsProduct ? "" : "loose-item")">@(group.IsProduct ? "Product" : "Loose")</span>
+                                @if (!string.IsNullOrEmpty(group.ProductCode))
+                                {
+                                    <span class="monospace">@group.ProductCode</span>
+                                    <text> • </text>
+                                }
+                                @group.ProductDescription
+                                @if (group.RequiredSets.HasValue)
+                                {
+                                    <span class="report-metadata ml-auto">Required Sets: <strong>@group.RequiredSets</strong></span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    @foreach (var item in group.Items)
+                    {
+                        <tr>
+                            <td class="monospace">@item.PartNumber</td>
+                            <td>@item.Description</td>
+                            <td class="text-center">@item.Unit</td>
+                            <td class="text-right">@item.Quantity</td>
+                            <td class="monospace text-center">@item.Location</td>
+                            <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+                            <td class="small-text">@item.Notes</td>
+                        </tr>
+                    }
+                </tbody>
+            }
+
+            <tfoot>
+                <tr>
+                    <td colspan="7">
+                        <div class="flex-row-space-between">
+                            <div class="small-text">
+                                Auto-generated on <span class="monospace">@Model.GeneratedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • All quantities shown are required to fulfill the order.
+                            </div>
+                            <div class="monospace">Total Lines: <strong>@Model.TotalLines</strong> • Total Units: <strong>@Model.TotalUnits</strong></div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- ===== Special Instructions ===== -->
+        @if (!string.IsNullOrEmpty(Model.SpecialInstructions))
+        {
+            <div class="info-box avoid-page-break mt-10">
+                <h3 class="info-box-title">Special Instructions</h3>
+                <div>@Model.SpecialInstructions</div>
+            </div>
+        }
+
+        <!-- ===== Footer / Sign-off ===== -->
+        <div class="signature-section avoid-page-break">
+            <div class="signature-box">
+                <h4 class="signature-box-title">Picked By</h4>
+                <div class="signature-line"></div>
+                <div>Date &amp; Time: ____________________</div>
+            </div>
+            <div class="signature-box">
+                <h4 class="signature-box-title">Checked By</h4>
+                <div class="signature-line"></div>
+                <div>Date &amp; Time: ____________________</div>
+            </div>
+            <div class="signature-box">
+                <h4 class="signature-box-title">Dispatch</h4>
+                <div>Courier: ________________________</div>
+                <div class="signature-line"></div>
+                <div>Pallets / Parcels: ______________</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,7 +1,6 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Models.Mappers;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Repositories;
+using ASAPPVC.App.Services;
 using FluentAssertions;
 using Moq;
 
@@ -38,7 +37,7 @@ namespace ASAPPVC.UnitTests.Services
                 Name = "P",
                 Description = "D",
                 Price = 1m,
-                Components = new List<ProductComponentFormVm> { new() { ComponentId = compId, } }
+                Components = new List<ProductComponentVm> { new() { ComponentId = compId, } }
             };
 
             _components.Setup(c => c.GetListByIdsAsync(It.IsAny<IEnumerable<Guid>>(), true, It.IsAny<System.Threading.CancellationToken>()))

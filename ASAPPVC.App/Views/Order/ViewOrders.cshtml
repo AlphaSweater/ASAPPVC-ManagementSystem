@@ -1,0 +1,248 @@
+@model List<ASAPPVC.App.Models.OrderListVm>
+@{
+	ViewData["Title"] = "Orders";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+}
+
+<style>
+	/* ---------- Root & Variables ---------- */
+	:root {
+		--primary-red: #d62828;
+		--primary-blue: #0d47a1;
+		--hover-red: #e03a3a;
+		--text-light: #ffffff;
+		--text-muted: rgba(255, 255, 255, 0.8);
+		--accent-orange: #ef4723;
+	}
+
+	/* ---------- Base & Background (use global site.css for background) ---------- */
+	* {
+		box-sizing: border-box;
+	}
+
+	html, body {
+		height: 100%;
+	}
+
+	/* background shapes come from site-level theme */
+
+	/* ---------- Main Content Layout ---------- */
+	.viewport {
+		padding: 40px 24px;
+		min-height: 100vh;
+	}
+
+	.content-container {
+		max-width: 1100px; /* Wider for tables */
+		margin: 0 auto;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+		border-radius: 16px;
+		padding: 32px 40px;
+	}
+
+	/* ---------- Header & Toolbar ---------- */
+	.page-header {
+		margin-bottom: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.main-title {
+		font-weight: 700;
+		font-size: 28px;
+		color: var(--text-light);
+		margin: 0;
+	}
+
+	.toolbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+
+	/* ---------- Alert Messages ---------- */
+	.alert {
+		padding: 16px 20px;
+		border-radius: 8px;
+		margin-bottom: 24px;
+		background: rgba(76, 175, 80, 0.2);
+		border: 1px solid rgba(76, 175, 80, 0.5);
+		color: var(--text-light);
+		font-size: 15px;
+	}
+
+	/* ---------- Action Buttons ---------- */
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		white-space: nowrap;
+	}
+
+	.btn {
+		height: 44px;
+		padding: 0 24px;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 16px;
+		cursor: pointer;
+		border: none;
+		transition: all .2s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+		.btn:active {
+			transform: scale(0.98);
+		}
+
+		.btn.btn-sm {
+			height: 36px;
+			padding: 0 16px;
+			font-size: 14px;
+		}
+
+	.btn-primary {
+		background: var(--primary-red);
+		color: var(--text-light);
+	}
+
+		.btn-primary:hover {
+			background: var(--hover-red);
+		}
+
+	.btn-secondary {
+		background: transparent;
+		color: var(--text-light);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+	}
+
+		.btn-secondary:hover {
+			background: rgba(255, 255, 255, 0.1);
+			border-color: rgba(255, 255, 255, 0.6);
+		}
+
+	/* ---------- Table Styling ---------- */
+	.table-section {
+		overflow-x: auto;
+	}
+
+	.table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+		.table th, .table td {
+			padding: 14px 16px;
+			text-align: left;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		}
+
+		.table thead th {
+			font-size: 14px;
+			font-weight: 700;
+			color: var(--text-light);
+			background-color: rgba(0, 0, 0, 0.15);
+		}
+
+		.table tbody tr {
+			transition: background-color 0.2s ease;
+		}
+
+			.table tbody tr:hover {
+				background-color: rgba(255, 255, 255, 0.08);
+			}
+
+		.table td {
+			font-size: 15px;
+			color: var(--text-muted);
+		}
+
+			.table td:first-child {
+				color: var(--text-light);
+				font-weight: 600;
+			}
+
+	.text-end {
+		text-align: right;
+	}
+</style>
+
+<div class="page">
+	@await Html.PartialAsync("_BackButton")
+
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Browse and manage customer orders.</p>
+			</div>
+			<div class="card-actions">
+				<a asp-action="AddOrder" class="btn btn-ghost">+ Create Order</a>
+			</div>
+		</header>
+
+		@if (TempData["AlertMessage"] is string alert)
+		{
+			<div class="alert">@alert</div>
+		}
+
+		<div class="card-body">
+			<section class="fields-panel" style="width:100%">
+				<section class="table-section">
+					<table class="table">
+						<thead>
+							<tr>
+								<th style="width:110px;">Order #</th>
+								<th>Customer</th>
+								<th style="width:180px;">Date</th>
+								<th style="width:150px;">Status</th>
+								<th style="width:120px;" class="text-end"># Products</th>
+								<th style="width:150px; text-align:center;">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (Model == null || !Model.Any())
+							{
+								<tr>
+									<td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">
+										No orders yet.
+									</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var o in Model)
+								{
+									<tr>
+										<td>@o.OrderCode</td>
+										<td>@o.CustomerName </td>
+										<td>@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+										<td>@o.OrderStatus</td>
+										<td class="text-end">@o.ItemCount</td>
+										<td>
+											<div class="actions">
+												<a asp-action="ViewOrder" asp-route-id="@o.Id" class="btn btn-secondary btn-sm">View</a>
+											</div>
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</section>
+			</section>
+		</div>
+	</div>
+</div>

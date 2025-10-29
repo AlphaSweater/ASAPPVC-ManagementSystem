@@ -1,7 +1,7 @@
-﻿using ASAPPVC.UI.Models;
-using ASAPPVC.UI.Repositories;
-using ASAPPVC.UI.Services;
-using ASAPPVC.UI.ViewModels.Auth;
+﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
+using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Auth;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +11,6 @@ namespace ASAPPVC.UnitTests.Services
 {
     public class AuthServiceTests
     {
-        private readonly Mock<IUserRepository> _userRepo = new();
         private readonly Mock<UserManager<ApplicationUser>> _userManager;
         private readonly Mock<SignInManager<ApplicationUser>> _signInManager;
         private readonly AuthService _sut;
@@ -28,7 +27,7 @@ namespace ASAPPVC.UnitTests.Services
                 Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(),
                 null, null, null, null);
 
-            _sut = new AuthService(_userManager.Object, _signInManager.Object, _userRepo.Object);
+            _sut = new AuthService(_userManager.Object, _signInManager.Object);
         }
 
         // ---------------- Calls Sign In Manager ----------------
@@ -53,7 +52,7 @@ namespace ASAPPVC.UnitTests.Services
         public async Task RegisterAsync_CreateFails_ReturnsFailureAndDoesNotAddRole()
         {
             // Arrange
-            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = UI.Models.Enums.RoleType.Admin };
+            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = RoleType.Admin };
             _userManager.Setup(u => u.CreateAsync(It.IsAny<ApplicationUser>(), vm.Password))
                         .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "err" }));
 
@@ -70,7 +69,7 @@ namespace ASAPPVC.UnitTests.Services
         public async Task RegisterAsync_CreateSucceeds_AddToRoleSucceeds_ReturnsSuccess()
         {
             // Arrange
-            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = UI.Models.Enums.RoleType.Admin };
+            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = RoleType.Admin };
             _userManager.Setup(u => u.CreateAsync(It.IsAny<ApplicationUser>(), vm.Password))
                         .ReturnsAsync(IdentityResult.Success);
             _userManager.Setup(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), vm.Role.ToString()))
@@ -89,7 +88,7 @@ namespace ASAPPVC.UnitTests.Services
         public async Task RegisterAsync_AddRoleThrows_RollsBackAndReturnsFailedWithProfileCreationCode()
         {
             // Arrange
-            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = UI.Models.Enums.RoleType.Admin };
+            var vm = new RegisterViewModel { Email = "x@y.com", Password = "pw", Role = RoleType.Admin };
             _userManager.Setup(u => u.CreateAsync(It.IsAny<ApplicationUser>(), vm.Password))
                         .ReturnsAsync(IdentityResult.Success);
             _userManager.Setup(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), vm.Role.ToString()))

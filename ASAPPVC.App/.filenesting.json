@@ -1,0 +1,21 @@
+﻿{
+    "dependentFileProviders":  {
+                                   "add":  {
+                                               "extensionToExtension":  {
+                                                                            "add":  {
+                                                                                        ".css":  [
+                                                                                                     ".cshtml"
+                                                                                                 ],
+                                                                                        ".js":  [
+                                                                                                    ".cshtml"
+                                                                                                ]
+                                                                                    }
+                                                                        },
+                                               "fileToFile":  {
+                                                                  "add":  {
+
+                                                                          }
+                                                              }
+                                           }
+                               }
+}
