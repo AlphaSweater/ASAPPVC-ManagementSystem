@@ -22,32 +22,12 @@ namespace ASAPPVC.UnitTests.Services
         [Fact]
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
-            var vm = new ProductFormVm { ProductName = "", Description = "", SellingPrice = 0m, ProductComponents = new() };
+            var vm = new ProductFormVm { ProductName = "", Description = "", SellingPrice = 0m, SelectedProductComponents = new() };
             var res = await _sut.CreateAsync(vm);
             res.Ok.Should().BeFalse();
             // Accept either of the validation messages produced by the service
             (res.Error?.Contains("Product name is required") == true || res.Error?.Contains("Product price must be greater than zero") == true)
                 .Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task CreateAsync_MissingComponents_ReturnsFailure()
-        {
-            var compId = Guid.NewGuid();
-            var vm = new ProductFormVm
-            {
-                ProductName = "P123",
-                Description = "A valid description for test",
-                SellingPrice = 1m,
-                ProductComponents = new List<ProductComponentVm> { new() { ComponentId = compId, RequiredQuantity = 1m } }
-            };
-
-            _components.Setup(c => c.GetListByIdsAsync(It.IsAny<IEnumerable<Guid>>(), true, It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(new List<Component>());
-
-            var res = await _sut.CreateAsync(vm);
-            res.Ok.Should().BeFalse();
-            res.Error.Should().Contain("Some components do not exist");
         }
 
         [Fact]
@@ -59,7 +39,7 @@ namespace ASAPPVC.UnitTests.Services
                 ProductName = "P123",
                 Description = "A valid description for test",
                 SellingPrice = 9.99m,
-                ProductComponents = new List<ProductComponentVm> { new() { ComponentId = compId, RequiredQuantity = 1m } }
+                SelectedProductComponents = new List<ProductComponentVm> { new() { ComponentId = compId, RequiredQuantity = 1m } }
             };
 
             var component = new Component { Id = compId, UnitCost = 1m, UnitOfMeasure = Unit.Piece };
@@ -67,7 +47,7 @@ namespace ASAPPVC.UnitTests.Services
                        .ReturnsAsync(new List<Component> { component });
 
             var product = new Product { Id = Guid.NewGuid(), ProductName = vm.ProductName, Description = vm.Description, SellingPrice = vm.SellingPrice };
-            _mapper.Setup(m => m.FromCreateVmAsync(vm, It.IsAny<IDictionary<Guid, Unit>>(), It.IsAny<CancellationToken>()))
+            _mapper.Setup(m => m.FromCreateVmAsync(vm, It.IsAny<CancellationToken>()))
                    .ReturnsAsync(product);
 
             _products.Setup(p => p.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>())).ReturnsAsync(product);

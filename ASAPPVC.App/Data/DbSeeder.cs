@@ -284,7 +284,7 @@ namespace ASAPPVC.App.Data
                     SellingPrice  = 12999.00m,
                     ReorderLevel  = 3m,
                     IsActive      = true,
-                    ProductComponents = new()             // BOM to be added next
+                    SelectedProductComponents = new()             // BOM to be added next
 				},
                 new()
                 {
@@ -299,7 +299,7 @@ namespace ASAPPVC.App.Data
                     SellingPrice  = 4499.00m,
                     ReorderLevel  = 5m,
                     IsActive      = true,
-                    ProductComponents = new()
+                    SelectedProductComponents = new()
                 },
                 new()
                 {
@@ -314,7 +314,7 @@ namespace ASAPPVC.App.Data
                     SellingPrice  = 5299.00m,
                     ReorderLevel  = 4m,
                     IsActive      = true,
-                    ProductComponents = new()
+                    SelectedProductComponents = new()
                 },
                 new()
                 {
@@ -329,7 +329,7 @@ namespace ASAPPVC.App.Data
                     SellingPrice  = 18499.00m,
                     ReorderLevel  = 2m,
                     IsActive      = true,
-                    ProductComponents = new()
+                    SelectedProductComponents = new()
                 },
                 new()
                 {
@@ -344,14 +344,14 @@ namespace ASAPPVC.App.Data
                     SellingPrice  = 6699.00m,
                     ReorderLevel  = 3m,
                     IsActive      = true,
-                    ProductComponents = new()
+                    SelectedProductComponents = new()
                 }
             };
 
             // Only create products that include component lines (ProductComponents.Count >0).
             foreach (var vm in demoProducts)
             {
-                if (vm.ProductComponents is null || vm.ProductComponents.Count == 0)
+                if (vm.SelectedProductComponents is null || vm.SelectedProductComponents.Count == 0)
                 {
                     // Skip incomplete placeholder entries - user will provide data later.
                     continue;
