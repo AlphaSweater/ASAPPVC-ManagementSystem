@@ -123,8 +123,8 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
             var saved = op.Value;
             TempData["AlertMessage"] = vm.IsEdit
-                ? $"Component '{saved.Name}' updated."
-                : $"Component '{saved.Name}' created.";
+                ? $"Component '{saved.ComponentName}' updated."
+                : $"Component '{saved.ComponentName}' created.";
 
             // Prefer friendly code when available
             return !string.IsNullOrWhiteSpace(saved.ComponentCode)

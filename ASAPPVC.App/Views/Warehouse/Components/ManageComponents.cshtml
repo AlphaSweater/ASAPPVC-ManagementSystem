@@ -12,8 +12,6 @@
 }
 
 <div class="page">
-	@await Html.PartialAsync("_BackButton")
-
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
@@ -90,7 +88,7 @@
 												@($"{c.CurrentAmount} {c.ShortFormattedAmount}")
 											</td>
 
-											<td class="ft-money ft-shrink">@c.DisplayCost</td>
+											<td class="ft-money ft-shrink">@c.DisplayPrice</td>
 
 											<td class="ft-actions ft-shrink">
 												<div class="actions">

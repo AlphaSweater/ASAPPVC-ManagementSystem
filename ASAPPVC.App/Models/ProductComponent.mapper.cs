@@ -66,7 +66,7 @@ namespace ASAPPVC.App.Models
                 ProductId = productComponent.ProductId,
                 ComponentId = productComponent.ComponentId,
                 ComponentCode = productComponent.Component?.ComponentCode ?? string.Empty,
-                ComponentName = productComponent.Component?.Name ?? string.Empty,
+                ComponentName = productComponent.Component?.ComponentName ?? string.Empty,
                 Unit = productComponent.Unit,
                 Quantity = productComponent.QuantityRequired,
                 UnitCost = productComponent.Component?.UnitCost ?? 0m,
