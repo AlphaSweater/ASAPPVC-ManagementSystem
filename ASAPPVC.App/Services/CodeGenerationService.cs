@@ -138,31 +138,34 @@ namespace ASAPPVC.App.Services
         private static string BuildCodeBase(CodeGenerationRequest req, string prefix, int number, DateTime tsUtc)
         {
             string category = KeepAlnumUpper(req.Category, 3);
+            string material = KeepAlnumUpper(req.Material, 3);
             string? version = req.Version.HasValue ? $"V{Math.Clamp(req.Version.Value, 1, 99):00}" : null;
 
             return (req.Type) switch
             {
                 CodeType.Product => BuildProductCode(prefix, category, number, version),
-                CodeType.Component => BuildComponentCode(prefix, number),
+                CodeType.Component => BuildComponentCode(prefix, material, number),
                 CodeType.Order => $"{prefix}-{tsUtc:yyyyMM}-{number:0000}",
                 CodeType.PickingSlip => BuildPickingSlipCode(prefix, req.RelatedCode!, version!, number),
                 _ => $"{prefix}-{number:0000}"
             };
         }
 
-        private static string BuildProductCode(string pfx, string category, int num, string? ver)
+        private static string BuildProductCode(string pfx, string categoryPfx, int num, string? ver)
         {
-            if (!string.IsNullOrEmpty(category) && ver is not null)
-                return $"{pfx}-{category}-{num:0000}-{ver}";
-            if (!string.IsNullOrEmpty(category))
-                return $"{pfx}-{category}-{num:0000}";
+            if (!string.IsNullOrEmpty(categoryPfx) && ver is not null)
+                return $"{pfx}-{categoryPfx}-{num:0000}-{ver}";
+            if (!string.IsNullOrEmpty(categoryPfx))
+                return $"{pfx}-{categoryPfx}-{num:0000}";
             if (ver is not null)
                 return $"{pfx}-{num:0000}-{ver}";
             return $"{pfx}-{num:0000}";
         }
 
-        private static string BuildComponentCode(string pfx, int num)
+        private static string BuildComponentCode(string pfx, string materialPfx, int num)
         {
+            if (!string.IsNullOrEmpty(materialPfx))
+                return $"{pfx}-{materialPfx}-{num:00000}";
             return $"{pfx}-{num:00000}";
         }
 

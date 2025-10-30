@@ -77,10 +77,13 @@ namespace ASAPPVC.App.Models.Enums
         Copper = 7,
 
         [ModifierAttr("RUB", "Rubber")]
-        Rubber = 9,
+        Rubber = 8,
 
         [ModifierAttr("CHM", "Chemical")]
-        Chemical = 8,
+        Chemical = 9,
+
+        [ModifierAttr("GLS", "Glass")]
+        Glass = 10
     }
 
     // Convenience extension methods that use EnumAttributeAccessor to read attribute data.
