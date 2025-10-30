@@ -1,5 +1,4 @@
-﻿using ASAPPVC.App.Models.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.App.Models
@@ -10,6 +9,10 @@ namespace ASAPPVC.App.Models
     /// </summary>
     public class ProductComponent
     {
+        // ===============================
+        // Core Identification
+        // ===============================
+
         // Foreign key to the Product
         [Required, ForeignKey(nameof(Product))]
         public Guid ProductId { get; set; }
@@ -18,18 +21,27 @@ namespace ASAPPVC.App.Models
         [Required, ForeignKey(nameof(Component))]
         public Guid ComponentId { get; set; }
 
-        // Unit of Measure for the Component in this Product
-        [Required]
-        public Unit Unit { get; set; } = Unit.Piece;
+        // ===============================
+        // Quantity Requirements
+        // ===============================
 
-        // Quantity of this Component in the Product
-        [Required]
-        [Range(typeof(decimal), "0.01", "999999", ErrorMessage = "Quantity must be greater than zero")]
-        public decimal QuantityRequired { get; set; } = 1m;
+        // How many component units are required to make ONE product unit.
+        [Required, Column(TypeName = "decimal(18,4)")]
+        [Range(0.0001, double.MaxValue, ErrorMessage = "Quantity per unit must be > 0")]
+        public decimal RequiredQuantity { get; set; } = 1m;
 
-        // Navigation properties
-        public Component? Component { get; set; }
+        // ===============================
+        // Audit
+        // ===============================
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+        // ===============================
+        // Navigation
+        // ===============================
 
         public Product? Product { get; set; }
+        public Component? Component { get; set; }
     }
 }

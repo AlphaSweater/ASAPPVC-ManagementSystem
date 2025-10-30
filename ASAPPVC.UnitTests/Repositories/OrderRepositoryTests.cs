@@ -30,7 +30,7 @@ namespace ASAPPVC.UnitTests.Repositories
             var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", Name = "Widget", Price = 5m, Description = "D" };
 
             var order = new Order { Id = Guid.NewGuid(), OrderCode = "ORD-001", CustomerId = customer.Id, OrderDate = DateTime.UtcNow, OrderStatus = default };
-            var op = new OrderProduct { OrderId = order.Id, ProductId = product.Id, Quantity = 2 };
+            var op = new OrderProduct { OrderId = order.Id, ProductId = product.Id, OrderedQuantity = 2 };
 
             // set navigation properties so EF will wire them if tracked
             order.OrderProducts = new List<OrderProduct> { op };

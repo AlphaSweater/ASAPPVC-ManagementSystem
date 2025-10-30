@@ -128,7 +128,7 @@ namespace ASAPPVC.App.Controllers
                 Products = order.OrderProducts.Select(op => new OrderProductVm
                 {
                     ProductId = op.ProductId,
-                    Quantity = op.Quantity
+                    Quantity = op.OrderedQuantity
                 }).ToList()
             };
 

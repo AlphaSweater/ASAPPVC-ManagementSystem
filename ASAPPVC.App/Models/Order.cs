@@ -5,6 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.App.Models
 {
+    /// <summary>
+    /// Domain model representing a customer order. This class contains only data and
+    /// mapping annotations. Business logic and calculations should live in services.
+    /// </summary>
     [Index(nameof(OrderCode), IsUnique = true)]
     public class Order
     {
@@ -16,58 +20,64 @@ namespace ASAPPVC.App.Models
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required, MaxLength(64)]
-        public string OrderCode { get; set; } = string.Empty; // e.g., ORD-202510-0001
+        public string OrderCode { get; set; } = string.Empty; // Human-friendly unique order code (e.g. ORD-202510-0001).
 
-        // Who placed this order (customer account)
+        // ===============================
+        // Relationships (FKs)
+        // ===============================
+
         [Required, ForeignKey(nameof(Customer))]
         public Guid CustomerId { get; set; }
 
         public Customer? Customer { get; set; }
 
-        // Who created the order in the system (your staff/employee)
         [Required, ForeignKey(nameof(CreatedBy))]
         public Guid CreatedByUserId { get; set; }
 
         public ApplicationUser? CreatedBy { get; set; }
 
-        // Optional: who last updated (for audit trails)
         [ForeignKey(nameof(UpdatedBy))]
         public Guid? UpdatedByUserId { get; set; }
 
         public ApplicationUser? UpdatedBy { get; set; }
 
         // ===============================
-        // Dates & Lifecycle
+        // Dates
         // ===============================
 
         [Required]
-        public DateTime OrderDate { get; set; } = DateTime.UtcNow; // when order was placed
+        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         // ===============================
-        // Statuses
+        // Status
         // ===============================
 
         [Required]
-        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; // your existing enum
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
         // ===============================
-        // Money (Stored and Set in Services)
+        // Money (stored snapshot values)
+        // Services should populate and update these values.
         // ===============================
 
-        [Required, MaxLength(3)]
+        [Required, StringLength(3, MinimumLength = 3)]
         public string Currency { get; set; } = "ZAR";
 
+        [Precision(18, 2)]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Subtotal { get; set; } = 0m;   // sum of lines before tax/discount
+        public decimal Subtotal { get; set; } = 0m;
 
+        [Precision(18, 2)]
         [Column(TypeName = "decimal(18,2)")]
         public decimal DiscountAmount { get; set; } = 0m;
 
+        [Precision(18, 2)]
         [Column(TypeName = "decimal(18,2)")]
         public decimal TaxAmount { get; set; } = 0m;
 
+        [Precision(18, 2)]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Total { get; set; } = 0m;      // Subtotal - Discount + Tax + Shipping
+        public decimal Total { get; set; } = 0m;
 
         // ===============================
         // Audit
@@ -77,7 +87,7 @@ namespace ASAPPVC.App.Models
         public DateTime? UpdatedAt { get; set; }
 
         // ===============================
-        // Relationships
+        // Navigation
         // ===============================
 
         public List<OrderProduct> OrderProducts { get; set; } = new();

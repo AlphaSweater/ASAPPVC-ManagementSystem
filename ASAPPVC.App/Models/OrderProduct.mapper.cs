@@ -66,7 +66,7 @@ namespace ASAPPVC.App.Models
           ProductCode = orderProduct.Product?.ProductCode ?? string.Empty,
        ProductName = orderProduct.Product?.Name ?? string.Empty,
        UnitPrice = orderProduct.Product?.Price ?? 0m,
-       Quantity = orderProduct.Quantity,
+       Quantity = orderProduct.OrderedQuantity,
       Remove = false // Default for display/edit scenarios
    };
     }
@@ -91,7 +91,7 @@ namespace ASAPPVC.App.Models
             {
     OrderId = orderId,
          ProductId = vm.ProductId,
-     Quantity = NormalizeQuantity(vm.Quantity)
+     OrderedQuantity = NormalizeQuantity(vm.Quantity)
    };
   }
 
@@ -119,7 +119,7 @@ namespace ASAPPVC.App.Models
       ArgumentNullException.ThrowIfNull(vm);
 
        target.ProductId = vm.ProductId;
-         target.Quantity = NormalizeQuantity(vm.Quantity);
+         target.OrderedQuantity = NormalizeQuantity(vm.Quantity);
    }
 
         public List<OrderProduct> ApplyVms(IEnumerable<OrderProduct> existingProducts, IEnumerable<OrderProductVm> items)
