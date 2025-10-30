@@ -43,12 +43,12 @@ namespace ASAPPVC.App.Models
         /// <summary>
         /// Creates a new Product from a ProductFormVm.
         /// </summary>
-        Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
+        Task<Product> FromCreateVmAsync(ProductFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Applies an update to an existing Product from a ProductFormVm and returns the modified entity.
         /// </summary>
-        Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
+        Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, CancellationToken ct = default);
     }
 
     #endregion Interface
@@ -68,21 +68,24 @@ namespace ASAPPVC.App.Models
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var pcs = product.ProductComponents ?? new List<ProductComponent>();
+            var productComponents = product.ProductComponents ?? new List<ProductComponent>();
+            var hasImage = product.Image?.Data is { Length: > 0 };
 
             return new ProductListVm
             {
                 Id = product.Id,
                 ProductCode = product.ProductCode,
-                Name = product.Name,
-                Price = product.Price,
+
+                ProductName = product.ProductName,
                 Description = product.Description,
-                HasImage = product.Image?.Data is { Length: > 0 },
-                ThumbUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image/thumb" : null,
-                ComponentCount = pcs.Count,
-                Category = product.Category,
-                Material = product.Material,
-                Colour = product.Colour
+                HasImage = hasImage,
+                ThumbUrl = hasImage ? $"/products/{product.Id}/image/thumb" : null,
+
+                SellingPrice = product.SellingPrice,
+
+                ReorderLevel = product.ReorderLevel,
+
+                ComponentCount = productComponents.Count,
             };
         }
 
@@ -90,20 +93,29 @@ namespace ASAPPVC.App.Models
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var components = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+            var productComponents = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+            var hasImage = product.Image?.Data is { Length: > 0 };
 
             return new ProductDetailVm
             {
                 Id = product.Id,
                 ProductCode = product.ProductCode,
-                Name = product.Name,
-                Price = product.Price,
+
+                ProductName = product.ProductName,
                 Description = product.Description,
-                ImageUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image" : null,
-                Components = components,
+                HasImage = hasImage,
+                ImageUrl = hasImage ? $"/products/{product.Id}/image" : null,
+
                 Category = product.Category,
-                Material = product.Material,
-                Colour = product.Colour
+                MaterialType = product.MaterialType,
+                ColourOption = product.ColourOption,
+
+                SellingPrice = product.SellingPrice,
+                ProductionCost = product.ProductionCost,
+
+                ReorderLevel = product.ReorderLevel,
+
+                ProductComponents = productComponents,
             };
         }
 
@@ -111,20 +123,28 @@ namespace ASAPPVC.App.Models
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            var components = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
+            var productComponents = _productComponentMapper.ToBridgeVms(product.ProductComponents ?? Enumerable.Empty<ProductComponent>());
 
             return new ProductFormVm
             {
                 Id = product.Id,
                 ProductCode = product.ProductCode,
-                Name = product.Name,
-                Price = product.Price,
+
+                ProductName = product.ProductName,
                 Description = product.Description,
                 ExistingImageUrl = product.Image?.Data is { Length: > 0 } ? $"/products/{product.Id}/image" : null,
+
                 Category = product.Category,
-                Material = product.Material,
-                Colour = product.Colour,
-                Components = components
+                MaterialType = product.MaterialType,
+                ColourOption = product.ColourOption,
+
+                SellingPrice = product.SellingPrice,
+
+                ReorderLevel = product.ReorderLevel,
+
+                IsActive = product.IsActive,
+
+                SelectedProductComponents = productComponents
             };
         }
 
@@ -132,41 +152,47 @@ namespace ASAPPVC.App.Models
         // ViewModels → Domain (Create / Update)
         // ------------------------------------------------------------
 
-        public async Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> FromCreateVmAsync(ProductFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
             var product = new Product
             {
-                ProductCode = NormalizeCodeOrGenerate(vm.ProductCode, "PROD"),
-                Name = NormalizeString(vm.Name),
+                ProductCode = NormalizeCodeOrGenerate(vm.ProductCode, "PROD", vm.Category.GetCode()),
+
+                ProductName = NormalizeString(vm.ProductName),
                 Description = NormalizeString(vm.Description),
-                Price = NormalizeMoney(vm.Price),
+
                 Category = vm.Category,
-                Material = vm.Material,
-                Colour = vm.Colour
+                MaterialType = vm.MaterialType,
+                ColourOption = vm.ColourOption,
+
+                SellingPrice = NormalizeMoney(vm.SellingPrice),
+
+                ReorderLevel = vm.ReorderLevel,
+
+                IsActive = true,
             };
 
             // Process image upload if provided
             if (vm.Image is not null)
             {
-                if (ImageService is null)
+                if (_imageService is null)
                     throw new InvalidOperationException("Image service is not available.");
 
-                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                var processed = await _imageService.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
                     throw new InvalidOperationException(processed.Error);
 
                 product.Image = processed.Value!.ToAppImage();
             }
 
-            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            product.ProductComponents = _productComponentMapper.FromBridgeVms(product.Id, vm.Components ?? Enumerable.Empty<ProductComponentVm>(), lookup);
+            product.ProductComponents = _productComponentMapper.FromBridgeVms(product.Id, vm.SelectedProductComponents ?? Enumerable.Empty<ProductComponentVm>());
 
             return product;
         }
 
-        public async Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);
@@ -174,41 +200,34 @@ namespace ASAPPVC.App.Models
                 throw new InvalidOperationException("Mismatched product Id.");
 
             existing.ProductCode = NormalizeString(vm.ProductCode);
-            existing.Name = NormalizeString(vm.Name);
+            existing.ProductName = NormalizeString(vm.ProductName);
             existing.Description = NormalizeString(vm.Description);
-            existing.Price = NormalizeMoney(vm.Price);
 
-            // Image semantics:
-            // null → leave unchanged
-            // empty → clear
-            // filled → replace
-            if (vm.Image is null)
+            existing.Category = vm.Category;
+            existing.MaterialType = vm.MaterialType;
+            existing.ColourOption = vm.ColourOption;
+
+            existing.SellingPrice = NormalizeMoney(vm.SellingPrice);
+
+            existing.ReorderLevel = vm.ReorderLevel;
+
+            existing.IsActive = vm.IsActive;
+
+            // Process new image upload if provided
+            if (vm.Image is not null)
             {
-                // leave as-is
-            }
-            else if (vm.Image.Length == 0)
-            {
-                existing.Image = null;
-            }
-            else
-            {
-                if (ImageService is null)
+                if (_imageService is null)
                     throw new InvalidOperationException("Image service is not available.");
 
-                var processed = await ImageService.ProcessUploadAsync(vm.Image, ct);
+                var processed = await _imageService.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
-                    throw new InvalidOperationException(processed.Error);
+                    throw new InvalidOperationException(processed.Error ?? "Image processing failed.");
 
-                existing.Image = processed.Value!.ToAppImage();
+                existing.Image = processed.Value?.ToAppImage()
+                    ?? throw new InvalidOperationException("Processed image returned null.");
             }
 
-            // Simple modifiers
-            existing.Category = vm.Category;
-            existing.Material = vm.Material;
-            existing.Colour = vm.Colour;
-
-            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            existing.ProductComponents = _productComponentMapper.ApplyUpdateToBridgeVms(existing.ProductComponents, existing.Id, vm.Components ?? Enumerable.Empty<ProductComponentVm>(), lookup);
+            existing.ProductComponents = _productComponentMapper.ApplyUpdateToBridgeVms(existing.ProductComponents, existing.Id, vm.SelectedProductComponents ?? Enumerable.Empty<ProductComponentVm>());
 
             return existing;
         }

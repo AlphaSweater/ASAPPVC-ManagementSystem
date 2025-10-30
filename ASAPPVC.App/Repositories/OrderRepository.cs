@@ -36,6 +36,15 @@ namespace ASAPPVC.App.Repositories
         Task<Order?> GetByIdOrCodeWithDetailsAsync(Guid? id = null, string? code = null, bool asNoTracking = true, CancellationToken ct = default);
 
         /// <summary>
+        /// Loads the full domain graph for a single order (aggregate root) by Id:
+        /// Order → Customer, OrderProducts → Product → ProductComponents → Component.
+        /// </summary>
+        /// <param name="id">Order Id (Guid).</param>
+        /// <param name="asNoTracking">Return untracked entities when true (default).</param>
+        /// <param name="ct">Cancellation token.</param>
+        Task<Order?> GetFullDomainAsync(Guid id, bool asNoTracking = true, CancellationToken ct = default);
+
+        /// <summary>
         /// Retrieves multiple orders by either a collection of <paramref name="ids"/> or a collection of <paramref name="codes"/>.<br/>
         /// Implementations may prefer ids when any valid guid is present and fallback to codes otherwise.<br/>
         /// </summary>
@@ -108,6 +117,7 @@ namespace ASAPPVC.App.Repositories
             if (id.HasValue && id.Value != Guid.Empty)
             {
                 var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+
                 return await query
                     .Include(o => o.Customer)
                     .Include(o => o.OrderProducts)
@@ -119,6 +129,7 @@ namespace ASAPPVC.App.Repositories
             if (!string.IsNullOrWhiteSpace(code))
             {
                 var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+
                 return await query
                     .Include(o => o.Customer)
                     .Include(o => o.OrderProducts)
@@ -128,6 +139,25 @@ namespace ASAPPVC.App.Repositories
 
             // Neither provided => nothing to fetch
             return null;
+        }
+
+        public async Task<Order?> GetFullDomainAsync(
+        Guid id,
+        bool asNoTracking = true,
+        CancellationToken ct = default)
+        {
+            if (id == Guid.Empty) return null;
+
+            var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+
+            return await query
+                .AsSplitQuery()
+                .Include(o => o.Customer)
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                        .ThenInclude(p => p.ProductComponents)
+                            .ThenInclude(pc => pc.Component)
+                .FirstOrDefaultAsync(o => o.Id == id, ct);
         }
 
         public async Task<List<Order>> GetListByIdsOrCodesAsync(
@@ -153,6 +183,7 @@ namespace ASAPPVC.App.Repositories
         public async Task<List<Order>> GetListWithDetailsAsync(bool asNoTracking = true, CancellationToken ct = default)
         {
             var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
+
             return await query
                 .Include(o => o.Customer)
                 .Include(o => o.OrderProducts)
@@ -164,6 +195,7 @@ namespace ASAPPVC.App.Repositories
         public async Task<List<Order>> GetListAsync(bool asNoTracking = true, CancellationToken ct = default)
         {
             var list = await ListAsync(asNoTracking, ct);
+
             return list.OrderByDescending(o => o.OrderDate).ToList();
         }
 

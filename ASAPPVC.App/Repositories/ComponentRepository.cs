@@ -119,9 +119,9 @@ namespace ASAPPVC.App.Repositories
 
             // Simple contains search on Name/ComponentCode; push to DB with tracking control
             var query = asNoTracking ? _set.AsNoTracking() : _set.AsQueryable();
-            return query.Where(p => EF.Functions.Like(p.Name, $"%{term}%")
-                                || EF.Functions.Like(p.ComponentCode, $"%{term}%"))
-                       .OrderBy(p => p.Name)
+            return query.Where(c => EF.Functions.Like(c.ComponentName, $"%{term}%")
+                                || EF.Functions.Like(c.ComponentCode, $"%{term}%"))
+                       .OrderBy(c => c.ComponentName)
                        .ToListAsync(ct);
         }
     }

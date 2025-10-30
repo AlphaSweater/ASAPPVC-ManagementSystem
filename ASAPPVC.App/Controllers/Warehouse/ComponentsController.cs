@@ -123,8 +123,8 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
             var saved = op.Value;
             TempData["AlertMessage"] = vm.IsEdit
-                ? $"Component '{saved.Name}' updated."
-                : $"Component '{saved.Name}' created.";
+                ? $"Component '{saved.ComponentName}' updated."
+                : $"Component '{saved.ComponentName}' created.";
 
             // Prefer friendly code when available
             return !string.IsNullOrWhiteSpace(saved.ComponentCode)
@@ -136,7 +136,11 @@ namespace ASAPPVC.App.Controllers.Warehouse
         private RedirectToActionResult GoIndexWithError(string message)
         {
             TempData["ErrorMessage"] = message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(
+                actionName: "Index",
+                controllerName: "Warehouse",
+                routeValues: new { area = "Warehouse" }
+            );
         }
     }
 }

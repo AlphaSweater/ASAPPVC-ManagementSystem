@@ -1,9 +1,12 @@
 using ASAPPVC.App.Data;
 using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Filters;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace ASAPPVC.App
 {
@@ -62,7 +65,13 @@ namespace ASAPPVC.App
             // ============================================
             // MVC / Razor Pages
             // ============================================
-            services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<ValidationActionFilter>();
+            });
+
+            // discover all validators in this assembly
+            builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Add in-memory caching
             services.AddMemoryCache();

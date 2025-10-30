@@ -17,16 +17,6 @@
     {
         [UnitAttr("PC", "piece", "pc")] Piece,
         [UnitAttr("PR", "pair", "pair")] Pair,
-        [UnitAttr("SH", "sheet", "sheet")] Sheet,
-        [UnitAttr("BT", "bottle", "bottle")] Bottle,
-        [UnitAttr("CN", "can", "can")] Can,
-        [UnitAttr("TB", "tube", "tube")] Tube,
-        [UnitAttr("PK", "pack", "pack")] Pack,
-        [UnitAttr("ST", "set", "set")] Set,
-        [UnitAttr("BG", "bag", "bag")] Bag,
-        [UnitAttr("RL", "roll", "roll")] Roll,
-        [UnitAttr("BX", "box", "box")] Box,
-        [UnitAttr("PL", "pallet", "pallet")] Pallet,
 
         [UnitAttr("M", "meter", "m")] Meter,
         [UnitAttr("CM", "centimeter", "cm")] Centimeter,
@@ -52,7 +42,7 @@
                 var txt = shortVal;
                 if (quantity != 1 && !txt.EndsWith("s", StringComparison.OrdinalIgnoreCase))
                     txt += "s";
-                return txt;
+                return $"{quantity} {txt}";
             }
             else
             {
@@ -60,7 +50,7 @@
                 var txt = name;
                 if (quantity != 1 && !txt.EndsWith("s", StringComparison.OrdinalIgnoreCase))
                     txt += "s";
-                return txt;
+                return $"{quantity} {txt}";
             }
         }
     }

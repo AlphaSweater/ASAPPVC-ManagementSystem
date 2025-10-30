@@ -89,7 +89,7 @@ public class CodeGenerationServiceTests
         result.Value.Should().MatchRegex(@"^PRD-DRR-\d{4}-V12-[A-Z0-9]$"); // e.g., PRD-DRR-0099-V12-X
     }
 
-    // ---------------- Component: Generate without category ----------------
+    // ---------------- Component: Generate Code----------------
     [Fact]
     public async Task GenerateComponentCode_WithoutCategory_ReturnsCorrectFormat()
     {
@@ -97,32 +97,14 @@ public class CodeGenerationServiceTests
         _counters.Setup(r => r.IncrementAndGetAsync(CodeType.Component, null, It.IsAny<CancellationToken>()))
                  .ReturnsAsync(123);
 
-        var request = new CodeGenerationRequest { Type = CodeType.Component };
+        var request = new CodeGenerationRequest { Type = CodeType.Component, Material = Material.PVC.GetCode() };
 
         // Act
         var result = await _sut.GenerateCodeAsync(request);
 
         // Assert
         result.Ok.Should().BeTrue();
-        result.Value.Should().MatchRegex(@"^CMP-\d{5}-[A-Z0-9]$"); // e.g., CMP-00123-X
-    }
-
-    // ---------------- Component: Generate with category ----------------
-    [Fact]
-    public async Task GenerateComponentCode_WithCategory_IncludesCategory()
-    {
-        // Arrange
-        _counters.Setup(r => r.IncrementAndGetAsync(CodeType.Component, null, It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(456);
-
-        var request = new CodeGenerationRequest { Type = CodeType.Component, Category = "HNG" };
-
-        // Act
-        var result = await _sut.GenerateCodeAsync(request);
-
-        // Assert
-        result.Ok.Should().BeTrue();
-        result.Value.Should().MatchRegex(@"^CMP-HNG-\d{5}-[A-Z0-9]$"); // e.g., CMP-HNG-00456-X
+        result.Value.Should().MatchRegex(@"^CMP-PVC-\d{5}-[A-Z0-9]$"); // e.g., CMP-PVC-00123-X
     }
 
     // ---------------- Order: Uses period key from timestamp ----------------

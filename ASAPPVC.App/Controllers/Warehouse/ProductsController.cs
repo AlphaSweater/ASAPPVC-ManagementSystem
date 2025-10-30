@@ -38,9 +38,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
         [HttpGet]
         public async Task<IActionResult> AddProduct(CancellationToken ct)
         {
-            var result = await _components.ListAsync(ct);
-            var componentList = result.Ok && result.Value is not null ? result.Value : new List<ComponentListVm>();
-            ViewData["Components"] = componentList;
+            var componentLookupResult = await _components.ListAsync(ct);
             return View(AddProductViewName, new ProductFormVm());
         }
 
@@ -83,7 +81,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
             }
 
             var product = result.Value;
-            TempData["AlertMessage"] = $"Product '{vm.Name}' created successfully.";
+            TempData["AlertMessage"] = $"Product '{vm.ProductName}' created successfully.";
             return RedirectToAction(nameof(ViewProduct), new { id = product.Id });
         }
 

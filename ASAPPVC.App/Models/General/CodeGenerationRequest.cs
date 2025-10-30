@@ -9,6 +9,9 @@ namespace ASAPPVC.App.Models.General
     {
         public CodeType Type { get; init; }
 
+        // Optional material prefix to use in code generation
+        public string? Material { get; init; }
+
         // Optional descriptive category: e.g. "WIN" (window), "DRR" (door)
         public string? Category { get; init; }
 

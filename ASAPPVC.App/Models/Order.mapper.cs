@@ -1,5 +1,7 @@
+using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Models.Mappers;
 using ASAPPVC.App.Services;
+using ASAPPVC.App.ViewModels.Reports;
 
 namespace ASAPPVC.App.Models
 {
@@ -26,6 +28,12 @@ namespace ASAPPVC.App.Models
         /// Converts an Order domain entity into an OrderFormVm for use in edit forms.
         /// </summary>
         OrderFormVm ToFormVm(Order order);
+
+        /// <summary>
+        /// Builds a PickingSlipViewModel from a fully-loaded Order aggregate.
+        /// Expects: Order -> Customer, OrderProducts -> Product -> ProductComponents -> Component.
+        /// </summary>
+        PickingSlipViewModel ToPickingSlipVm(Order order);
 
         /// <summary>
         /// Builds an Order domain entity from the unified order form VM. Generates an order code
@@ -66,8 +74,8 @@ namespace ASAPPVC.App.Models
 
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
 
-            var itemCount = lines.Sum(x => x.Quantity);
-            var total = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
+            var itemCount = lines.Sum(x => x.OrderedQuantity);
+            var total = lines.Sum(x => (x.Product?.SellingPrice ?? 0m) * x.OrderedQuantity);
 
             return new OrderListVm
             {
@@ -89,8 +97,8 @@ namespace ASAPPVC.App.Models
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
             var products = includeProducts ? _orderProductMapper.ToVms(lines) : new List<OrderProductVm>();
 
-            var itemCount = lines.Sum(x => x.Quantity);
-            var subtotal = lines.Sum(x => (x.Product?.Price ?? 0m) * x.Quantity);
+            var itemCount = lines.Sum(x => x.OrderedQuantity);
+            var subtotal = lines.Sum(x => (x.Product?.SellingPrice ?? 0m) * x.OrderedQuantity);
             var tax = 0m; // keep zero for now — compute later if needed
             var grand = subtotal + tax;
 
@@ -147,6 +155,116 @@ namespace ASAPPVC.App.Models
 
             return order;
         }
+        public PickingSlipViewModel ToPickingSlipVm(Order order)
+        {
+            ArgumentNullException.ThrowIfNull(order);
+
+            var vm = new PickingSlipViewModel
+            {
+                PickingSlipNumber = $"PSL-{order.OrderCode}",
+                OrderNumber = order.OrderCode,
+                CreatedDateTime = order.OrderDate,
+                GeneratedDateTime = DateTime.UtcNow,
+                Priority = ((Enum)order.OrderStatus).GetAttributePropertyOrDefault<UnitAttr, string>("ShortName", order.OrderStatus.ToString()),
+
+                From = new FromInfo
+                {
+                    Company = "ASAPPVC (Pty) Ltd",
+                    Warehouse = "Main Warehouse",
+                    Contact = "info@asappvc.co.za"
+                },
+                For = new ForInfo
+                {
+                    Client = (order.Customer is null)
+                        ? string.Empty
+                        : $"{order.Customer.Name} {order.Customer.Surname}".Trim(),
+                    ProjectSite = string.Empty,
+                    Contact = (order.Customer is null)
+                        ? string.Empty
+                        : string.Join(" • ", new[]
+                          {
+                      order.Customer.Email?.Trim(),
+                      order.Customer.PhoneNumber?.Trim()
+                          }.Where(s => !string.IsNullOrWhiteSpace(s)))
+                },
+                Order = new OrderInfo
+                {
+                    OrderNumber = order.OrderCode,
+                    Created = order.OrderDate,
+                    PickBy = order.OrderDate.AddDays(1)
+                },
+                SpecialInstructions = string.Empty
+            };
+
+            var productGroups = new List<ProductGroup>();
+            var locationTotals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
+            foreach (var line in lines)
+            {
+                var product = line.Product;
+                var group = new ProductGroup
+                {
+                    IsProduct = true,
+                    ProductCode = product?.ProductCode ?? string.Empty,
+                    ProductDescription = product?.ProductName ?? string.Empty,
+                    RequiredSets = line.OrderedQuantity,
+                    Items = new List<PickingItem>()
+                };
+
+                var pcs = product?.ProductComponents;
+
+                if (pcs is not null && pcs.Count > 0)
+                {
+                    foreach (var pc in pcs)
+                    {
+                        var comp = pc.Component;
+                        if (comp is null) continue;
+
+                        var qty = line.OrderedQuantity;
+                        var loc = (comp.LocationCode ?? string.Empty).Trim();
+
+                        group.Items.Add(new PickingItem
+                        {
+                            PartNumber = comp.ComponentCode,
+                            Description = comp.ComponentName,
+                            Unit = ((Enum)comp.UnitOfMeasure).GetAttributePropertyOrDefault<UnitAttr, string>("ShortName", comp.UnitOfMeasure.ToString()),
+                            Quantity = qty,
+                            Location = string.IsNullOrWhiteSpace(loc) ? "-" : loc,
+                            Notes = comp.LocationNote
+                        });
+
+                        if (!string.IsNullOrWhiteSpace(loc))
+                            locationTotals[loc] = (locationTotals.TryGetValue(loc, out var c) ? c : 0) + qty;
+                    }
+                }
+                else
+                {
+                    group.Items.Add(new PickingItem
+                    {
+                        PartNumber = product?.ProductCode ?? string.Empty,
+                        Description = product?.ProductName ?? string.Empty,
+                        Unit = "ea",
+                        Quantity = line.OrderedQuantity,
+                        Location = "-"
+                    });
+                }
+
+                productGroups.Add(group);
+            }
+
+            vm.ProductGroups = productGroups;
+            vm.LocationSummary = locationTotals
+                .OrderBy(kv => kv.Key)
+                .Select(kv => $"{kv.Key} ×{kv.Value}")
+                .ToList();
+
+            vm.TotalLines = productGroups.Sum(g => g.Items.Count);
+            vm.TotalUnits = productGroups.Sum(g => g.Items.Sum(i => i.Quantity));
+
+            return vm;
+        }
+
 
         // ------------------------------------------------------------
         // Update existing domain entity from Edit VM

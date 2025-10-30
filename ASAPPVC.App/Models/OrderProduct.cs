@@ -9,17 +9,36 @@ namespace ASAPPVC.App.Models
     /// </summary>
     public class OrderProduct
     {
-        // Foreign key to the order
+        // ===============================
+        // Core Identification
+        // ===============================
+
+        // Foreign key to the Order
         [Required, ForeignKey(nameof(Order))]
         public Guid OrderId { get; set; }
 
-        // Foreign key to the product
+        // Foreign key to the Product
         [Required, ForeignKey(nameof(Product))]
         public Guid ProductId { get; set; }
 
+        // ===============================
+        // Quantity Requirements
+        // ===============================
+
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
-        public int Quantity { get; set; } = 1;
+        public int OrderedQuantity { get; set; } = 1;
+
+        // ===============================
+        // Audit
+        // ===============================
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+        // ===============================
+        // Navigation
+        // ===============================
 
         public Order? Order { get; set; }
 

@@ -12,8 +12,6 @@
 }
 
 <div class="page">
-	@await Html.PartialAsync("_BackButton")
-
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
@@ -66,7 +64,7 @@
 								{
 									foreach (var c in Model.Components)
 									{
-										var stockValue = c.UnitCost * c.CurrentAmount;
+										var stockValue = c.UnitCost * c.QuantityOnHand;
 										<tr>
 
 											<td class="ft-media ft-shrink">
@@ -82,12 +80,12 @@
 
 											<td class="ft-code ft-shrink">@c.ComponentCode</td>
 
-											<td class="ft-left ft-shrink">@c.Name</td>
+											<td class="ft-left ft-shrink">@c.ComponentName</td>
 
-											<td class="ft-center ft-shrink">@c.StorageLocation</td>
+											<td class="ft-center ft-shrink">@c.LocationCode</td>
 
 											<td class="ft-number ft-shrink">
-												@($"{c.CurrentAmount} {c.ShortFormattedAmount}")
+												@($"{c.ShortFormattedQuantity}")
 											</td>
 
 											<td class="ft-money ft-shrink">@c.DisplayCost</td>
