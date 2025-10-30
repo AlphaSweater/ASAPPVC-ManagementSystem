@@ -34,12 +34,10 @@ namespace ASAPPVC.App.Models
         // Stock & Cost Data
         // ===============================
 
-        [Required]
-        [Column(TypeName = "decimal(18,4)")]
+        [Required, Column(TypeName = "decimal(18,4)")]
         public decimal QuantityOnHand { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
+        [Required, Column(TypeName = "decimal(18,2)")]
         public decimal UnitCost { get; set; }       // “Cost” → Cost of one component unit
 
         [Required]
@@ -50,8 +48,7 @@ namespace ASAPPVC.App.Models
         // ===============================
 
         // Examples: "A-2", "B-12", "R1-05", "PACK-1"
-        [Required]
-        [MaxLength(32)]
+        [Required, MaxLength(32)]
         [RegularExpression(@"^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$", ErrorMessage = "Use letters/numbers with optional dashes, e.g. A-2 or B-12.")]
         public string? LocationCode { get; set; }
 
