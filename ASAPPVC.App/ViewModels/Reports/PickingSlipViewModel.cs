@@ -6,7 +6,6 @@
         public string OrderNumber { get; set; } = string.Empty;
         public DateTime CreatedDateTime { get; set; }
         public string Priority { get; set; } = string.Empty;
-        public string LogoPath { get; set; } = string.Empty;
 
         public FromInfo From { get; set; } = new();
         public ForInfo For { get; set; } = new();
