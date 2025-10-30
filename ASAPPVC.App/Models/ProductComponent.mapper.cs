@@ -25,24 +25,24 @@ namespace ASAPPVC.App.Models
         /// <summary>
         /// Creates a new ProductComponent from a view model.
         /// </summary>
-        ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup);
+        ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm);
 
         /// <summary>
         /// Bulk create: merges duplicates (by ComponentId), sums quantities and returns ProductComponent rows.
         /// Used for both create and update operations.
         /// </summary>
-        List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup);
+        List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items);
 
         /// <summary>
         /// Applies a view model to an existing ProductComponent (mutates the target).
         /// </summary>
-        void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup);
+        void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm);
 
         /// <summary>
         /// Bulk update: updates existing ProductComponent rows in-place (preserving instances when possible),
         /// creates missing rows and drops lines marked for removal.
         /// </summary>
-        List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup);
+        List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items);
     }
 
     #endregion Interface
@@ -86,10 +86,9 @@ namespace ASAPPVC.App.Models
         // VM → Domain (upsert)
         // ------------------------------------------------------------
 
-        public ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public ProductComponent FromBridgeVm(Guid productId, ProductComponentVm vm)
         {
             ArgumentNullException.ThrowIfNull(vm);
-            ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             return new ProductComponent
             {
@@ -100,10 +99,8 @@ namespace ASAPPVC.App.Models
             };
         }
 
-        public List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> FromBridgeVms(Guid productId, IEnumerable<ProductComponentVm> items)
         {
-            ArgumentNullException.ThrowIfNull(componentUnitLookup);
-
             return (items ?? Enumerable.Empty<ProductComponentVm>())
                 .GroupBy(i => i.ComponentId)
                 .Select(g => new ProductComponentVm
@@ -111,7 +108,7 @@ namespace ASAPPVC.App.Models
                     ComponentId = g.Key,
                     RequiredQuantity = g.Sum(x => x.RequiredQuantity)
                 })
-                .Select(vm => FromBridgeVm(productId, vm, componentUnitLookup))
+                .Select(vm => FromBridgeVm(productId, vm))
                 .ToList();
         }
 
@@ -119,21 +116,18 @@ namespace ASAPPVC.App.Models
         // Apply updates
         // ------------------------------------------------------------
 
-        public void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm, IDictionary<Guid, Unit> componentUnitLookup)
+        public void ApplyUpdateToBridgeVm(ProductComponent target, ProductComponentVm vm)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(vm);
-            ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             target.ComponentId = vm.ComponentId;
-            target.UnitOfMeasure = ResolveUnit(componentUnitLookup, vm.ComponentId);
+            target.UnitOfMeasure = vm.UnitOfMeasure;
             target.RequiredQuantity = NormalizeQuantity(vm.RequiredQuantity);
         }
 
-        public List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
+        public List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items)
         {
-            ArgumentNullException.ThrowIfNull(componentUnitLookup);
-
             var existingByComponent = (existingComponents ?? Enumerable.Empty<ProductComponent>())
                 .ToDictionary(x => x.ComponentId, x => x);
 
@@ -151,7 +145,7 @@ namespace ASAPPVC.App.Models
                         ? existing
                         : new ProductComponent { ProductId = productId };
 
-                    ApplyUpdateToBridgeVm(line, vm, componentUnitLookup);
+                    ApplyUpdateToBridgeVm(line, vm);
                     return line;
                 })
                 .ToList();
@@ -164,11 +158,6 @@ namespace ASAPPVC.App.Models
         private static decimal NormalizeQuantity(decimal q)
         {
             return q < 0 ? 0 : Math.Round(q, 4, MidpointRounding.AwayFromZero);
-        }
-
-        private static Unit ResolveUnit(IDictionary<Guid, Unit> lookup, Guid componentId)
-        {
-            return lookup.TryGetValue(componentId, out var u) ? u : Unit.Piece;
         }
     }
 }

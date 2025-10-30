@@ -43,12 +43,12 @@ namespace ASAPPVC.App.Models
         /// <summary>
         /// Creates a new Product from a ProductFormVm.
         /// </summary>
-        Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
+        Task<Product> FromCreateVmAsync(ProductFormVm vm, CancellationToken ct = default);
 
         /// <summary>
         /// Applies an update to an existing Product from a ProductFormVm and returns the modified entity.
         /// </summary>
-        Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default);
+        Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, CancellationToken ct = default);
     }
 
     #endregion Interface
@@ -144,7 +144,7 @@ namespace ASAPPVC.App.Models
 
                 IsActive = product.IsActive,
 
-                ProductComponents = productComponents
+                SelectedProductComponents = productComponents
             };
         }
 
@@ -152,7 +152,7 @@ namespace ASAPPVC.App.Models
         // ViewModels → Domain (Create / Update)
         // ------------------------------------------------------------
 
-        public async Task<Product> FromCreateVmAsync(ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> FromCreateVmAsync(ProductFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(vm);
 
@@ -187,13 +187,12 @@ namespace ASAPPVC.App.Models
                 product.Image = processed.Value!.ToAppImage();
             }
 
-            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            product.ProductComponents = _productComponentMapper.FromBridgeVms(product.Id, vm.ProductComponents ?? Enumerable.Empty<ProductComponentVm>(), lookup);
+            product.ProductComponents = _productComponentMapper.FromBridgeVms(product.Id, vm.SelectedProductComponents ?? Enumerable.Empty<ProductComponentVm>());
 
             return product;
         }
 
-        public async Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, IDictionary<Guid, Unit>? componentUnitLookup = null, CancellationToken ct = default)
+        public async Task<Product> ApplyUpdateAsync(Product existing, ProductFormVm vm, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(existing);
             ArgumentNullException.ThrowIfNull(vm);
@@ -228,8 +227,7 @@ namespace ASAPPVC.App.Models
                     ?? throw new InvalidOperationException("Processed image returned null.");
             }
 
-            var lookup = componentUnitLookup ?? new Dictionary<Guid, Unit>();
-            existing.ProductComponents = _productComponentMapper.ApplyUpdateToBridgeVms(existing.ProductComponents, existing.Id, vm.ProductComponents ?? Enumerable.Empty<ProductComponentVm>(), lookup);
+            existing.ProductComponents = _productComponentMapper.ApplyUpdateToBridgeVms(existing.ProductComponents, existing.Id, vm.SelectedProductComponents ?? Enumerable.Empty<ProductComponentVm>());
 
             return existing;
         }

@@ -176,7 +176,9 @@ namespace ASAPPVC.App.Models
         // Component lines (match model naming)
         [Display(Name = "Components")]
         [MinLength(1, ErrorMessage = "A product requires at least one component.")]
-        public List<ProductComponentVm> ProductComponents { get; set; } = new();
+        public List<ProductComponentVm> SelectedProductComponents { get; set; } = new();
+
+        public List<ProductComponentVm> AvailableProductComponents { get; set; } = new();
 
         // --------------------------------------------------
         // Validation & helpers
@@ -190,11 +192,11 @@ namespace ASAPPVC.App.Models
                     new[] { nameof(ProductCode) });
             }
 
-            if (ProductComponents is { Count: > 0 })
+            if (SelectedProductComponents is { Count: > 0 })
             {
-                for (int i = 0; i < ProductComponents.Count; i++)
+                for (int i = 0; i < SelectedProductComponents.Count; i++)
                 {
-                    var c = ProductComponents[i];
+                    var c = SelectedProductComponents[i];
                 }
             }
         }

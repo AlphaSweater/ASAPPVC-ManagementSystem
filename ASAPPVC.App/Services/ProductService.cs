@@ -1,5 +1,4 @@
 using ASAPPVC.App.Models;
-using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
 
@@ -140,11 +139,11 @@ namespace ASAPPVC.App.Services
                 return Result.Fail("Product description is required.");
             if (vm.SellingPrice <= 0)
                 return Result.Fail("Product price must be greater than zero.");
-            if (vm.ProductComponents is null || vm.ProductComponents.Count == 0)
+            if (vm.SelectedProductComponents is null || vm.SelectedProductComponents.Count == 0)
                 return Result.Fail("A product requires at least one component.");
 
             // Validate component entries
-            foreach (var comp in vm.ProductComponents)
+            foreach (var comp in vm.SelectedProductComponents)
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
@@ -169,11 +168,11 @@ namespace ASAPPVC.App.Services
                 return Result.Fail("Product code is required.");
             if (vm.SellingPrice <= 0)
                 return Result.Fail("Product price must be greater than zero.");
-            if (vm.ProductComponents is null || vm.ProductComponents.Count == 0)
+            if (vm.SelectedProductComponents is null || vm.SelectedProductComponents.Count == 0)
                 return Result.Fail("A product requires at least one component.");
 
             // Validate component entries
-            foreach (var comp in vm.ProductComponents)
+            foreach (var comp in vm.SelectedProductComponents)
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
@@ -192,18 +191,39 @@ namespace ASAPPVC.App.Services
                 vm.ProductCode = vm.ProductCode.Trim();
         }
 
-        // ---------- Build component unit lookup helper ----------
+        // ---------- Build component lookup helper ----------
 
-        private async Task<IDictionary<Guid, Unit>> BuildComponentUnitLookupAsync(
-            IEnumerable<Guid> componentIds,
-            CancellationToken ct)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves all active components as a lookup dictionary for product component building
+        private async Task<Result<Dictionary<Guid, ProductComponentVm>>> GetComponentLookupAsync(CancellationToken ct = default)
         {
-            var distinctIds = componentIds.Where(id => id != Guid.Empty).Distinct().ToList();
-            if (distinctIds.Count == 0)
-                return new Dictionary<Guid, Unit>();
+            try
+            {
+                // Fetch all active components
+                var components = await _components.ListAsync(asNoTracking: true, ct: ct);
 
-            var components = await _components.GetListByIdsAsync(distinctIds, asNoTracking: true, ct);
-            return components.ToDictionary(c => c.Id, c => c.UnitOfMeasure);
+                // Convert to ProductComponentVm and build dictionary
+                var lookup = components.ToDictionary(
+                    c => c.Id,
+                    c => new ProductComponentVm
+                    {
+                        ProductId = Guid.Empty, // Not associated with a specific product yet
+                        ComponentId = c.Id,
+                        ComponentCode = c.ComponentCode,
+                        ComponentName = c.ComponentName,
+                        UnitCost = c.UnitCost,
+                        RequiredQuantity = 1m, // Default quantity
+                        UnitOfMeasure = c.UnitOfMeasure,
+                        Remove = false,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+
+                return Result<Dictionary<Guid, ProductComponentVm>>.Success(lookup);
+            }
+            catch (Exception ex)
+            {
+                return Result<Dictionary<Guid, ProductComponentVm>>.Fail($"Failed to build component lookup: {ex.Message}");
+            }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -218,17 +238,8 @@ namespace ASAPPVC.App.Services
 
             try
             {
-                // Build unit lookup for components
-                var componentIds = vm.ProductComponents.Select(c => c.ComponentId).ToList();
-                var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
-
-                // Verify all components exist
-                var missingIds = componentIds.Where(id => !unitLookup.ContainsKey(id)).ToList();
-                if (missingIds.Any())
-                    return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
-
                 // Map VM to domain entity (mapper handles code generation and component mapping and image processing)
-                var product = await _mapper.FromCreateVmAsync(vm, unitLookup, ct);
+                var product = await _mapper.FromCreateVmAsync(vm, ct);
 
                 // Persist
                 var added = await _products.AddAsync(product, ct);
@@ -275,16 +286,10 @@ namespace ASAPPVC.App.Services
                 }
 
                 // Build unit lookup for components
-                var componentIds = vm.ProductComponents.Select(c => c.ComponentId).ToList();
-                var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
-
-                // Verify all components exist
-                var missingIds = componentIds.Where(id => !unitLookup.ContainsKey(id)).ToList();
-                if (missingIds.Any())
-                    return Result<Product>.Fail($"Some components do not exist: {string.Join(", ", missingIds)}");
+                var componentIds = vm.SelectedProductComponents.Select(c => c.ComponentId).ToList();
 
                 // Apply changes via mapper (handles component reconciliation and image processing)
-                await _mapper.ApplyUpdateAsync(existing, vm, unitLookup, ct);
+                await _mapper.ApplyUpdateAsync(existing, vm, ct);
 
                 // Persist changes
                 _products.Update(existing);
