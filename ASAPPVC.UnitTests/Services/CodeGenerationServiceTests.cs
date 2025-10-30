@@ -97,14 +97,14 @@ public class CodeGenerationServiceTests
         _counters.Setup(r => r.IncrementAndGetAsync(CodeType.Component, null, It.IsAny<CancellationToken>()))
                  .ReturnsAsync(123);
 
-        var request = new CodeGenerationRequest { Type = CodeType.Component };
+        var request = new CodeGenerationRequest { Type = CodeType.Component, Material = Material.PVC.GetCode() };
 
         // Act
         var result = await _sut.GenerateCodeAsync(request);
 
         // Assert
         result.Ok.Should().BeTrue();
-        result.Value.Should().MatchRegex(@"^CMP-\d{5}-[A-Z0-9]$"); // e.g., CMP-00123-X
+        result.Value.Should().MatchRegex(@"^CMP-PVC-\d{5}-[A-Z0-9]$"); // e.g., CMP-PVC-00123-X
     }
 
     // ---------------- Order: Uses period key from timestamp ----------------

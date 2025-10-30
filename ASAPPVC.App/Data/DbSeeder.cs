@@ -110,131 +110,134 @@ namespace ASAPPVC.App.Data
 
             var demoComponents = new List<ComponentFormVm>
             {
-                new()
-                {
-                    ComponentName   = "M6 Hex Bolt · 20mm",
-                    MaterialType    = Material.Steel,
-                    UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 250m,
-                    UnitCost        = 1.90m,
+                new() // 1
+				{
+                    ComponentName   = "uPVC Profile Kit · Door Frame (2400×2100)",
+                    MaterialType    = Material.PVC,
+                    ColourOption    = Colour.White,
+                    UnitOfMeasure   = Unit.Piece,     // full frame kit = 1 piece
+					QuantityOnHand  = 12m,
+                    UnitCost        = 2300.00m,
                     LocationCode    = "A-1",
-                    LocationNote    = "Fastener rack · upper bin",
-                    ReorderLevel    = 100m,
+                    LocationNote    = "Frame kits shelf",
+                    ReorderLevel    = 4m,
                     IsActive        = true
                 },
-                new()
-                {
-                    ComponentName   = "M6 Flat Washer",
-                    MaterialType    = Material.Steel,
-                    UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 900m,
-                    UnitCost        = 0.35m,
-                    LocationCode    = "A-2",
-                    LocationNote    = "Fastener rack · middle bin",
-                    ReorderLevel    = 300m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "M6 Nylon Lock Nut",
-                    MaterialType    = Material.Steel,
-                    ColourOption    = Colour.None,
-                    UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 480m,
-                    UnitCost        = 0.85m,
-                    LocationCode    = "A-3",
-                    LocationNote    = "Fastener rack · lower bin",
-                    ReorderLevel    = 200m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "Electrical Cable · 1.5mm² Copper Roll (100m)",
-                    MaterialType    = Material.Copper,
-                    ColourOption    = Colour.Red,
-                    UnitOfMeasure   = Unit.Piece, // each roll is one piece
-                    QuantityOnHand  = 35m,        // rolls
-                    UnitCost        = 850.00m,    // cost per roll
-                    LocationCode    = "B-1",
-                    LocationNote    = "Cable reel rack",
-                    ReorderLevel    = 10m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "PVC Coupler · 25mm",
+                new() // 2
+				{
+                    ComponentName   = "uPVC Profile Kit · Window Frame (1200×900)",
                     MaterialType    = Material.PVC,
                     ColourOption    = Colour.White,
                     UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 85m,
-                    UnitCost        = 7.90m,
-                    LocationCode    = "B-2",
-                    LocationNote    = "Plumbing section",
-                    ReorderLevel    = 40m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "Acrylic Paint · 5L Tin",
-                    MaterialType    = Material.Chemical,
-                    ColourOption    = Colour.White,
-                    UnitOfMeasure   = Unit.Piece,
                     QuantityOnHand  = 25m,
-                    UnitCost        = 400.00m, // per tin
+                    UnitCost        = 980.00m,
+                    LocationCode    = "A-2",
+                    LocationNote    = "Window kits shelf",
+                    ReorderLevel    = 8m,
+                    IsActive        = true
+                },
+                new() // 3
+				{
+                    ComponentName   = "IGU Double-Glazed Unit · 24mm (1200×900)",
+                    MaterialType    = Material.Glass,
+                    ColourOption    = Colour.None,
+                    UnitOfMeasure   = Unit.Piece,
+                    QuantityOnHand  = 30m,
+                    UnitCost        = 1450.00m,
+                    LocationCode    = "B-1",
+                    LocationNote    = "Glass rack",
+                    ReorderLevel    = 10m,
+                    IsActive        = true
+                },
+                new() // 4
+				{
+                    ComponentName   = "IGU Double-Glazed Unit · 24mm (2400×2100, 2-Panel Set)",
+                    MaterialType    = Material.Glass,
+                    ColourOption    = Colour.None,
+                    UnitOfMeasure   = Unit.Piece,   // set of 2 panels boxed as one piece
+					QuantityOnHand  = 10m,
+                    UnitCost        = 5200.00m,
+                    LocationCode    = "B-2",
+                    LocationNote    = "Oversize glass rack",
+                    ReorderLevel    = 4m,
+                    IsActive        = true
+                },
+                new() // 5
+				{
+                    ComponentName   = "Sliding Door Roller Set · Stainless Tandem",
+                    MaterialType    = Material.Steel,
+                    ColourOption    = Colour.Silver,
+                    UnitOfMeasure   = Unit.Piece,  // set = 1 piece
+					QuantityOnHand  = 40m,
+                    UnitCost        = 480.00m,
                     LocationCode    = "C-1",
-                    LocationNote    = "Paint shelf",
-                    ReorderLevel    = 10m,
+                    LocationNote    = "Hardware bin",
+                    ReorderLevel    = 12m,
                     IsActive        = true
                 },
-                new()
-                {
-                    ComponentName   = "Industrial Grease · 1kg Tub",
-                    MaterialType    = Material.Chemical,
-                    UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 40m,
-                    UnitCost        = 65.00m,
-                    LocationCode    = "C-2",
-                    LocationNote    = "Lubricants shelf",
-                    ReorderLevel    = 10m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "Rubber O-Ring 10×2mm",
-                    MaterialType    = Material.Rubber,
-                    ColourOption    = Colour.Black,
-                    UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 320m,
-                    UnitCost        = 1.20m,
-                    LocationCode    = "D-1",
-                    LocationNote    = "Seals drawer",
-                    ReorderLevel    = 100m,
-                    IsActive        = true
-                },
-                new()
-                {
-                    ComponentName   = "Aluminium L-Bracket · 40×40×3mm",
-                    MaterialType    = Material.Aluminium,
+                new() // 6
+				{
+                    ComponentName   = "Multipoint Lockset · Door (uPVC)",
+                    MaterialType    = Material.Steel,
                     ColourOption    = Colour.Silver,
                     UnitOfMeasure   = Unit.Piece,
-                    QuantityOnHand  = 45m,
-                    UnitCost        = 18.75m,
-                    LocationCode    = "D-2",
-                    LocationNote    = "Hardware rack",
+                    QuantityOnHand  = 28m,
+                    UnitCost        = 750.00m,
+                    LocationCode    = "C-2",
+                    LocationNote    = "Locks drawer",
+                    ReorderLevel    = 8m,
+                    IsActive        = true
+                },
+                new() // 7
+				{
+                    ComponentName   = "Handle Pair · Door/Window (uPVC)",
+                    MaterialType    = Material.Aluminium,
+                    ColourOption    = Colour.White,
+                    UnitOfMeasure   = Unit.Piece,   // pair boxed as one piece
+					QuantityOnHand  = 80m,
+                    UnitCost        = 260.00m,
+                    LocationCode    = "D-1",
+                    LocationNote    = "Handles bin",
                     ReorderLevel    = 20m,
                     IsActive        = true
                 },
-                new()
-                {
-                    ComponentName   = "Hydraulic Hose Roll · 12mm Reinforced (50m)",
+                new() // 8
+				{
+                    ComponentName   = "Compression Gasket Kit · 24mm IGU",
                     MaterialType    = Material.Rubber,
                     ColourOption    = Colour.Black,
-                    UnitOfMeasure   = Unit.Piece, // each roll is one piece
-                    QuantityOnHand  = 10m,        // rolls
-                    UnitCost        = 1125.00m,   // per roll
+                    UnitOfMeasure   = Unit.Piece,   // kit for one unit
+					QuantityOnHand  = 120m,
+                    UnitCost        = 180.00m,
+                    LocationCode    = "D-2",
+                    LocationNote    = "Seals drawer",
+                    ReorderLevel    = 40m,
+                    IsActive        = true
+                },
+                new() // 9
+				{
+                    ComponentName   = "Friction Stay Hinge Pair · Casement",
+                    MaterialType    = Material.Steel,
+                    ColourOption    = Colour.Silver,
+                    UnitOfMeasure   = Unit.Piece,   // pair boxed as one piece
+					QuantityOnHand  = 55m,
+                    UnitCost        = 320.00m,
                     LocationCode    = "E-1",
-                    LocationNote    = "Hose reel rack",
-                    ReorderLevel    = 5m,
+                    LocationNote    = "Hinges shelf",
+                    ReorderLevel    = 15m,
+                    IsActive        = true
+                },
+                new() // 10
+				{
+                    ComponentName   = "Tilt & Turn Hardware Kit · uPVC",
+                    MaterialType    = Material.Steel,
+                    ColourOption    = Colour.Silver,
+                    UnitOfMeasure   = Unit.Piece,   // full kit = one piece
+					QuantityOnHand  = 18m,
+                    UnitCost        = 980.00m,
+                    LocationCode    = "E-2",
+                    LocationNote    = "Hardware kits",
+                    ReorderLevel    = 6m,
                     IsActive        = true
                 }
             };
