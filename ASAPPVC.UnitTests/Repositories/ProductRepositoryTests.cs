@@ -20,17 +20,17 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- GetByIdOrCodeWithComponents: includes components ----------------
         [Fact]
-        public async System.Threading.Tasks.Task GetByIdOrCodeWithComponentsAsync_IncludesComponentsAsync()
+        public async Task GetByIdOrCodeWithComponentsAsync_IncludesComponentsAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "CMP-1", Name = "Screw", UnitCost = 0.1m, CurrentAmount = 100m, StorageLocation = "L1" };
-            var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", Name = "Panel", Price = 10m, Description = "Desc" };
+            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "CMP-1", ComponentName = "Screw", UnitCost = 0.1m, QuantityOnHand = 100m, LocationCode = "L-1" };
+            var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", ProductName = "Panel", SellingPrice = 10m, Description = "Desc" };
 
-            var pc = new ProductComponent { ComponentId = comp.Id, ProductId = product.Id, QuantityRequired = 2m, Unit = Unit.Piece };
+            var pc = new ProductComponent { ComponentId = comp.Id, ProductId = product.Id, RequiredQuantity = 2m, UnitOfMeasure = Unit.Piece };
 
             // set navigation properties so EF will wire them if tracked
             product.ProductComponents = new List<ProductComponent> { pc };

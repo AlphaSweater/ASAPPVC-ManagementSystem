@@ -49,7 +49,7 @@
 										<option value="">-- Select a product --</option>
 										@foreach (var product in Model.AvailableProducts)
 										{
-											<option value="@product.Id" data-price="@product.Price.ToString("F2")" data-name="@product.Name">@product.Name — @product.Price.ToString("C")</option>
+											<option value="@product.Id" data-price="@product.SellingPrice.ToString("F2")" data-name="@product.ProductName">@product.ProductName — @product.SellingPrice.ToString("C")</option>
 										}
 									</select>
 								</div>

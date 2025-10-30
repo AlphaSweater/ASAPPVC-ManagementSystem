@@ -25,22 +25,34 @@ namespace ASAPPVC.App.Models
         public string LocationCode { get; set; } = string.Empty;
         public string? LocationNote { get; set; }
 
-        // Reorder signals
-
+        // Reorder signal
         public decimal ReorderLevel { get; init; }
-        public bool IsActive { get; init; } = true;
 
         // Media
 
         public bool HasImage { get; init; }
         public string? ThumbUrl { get; init; }
 
+        // --------------------------------------------------
         // Computed UI helpers
 
-        public string DisplayPrice => UnitCost.ToString("C");
+        public string DisplayCost => UnitCost.ToString("C");
         public string ShortFormattedQuantity => UnitOfMeasure.ToDisplay(QuantityOnHand, shortForm: true);
-        public bool IsBelowReorder => ReorderLevel > 0 && QuantityOnHand <= ReorderLevel;
-        public string StockHealth => IsBelowReorder ? "Restock" : "OK";
+
+        public ReorderStatus ReorderStatus => ReorderStatusPolicy.Evaluate(QuantityOnHand, ReorderLevel);
+        public decimal ReorderRatio => ReorderStatusPolicy.GetRatio(QuantityOnHand, ReorderLevel);
+
+        public string StockHealth =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Label", ReorderStatus.ToString());
+
+        public string StockHealthCss =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("CssClass", "status-ok");
+
+        public string StockHealthColor =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Color", "#27ae60");
+
+        // Audit + Lifecycle
+        public bool IsActive { get; init; } = true;
     }
 
     //-----------------------------------------------\\
@@ -54,7 +66,6 @@ namespace ASAPPVC.App.Models
 
         // Classification
 
-        public Category Category { get; init; }
         public Material MaterialType { get; init; }
         public Colour ColourOption { get; init; }
 
@@ -72,8 +83,6 @@ namespace ASAPPVC.App.Models
         // Reorder
 
         public decimal ReorderLevel { get; init; }
-        public decimal ReorderQuantity { get; init; }
-        public bool IsActive { get; init; } = true;
 
         // Media
 
@@ -85,14 +94,27 @@ namespace ASAPPVC.App.Models
 
         public int UsedInProductsCount { get; init; }
 
+        // --------------------------------------------------
         // Computed UI helpers
 
         public string DisplayPrice => UnitCost.ToString("C");
         public string ShortFormattedQuantity => UnitOfMeasure.ToDisplay(QuantityOnHand, shortForm: true);
-        public bool IsBelowReorder => ReorderLevel > 0 && QuantityOnHand <= ReorderLevel;
 
-        // Audit (read-only display)
+        public ReorderStatus ReorderStatus => ReorderStatusPolicy.Evaluate(QuantityOnHand, ReorderLevel);
+        public decimal ReorderRatio => ReorderStatusPolicy.GetRatio(QuantityOnHand, ReorderLevel);
 
+        public string StockHealth =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Label", ReorderStatus.ToString());
+
+        public string StockHealthCss =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("CssClass", "status-ok");
+
+        public string StockHealthColor =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Color", "#27ae60");
+
+        // Audit + Lifecycle
+
+        public bool IsActive { get; init; } = true;
         public DateTime CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
     }
@@ -102,8 +124,6 @@ namespace ASAPPVC.App.Models
     //-----------------------------------------------\\
     public sealed class ComponentFormVm
     {
-        private const decimal MaxQuantity = 1_000_000_000_000m;
-
         public Guid? Id { get; set; }
         public bool IsEdit => Id.HasValue;
 
@@ -117,8 +137,6 @@ namespace ASAPPVC.App.Models
         public string ComponentName { get; set; } = string.Empty;
 
         // Classification (optional inputs)
-        [Display(Name = "Category")]
-        public Category Category { get; set; } = Category.None;
 
         [Display(Name = "Material")]
         public Material MaterialType { get; set; } = Material.None;
@@ -127,8 +145,8 @@ namespace ASAPPVC.App.Models
         public Colour ColourOption { get; set; } = Colour.None;
 
         // Inventory & cost
-        [Display(Name = "Unit of Measure")]
-        [Required(ErrorMessage = "Unit of Measure is required.")]
+        [Display(Name = "Unit of Measurement")]
+        [Required(ErrorMessage = "Unit of Measurement is required.")]
         public Unit UnitOfMeasure { get; set; } = Unit.Piece;
 
         [Display(Name = "Quantity on Hand")]
@@ -137,7 +155,7 @@ namespace ASAPPVC.App.Models
 
         [Display(Name = "Unit Cost")]
         [Required(ErrorMessage = "Unit cost is required.")]
-        [Range(0.01, 999_999_999, ErrorMessage = "Unit cost must be a positive amount.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Unit cost must be a positive amount.")]
         public decimal UnitCost { get; set; }
 
         // Storage
@@ -156,18 +174,15 @@ namespace ASAPPVC.App.Models
         [Range(0, double.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
         public decimal ReorderLevel { get; set; }
 
-        [Display(Name = "Reorder Quantity")]
-        [Range(0, double.MaxValue, ErrorMessage = "Reorder quantity cannot be negative.")]
-        public decimal ReorderQuantity { get; set; }
-
-        [Display(Name = "Active")]
-        public bool IsActive { get; set; } = true;
-
         // Media
         [Display(Name = "Image (optional)")]
         public IFormFile? Image { get; set; }
 
         // For edit preview
         public string? ExistingImageUrl { get; set; }
+
+        // Audit + Lifecycle
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
     }
 }

@@ -1,3 +1,4 @@
+@using ASAPPVC.App.Models.Enums
 @model ASAPPVC.App.Models.ComponentFormVm
 @{
 	var isEdit = Model?.IsEdit == true;
@@ -76,15 +77,15 @@
 				<section class="fields-panel">
 					<div class="form-grid">
 						<div class="form-field half">
-							<label asp-for="Name" class="label"></label>
-							<input asp-for="Name" class="input" placeholder="e.g. Resistor 10k Ohm" />
-							<span asp-validation-for="Name" class="field-error"></span>
+							<label asp-for="ComponentName" class="label"></label>
+							<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
+							<span asp-validation-for="ComponentName" class="field-error"></span>
 						</div>
 
 						<div class="form-field half">
-							<label asp-for="StorageLocation" class="label"></label>
-							<input asp-for="StorageLocation" class="input" placeholder="e.g. Bin A-01" />
-							<span asp-validation-for="StorageLocation" class="field-error"></span>
+							<label asp-for="LocationCode" class="label"></label>
+							<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
+							<span asp-validation-for="LocationCode" class="field-error"></span>
 						</div>
 
 						<div class="form-field half">
@@ -97,15 +98,15 @@
 						</div>
 
 						<div class="form-field half">
-							<label asp-for="CurrentAmount" class="label"></label>
-							<input asp-for="CurrentAmount" class="input" type="number" min="0" placeholder="e.g. 100" />
-							<span asp-validation-for="CurrentAmount" class="field-error"></span>
+							<label asp-for="QuantityOnHand" class="label"></label>
+							<input asp-for="QuantityOnHand" class="input" type="number" min="0" placeholder="e.g. 100" />
+							<span asp-validation-for="QuantityOnHand" class="field-error"></span>
 						</div>
 
 						<div class="form-field full">
-							<label asp-for="Unit" class="label"></label>
-							<select asp-for="Unit" class="input" asp-items="Html.GetEnumSelectList<global::ASAPPVC.App.Models.Enums.Unit>()"></select>
-							<span asp-validation-for="Unit" class="field-error"></span>
+							<label asp-for="UnitOfMeasure" class="label"></label>
+							<select asp-for="UnitOfMeasure" class="input" asp-items="Html.GetEnumSelectList<Unit>()"></select>
+							<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
 						</div>
 					</div>
 

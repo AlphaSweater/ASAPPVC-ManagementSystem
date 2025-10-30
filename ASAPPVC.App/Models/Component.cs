@@ -26,7 +26,6 @@ namespace ASAPPVC.App.Models
         // Classification
         // ===============================
 
-        public Category Category { get; set; } = Category.None;
         public Material MaterialType { get; set; } = Material.None;
         public Colour ColourOption { get; set; } = Colour.None;
 
@@ -60,7 +59,6 @@ namespace ASAPPVC.App.Models
         // ===============================
 
         public decimal ReorderLevel { get; set; } = 0;     // Threshold for restocking alerts
-        public decimal ReorderQuantity { get; set; } = 0;  // Suggested reorder batch amount
 
         // ===============================
         // Media / References

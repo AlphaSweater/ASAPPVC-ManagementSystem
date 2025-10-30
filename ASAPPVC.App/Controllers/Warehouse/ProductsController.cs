@@ -83,7 +83,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
             }
 
             var product = result.Value;
-            TempData["AlertMessage"] = $"Product '{vm.Name}' created successfully.";
+            TempData["AlertMessage"] = $"Product '{vm.ProductName}' created successfully.";
             return RedirectToAction(nameof(ViewProduct), new { id = product.Id });
         }
 

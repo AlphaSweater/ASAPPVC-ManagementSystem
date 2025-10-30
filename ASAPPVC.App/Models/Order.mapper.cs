@@ -67,7 +67,7 @@ namespace ASAPPVC.App.Models
             var lines = order.OrderProducts ?? Enumerable.Empty<OrderProduct>();
 
             var itemCount = lines.Sum(x => x.OrderedQuantity);
-            var total = lines.Sum(x => (x.Product?.Price ?? 0m) * x.OrderedQuantity);
+            var total = lines.Sum(x => (x.Product?.SellingPrice ?? 0m) * x.OrderedQuantity);
 
             return new OrderListVm
             {
@@ -90,7 +90,7 @@ namespace ASAPPVC.App.Models
             var products = includeProducts ? _orderProductMapper.ToVms(lines) : new List<OrderProductVm>();
 
             var itemCount = lines.Sum(x => x.OrderedQuantity);
-            var subtotal = lines.Sum(x => (x.Product?.Price ?? 0m) * x.OrderedQuantity);
+            var subtotal = lines.Sum(x => (x.Product?.SellingPrice ?? 0m) * x.OrderedQuantity);
             var tax = 0m; // keep zero for now — compute later if needed
             var grand = subtotal + tax;
 

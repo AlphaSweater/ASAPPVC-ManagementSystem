@@ -44,6 +44,7 @@ namespace ASAPPVC.App.Models
                 Id = component.Id,
                 ComponentCode = component.ComponentCode,
                 ComponentName = component.ComponentName,
+
                 UnitOfMeasure = component.UnitOfMeasure,
                 QuantityOnHand = component.QuantityOnHand,
                 UnitCost = component.UnitCost,
@@ -78,7 +79,6 @@ namespace ASAPPVC.App.Models
                 ComponentCode = component.ComponentCode,
                 ComponentName = component.ComponentName,
 
-                Category = component.Category,
                 MaterialType = component.MaterialType,
                 ColourOption = component.ColourOption,
 
@@ -90,10 +90,6 @@ namespace ASAPPVC.App.Models
                 LocationNote = component.LocationNote,
 
                 ReorderLevel = component.ReorderLevel,
-                ReorderQuantity = component.ReorderQuantity,
-                IsActive = component.IsActive,
-
-                UsedInProductsCount = count,
 
                 HasImage = component.Image?.Data is { Length: > 0 },
                 ImageUrl = component.Image?.Data is { Length: > 0 }
@@ -101,6 +97,9 @@ namespace ASAPPVC.App.Models
                 : null,
                 ImageEtag = component.Image?.Sha256,
 
+                UsedInProductsCount = count,
+
+                IsActive = component.IsActive,
                 CreatedAt = component.CreatedAt,
                 UpdatedAt = component.UpdatedAt
             };
@@ -116,7 +115,6 @@ namespace ASAPPVC.App.Models
                 ComponentCode = component.ComponentCode,
                 ComponentName = component.ComponentName,
 
-                Category = component.Category,
                 MaterialType = component.MaterialType,
                 ColourOption = component.ColourOption,
 
@@ -128,11 +126,11 @@ namespace ASAPPVC.App.Models
                 LocationNote = component.LocationNote,
 
                 ReorderLevel = component.ReorderLevel,
-                ReorderQuantity = component.ReorderQuantity,
-                IsActive = component.IsActive,
 
                 // Provide existing image as data URL (if present) to show preview in edit forms
-                ExistingImageUrl = AsDataUrlOrNull(component.Image?.Data, component.Image?.ContentType)
+                ExistingImageUrl = AsDataUrlOrNull(component.Image?.Data, component.Image?.ContentType),
+
+                IsActive = component.IsActive,
             };
         }
 
@@ -146,29 +144,27 @@ namespace ASAPPVC.App.Models
 
             var entity = new Component
             {
-                ComponentCode = NormalizeCodeOrGenerate(vm.ComponentCode, "COMP"),
+                ComponentCode = NormalizeCodeOrGenerate(code: vm.ComponentCode, prefix: "COMP"),
                 ComponentName = NormalizeString(vm.ComponentName),
 
-                Category = vm.Category,
                 MaterialType = vm.MaterialType,
                 ColourOption = vm.ColourOption,
 
                 UnitOfMeasure = vm.UnitOfMeasure,
-                QuantityOnHand = vm.QuantityOnHand < 0m ? 0m : vm.QuantityOnHand,
+                QuantityOnHand = vm.QuantityOnHand,
                 UnitCost = NormalizeMoney(vm.UnitCost),
 
                 LocationCode = NormalizeString(vm.LocationCode),
                 LocationNote = NormalizeString(vm.LocationNote),
 
                 ReorderLevel = vm.ReorderLevel,
-                ReorderQuantity = vm.ReorderQuantity,
                 IsActive = vm.IsActive
             };
 
             if (vm.Image is not null)
             {
                 EnsureImageService();
-                var processed = await ImageService!.ProcessUploadAsync(vm.Image, ct);
+                var processed = await _imageService!.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
                     throw new ValidationException(processed.Error);
                 entity.Image = processed.Value!.ToAppImage();
@@ -187,7 +183,6 @@ namespace ASAPPVC.App.Models
             existing.ComponentCode = NormalizeString(vm.ComponentCode ?? existing.ComponentCode);
             existing.ComponentName = NormalizeString(vm.ComponentName);
 
-            existing.Category = vm.Category;
             existing.MaterialType = vm.MaterialType;
             existing.ColourOption = vm.ColourOption;
 
@@ -199,13 +194,12 @@ namespace ASAPPVC.App.Models
             existing.LocationNote = NormalizeString(vm.LocationNote);
 
             existing.ReorderLevel = vm.ReorderLevel;
-            existing.ReorderQuantity = vm.ReorderQuantity;
             existing.IsActive = vm.IsActive;
 
             if (vm.Image is not null)
             {
                 EnsureImageService();
-                var processed = await ImageService!.ProcessUploadAsync(vm.Image, ct);
+                var processed = await _imageService!.ProcessUploadAsync(vm.Image, ct);
                 if (!processed.Ok)
                     throw new ValidationException(processed.Error);
                 existing.Image = processed.Value!.ToAppImage(); // replace existing
@@ -220,7 +214,7 @@ namespace ASAPPVC.App.Models
 
         private void EnsureImageService()
         {
-            if (ImageService is null)
+            if (_imageService is null)
                 throw new InvalidOperationException("Image service is not available.");
         }
     }

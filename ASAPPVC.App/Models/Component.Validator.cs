@@ -10,7 +10,6 @@ namespace ASAPPVC.App.Models
         {
             // ---------- Enums ----------
             RuleFor(vm => vm.UnitOfMeasure).IsInEnum().WithMessage("Unit of Measure is invalid.");
-            RuleFor(vm => vm.Category).IsInEnum().WithMessage("Category is invalid.");
             RuleFor(vm => vm.MaterialType).IsInEnum().WithMessage("Material is invalid.");
             RuleFor(vm => vm.ColourOption).IsInEnum().WithMessage("Colour is invalid.");
 
@@ -28,7 +27,7 @@ namespace ASAPPVC.App.Models
                         return;
                     }
                     if (normalizedComponentName.Length is < 2 or > 100)
-                        context.AddFailure("Component name must be between2 and100 characters.");
+                        context.AddFailure("Component name must be between 2 and 100 characters.");
                 });
 
             // ---------- QuantityOnHand ----------
@@ -57,7 +56,7 @@ namespace ASAPPVC.App.Models
                     }
                     if (normalizedLocationCode.Length > 32)
                     {
-                        context.AddFailure("Location code must be32 characters or fewer.");
+                        context.AddFailure("Location code must be 32 characters or fewer.");
                         return;
                     }
                     if (!Regex.IsMatch(normalizedLocationCode, "^[A-Z0-9]+(?:-[A-Z0-9]+)*$"))
@@ -78,12 +77,12 @@ namespace ASAPPVC.App.Models
             RuleFor(vm => vm.ReorderLevel)
                 .GreaterThanOrEqualTo(0m).WithMessage("Reorder level cannot be negative.");
 
-            RuleFor(vm => vm.ReorderQuantity)
-                .GreaterThanOrEqualTo(0m).WithMessage("Reorder quantity cannot be negative.");
+            RuleFor(vm => vm.ReorderLevel)
+                .GreaterThanOrEqualTo(0m).WithMessage("Reorder level cannot be negative.");
 
             RuleFor(vm => vm)
-                .Must(model => !(model.ReorderLevel > 0m && model.ReorderQuantity <= 0m))
-                .WithMessage("Reorder quantity should be greater than0 when a reorder level is set.");
+                .Must(model => !(model.ReorderLevel > 0m && model.ReorderLevel <= 0m))
+                .WithMessage("Reorder level should be greater than 0 when a reorder level is set.");
 
             // ---------- Edit-only (normalize code first) ----------
             RuleFor(vm => vm.ComponentCode)
@@ -101,7 +100,7 @@ namespace ASAPPVC.App.Models
                         return;
                     }
                     if (normalizedComponentCode.Length > 64)
-                        context.AddFailure("Component code must be64 characters or fewer.");
+                        context.AddFailure("Component code must be 64 characters or fewer.");
                 });
         }
     }

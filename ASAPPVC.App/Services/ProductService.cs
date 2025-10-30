@@ -134,21 +134,21 @@ namespace ASAPPVC.App.Services
         {
             if (vm is null)
                 return Result.Fail("Create view model is required.");
-            if (string.IsNullOrWhiteSpace(vm.Name))
+            if (string.IsNullOrWhiteSpace(vm.ProductName))
                 return Result.Fail("Product name is required.");
             if (string.IsNullOrWhiteSpace(vm.Description))
                 return Result.Fail("Product description is required.");
-            if (vm.Price <= 0)
+            if (vm.SellingPrice <= 0)
                 return Result.Fail("Product price must be greater than zero.");
-            if (vm.Components is null || vm.Components.Count == 0)
+            if (vm.ProductComponents is null || vm.ProductComponents.Count == 0)
                 return Result.Fail("A product requires at least one component.");
 
             // Validate component entries
-            foreach (var comp in vm.Components)
+            foreach (var comp in vm.ProductComponents)
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
-                if (comp.Quantity <= 0)
+                if (comp.RequiredQuantity <= 0)
                     return Result.Fail("Component quantities must be greater than zero.");
             }
 
@@ -161,23 +161,23 @@ namespace ASAPPVC.App.Services
                 return Result.Fail("Edit view model is required.");
             if (vm.Id == Guid.Empty)
                 return Result.Fail("Product ID is required.");
-            if (string.IsNullOrWhiteSpace(vm.Name))
+            if (string.IsNullOrWhiteSpace(vm.ProductName))
                 return Result.Fail("Product name is required.");
             if (string.IsNullOrWhiteSpace(vm.Description))
                 return Result.Fail("Product description is required.");
             if (string.IsNullOrWhiteSpace(vm.ProductCode))
                 return Result.Fail("Product code is required.");
-            if (vm.Price <= 0)
+            if (vm.SellingPrice <= 0)
                 return Result.Fail("Product price must be greater than zero.");
-            if (vm.Components is null || vm.Components.Count == 0)
+            if (vm.ProductComponents is null || vm.ProductComponents.Count == 0)
                 return Result.Fail("A product requires at least one component.");
 
             // Validate component entries
-            foreach (var comp in vm.Components)
+            foreach (var comp in vm.ProductComponents)
             {
                 if (comp.ComponentId == Guid.Empty)
                     return Result.Fail("All components must have valid IDs.");
-                if (comp.Quantity <= 0)
+                if (comp.RequiredQuantity <= 0)
                     return Result.Fail("Component quantities must be greater than zero.");
             }
 
@@ -186,7 +186,7 @@ namespace ASAPPVC.App.Services
 
         private static void Normalize(ProductFormVm vm)
         {
-            vm.Name = vm.Name.Trim();
+            vm.ProductName = vm.ProductName.Trim();
             vm.Description = vm.Description.Trim();
             if (!string.IsNullOrWhiteSpace(vm.ProductCode))
                 vm.ProductCode = vm.ProductCode.Trim();
@@ -203,7 +203,7 @@ namespace ASAPPVC.App.Services
                 return new Dictionary<Guid, Unit>();
 
             var components = await _components.GetListByIdsAsync(distinctIds, asNoTracking: true, ct);
-            return components.ToDictionary(c => c.Id, c => c.Unit);
+            return components.ToDictionary(c => c.Id, c => c.UnitOfMeasure);
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -219,7 +219,7 @@ namespace ASAPPVC.App.Services
             try
             {
                 // Build unit lookup for components
-                var componentIds = vm.Components.Select(c => c.ComponentId).ToList();
+                var componentIds = vm.ProductComponents.Select(c => c.ComponentId).ToList();
                 var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
 
                 // Verify all components exist
@@ -275,7 +275,7 @@ namespace ASAPPVC.App.Services
                 }
 
                 // Build unit lookup for components
-                var componentIds = vm.Components.Select(c => c.ComponentId).ToList();
+                var componentIds = vm.ProductComponents.Select(c => c.ComponentId).ToList();
                 var unitLookup = await BuildComponentUnitLookupAsync(componentIds, ct);
 
                 // Verify all components exist

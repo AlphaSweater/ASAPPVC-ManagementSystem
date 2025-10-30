@@ -143,14 +143,14 @@ namespace ASAPPVC.App.Services
         {
             if (vm is null)
                 return Result.Fail("Create view model is required.");
-            if (string.IsNullOrWhiteSpace(vm.Name))
+            if (string.IsNullOrWhiteSpace(vm.ComponentName))
                 return Result.Fail("Component name is required.");
-            if (string.IsNullOrWhiteSpace(vm.StorageLocation))
+            if (string.IsNullOrWhiteSpace(vm.LocationCode))
                 return Result.Fail("Storage location is required.");
             if (vm.UnitCost <= 0)
                 return Result.Fail("Unit cost must be greater than zero.");
-            if (vm.CurrentAmount < 0)
-                return Result.Fail("Current amount cannot be negative.");
+            if (vm.QuantityOnHand < 0)
+                return Result.Fail("Quantity On Hand cannot be negative.");
 
             return Result.Success();
         }
@@ -163,13 +163,13 @@ namespace ASAPPVC.App.Services
                 return Result.Fail("Component ID is required.");
             if (string.IsNullOrWhiteSpace(vm.ComponentCode))
                 return Result.Fail("Component code is required.");
-            if (string.IsNullOrWhiteSpace(vm.Name))
+            if (string.IsNullOrWhiteSpace(vm.ComponentName))
                 return Result.Fail("Component name is required.");
-            if (string.IsNullOrWhiteSpace(vm.StorageLocation))
+            if (string.IsNullOrWhiteSpace(vm.LocationCode))
                 return Result.Fail("Storage location is required.");
             if (vm.UnitCost <= 0)
                 return Result.Fail("Unit cost must be greater than zero.");
-            if (vm.CurrentAmount < 0)
+            if (vm.QuantityOnHand < 0)
                 return Result.Fail("Current amount cannot be negative.");
 
             return Result.Success();
@@ -177,8 +177,8 @@ namespace ASAPPVC.App.Services
 
         private static void Normalize(ComponentFormVm vm)
         {
-            vm.Name = vm.Name.Trim();
-            vm.StorageLocation = vm.StorageLocation.Trim();
+            vm.ComponentName = vm.ComponentName.Trim();
+            vm.LocationCode = vm.LocationCode.Trim().ToUpper();
             if (!string.IsNullOrWhiteSpace(vm.ComponentCode))
                 vm.ComponentCode = vm.ComponentCode.Trim();
         }

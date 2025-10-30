@@ -67,8 +67,8 @@ namespace ASAPPVC.App.Models
                 ComponentId = productComponent.ComponentId,
                 ComponentCode = productComponent.Component?.ComponentCode ?? string.Empty,
                 ComponentName = productComponent.Component?.ComponentName ?? string.Empty,
-                Unit = productComponent.Unit,
-                Quantity = productComponent.QuantityRequired,
+                UnitOfMeasure = productComponent.Component?.UnitOfMeasure ?? Unit.Piece,
+                RequiredQuantity = productComponent.RequiredQuantity,
                 UnitCost = productComponent.Component?.UnitCost ?? 0m,
                 Remove = false // Default for display/edit scenarios
             };
@@ -95,8 +95,8 @@ namespace ASAPPVC.App.Models
             {
                 ProductId = productId,
                 ComponentId = vm.ComponentId,
-                Unit = ResolveUnit(componentUnitLookup, vm.ComponentId),
-                QuantityRequired = NormalizeQuantity(vm.Quantity)
+                RequiredQuantity = NormalizeQuantity(vm.RequiredQuantity),
+                UnitCost = vm.UnitCost
             };
         }
 
@@ -109,7 +109,7 @@ namespace ASAPPVC.App.Models
                 .Select(g => new ProductComponentVm
                 {
                     ComponentId = g.Key,
-                    Quantity = g.Sum(x => x.Quantity)
+                    RequiredQuantity = g.Sum(x => x.RequiredQuantity)
                 })
                 .Select(vm => FromBridgeVm(productId, vm, componentUnitLookup))
                 .ToList();
@@ -126,8 +126,8 @@ namespace ASAPPVC.App.Models
             ArgumentNullException.ThrowIfNull(componentUnitLookup);
 
             target.ComponentId = vm.ComponentId;
-            target.Unit = ResolveUnit(componentUnitLookup, vm.ComponentId);
-            target.QuantityRequired = NormalizeQuantity(vm.Quantity);
+            target.UnitOfMeasure = ResolveUnit(componentUnitLookup, vm.ComponentId);
+            target.RequiredQuantity = NormalizeQuantity(vm.RequiredQuantity);
         }
 
         public List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items, IDictionary<Guid, Unit> componentUnitLookup)
@@ -143,7 +143,7 @@ namespace ASAPPVC.App.Models
                 .Select(g => new ProductComponentVm
                 {
                     ComponentId = g.Key,
-                    Quantity = g.Sum(x => x.Quantity)
+                    RequiredQuantity = g.Sum(x => x.RequiredQuantity)
                 })
                 .Select(vm =>
                 {

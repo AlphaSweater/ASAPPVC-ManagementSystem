@@ -20,24 +20,35 @@ namespace ASAPPVC.App.Models
     {
         public Guid Id { get; init; }
         public string ProductCode { get; init; } = string.Empty;
-        public string Name { get; init; } = string.Empty;
-        public decimal Price { get; init; }
-        public string Description { get; init; } = string.Empty;
 
-        public bool HasImage { get; set; }
+        public string ProductName { get; init; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
         public string? ThumbUrl { get; init; }
+        public bool HasImage { get; set; }
+
+        public decimal SellingPrice { get; init; }
+
+        public decimal PotentialQuantityOnHand { get; init; }
+        public decimal ReorderLevel { get; init; }
 
         // Distinct number of components linked to this product
         public int ComponentCount { get; init; }
 
-        // Enum modifiers
+        // --------------------------------------------------
+        // Computed UI helpers
+        public string DisplayPrice => SellingPrice.ToString("C"); // UI currency format
 
-        public Category Category { get; init; } = Category.None;
-        public Material Material { get; init; } = Material.None;
-        public Colour Colour { get; init; } = Colour.None;
+        public ReorderStatus ReorderStatus => ReorderStatusPolicy.Evaluate(PotentialQuantityOnHand, ReorderLevel);
+        public decimal ReorderRatio => ReorderStatusPolicy.GetRatio(PotentialQuantityOnHand, ReorderLevel);
 
-        // Optional computed fields for UI display
-        public string DisplayPrice => Price.ToString("C"); // UI currency format
+        public string StockHealth =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Label", ReorderStatus.ToString());
+
+        public string StockHealthCss =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("CssClass", "status-ok");
+
+        public string StockHealthColor =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Color", "#27ae60");
 
         public string ComponentsBadge => $"{ComponentCount} comp{(ComponentCount == 1 ? "" : "s")}";
     }
@@ -55,22 +66,55 @@ namespace ASAPPVC.App.Models
     {
         public Guid Id { get; init; }
         public string ProductCode { get; init; } = string.Empty;
-        public string Name { get; init; } = string.Empty;
-        public decimal Price { get; init; }
+
+        public string ProductName { get; init; } = string.Empty;
         public string Description { get; init; } = string.Empty;
-
-        public bool HasImage { get; set; }
         public string? ImageUrl { get; init; }
-        public string? ImageEtag { get; init; }
+        public bool HasImage { get; set; }
 
-        // Enum modifiers
         public Category Category { get; init; } = Category.None;
+        public Material MaterialType { get; init; } = Material.None;
+        public Colour ColourOption { get; init; } = Colour.None;
 
-        public Material Material { get; init; } = Material.None;
-        public Colour Colour { get; init; } = Colour.None;
+        public decimal SellingPrice { get; init; }
+        public decimal? ProductionCost { get; init; }
+
+        public decimal PotentialQuantityOnHand { get; init; }
+        public decimal ReorderLevel { get; init; }
 
         // Linked components
-        public List<ProductComponentVm> Components { get; init; } = new();
+        public List<ProductComponentVm> ProductComponents { get; init; } = new();
+
+        // --------------------------------------------------
+        // Computed UI helpers
+        public int ComponentCount => ProductComponents.Count;
+
+        public string DisplayPrice => SellingPrice.ToString("C"); // UI currency format
+
+        public string? DisplayCost =>
+            (ProductionCost.HasValue) ? ProductionCost.Value.ToString("C") : null;
+
+        public decimal? GrossMarginAmount =>
+            (ProductionCost.HasValue) ? SellingPrice - ProductionCost.Value : null;
+
+        public decimal? GrossMarginPercent =>
+            (ProductionCost.HasValue && ProductionCost.Value > 0)
+                ? (SellingPrice - ProductionCost.Value) / ProductionCost.Value * 100m
+                : null;
+
+        public ReorderStatus ReorderStatus => ReorderStatusPolicy.Evaluate(PotentialQuantityOnHand, ReorderLevel);
+        public decimal ReorderRatio => ReorderStatusPolicy.GetRatio(PotentialQuantityOnHand, ReorderLevel);
+
+        public string StockHealth =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Label", ReorderStatus.ToString());
+
+        public string StockHealthCss =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("CssClass", "status-ok");
+
+        public string StockHealthColor =>
+            ReorderStatus.GetAttributePropertyOrDefault<ReorderStatusInfoAttribute, string>("Color", "#27ae60");
+
+        public string ComponentsBadge => $"{ComponentCount} comp{(ComponentCount == 1 ? "" : "s")}";
     }
 
     //-----------------------------------------------\\
@@ -94,12 +138,7 @@ namespace ASAPPVC.App.Models
         [Display(Name = "Product Name")]
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Display(Name = "Unit Price")]
-        [Required(ErrorMessage = "Price is required.")]
-        [Range(0.01, 999999, ErrorMessage = "Price must be a positive amount.")]
-        public decimal Price { get; set; }
+        public string ProductName { get; set; } = string.Empty;
 
         [Display(Name = "Description")]
         [Required(ErrorMessage = "Description is required.")]
@@ -116,17 +155,32 @@ namespace ASAPPVC.App.Models
         [Display(Name = "Category")]
         public Category Category { get; set; } = Category.None;
 
-        [Display(Name = "Material")]
-        public Material Material { get; set; } = Material.None;
+        [Display(Name = "Material Type")]
+        public Material MaterialType { get; set; } = Material.None;
 
-        [Display(Name = "Colour")]
-        public Colour Colour { get; set; } = Colour.None;
+        [Display(Name = "Colour Option")]
+        public Colour ColourOption { get; set; } = Colour.None;
 
-        // Component lines
+        [Display(Name = "Selling Price")]
+        [Required(ErrorMessage = "Selling Price is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Selling Price must be a positive amount.")]
+        public decimal SellingPrice { get; set; }
+
+        [Display(Name = "Reorder Level")]
+        [Range(0, double.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
+        public decimal ReorderLevel { get; set; }
+
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
+
+        // Component lines (match model naming)
         [Display(Name = "Components")]
         [MinLength(1, ErrorMessage = "A product requires at least one component.")]
-        public List<ProductComponentVm> Components { get; set; } = new();
+        public List<ProductComponentVm> ProductComponents { get; set; } = new();
 
+        // --------------------------------------------------
+        // Validation & helpers
+        // --------------------------------------------------
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (IsEdit && string.IsNullOrWhiteSpace(ProductCode))
@@ -136,11 +190,11 @@ namespace ASAPPVC.App.Models
                     new[] { nameof(ProductCode) });
             }
 
-            if (Components is { Count: > 0 })
+            if (ProductComponents is { Count: > 0 })
             {
-                for (int i = 0; i < Components.Count; i++)
+                for (int i = 0; i < ProductComponents.Count; i++)
                 {
-                    var c = Components[i];
+                    var c = ProductComponents[i];
                 }
             }
         }

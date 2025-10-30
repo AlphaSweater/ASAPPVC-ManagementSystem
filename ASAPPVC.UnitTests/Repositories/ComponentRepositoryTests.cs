@@ -19,14 +19,14 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- GetByIdOrCode: by Id returns entity ----------------
         [Fact]
-        public async System.Threading.Tasks.Task GetByIdOrCodeAsync_ById_ReturnsComponentAsync()
+        public async Task GetByIdOrCodeAsync_ById_ReturnsComponentAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "C-001", Name = "Bolt", UnitCost = 1m, CurrentAmount = 5m, StorageLocation = "A1" };
+            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "C-001", ComponentName = "Bolt", UnitCost = 1m, QuantityOnHand = 5m, LocationCode = "A-1" };
             ctx.Components.Add(comp);
             await ctx.SaveChangesAsync();
 
@@ -40,14 +40,14 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- GetByIdOrCode: by Code returns entity ----------------
         [Fact]
-        public async System.Threading.Tasks.Task GetByIdOrCodeAsync_ByCode_ReturnsComponentAsync()
+        public async Task GetByIdOrCodeAsync_ByCode_ReturnsComponentAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "C-002", Name = "Nut", UnitCost = 0.5m, CurrentAmount = 10m, StorageLocation = "B2" };
+            var comp = new Component { Id = Guid.NewGuid(), ComponentCode = "C-002", ComponentName = "Nut", UnitCost = 0.5m, QuantityOnHand = 10m, LocationCode = "B-2" };
             ctx.Components.Add(comp);
             await ctx.SaveChangesAsync();
 
@@ -61,15 +61,15 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- GetListOrderedByCode: returns ordered list ----------------
         [Fact]
-        public async System.Threading.Tasks.Task GetListOrderedByCodeAsync_ReturnsOrderedAsync()
+        public async Task GetListOrderedByCodeAsync_ReturnsOrderedAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var a = new Component { Id = Guid.NewGuid(), ComponentCode = "C-100", Name = "A", UnitCost = 1m, CurrentAmount = 1m, StorageLocation = "X" };
-            var b = new Component { Id = Guid.NewGuid(), ComponentCode = "C-010", Name = "B", UnitCost = 1m, CurrentAmount = 1m, StorageLocation = "X" };
+            var a = new Component { Id = Guid.NewGuid(), ComponentCode = "C-100", ComponentName = "A", UnitCost = 1m, QuantityOnHand = 1m, LocationCode = "X-1" };
+            var b = new Component { Id = Guid.NewGuid(), ComponentCode = "C-010", ComponentName = "B", UnitCost = 1m, QuantityOnHand = 1m, LocationCode = "X-2" };
             ctx.Components.AddRange(a, b);
             await ctx.SaveChangesAsync();
 
@@ -82,15 +82,15 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- Search: empty term returns all ordered ----------------
         [Fact]
-        public async System.Threading.Tasks.Task SearchAsync_EmptyTerm_ReturnsAllOrderedAsync()
+        public async Task SearchAsync_EmptyTerm_ReturnsAllOrderedAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
             using var ctx = CreateContext(conn);
             ctx.Database.EnsureCreated();
 
-            var x = new Component { Id = Guid.NewGuid(), ComponentCode = "C-200", Name = "Zed", UnitCost = 1m, CurrentAmount = 1m, StorageLocation = "X" };
-            var y = new Component { Id = Guid.NewGuid(), ComponentCode = "C-100", Name = "Alpha", UnitCost = 1m, CurrentAmount = 1m, StorageLocation = "X" };
+            var x = new Component { Id = Guid.NewGuid(), ComponentCode = "C-200", ComponentName = "Zed", UnitCost = 1m, QuantityOnHand = 1m, LocationCode = "X-1" };
+            var y = new Component { Id = Guid.NewGuid(), ComponentCode = "C-100", ComponentName = "Alpha", UnitCost = 1m, QuantityOnHand = 1m, LocationCode = "X-2" };
             ctx.Components.AddRange(x, y);
             await ctx.SaveChangesAsync();
 
@@ -98,7 +98,7 @@ namespace ASAPPVC.UnitTests.Repositories
 
             var results = await repo.SearchAsync(term: string.Empty);
 
-            results.Select(r => r.Name).Should().ContainInOrder("Alpha", "Zed");
+            results.Select(r => r.ComponentName).Should().ContainInOrder("Alpha", "Zed");
         }
     }
 }

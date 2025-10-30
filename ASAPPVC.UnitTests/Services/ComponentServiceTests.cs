@@ -22,7 +22,7 @@ namespace ASAPPVC.UnitTests.Services
         public async Task CreateAsync_InvalidVm_ReturnsFailure()
         {
             // Arrange
-            var vm = new ComponentFormVm { Name = "", StorageLocation = "  ", UnitCost = 0m, CurrentAmount = -1m };
+            var vm = new ComponentFormVm { ComponentName = "", LocationCode = "  ", UnitCost = 0m, QuantityOnHand = -1m };
 
             // Act
             var res = await _sut.CreateAsync(vm);
@@ -37,8 +37,8 @@ namespace ASAPPVC.UnitTests.Services
         public async Task CreateAsync_Valid_CallsMapperAndRepository_ReturnsCreated()
         {
             // Arrange
-            var vm = new ComponentFormVm { Name = "Bolt", StorageLocation = "A1", UnitCost = 1.5m, CurrentAmount = 10m };
-            var created = new Component { Id = Guid.NewGuid(), Name = "Bolt" };
+            var vm = new ComponentFormVm { ComponentName = "Bolt", LocationCode = "A-1", UnitCost = 1.5m, QuantityOnHand = 10m };
+            var created = new Component { Id = Guid.NewGuid(), ComponentName = "Bolt" };
 
             _mapper.Setup(m => m.FromCreateVmAsync(vm, It.IsAny<CancellationToken>()))
                    .ReturnsAsync(created);

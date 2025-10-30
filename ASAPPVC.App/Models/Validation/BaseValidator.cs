@@ -48,9 +48,7 @@ namespace ASAPPVC.App.Models.Validation
         /// </summary>
         protected static bool IsIntegerOnlyUnit(Unit unit)
         {
-            return unit is Unit.Piece or Unit.Pair or Unit.Sheet or Unit.Bottle or Unit.Can
-            or Unit.Tube or Unit.Pack or Unit.Set or Unit.Bag or Unit.Roll
-            or Unit.Box or Unit.Pallet;
+            return unit is Unit.Piece or Unit.Pair;
         }
     }
 }

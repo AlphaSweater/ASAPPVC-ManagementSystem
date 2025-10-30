@@ -19,7 +19,7 @@ namespace ASAPPVC.UnitTests.Repositories
 
         // ---------------- GetByIdOrCodeWithDetails: includes customer and products ----------------
         [Fact]
-        public async System.Threading.Tasks.Task GetByIdOrCodeWithDetailsAsync_IncludesDetailsAsync()
+        public async Task GetByIdOrCodeWithDetailsAsync_IncludesDetailsAsync()
         {
             using var conn = new SqliteConnection("DataSource=:memory:");
             conn.Open();
@@ -27,9 +27,14 @@ namespace ASAPPVC.UnitTests.Repositories
             ctx.Database.EnsureCreated();
 
             var customer = new Customer { Id = Guid.NewGuid(), Name = "John", Surname = "Doe", PhoneNumber = "123", Email = "a@b.com" };
-            var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", Name = "Widget", Price = 5m, Description = "D" };
+            var product = new Product { Id = Guid.NewGuid(), ProductCode = "PRD-1", ProductName = "Widget", SellingPrice = 5m, Description = "D" };
 
             var order = new Order { Id = Guid.NewGuid(), OrderCode = "ORD-001", CustomerId = customer.Id, OrderDate = DateTime.UtcNow, OrderStatus = default };
+
+            // create an identity user required by the Order.CreatedByUserId FK
+            var createdBy = new ApplicationUser { Id = Guid.NewGuid(), FirstName = "System", LastName = "User", Email = "sys@local", UserName = "sys@local" };
+            order.CreatedByUserId = createdBy.Id;
+
             var op = new OrderProduct { OrderId = order.Id, ProductId = product.Id, OrderedQuantity = 2 };
 
             // set navigation properties so EF will wire them if tracked
@@ -38,6 +43,7 @@ namespace ASAPPVC.UnitTests.Repositories
 
             ctx.Customers.Add(customer);
             ctx.Products.Add(product);
+            ctx.Users.Add(createdBy);
             ctx.Orders.Add(order);
             ctx.OrderProducts.Add(op);
             await ctx.SaveChangesAsync();

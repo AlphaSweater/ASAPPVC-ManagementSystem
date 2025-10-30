@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ASAPPVC.App.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASAPPVC.App.Models
@@ -29,6 +30,14 @@ namespace ASAPPVC.App.Models
         [Required, Column(TypeName = "decimal(18,4)")]
         [Range(0.0001, double.MaxValue, ErrorMessage = "Quantity per unit must be > 0")]
         public decimal RequiredQuantity { get; set; } = 1m;
+
+        public Unit UnitOfMeasure { get; set; }
+
+        // ==============================
+        // Snapshot of Unit Cost
+        // ==============================
+        [Required, Column(TypeName = "decimal(18,2)")]
+        public decimal UnitCost { get; set; }
 
         // ===============================
         // Audit

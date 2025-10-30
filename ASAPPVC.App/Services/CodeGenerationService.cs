@@ -143,7 +143,7 @@ namespace ASAPPVC.App.Services
             return (req.Type) switch
             {
                 CodeType.Product => BuildProductCode(prefix, category, number, version),
-                CodeType.Component => BuildComponentCode(prefix, category, number),
+                CodeType.Component => BuildComponentCode(prefix, number),
                 CodeType.Order => $"{prefix}-{tsUtc:yyyyMM}-{number:0000}",
                 CodeType.PickingSlip => BuildPickingSlipCode(prefix, req.RelatedCode!, version!, number),
                 _ => $"{prefix}-{number:0000}"
@@ -161,9 +161,9 @@ namespace ASAPPVC.App.Services
             return $"{pfx}-{num:0000}";
         }
 
-        private static string BuildComponentCode(string pfx, string category, int num)
+        private static string BuildComponentCode(string pfx, int num)
         {
-            return string.IsNullOrEmpty(category) ? $"{pfx}-{num:00000}" : $"{pfx}-{category}-{num:00000}";
+            return $"{pfx}-{num:00000}";
         }
 
         private static string BuildPickingSlipCode(string pfx, string relatedOrderCode, string version, int fallbackNum)

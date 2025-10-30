@@ -19,8 +19,17 @@ namespace ASAPPVC.App.Models
         [Required, MaxLength(64)]
         public string ProductCode { get; set; } = string.Empty;
 
+        // ===============================
+        // Content
+        // ===============================
+
         [Required, MaxLength(100)]
         public string ProductName { get; set; } = string.Empty;
+
+        [Required, MaxLength(500)]
+        public string Description { get; set; } = string.Empty;
+
+        public AppImage? Image { get; set; }
 
         // ===============================
         // Classification
@@ -31,46 +40,21 @@ namespace ASAPPVC.App.Models
         public Colour ColourOption { get; set; } = Colour.None;
 
         // ===============================
-        // Pricing & Costing
+        // Pricing & Cost
         // ===============================
 
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal SellingPrice { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal? ProductionCost { get; set; }
-
-        [NotMapped]
-        public decimal? GrossMarginAmount =>
-            (ProductionCost.HasValue) ? SellingPrice - ProductionCost.Value : null;
-
-        [NotMapped]
-        public decimal? GrossMarginPercent =>
-            (ProductionCost.HasValue && ProductionCost.Value > 0)
-                ? (SellingPrice - ProductionCost.Value) / ProductionCost.Value * 100m
-                : null;
+        public decimal? ProductionCost =>
+            ProductComponents?.Sum(pc => pc.UnitCost * pc.RequiredQuantity);
 
         // ===============================
-        // Inventory & Unit
+        // Inventory
         // ===============================
 
-        [Required]
-        public Unit UnitOfMeasure { get; set; } = Unit.Piece;
-
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal PotentialQuantityOnHand { get; set; } = 0m; // This should be calculated based on what math of what components are required and in what quantities ? and then like how many of these productys we could make based on the component stock
-
-        public decimal ReorderLevel { get; set; } = 0m;     // Trigger point
-        public decimal ReorderQuantity { get; set; } = 0m;  // Suggested batch
-
-        // ===============================
-        // Content
-        // ===============================
-
-        [Required, MaxLength(500)]
-        public string Description { get; set; } = string.Empty;
-
-        public AppImage? Image { get; set; }
+        public decimal ReorderLevel { get; set; } = 0m;     // Threshold for restocking alerts
 
         // ===============================
         // Lifecycle / Audit

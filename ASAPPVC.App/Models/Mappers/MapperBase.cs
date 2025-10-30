@@ -10,13 +10,13 @@ namespace ASAPPVC.App.Models.Mappers
     /// </summary>
     public abstract class MapperBase
     {
-        protected readonly ICodeGenerationService? CodeGenerationService;
-        protected readonly IImageService? ImageService;
+        protected readonly ICodeGenerationService? _codeGenService;
+        protected readonly IImageService? _imageService;
 
         protected MapperBase(ICodeGenerationService? codeGenerationService = null, IImageService? imageService = null)
         {
-            CodeGenerationService = codeGenerationService;
-            ImageService = imageService;
+            _codeGenService = codeGenerationService;
+            _imageService = imageService;
         }
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace ASAPPVC.App.Models.Mappers
 
             var safeMime = string.IsNullOrWhiteSpace(mime) ? "image/png" : mime.Trim();
 
-            if (ImageService is not null)
+            if (_imageService is not null)
             {
                 try
                 {
                     // Attempt to let the image service process the bytes and use its payload (may contain thumbnails, normalized content type, etc.)
-                    var res = ImageService.ProcessBytesAsync(data, safeMime).GetAwaiter().GetResult();
+                    var res = _imageService.ProcessBytesAsync(data, safeMime).GetAwaiter().GetResult();
                     if (res.Ok && res.Value is not null && res.Value.Data is { Length: > 0 })
                     {
                         var contentType = string.IsNullOrWhiteSpace(res.Value.ContentType) ? safeMime : res.Value.ContentType.Trim();
@@ -73,15 +73,13 @@ namespace ASAPPVC.App.Models.Mappers
         /// Normalizes a code or generates one using the provided prefix and optional code generator.
         /// Falls back to a GUID-based code if no generator is available.
         /// </summary>
-        protected string NormalizeCodeOrGenerate(string? code, string prefix)
+        protected string NormalizeCodeOrGenerate(string? code, string prefix, string? category = null)
         {
             var trimmed = (code ?? string.Empty).Trim();
             if (!string.IsNullOrWhiteSpace(trimmed))
                 return trimmed;
 
-            // Try using the new async code generation service if available. We call it synchronously
-            // here because mapper APIs are synchronous; if generation fails we fall back to GUID.
-            if (CodeGenerationService is not null)
+            if (_codeGenService is not null)
             {
                 try
                 {
@@ -96,8 +94,8 @@ namespace ASAPPVC.App.Models.Mappers
                         _ => CodeType.Product
                     };
 
-                    var req = new CodeGenerationRequest { Type = type };
-                    var res = CodeGenerationService.GenerateCodeAsync(req).GetAwaiter().GetResult();
+                    var req = new CodeGenerationRequest { Type = type, Category = category };
+                    var res = _codeGenService.GenerateCodeAsync(req).GetAwaiter().GetResult();
                     if (res.Ok && !string.IsNullOrWhiteSpace(res.Value))
                         return res.Value.Trim();
                 }
