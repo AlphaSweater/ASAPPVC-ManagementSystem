@@ -100,7 +100,7 @@ namespace ASAPPVC.App.Models
     //-----------------------------------------------\\
     // Create/Update form (Add + Edit)
     //-----------------------------------------------\\
-    public sealed class ComponentFormVm : IValidatableObject
+    public sealed class ComponentFormVm
     {
         private const decimal MaxQuantity = 1_000_000_000_000m;
 
@@ -129,7 +129,7 @@ namespace ASAPPVC.App.Models
         // Inventory & cost
         [Display(Name = "Unit of Measure")]
         [Required(ErrorMessage = "Unit of Measure is required.")]
-        public Unit UnitOfMeasure { get; init; } = Unit.Piece;
+        public Unit UnitOfMeasure { get; set; } = Unit.Piece;
 
         [Display(Name = "Quantity on Hand")]
         [Required(ErrorMessage = "Quantity on hand is required.")]
@@ -169,61 +169,5 @@ namespace ASAPPVC.App.Models
 
         // For edit preview
         public string? ExistingImageUrl { get; set; }
-
-        // Validation
-        public IEnumerable<ValidationResult> Validate(ValidationContext context)
-        {
-            // 1) On Edit, ComponentCode is required
-            if (IsEdit && string.IsNullOrWhiteSpace(ComponentCode))
-            {
-                yield return new ValidationResult(
-                    "Component code is required when editing.",
-                    new[] { nameof(ComponentCode) });
-            }
-
-            // 2) QuantityOnHand must be >= 0 and within sane bounds
-            if (QuantityOnHand < 0m)
-            {
-                yield return new ValidationResult(
-                    "Quantity on hand cannot be negative.",
-                    new[] { nameof(QuantityOnHand) });
-            }
-            if (QuantityOnHand >= MaxQuantity)
-            {
-                yield return new ValidationResult(
-                    $"Quantity on hand must be less than {MaxQuantity:N0}.",
-                    new[] { nameof(QuantityOnHand) });
-            }
-
-            // 3) Integer-only units cannot have fractional amounts
-            if (IsIntegerOnlyUnit(UnitOfMeasure) && QuantityOnHand != Math.Floor(QuantityOnHand))
-            {
-                yield return new ValidationResult(
-                    "This unit does not allow fractional quantities.",
-                    new[] { nameof(QuantityOnHand) });
-            }
-
-            // 4) If a reorder level is set, reorder quantity should be > 0 (helps UX)
-            if (ReorderLevel > 0 && ReorderQuantity <= 0)
-            {
-                yield return new ValidationResult(
-                    "Reorder quantity should be greater than 0 when a reorder level is set.",
-                    new[] { nameof(ReorderQuantity) });
-            }
-        }
-
-        /// <summary>
-        /// Units that require integer-only values (countable items).
-        /// </summary>
-        private static bool IsIntegerOnlyUnit(Unit unit)
-        {
-            return unit switch
-            {
-                Unit.Piece or Unit.Pair or Unit.Sheet or Unit.Bottle or Unit.Can or
-                Unit.Tube or Unit.Pack or Unit.Set or Unit.Bag or Unit.Roll or
-                Unit.Box or Unit.Pallet => true,
-                _ => false
-            };
-        }
     }
 }

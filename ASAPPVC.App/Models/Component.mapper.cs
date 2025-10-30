@@ -84,7 +84,7 @@ namespace ASAPPVC.App.Models
 
                 UnitOfMeasure = component.UnitOfMeasure,
                 QuantityOnHand = component.QuantityOnHand,
-                UnitPrice = component.UnitCost,
+                UnitCost = component.UnitCost,
 
                 LocationCode = component.LocationCode ?? string.Empty,
                 LocationNote = component.LocationNote,
@@ -122,7 +122,7 @@ namespace ASAPPVC.App.Models
 
                 UnitOfMeasure = component.UnitOfMeasure,
                 QuantityOnHand = component.QuantityOnHand,
-                UnitPrice = component.UnitCost,
+                UnitCost = component.UnitCost,
 
                 LocationCode = component.LocationCode ?? string.Empty,
                 LocationNote = component.LocationNote,
@@ -155,7 +155,7 @@ namespace ASAPPVC.App.Models
 
                 UnitOfMeasure = vm.UnitOfMeasure,
                 QuantityOnHand = vm.QuantityOnHand < 0m ? 0m : vm.QuantityOnHand,
-                UnitCost = NormalizeMoney(vm.UnitPrice),
+                UnitCost = NormalizeMoney(vm.UnitCost),
 
                 LocationCode = NormalizeString(vm.LocationCode),
                 LocationNote = NormalizeString(vm.LocationNote),
@@ -193,7 +193,7 @@ namespace ASAPPVC.App.Models
 
             existing.UnitOfMeasure = vm.UnitOfMeasure;
             existing.QuantityOnHand = vm.QuantityOnHand < 0m ? 0m : vm.QuantityOnHand;
-            existing.UnitCost = NormalizeMoney(vm.UnitPrice);
+            existing.UnitCost = NormalizeMoney(vm.UnitCost);
 
             existing.LocationCode = NormalizeString(vm.LocationCode);
             existing.LocationNote = NormalizeString(vm.LocationNote);
