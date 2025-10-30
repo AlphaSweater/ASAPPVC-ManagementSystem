@@ -1,4 +1,4 @@
-@using System.Linq
+﻿@using System.Linq
 @model ASAPPVC.App.ViewModels.Warehouse.ManageComponentsVm
 
 @{
@@ -25,7 +25,7 @@
 				<a class="btn btn-ghost"
 				   asp-area="Warehouse"
 				   asp-controller="Components"
-				   asp-action="AddComponent">
+				   asp-action="AddNew">
 					+ Add New Component
 				</a>
 			</div>
@@ -51,42 +51,81 @@
 						<table class="fancy-table">
 							<thead>
 								<tr>
-									<th class="ft-center ft-shrink">Component Code</th>
-									<th class="ft-left ft-grow">Component Name</th>
-									<th class="ft-center ft-shrink">Location</th>
-									<th class="ft-number ft-shrink">Current Stock</th>
-									<th class="ft-money ft-shrink">Unit Price</th>
-									<th class="ft-actions ft-shrink">Actions</th>
+									<th></th>
+									<th scope="col" class="ft-left ft-shrink">Code</th>
+									<th scope="col" class="ft-left ft-grow">Component</th>
+									<th scope="col" class="ft-center ft-shrink">Location</th>
+									<th scope="col" class="ft-number ft-shrink">Current Stock</th>
+									<th scope="col" class="ft-money ft-shrink">Unit Cost</th>
+									<th scope="col" class="ft-actions ft-shrink">Actions</th>
 								</tr>
 							</thead>
 
 							<tbody>
 								@if (Model is { HasComponents: true })
 								{
-									foreach (var component in Model.Components)
+									foreach (var c in Model.Components)
 									{
+										var stockValue = c.UnitCost * c.CurrentAmount;
 										<tr>
-											<td class="ft-code ft-shrink">@component.ComponentCode</td>
-											<td class="ft-left ft-grow ft-name">@component.Name</td>
-											<td class="ft-center ft-shrink">@component.StorageLocation</td>
-											<td class="ft-number ft-shrink">@component.CurrentAmount</td>
-											<td class="ft-money ft-shrink">@($"R {component.UnitCost:0.00}")</td>
+
+											<td class="ft-media ft-shrink">
+												@if (c.HasImage && !string.IsNullOrWhiteSpace(c.ThumbUrl))
+												{
+													<img src="@c.ThumbUrl" class="ft-media__img" />
+												}
+												else
+												{
+													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
+												}
+											</td>
+
+											<td class="ft-code ft-shrink">@c.ComponentCode</td>
+
+											<td class="ft-left ft-shrink">@c.Name</td>
+
+											<td class="ft-center ft-shrink">@c.StorageLocation</td>
+
+											<td class="ft-number ft-shrink">
+												@($"{c.CurrentAmount} {c.ShortFormattedAmount}")
+											</td>
+
+											<td class="ft-money ft-shrink">@c.DisplayCost</td>
+
 											<td class="ft-actions ft-shrink">
 												<div class="actions">
-													<a class="btn btn-secondary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Components"
-													   asp-action="ViewComponent"
-													   asp-route-id="@component.Id">
-														View
-													</a>
-													<a class="btn btn-primary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Components"
-													   asp-action="AddComponent"
-													   asp-route-id="@component.Id">
-														Edit
-													</a>
+													@if (!string.IsNullOrWhiteSpace(c.ComponentCode))
+													{
+														<!-- URL: /Warehouse/Components/View/{code} -->
+														<a class="btn btn-secondary btn-sm"
+														   asp-area="Warehouse"
+														   asp-controller="Components"
+														   asp-action="DetailsByCode"
+														   asp-route-code="@c.ComponentCode">View</a>
+
+														<!-- URL: /Warehouse/Components/Edit/{code} -->
+														<a class="btn btn-primary btn-sm"
+														   asp-area="Warehouse"
+														   asp-controller="Components"
+														   asp-action="EditByCode"
+														   asp-route-code="@c.ComponentCode">Edit</a>
+													}
+													else
+													{
+														<!-- URL: /Warehouse/Components/View/{id} -->
+														<a class="btn btn-secondary btn-sm"
+														   asp-area="Warehouse"
+														   asp-controller="Components"
+														   asp-action="DetailsById"
+														   asp-route-id="@c.Id">View</a>
+
+														<!-- URL: /Warehouse/Components/Edit/{id} -->
+														<a class="btn btn-primary btn-sm"
+														   asp-area="Warehouse"
+														   asp-controller="Components"
+														   asp-action="EditById"
+														   asp-route-id="@c.Id">Edit</a>
+													}
 												</div>
 											</td>
 										</tr>
@@ -95,14 +134,36 @@
 								else
 								{
 									<tr>
-										<td colspan="6" class="ft-center">
-											No components found.
-										</td>
+										<td colspan="7" class="ft-center">No components found.</td>
 									</tr>
 								}
 							</tbody>
 						</table>
 					</div>
+
+					@if (Model.TotalCount > Model.PageSize)
+					{
+						var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+						<nav class="pager" aria-label="Components pagination">
+							<a class="pager__btn @(Model.Page <= 1 ? "is-disabled" : null)"
+							   asp-area="Warehouse"
+							   asp-controller="Components"
+							   asp-action="Index"
+							   asp-route-page="@(Model.Page - 1)"
+							   asp-route-pageSize="@Model.PageSize"
+							   asp-route-term="@Model.SearchQuery">Prev</a>
+
+							<span class="pager__status">Page @Model.Page of @totalPages</span>
+
+							<a class="pager__btn @(Model.Page >= totalPages ? "is-disabled" : null)"
+							   asp-area="Warehouse"
+							   asp-controller="Components"
+							   asp-action="Index"
+							   asp-route-page="@(Model.Page + 1)"
+							   asp-route-pageSize="@Model.PageSize"
+							   asp-route-term="@Model.SearchQuery">Next</a>
+						</nav>
+					}
 				</section>
 			</section>
 		</div>
