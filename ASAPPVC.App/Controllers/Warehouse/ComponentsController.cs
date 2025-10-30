@@ -136,7 +136,11 @@ namespace ASAPPVC.App.Controllers.Warehouse
         private RedirectToActionResult GoIndexWithError(string message)
         {
             TempData["ErrorMessage"] = message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(
+                actionName: "Index",
+                controllerName: "Warehouse",
+                routeValues: new { area = "Warehouse" }
+            );
         }
     }
 }
