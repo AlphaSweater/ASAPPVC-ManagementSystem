@@ -1,4 +1,4 @@
-using ASAPPVC.App.Models;
+﻿using ASAPPVC.App.Models;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
 
@@ -58,6 +58,12 @@ namespace ASAPPVC.App.Services
         /// if the order does not exist or an error occurs.
         /// </returns>
         Task<Result<Order>> GetDomainAsync(Guid id, CancellationToken ct = default);
+
+        /// <summary>
+        /// Loads the full domain graph for a single order (aggregate root) by Id:
+        /// Order → Customer, OrderProducts → Product → ProductComponents → Component.
+        /// </summary>
+        Task<Result<Order>> GetFullDomainAsync(Guid id, CancellationToken ct = default);
 
         /// <summary>
         /// Retrieves the full list of orders mapped to lightweight list view models.
@@ -287,6 +293,7 @@ namespace ASAPPVC.App.Services
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Retrieves a single order entity (raw domain model)
+        // TODO: FIX ME PLEASE I AM BEGGING OH GOD THE AGONY
         public async Task<Result<Order>> GetDomainAsync(Guid id, CancellationToken ct = default)
         {
             if (id == Guid.Empty)
@@ -300,6 +307,29 @@ namespace ASAPPVC.App.Services
 
                 return Result<Order>.Success(order);
             }
+            catch (Exception ex)
+            {
+                return Result<Order>.Fail($"Failed to retrieve order: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves the full domain graph for an order
+        public async Task<Result<Order>> GetFullDomainAsync(Guid id, CancellationToken ct = default)
+        {
+            if (id == Guid.Empty)
+                return Result<Order>.Fail("Order ID is required.");
+
+            try
+            {
+                var order = await _orders.GetFullDomainAsync(id, asNoTracking: true, ct: ct);
+
+                if (order is null)
+                    return Result<Order>.Fail("Order not found.");
+
+                return Result<Order>.Success(order);
+            }
+
             catch (Exception ex)
             {
                 return Result<Order>.Fail($"Failed to retrieve order: {ex.Message}");
@@ -345,5 +375,4 @@ namespace ASAPPVC.App.Services
         }
     }
 }
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

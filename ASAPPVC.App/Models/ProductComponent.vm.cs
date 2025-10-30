@@ -17,32 +17,50 @@ namespace ASAPPVC.App.Models
         private const decimal MaxQuantity = 1_000_000_000_000m; // 1 trillion
         private const decimal MinQuantity = 0m;
 
-        // Core identifiers
+        // ===============================
+        // Core Identification
+        // ===============================
+
         public Guid ProductId { get; init; }
 
         [Required]
         public Guid ComponentId { get; set; }
 
-        // Display fields
+        // ===============================
+        // SnapShot of Component Info
+        // ===============================
+
         public string ComponentCode { get; init; } = string.Empty;
 
         public string ComponentName { get; init; } = string.Empty;
-        public Unit Unit { get; init; }
+
         public decimal UnitCost { get; init; }
+
+        // ===============================
+        // Editable fields
+        // ===============================
 
         // Editable quantity
         [Required]
-        [Range(typeof(decimal), "0.01", "999999", ErrorMessage = "Quantity must be greater than zero")]
-        public decimal Quantity { get; set; } = 1m;
+        [Range(0.01, double.MaxValue, ErrorMessage = "Quantity of Component must be greater than zero")]
+        public decimal RequiredQuantity { get; set; } = 1m;
 
-        // Edit-only flag: mark for removal during updates
+        public Unit UnitOfMeasure { get; init; }
+
+        // ===============================
+        // Edit-only values
+
         public bool Remove { get; set; }
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
+        // ------------------------------
         // Computed properties for display
-        public decimal TotalCost => UnitCost * Quantity;
+        public decimal TotalCost => UnitCost * RequiredQuantity;
 
-        public string ShortFormattedQuantity => Unit.ToDisplay(Quantity, shortForm: true);
+        public string ShortFormattedQuantity => UnitOfMeasure.ToDisplay(RequiredQuantity, shortForm: true);
 
+        // ------------------------------
+        // Validation
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             // ComponentId must not be empty
@@ -54,19 +72,19 @@ namespace ASAPPVC.App.Models
             }
 
             // Quantity must be greater than 0
-            if (Quantity <= MinQuantity)
+            if (RequiredQuantity <= MinQuantity)
             {
                 yield return new ValidationResult(
                     $"Quantity must be greater than {MinQuantity:N0}.",
-                    new[] { nameof(Quantity) });
+                    new[] { nameof(RequiredQuantity) });
             }
 
             // Quantity must be less than 1 trillion
-            if (Quantity >= MaxQuantity)
+            if (RequiredQuantity >= MaxQuantity)
             {
                 yield return new ValidationResult(
                     $"Quantity must be less than {MaxQuantity:N0}.",
-                    new[] { nameof(Quantity) });
+                    new[] { nameof(RequiredQuantity) });
             }
         }
     }

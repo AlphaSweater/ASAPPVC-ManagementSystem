@@ -24,7 +24,7 @@
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
-				<h1 id="page-title" class="card-title">@vm!.Name</h1>
+				<h1 id="page-title" class="card-title">@vm!.ProductName</h1>
 				<p class="card-subtitle">Product details and cost breakdown.</p>
 			</div>
 			<div class="card-actions">
@@ -46,7 +46,7 @@
 					<div class="info-col">
 						<div class="info-pair">
 							<div class="label">Product Price</div>
-							<div class="value price">@vm.Price.ToString("C")</div>
+							<div class="value price">@vm.SellingPrice.ToString("C")</div>
 						</div>
 						<div class="info-pair">
 							<div class="label">Description</div>
@@ -69,17 +69,18 @@
 							</tr>
 						</thead>
 						<tbody>
-							@if (vm.Components != null && vm.Components.Any())
+							@if (vm.ProductComponents != null && vm.ProductComponents.Any())
 							{
 								decimal grandTotal = 0;
-								foreach (var line in vm.Components)
+								foreach (var line in vm.ProductComponents)
 								{
 									var unitCost = line.UnitCost;
-									var subtotal = unitCost * line.Quantity;
+									var subtotal = unitCost * line.RequiredQuantity;
 									grandTotal += subtotal;
 									<tr>
+										<td>@line.ComponentCode</td>
 										<td>@line.ComponentName</td>
-										<td class="align-right">@line.Quantity</td>
+										<td class="align-right">@line.ShortFormattedQuantity</td>
 										<td class="align-right">@unitCost.ToString("C")</td>
 										<td class="align-right">@subtotal.ToString("C")</td>
 									</tr>

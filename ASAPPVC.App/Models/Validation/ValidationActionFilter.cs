@@ -1,0 +1,56 @@
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace ASAPPVC.App.Models.Filters
+{
+    /// Runs any IValidator<T> for action arguments automatically.
+    public sealed class ValidationActionFilter : IAsyncActionFilter
+    {
+        private readonly IServiceProvider _services;
+
+        public ValidationActionFilter(IServiceProvider services)
+        {
+            _services = services;
+        }
+
+        public async Task OnActionExecutionAsync(ActionExecutingContext ctx, ActionExecutionDelegate next)
+        {
+            foreach (var arg in ctx.ActionArguments.Values)
+            {
+                if (arg is null)
+                    continue;
+
+                var vType = typeof(IValidator<>).MakeGenericType(arg.GetType());
+                if (_services.GetService(vType) is not IValidator validator)
+                    continue;
+
+                var vCtxType = typeof(FluentValidation.ValidationContext<>).MakeGenericType(arg.GetType());
+                var vCtx = Activator.CreateInstance(vCtxType, arg)!;
+
+                var method = vType.GetMethod(nameof(IValidator<object>.ValidateAsync), new[] { vCtxType, typeof(CancellationToken) })!;
+                var task = (Task<ValidationResult>)method.Invoke(validator, new object[] { vCtx, ctx.HttpContext.RequestAborted })!;
+                var result = await task;
+
+                if (!result.IsValid)
+                {
+                    foreach (var e in result.Errors)
+                        ctx.ModelState.AddModelError(e.PropertyName, e.ErrorMessage);
+
+                    if (ctx.Controller is Controller c)
+                    {
+                        ctx.Result = c.View(ctx.RouteData.Values["action"]?.ToString(), arg);
+                    }
+                    else
+                    {
+                        ctx.Result = new BadRequestObjectResult(ctx.ModelState);
+                    }
+                    return;
+                }
+            }
+
+            await next();
+        }
+    }
+}

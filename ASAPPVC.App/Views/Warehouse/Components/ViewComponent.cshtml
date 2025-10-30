@@ -9,11 +9,11 @@
 		: "/Assets/Images/placeholder.png";
 
 	// Calculate total stock value
-	var totalStockValue = Model != null ? (Model.UnitCost * Model.CurrentAmount) : 0m;
-	
+	var totalStockValue = Model != null ? (Model.UnitCost * Model.QuantityOnHand) : 0m;
+
 	// Determine the identifier for URLs - prefer code for readability, fallback to ID
-	var urlIdentifier = !string.IsNullOrWhiteSpace(Model?.ComponentCode) 
-		? Model.ComponentCode 
+	var urlIdentifier = !string.IsNullOrWhiteSpace(Model?.ComponentCode)
+		? Model.ComponentCode
 		: Model?.Id.ToString() ?? string.Empty;
 }
 
@@ -31,7 +31,7 @@
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
-				<h1 id="page-title" class="card-title">@Model?.Name</h1>
+				<h1 id="page-title" class="card-title">@Model?.ComponentCode: @Model?.ComponentName</h1>
 				<p class="card-subtitle">Component details and stock info.</p>
 			</div>
 			<div class="card-actions">
@@ -50,7 +50,7 @@
 					<!-- Image Column -->
 					<div class="image-col">
 						<div class="image-box">
-							<img src="@imageSource" alt="@Model?.Name Component Image" />
+							<img src="@imageSource" alt="@Model?.ComponentName Component Image" />
 						</div>
 					</div>
 
@@ -61,16 +61,20 @@
 							<div class="value">@Model?.ComponentCode</div>
 						</div>
 						<div class="info-pair">
+							<div class="label">Component Name</div>
+							<div class="value">@Model?.ComponentName</div>
+						</div>
+						<div class="info-pair">
 							<div class="label">Unit of Measurement</div>
-							<div class="value">@Model?.Unit</div>
+							<div class="value">@Model?.UnitOfMeasure</div>
 						</div>
 						<div class="info-pair">
 							<div class="label">Storage Location</div>
-							<div class="value">@Model?.StorageLocation</div>
+							<div class="value">@Model?.LocationCode</div>
 						</div>
 						<div class="info-pair">
 							<div class="label">Current Stock</div>
-							<div class="value">@Model?.CurrentAmount</div>
+							<div class="value">@Model?.QuantityOnHand</div>
 						</div>
 						<div class="info-pair">
 							<div class="label">Cost Per Unit</div>

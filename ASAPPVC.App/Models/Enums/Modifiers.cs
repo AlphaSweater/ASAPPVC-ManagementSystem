@@ -41,7 +41,13 @@ namespace ASAPPVC.App.Models.Enums
         Black = 4,
 
         [ModifierAttr("WHT", "White")]
-        White = 5
+        White = 5,
+
+        [ModifierAttr("GLD", "Gold")]
+        Gold = 6,
+
+        [ModifierAttr("SLV", "Silver")]
+        Silver = 7,
     }
 
     // Materials (examples)
@@ -59,7 +65,25 @@ namespace ASAPPVC.App.Models.Enums
         PVC = 3,
 
         [ModifierAttr("STL", "Steel")]
-        Steel = 4
+        Steel = 4,
+
+        [ModifierAttr("FIB", "Fiberglass")]
+        Fiberglass = 5,
+
+        [ModifierAttr("COM", "Composite")]
+        Composite = 6,
+
+        [ModifierAttr("COP", "Copper")]
+        Copper = 7,
+
+        [ModifierAttr("RUB", "Rubber")]
+        Rubber = 8,
+
+        [ModifierAttr("CHM", "Chemical")]
+        Chemical = 9,
+
+        [ModifierAttr("GLS", "Glass")]
+        Glass = 10
     }
 
     // Convenience extension methods that use EnumAttributeAccessor to read attribute data.
