@@ -1,187 +1,169 @@
 ﻿using ASAPPVC.App.Models;
 using ASAPPVC.App.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASAPPVC.App.Controllers
 {
-    public class OrderController : Controller
+    [Authorize]
+    [AutoValidateAntiforgeryToken]
+    [Route("[controller]")]
+    public class OrdersController(IOrderService orders, ICustomerService customers, IProductService products) : Controller
     {
-        //─────────── Dependencies ───────────\\
-        private readonly IOrderService _orders;
+        private readonly IOrderService _orders = orders;
+        private readonly ICustomerService _customers = customers;
+        private readonly IProductService _products = products;
 
-        private readonly ICustomerService _customers;
-        private readonly IProductService _products;
+        // Views
+        public const string ViewRoot = "Views/Orders/";
 
-        //constructor
-        public OrderController(IOrderService orders, ICustomerService customers, IProductService products)
+        private const string ManageOrdersViewName = ViewRoot + "ManageOrders.cshtml";
+        private const string DetailsViewName = ViewRoot + "ViewOrder.cshtml";
+        private const string UpsertViewName = ViewRoot + "UpsertOrder.cshtml";
+
+        // GET /Orders?term=...
+        [HttpGet("")]
+        public async Task<IActionResult> Index([FromQuery] string? term, CancellationToken ct)
         {
-            _orders = orders;
-            _customers = customers;
-            _products = products;
-        }
+            var query = term?.Trim();
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays the add order view with customer and product selections
-        [HttpGet]
-        public async Task<IActionResult> AddOrder(CancellationToken ct)
-        {
-            var customersResult = await _customers.ListAsync(ct);
-            var productsResult = await _products.ListAsync(ct);
+            // Prefer SearchAsync if available for consistency with Products/Components
+            var result = string.IsNullOrWhiteSpace(query)
+                ? await _orders.ListAsync(ct)
+                : await _orders.SearchAsync(query, ct);
 
-            if (!productsResult.Ok)
+            if (!result.Ok || result.Value is null)
             {
-                TempData["ErrorMessage"] = productsResult.Error;
-                return RedirectToAction(nameof(ViewOrders));
+                TempData["ErrorMessage"] = result.Error ?? "Failed to load orders.";
+                return View(ManageOrdersViewName, new List<OrderListVm>());
             }
 
-            ViewData["Customers"] = customersResult;
-            ViewData["Products"] = productsResult.Value;
-            return View();
+            ViewData["SearchQuery"] = query;
+            return View(ManageOrdersViewName, result.Value);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //handles the submission of the add order form
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrder(OrderFormVm vm, CancellationToken ct)
+        // GET /Orders/View/{id:guid}
+        [HttpGet("View/{id:guid}")]
+        public Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
+        {
+            return GetAndShowDetails(id, ct);
+        }
+
+        // GET /Orders/AddNew
+        [HttpGet("AddNew")]
+        public async Task<IActionResult> AddNew(CancellationToken ct)
+        {
+            var vm = new OrderFormVm();
+            await PopulateLookupsAsync(vm, ct);
+            return View(UpsertViewName, vm);
+        }
+
+        // GET /Orders/Edit/{id:guid}
+        [HttpGet("Edit/{id:guid}")]
+        public Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
+        {
+            return GetAndShowForm(id, ct);
+        }
+
+        // POST /Orders/Upsert
+        [HttpPost("Upsert")]
+        public async Task<IActionResult> Upsert([FromForm] OrderFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
             {
-                var customersResult = await _customers.ListAsync(ct);
-                var productsResult = await _products.ListAsync(ct);
-                ViewData["Customers"] = customersResult;
-                ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
-                return View(vm);
+                await PopulateLookupsAsync(vm, ct);
+                return View(UpsertViewName, vm);
             }
 
-            var result = await _orders.CreateAsync(vm, ct);
-            if (!result.Ok || result.Value is null)
+            var op = vm.IsEdit
+                ? await _orders.UpdateAsync(vm, ct)
+                : await _orders.CreateAsync(vm, ct);
+
+            if (!op.Ok || op.Value is null)
             {
-                var customersResult = await _customers.ListAsync(ct);
-                var productsResult = await _products.ListAsync(ct);
-                ViewData["Customers"] = customersResult;
-                ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
-                ModelState.AddModelError(string.Empty, result.Error ?? "Unable to create order.");
-                return View(vm);
+                await PopulateLookupsAsync(vm, ct);
+                ModelState.AddModelError(string.Empty, op.Error ?? (vm.IsEdit ? "Unable to update order." : "Unable to create order."));
+                return View(UpsertViewName, vm);
             }
 
-            TempData["AlertMessage"] = $"Order '{result.Value.OrderCode}' created successfully.";
-            return RedirectToAction(nameof(ViewOrders));
+            var saved = op.Value;
+            TempData["AlertMessage"] = vm.IsEdit
+                ? $"Order '{saved.OrderCode}' updated successfully."
+                : $"Order '{saved.OrderCode}' created successfully.";
+
+            return RedirectToAction(nameof(DetailsById), new { id = saved.Id });
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays the list of orders
-        [HttpGet]
-        public async Task<IActionResult> ViewOrders(CancellationToken ct)
+        // POST /Orders/Delete/{id:guid}
+        [HttpPost("Delete/{id:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
         {
-            var result = await _orders.ListAsync(ct);
+            var result = await _orders.DeleteAsync(id, ct);
             if (!result.Ok)
-            {
-                TempData["ErrorMessage"] = result.Error;
-                return View(new List<OrderListVm>());
-            }
+                TempData["ErrorMessage"] = result.Error ?? "Unable to delete order.";
+            else
+                TempData["AlertMessage"] = "Order deleted successfully.";
 
-            return View(result.Value);
+            return RedirectToAction(nameof(Index));
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays a specific order by its ID
-        [HttpGet]
-        public async Task<IActionResult> ViewOrder(Guid id, CancellationToken ct)
-        {
-            var result = await _orders.GetDetailAsync(id, ct);
-            if (!result.Ok || result.Value is null)
-            {
-                TempData["ErrorMessage"] = result.Error ?? "Order not found.";
-                return RedirectToAction(nameof(ViewOrders));
-            }
+        // ===== Helpers =====
 
-            return View(result.Value);
+        private async Task<IActionResult> GetAndShowDetails(Guid id, CancellationToken ct)
+        {
+            var res = await _orders.GetDetailAsync(id, ct);
+            if (!res.Ok || res.Value is null)
+                return GoIndexWithError(res.Error ?? "Order not found.");
+            return View(DetailsViewName, res.Value);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //displays the edit order view
-        [HttpGet]
-        public async Task<IActionResult> EditOrder(Guid id, CancellationToken ct)
+        private async Task<IActionResult> GetAndShowForm(Guid id, CancellationToken ct)
         {
-            var orderResult = await _orders.GetDomainAsync(id, ct);
-            if (!orderResult.Ok || orderResult.Value is null)
-            {
-                TempData["ErrorMessage"] = orderResult.Error ?? "Order not found.";
-                return RedirectToAction(nameof(ViewOrders));
-            }
+            var orderRes = await _orders.GetDomainAsync(id, ct);
+            if (!orderRes.Ok || orderRes.Value is null)
+                return GoIndexWithError(orderRes.Error ?? "Order not found.");
 
-            var customersResult = await _customers.ListAsync(ct);
-            var productsResult = await _products.ListAsync(ct);
-
-            ViewData["Customers"] = customersResult;
-            ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
-
-            var order = orderResult.Value;
+            var o = orderRes.Value;
             var vm = new OrderFormVm
             {
-                Id = order.Id,
-                OrderCode = order.OrderCode,
-                CustomerId = order.CustomerId,
-                OrderDate = order.OrderDate,
-                OrderStatus = order.OrderStatus,
-                Products = order.OrderProducts.Select(op => new OrderProductVm
+                Id = o.Id,
+                OrderCode = o.OrderCode,
+                CustomerId = o.CustomerId,
+                OrderDate = o.OrderDate,
+                OrderStatus = o.OrderStatus,
+                Products = o.OrderProducts.Select(op => new OrderProductVm
                 {
                     ProductId = op.ProductId,
                     Quantity = op.OrderedQuantity
                 }).ToList()
             };
 
-            return View(vm);
+            await PopulateLookupsAsync(vm, ct);
+            return View(UpsertViewName, vm);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //handles the submission of the edit order form
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditOrder(OrderFormVm vm, CancellationToken ct)
+        /// <summary>
+        /// Populate form VM lookup lists via GetAvailable{Model}Async services.
+        /// Assumes OrderFormVm exposes AvailableCustomers / AvailableProducts.
+        /// </summary>
+        private async Task PopulateLookupsAsync(OrderFormVm vm, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-            {
-                var customersResult = await _customers.ListAsync(ct);
-                var productsResult = await _products.ListAsync(ct);
-                ViewData["Customers"] = customersResult;
-                ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
-                return View(vm);
-            }
+            var customers = await _customers.GetAvailableCustomersAsync(ct);
+            var products = await _products.GetAvailableProductsAsync(ct);
 
-            var result = await _orders.UpdateAsync(vm, ct);
-            if (!result.Ok || result.Value is null)
-            {
-                var customersResult = await _customers.ListAsync(ct);
-                var productsResult = await _products.ListAsync(ct);
-                ViewData["Customers"] = customersResult;
-                ViewData["Products"] = productsResult.Ok ? productsResult.Value : new List<ProductListVm>();
-                ModelState.AddModelError(string.Empty, result.Error ?? "Unable to update order.");
-                return View(vm);
-            }
+            vm.AvailableCustomers = customers.Ok && customers.Value is not null
+                ? customers.Value
+                : new List<Customer>();
 
-            TempData["AlertMessage"] = $"Order '{result.Value.OrderCode}' updated successfully.";
-            return RedirectToAction(nameof(ViewOrder), new { id = result.Value.Id });
+            vm.AvailableProducts = products.Ok && products.Value is not null
+                ? products.Value
+                : new List<ProductListVm>();
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
-        //deletes an order by ID
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteOrder(Guid id, CancellationToken ct)
+        private RedirectToActionResult GoIndexWithError(string message)
         {
-            var result = await _orders.DeleteAsync(id, ct);
-            if (!result.Ok)
-            {
-                TempData["ErrorMessage"] = result.Error ?? "Unable to delete order.";
-            }
-            else
-            {
-                TempData["AlertMessage"] = "Order deleted successfully.";
-            }
-
-            return RedirectToAction(nameof(ViewOrders));
+            TempData["ErrorMessage"] = message;
+            return RedirectToAction(nameof(Index));
         }
     }
 }

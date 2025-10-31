@@ -83,6 +83,12 @@ namespace ASAPPVC.App.Services
         Task<Result<List<ComponentListVm>>> ListAsync(CancellationToken ct = default);
 
         /// <summary>
+        /// Retrieves only available (active) components mapped to lightweight list view models.
+        /// Useful for pickers and dropdowns where only active components should be selectable.
+        /// </summary>
+        Task<Result<List<ComponentListVm>>> GetAvailableAsync(CancellationToken ct = default);
+
+        /// <summary>
         /// Retrieves multiple components by a collection of internal ids and/or human-friendly codes.
         /// Returns components mapped to list view models.
         /// </summary>
@@ -346,6 +352,23 @@ namespace ASAPPVC.App.Services
             catch (Exception ex)
             {
                 return Result<List<ComponentListVm>>.Fail($"Failed to list components: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Retrieves available (active) components only
+        public async Task<Result<List<ComponentListVm>>> GetAvailableAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var components = await _components.GetListOrderedByCodeAsync(asNoTracking: true, ct);
+                var available = components.Where(c => c.IsActive).ToList();
+                var listVms = available.Select(c => _mapper.ToListVm(c)).ToList();
+                return Result<List<ComponentListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ComponentListVm>>.Fail($"Failed to retrieve available components: {ex.Message}");
             }
         }
 

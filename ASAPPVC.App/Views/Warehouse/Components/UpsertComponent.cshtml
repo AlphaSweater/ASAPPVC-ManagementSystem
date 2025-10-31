@@ -12,7 +12,6 @@
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/UpsertComponent.css" asp-append-version="true" />
 }
 
@@ -55,121 +54,120 @@
 			<input asp-for="ExistingImageUrl" type="hidden" />
 
 			<div class="card-body">
-				<!-- Image panel -->
-				<section class="media-panel">
-					<h2 class="sr-only">Component Image</h2>
-					<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
-						<img id="previewImg" src="@startImg" alt="Preview" />
-						<div class="dropzone-overlay">📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span></div>
-					</label>
-					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
-					<span asp-validation-for="Image" class="field-error"></span>
-					@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
-					{
-						<div class="meta"><small class="muted">Code: <strong>@Model.ComponentCode</strong></small></div>
-					}
-				</section>
+				<!-- LAYOUT GRID WRAPPER -->
+				<div class="layout-grid">
+					<!-- Image (left column, spans two rows) -->
+					<section class="media-panel grid-media">
+						<h2 class="sr-only">Component Image</h2>
+						<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
+							<img id="previewImg" src="@startImg" alt="Preview" />
+							<div class="dropzone-overlay">📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span></div>
+						</label>
+						<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
+						<span asp-validation-for="Image" class="field-error"></span>
+						@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
+						{
+							<div class="meta"><small class="muted">Code: <strong>@Model.ComponentCode</strong></small></div>
+						}
+					</section>
 
-				<!-- Right side fields -->
-				<section class="fields-panel" style="min-width:0;flex:1 1 auto;">
-					<div class="sections">
-
-						<!-- Identification -->
-						<div class="section-card">
-							<div class="section-head"><div class="section-title">Identification</div></div>
-							<div class="section-grid">
-								<div class="form-field col-8 col-md-12">
-									<label asp-for="ComponentName" class="label"></label>
-									<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
-									<span asp-validation-for="ComponentName" class="field-error"></span>
-								</div>
-								<div class="form-field col-4 col-md-12">
-									<label asp-for="LocationCode" class="label"></label>
-									<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
-									<span asp-validation-for="LocationCode" class="field-error"></span>
-								</div>
+					<!-- Identification (top-right) -->
+					<section class="section-card grid-id">
+						<div class="section-head"><div class="section-title">Identification</div></div>
+						<div class="section-grid">
+							<div class="form-field col-8 col-md-12">
+								<label asp-for="ComponentName" class="label"></label>
+								<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
+								<span asp-validation-for="ComponentName" class="field-error"></span>
+							</div>
+							<div class="form-field col-4 col-md-12">
+								<label asp-for="LocationCode" class="label"></label>
+								<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
+								<span asp-validation-for="LocationCode" class="field-error"></span>
 							</div>
 						</div>
+					</section>
 
-						<!-- Classification -->
-						<div class="section-card">
-							<div class="section-head"><div class="section-title">Classification</div></div>
-							<div class="section-grid">
-								<div class="form-field col-6 col-md-12">
-									<label asp-for="MaterialType" class="label"></label>
-									<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
-									<span asp-validation-for="MaterialType" class="field-error"></span>
-								</div>
-								<div class="form-field col-6 col-md-12">
-									<label asp-for="ColourOption" class="label"></label>
-									<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
-									<span asp-validation-for="ColourOption" class="field-error"></span>
-								</div>
+					<!-- Classification (beneath Identification, right column) -->
+					<section class="section-card grid-classify">
+						<div class="section-head"><div class="section-title">Classification</div></div>
+						<div class="section-grid">
+							<div class="form-field col-6 col-md-12">
+								<label asp-for="MaterialType" class="label"></label>
+								<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
+								<span asp-validation-for="MaterialType" class="field-error"></span>
+							</div>
+							<div class="form-field col-6 col-md-12">
+								<label asp-for="ColourOption" class="label"></label>
+								<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
+								<span asp-validation-for="ColourOption" class="field-error"></span>
 							</div>
 						</div>
+					</section>
 
-						<!-- Stock & Units (Joined control) -->
-						<div class="section-card">
-							<div class="section-head"><div class="section-title">Stock & Units</div></div>
-							<div class="section-grid">
-								<div class="form-field col-6 col-md-12">
-									<label class="label">@Html.DisplayNameFor(m => m.UnitOfMeasure) &nbsp;/&nbsp; @Html.DisplayNameFor(m => m.QuantityOnHand)</label>
-									<div class="unitqty" role="group" aria-label="Unit of measure and quantity on hand">
-										<select asp-for="UnitOfMeasure" class="unit-select" asp-items="Html.GetEnumSelectList<Unit>()"></select>
-										<input asp-for="QuantityOnHand" class="qty-input" type="number" min="0" step="0.0001" placeholder="e.g. 100" />
-									</div>
-									<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
-									<span asp-validation-for="QuantityOnHand" class="field-error"></span>
+					<!-- Stock & Units (new row, left) -->
+					<section class="section-card grid-stock">
+						<div class="section-head"><div class="section-title">Stock & Units</div></div>
+						<div class="section-grid">
+							<div class="form-field col-6 col-md-12">
+								<label class="label">@Html.DisplayNameFor(m => m.UnitOfMeasure) &nbsp;/&nbsp; @Html.DisplayNameFor(m => m.QuantityOnHand)</label>
+								<div class="unitqty" role="group" aria-label="Unit of measure and quantity on hand">
+									<select asp-for="UnitOfMeasure" class="unit-select" asp-items="Html.GetEnumSelectList<Unit>()"></select>
+									<input asp-for="QuantityOnHand" class="qty-input" type="number" min="0" step="0.0001" placeholder="e.g. 100" />
 								</div>
-								<div class="form-field col-6 col-md-12">
-									<label asp-for="ReorderLevel" class="label"></label>
-									<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
-									<span asp-validation-for="ReorderLevel" class="field-error"></span>
-								</div>
+								<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
+								<span asp-validation-for="QuantityOnHand" class="field-error"></span>
+							</div>
+							<div class="form-field col-6 col-md-12">
+								<label asp-for="ReorderLevel" class="label"></label>
+								<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
+								<span asp-validation-for="ReorderLevel" class="field-error"></span>
 							</div>
 						</div>
+					</section>
 
-						<!-- Pricing -->
-						<div class="section-card">
-							<div class="section-head"><div class="section-title">Pricing</div></div>
-							<div class="section-grid">
-								<div class="form-field col-6 col-md-12">
-									<label asp-for="UnitCost" class="label"></label>
-									<div class="input-group">
-										<span class="prefix">R</span>
-										<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
-									</div>
-									<span asp-validation-for="UnitCost" class="field-error"></span>
+					<!-- Pricing (same row, right) -->
+					<section class="section-card grid-price">
+						<div class="section-head"><div class="section-title">Pricing</div></div>
+						<div class="section-grid">
+							<div class="form-field col-12">
+								<label asp-for="UnitCost" class="label"></label>
+								<div class="input-group">
+									<span class="prefix">R</span>
+									<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
 								</div>
-								<div class="form-field col-6 col-md-12">
-									<label asp-for="IsActive" class="label">Status</label>
-									<select asp-for="IsActive" class="input">
-										<option value="true">Active</option>
-										<option value="false">Inactive</option>
-									</select>
-									<span asp-validation-for="IsActive" class="field-error"></span>
-								</div>
+								<span asp-validation-for="UnitCost" class="field-error"></span>
+							</div>
+							<div class="form-field col-12">
+								<label asp-for="IsActive" class="label">Status</label>
+								<select asp-for="IsActive" class="input">
+									<option value="true">Active</option>
+									<option value="false">Inactive</option>
+								</select>
+								<span asp-validation-for="IsActive" class="field-error"></span>
 							</div>
 						</div>
+					</section>
 
-						<!-- Storage Note -->
-						<div class="section-card">
-							<div class="section-head"><div class="section-title">Storage Notes</div></div>
-							<div class="section-grid">
-								<div class="form-field col-12">
-									<label asp-for="LocationNote" class="label"></label>
-									<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
-									<span asp-validation-for="LocationNote" class="field-error"></span>
-								</div>
+					<!-- Storage (full width row) -->
+					<section class="section-card grid-notes">
+						<div class="section-head"><div class="section-title">Storage Notes</div></div>
+						<div class="section-grid">
+							<div class="form-field col-12">
+								<label asp-for="LocationNote" class="label"></label>
+								<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
+								<span asp-validation-for="LocationNote" class="field-error"></span>
 							</div>
 						</div>
+					</section>
 
-						<div class="form-actions" style="margin-top:4px;">
-							<button type="submit" class="btn btn-primary">@(isEdit ? "Save Changes" : "Save Component")</button>
-							<button type="reset" class="btn btn-ghost">Reset</button>
-						</div>
+					<!-- Actions (full width) -->
+					<div class="form-actions grid-actions">
+						<button type="submit" class="btn btn-primary">@(isEdit ? "Save Changes" : "Save Component")</button>
+						<button type="reset" class="btn btn-ghost">Reset</button>
 					</div>
-				</section>
+				</div>
+				<!-- /LAYOUT GRID WRAPPER -->
 			</div>
 		</form>
 	</div>

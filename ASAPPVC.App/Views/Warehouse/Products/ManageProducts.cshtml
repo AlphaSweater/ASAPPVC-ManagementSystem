@@ -1,4 +1,4 @@
-@using ASAPPVC.App.ViewModels.Warehouse
+﻿@using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
 	ViewData["Title"] = "Products";
@@ -38,8 +38,9 @@
 						<table class="fancy-table">
 							<thead>
 								<tr>
+									<th></th>
 									<th class="ft-left ft-shrink">Product Code</th>
-									<th class="ft-left ft-grow">Product</th>
+									<th class="ft-left ft-shrink">Product</th>
 									<th class="ft-left ft-grow">Description</th>
 									<th class="ft-right ft-shrink">Price</th>
 									<th class="ft-center ft-shrink"># Components</th>
@@ -52,8 +53,18 @@
 									foreach (var product in Model.Products)
 									{
 										<tr>
+											<td class="ft-media ft-shrink">
+												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
+												{
+													<img src="@product.ThumbUrl" class="ft-media__img" />
+												}
+												else
+												{
+													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
+												}
+											</td>
 											<td class="ft-code ft-shrink">@product.ProductCode</td>
-											<td class="ft-left ft-grow ft-name">@product.ProductName</td>
+											<td class="ft-name ft-shrink ">@product.ProductName</td>
 											<td class="ft-left ft-grow">@product.Description</td>
 											<td class="ft-money ft-shrink">@product.DisplayPrice</td>
 											<td class="ft-center ft-shrink">@product.ComponentCount</td>

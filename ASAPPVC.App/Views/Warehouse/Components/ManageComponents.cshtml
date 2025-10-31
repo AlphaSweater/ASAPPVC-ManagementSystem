@@ -24,7 +24,7 @@
 				   asp-area="Warehouse"
 				   asp-controller="Components"
 				   asp-action="AddNew">
-					+ Add New Component
+					+ Add Component
 				</a>
 			</div>
 		</header>
@@ -50,7 +50,7 @@
 							<thead>
 								<tr>
 									<th></th>
-									<th scope="col" class="ft-left ft-shrink">Code</th>
+									<th scope="col" class="ft-left ft-shrink">Component Code</th>
 									<th scope="col" class="ft-left ft-grow">Component</th>
 									<th scope="col" class="ft-center ft-shrink">Location</th>
 									<th scope="col" class="ft-number ft-shrink">Current Stock</th>
@@ -62,15 +62,15 @@
 							<tbody>
 								@if (Model is { HasComponents: true })
 								{
-									foreach (var c in Model.Components)
+									foreach (var component in Model.Components)
 									{
-										var stockValue = c.UnitCost * c.QuantityOnHand;
+										var stockValue = component.UnitCost * component.QuantityOnHand;
 										<tr>
 
 											<td class="ft-media ft-shrink">
-												@if (c.HasImage && !string.IsNullOrWhiteSpace(c.ThumbUrl))
+												@if (component.HasImage && !string.IsNullOrWhiteSpace(component.ThumbUrl))
 												{
-													<img src="@c.ThumbUrl" class="ft-media__img" />
+													<img src="@component.ThumbUrl" class="ft-media__img" />
 												}
 												else
 												{
@@ -78,35 +78,35 @@
 												}
 											</td>
 
-											<td class="ft-code ft-shrink">@c.ComponentCode</td>
+											<td class="ft-code ft-shrink">@component.ComponentCode</td>
 
-											<td class="ft-left ft-shrink">@c.ComponentName</td>
+											<td class="ft-left ft-shrink">@component.ComponentName</td>
 
-											<td class="ft-center ft-shrink">@c.LocationCode</td>
+											<td class="ft-center ft-shrink">@component.LocationCode</td>
 
 											<td class="ft-number ft-shrink">
-												@($"{c.ShortFormattedQuantity}")
+												@($"{component.ShortFormattedQuantity}")
 											</td>
 
-											<td class="ft-money ft-shrink">@c.DisplayCost</td>
+											<td class="ft-money ft-shrink">@component.DisplayCost</td>
 
 											<td class="ft-actions ft-shrink">
 												<div class="actions">
-													@if (!string.IsNullOrWhiteSpace(c.ComponentCode))
+													@if (!string.IsNullOrWhiteSpace(component.ComponentCode))
 													{
 														<!-- URL: /Warehouse/Components/View/{code} -->
 														<a class="btn btn-secondary btn-sm"
 														   asp-area="Warehouse"
 														   asp-controller="Components"
 														   asp-action="DetailsByCode"
-														   asp-route-code="@c.ComponentCode">View</a>
+														   asp-route-code="@component.ComponentCode">View</a>
 
 														<!-- URL: /Warehouse/Components/Edit/{code} -->
 														<a class="btn btn-primary btn-sm"
 														   asp-area="Warehouse"
 														   asp-controller="Components"
 														   asp-action="EditByCode"
-														   asp-route-code="@c.ComponentCode">Edit</a>
+														   asp-route-code="@component.ComponentCode">Edit</a>
 													}
 													else
 													{
@@ -115,14 +115,14 @@
 														   asp-area="Warehouse"
 														   asp-controller="Components"
 														   asp-action="DetailsById"
-														   asp-route-id="@c.Id">View</a>
+														   asp-route-id="@component.Id">View</a>
 
 														<!-- URL: /Warehouse/Components/Edit/{id} -->
 														<a class="btn btn-primary btn-sm"
 														   asp-area="Warehouse"
 														   asp-controller="Components"
 														   asp-action="EditById"
-														   asp-route-id="@c.Id">Edit</a>
+														   asp-route-id="@component.Id">Edit</a>
 													}
 												</div>
 											</td>

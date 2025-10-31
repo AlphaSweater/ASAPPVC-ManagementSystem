@@ -1,182 +1,182 @@
 ﻿/* ---------- Root & Variables ---------- */
 :root {
-    --primary-red: #d62828;
-    --primary-blue: #0d47a1;
-    --hover-red: #e03a3a;
-    --text-light: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.8);
-    --accent-orange: #ef4723;
+	--primary-red: #d62828;
+	--primary-blue: #0d47a1;
+	--hover-red: #e03a3a;
+	--text-light: #ffffff;
+	--text-muted: rgba(255, 255, 255, 0.8);
+	--accent-orange: #ef4723;
 }
 
 /* ---------- Base & Background ---------- */
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 /* ---------- Main Content Layout ---------- */
 .viewport {
-    padding: 40px 24px;
-    min-height: 100vh;
+	padding: 40px 24px;
+	min-height: 100vh;
 }
 
 .content-container {
-    max-width: 1100px; /* Wider for tables */
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    border-radius: 16px;
-    padding: 32px 40px;
+	max-width: 1100px; /* Wider for tables */
+	margin: 0 auto;
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+	border-radius: 16px;
+	padding: 32px 40px;
 }
 
 /* ---------- Header & Toolbar ---------- */
 .page-header {
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	margin-bottom: 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .main-title {
-    font-weight: 700;
-    font-size: 28px;
-    color: var(--text-light);
-    margin: 0;
+	font-weight: 700;
+	font-size: 28px;
+	color: var(--text-light);
+	margin: 0;
 }
 
 .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 24px;
 }
 
 .search-form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-grow: 1;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-grow: 1;
 }
 
 .input {
-    height: 44px;
-    font-size: 16px;
-    color: var(--text-light);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 0 12px;
-    outline: none;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
-    width: 100%;
-    max-width: 400px;
+	height: 44px;
+	font-size: 16px;
+	color: var(--text-light);
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-radius: 8px;
+	padding: 0 12px;
+	outline: none;
+	transition: border-color 0.3s ease, background-color 0.3s ease;
+	width: 100%;
+	max-width: 400px;
 }
 
-    .input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-    }
+	.input::placeholder {
+		color: rgba(255, 255, 255, 0.5);
+	}
 
-    .input:focus {
-        border-color: rgba(255, 255, 255, 0.7);
-        background: rgba(255, 255, 255, 0.1);
-    }
+	.input:focus {
+		border-color: rgba(255, 255, 255, 0.7);
+		background: rgba(255, 255, 255, 0.1);
+	}
 
 /* ---------- Action Buttons ---------- */
 .actions {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    white-space: nowrap;
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	white-space: nowrap;
 }
 
 .btn {
-    height: 44px;
-    padding: 0 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    transition: all .2s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+	height: 44px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 16px;
+	cursor: pointer;
+	border: none;
+	transition: all .2s ease;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
-    .btn:active {
-        transform: scale(0.98);
-    }
+	.btn:active {
+		transform: scale(0.98);
+	}
 
-    .btn.btn-sm {
-        height: 36px;
-        padding: 0 16px;
-        font-size: 14px;
-    }
+	.btn.btn-sm {
+		height: 36px;
+		padding: 0 16px;
+		font-size: 14px;
+	}
 
 .btn-primary {
-    background: var(--primary-red);
-    color: var(--text-light);
+	background: var(--primary-red);
+	color: var(--text-light);
 }
 
-    .btn-primary:hover {
-        background: var(--hover-red);
-    }
+	.btn-primary:hover {
+		background: var(--hover-red);
+	}
 
 .btn-secondary {
-    background: transparent;
-    color: var(--text-light);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.6);
-    }
+	.btn-secondary:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
+	}
 
 /* ---------- Table Styling ---------- */
 .table-section {
-    overflow-x: auto;
+	overflow-x: auto;
 }
 
 .table {
-    width: 100%;
-    border-collapse: collapse;
+	width: 100%;
+	border-collapse: collapse;
 }
 
-    .table th, .table td {
-        padding: 14px 16px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
+	.table th, .table td {
+		padding: 14px 16px;
+		text-align: left;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-    .table thead th {
-        font-size: 14px;
-        font-weight: 700;
-        color: var(--text-light);
-        background-color: rgba(0, 0, 0, 0.15);
-    }
+	.table thead th {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--text-light);
+		background-color: rgba(0, 0, 0, 0.15);
+	}
 
-    .table tbody tr {
-        transition: background-color 0.2s ease;
-    }
+	.table tbody tr {
+		transition: background-color 0.2s ease;
+	}
 
-        .table tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
+		.table tbody tr:hover {
+			background-color: rgba(255, 255, 255, 0.08);
+		}
 
-    .table td {
-        font-size: 15px;
-        color: var(--text-muted);
-    }
+	.table td {
+		font-size: 15px;
+		color: var(--text-muted);
+	}
 
-        .table td:first-child {
-            color: var(--text-light);
-            font-weight: 600;
-        }
+		.table td:first-child {
+			color: var(--text-light);
+			font-weight: 600;
+		}
 
 .text-right {
-    text-align: right;
+	text-align: right;
 }

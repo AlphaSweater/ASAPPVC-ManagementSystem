@@ -15,58 +15,42 @@ namespace ASAPPVC.App.Controllers.Warehouse
         private readonly IComponentService _components = components;
 
         // Views
-
         public const string ViewRoot = WarehouseController.ViewRoot + "Components/";
+
         private const string ManageComponentsViewName = ViewRoot + "ManageComponents.cshtml";
         private const string DetailsViewName = ViewRoot + "ViewComponent.cshtml";
         private const string UpsertViewName = ViewRoot + "UpsertComponent.cshtml";
 
-        // GET /Warehouse/Components
+        // GET /Warehouse/Components?term=...
         [HttpGet("")]
-        public async Task<IActionResult> Index(CancellationToken ct)
+        public async Task<IActionResult> Index([FromQuery] string? term, CancellationToken ct)
         {
-            var result = await _components.ListAsync(ct);
+            var query = term?.Trim();
+            var result = string.IsNullOrWhiteSpace(query)
+                ? await _components.ListAsync(ct)
+                : await _components.SearchAsync(query, ct);
+
             if (!result.Ok || result.Value is null)
                 return GoIndexWithError(result.Error ?? "Failed to load components.");
 
-            return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value));
-        }
-
-        // GET /Warehouse/Components/Search?term=...
-        [HttpGet("Search")]
-        public async Task<IActionResult> Search([FromQuery] string? term, CancellationToken ct)
-        {
-            var result = await _components.SearchAsync(term, ct);
-            if (!result.Ok || result.Value is null)
-                return GoIndexWithError(result.Error ?? "Failed to search components.");
-
-            return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value, searchQuery: term));
+            return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value, searchQuery: query));
         }
 
         // GET /Warehouse/Components/View/{id:guid}
         [HttpGet("View/{id:guid}")]
-        public async Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
+        public Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
         {
-            var byId = await _components.GetDetailAsync(id: id, code: null, ct: ct);
-            if (!byId.Ok || byId.Value is null)
-                return GoIndexWithError(byId.Error ?? "Component not found.");
-
-            return View(DetailsViewName, byId.Value);
+            return GetAndShowDetails(id: id, code: null, ct);
         }
 
         // GET /Warehouse/Components/View/{code}
         [HttpGet("View/{code}")]
-        public async Task<IActionResult> DetailsByCode([FromRoute] string code, CancellationToken ct)
+        public Task<IActionResult> DetailsByCode([FromRoute] string code, CancellationToken ct)
         {
-            code = (code ?? string.Empty).Trim();
-            if (code.Length == 0)
-                return GoIndexWithError("Component not found.");
-
-            var byCode = await _components.GetDetailAsync(id: null, code: code, ct: ct);
-            if (!byCode.Ok || byCode.Value is null)
-                return GoIndexWithError(byCode.Error ?? "Component not found.");
-
-            return View(DetailsViewName, byCode.Value);
+            var c = (code ?? string.Empty).Trim();
+            return string.IsNullOrEmpty(c)
+                ? Task.FromResult<IActionResult>(GoIndexWithError("Component not found."))
+                : GetAndShowDetails(id: null, code: c, ct);
         }
 
         // --- Create ---
@@ -78,30 +62,23 @@ namespace ASAPPVC.App.Controllers.Warehouse
             return View(UpsertViewName, new ComponentFormVm());
         }
 
+        // --- Edit ---
+
         // GET /Warehouse/Components/Edit/{id:guid}
         [HttpGet("Edit/{id:guid}")]
-        public async Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
+        public Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
         {
-            var byId = await _components.GetFormAsync(id: id, ct: ct);
-            if (!byId.Ok || byId.Value is null)
-                return GoIndexWithError(byId.Error ?? "Component not found.");
-
-            return View(UpsertViewName, byId.Value);
+            return GetAndShowForm(id: id, code: null, ct);
         }
 
         // GET /Warehouse/Components/Edit/{code}
         [HttpGet("Edit/{code}")]
-        public async Task<IActionResult> EditByCode([FromRoute] string code, CancellationToken ct)
+        public Task<IActionResult> EditByCode([FromRoute] string code, CancellationToken ct)
         {
-            code = (code ?? string.Empty).Trim();
-            if (code.Length == 0)
-                return GoIndexWithError("Component not found.");
-
-            var byCode = await _components.GetFormAsync(code: code, ct: ct);
-            if (!byCode.Ok || byCode.Value is null)
-                return GoIndexWithError(byCode.Error ?? "Component not found.");
-
-            return View(UpsertViewName, byCode.Value);
+            var c = (code ?? string.Empty).Trim();
+            return string.IsNullOrEmpty(c)
+                ? Task.FromResult<IActionResult>(GoIndexWithError("Component not found."))
+                : GetAndShowForm(id: null, code: c, ct);
         }
 
         // --- Save (create or update) ---
@@ -128,10 +105,27 @@ namespace ASAPPVC.App.Controllers.Warehouse
                 ? $"Component '{saved.ComponentName}' updated."
                 : $"Component '{saved.ComponentName}' created.";
 
-            // Prefer friendly code when available
             return !string.IsNullOrWhiteSpace(saved.ComponentCode)
                 ? RedirectToAction(nameof(DetailsByCode), new { code = saved.ComponentCode })
                 : RedirectToAction(nameof(DetailsById), new { id = saved.Id });
+        }
+
+        // ===== Helpers =====
+
+        private async Task<IActionResult> GetAndShowDetails(Guid? id, string? code, CancellationToken ct)
+        {
+            var res = await _components.GetDetailAsync(id: id, code: code, ct: ct);
+            if (!res.Ok || res.Value is null)
+                return GoIndexWithError(res.Error ?? "Component not found.");
+            return View(DetailsViewName, res.Value);
+        }
+
+        private async Task<IActionResult> GetAndShowForm(Guid? id, string? code, CancellationToken ct)
+        {
+            var res = await _components.GetFormAsync(id: id, code: code, ct: ct);
+            if (!res.Ok || res.Value is null)
+                return GoIndexWithError(res.Error ?? "Component not found.");
+            return View(UpsertViewName, res.Value);
         }
 
         // Centralized: set error + go back to index
