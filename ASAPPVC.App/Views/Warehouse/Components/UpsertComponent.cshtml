@@ -49,7 +49,6 @@
 			<!-- Hidden essentials -->
 			<input asp-for="Id" type="hidden" />
 			<input asp-for="IsEdit" type="hidden" value="@(isEdit ? "true" : "false")" />
-			<input asp-for="ComponentCode" type="hidden" />
 			<input asp-for="ExistingImageUrl" type="hidden" />
 
 			<div class="card-body fxg-f-col fxg-u-gap-6">
@@ -71,12 +70,6 @@
 						</label>
 						<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
 						<span asp-validation-for="Image" class="field-error"></span>
-
-						@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
-						{
-							<div class="meta"><small class="muted">Code: <strong>@Model.ComponentCode</strong></small></div>
-						}
-
 						<noscript>
 							<p class="field-error">Image preview requires JavaScript.</p>
 						</noscript>
@@ -90,15 +83,18 @@
 								<div class="section-title">Identification</div>
 							</div>
 							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+								@if (!isEdit && string.IsNullOrWhiteSpace(Model?.ComponentCode))
+								{
+									<div class="form-field fxg-f-cell" style="flex: 2 1 360px; min-width: 260px;">
+										<label asp-for="ComponentCode" class="label"></label>
+										<input asp-for="ComponentCode" class="input" placeholder="COMP-021958d8" />
+										<span asp-validation-for="ComponentCode" class="field-error"></span>
+									</div>
+								}
 								<div class="form-field fxg-f-cell" style="flex: 2 1 360px; min-width: 260px;">
 									<label asp-for="ComponentName" class="label"></label>
 									<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
 									<span asp-validation-for="ComponentName" class="field-error"></span>
-								</div>
-								<div class="form-field fxg-f-cell" style="flex: 1 1 200px; min-width: 220px;">
-									<label asp-for="LocationCode" class="label"></label>
-									<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
-									<span asp-validation-for="LocationCode" class="field-error"></span>
 								</div>
 							</div>
 						</section>
@@ -172,7 +168,12 @@
 				<!-- Row 3: Storage notes (full width) -->
 				<section class="section-card fxg-f-col fxg-f-cell fxg-u-gap-4" style="flex: 1 1 100%; min-width: 320px;">
 					<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
-						<div class="section-title">Storage Notes</div>
+						<div class="section-title">Storage Details</div>
+					</div>
+					<div class="form-field fxg-f-cell">
+						<label asp-for="LocationCode" class="label"></label>
+						<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
+						<span asp-validation-for="LocationCode" class="field-error"></span>
 					</div>
 					<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
 						<div class="form-field fxg-f-cell" style="flex: 1 1 100%; min-width: 320px;">
@@ -195,51 +196,9 @@
 
 @section Scripts {
 	<script>
-		(() => {
-			const input = document.getElementById('imageFile');
-			const preview = document.getElementById('previewImg');
-			const zone = document.getElementById('dropzone');
-
-			const previewFile = file => {
-				if (!file || !file.type?.startsWith?.('image/')) return;
-				const reader = new FileReader();
-				reader.onload = e => preview.src = e.target.result;
-				reader.readAsDataURL(file);
-			};
-
-			input?.addEventListener('change', () => previewFile(input.files[0]));
-			['dragenter', 'dragover'].forEach(evt =>
-				zone?.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('is-dragover'); })
-			);
-			['dragleave', 'drop'].forEach(evt =>
-				zone?.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('is-dragover'); })
-			);
-			zone?.addEventListener('drop', e => {
-				const file = e.dataTransfer?.files?.[0];
-				if (file) { input.files = e.dataTransfer.files; previewFile(file); }
-			});
-			zone?.addEventListener('keydown', e => {
-				if (['Enter', ' '].includes(e.key)) { e.preventDefault(); input.click(); }
-			});
-
-			// Header status toggle sync -> Status <select>
-			const headerCheckbox = document.getElementById('IsActiveHeader');
-			const headerLabel = document.getElementById('IsActiveLabel');
-			const headerText = document.getElementById('IsActiveText');
-			if (headerCheckbox && headerLabel && headerText) {
-				const setState = () => {
-					headerLabel.setAttribute('aria-pressed', headerCheckbox.checked ? 'true' : 'false');
-					headerLabel.classList.toggle('btn-primary', headerCheckbox.checked);
-					headerLabel.classList.toggle('btn-secondary', !headerCheckbox.checked);
-					headerText.textContent = headerCheckbox.checked ? 'Active' : 'Inactive';
-					const select = document.getElementById('@Html.IdFor(m => m.IsActive)');
-					if (select && select.tagName === 'SELECT') {
-						select.value = headerCheckbox.checked ? 'true' : 'false';
-					}
-				};
-				setState();
-				headerCheckbox.addEventListener('change', setState);
-			}
-		})();
+		window.__UpsertComponentOptions = {
+			isActiveSelectId: '@Html.IdFor(m => m.IsActive)'
+		};
 	</script>
+	<script src="~/js/views/warehouse/components/UpsertComponent.js" asp-append-version="true"></script>
 }
