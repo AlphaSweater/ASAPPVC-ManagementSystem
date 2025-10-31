@@ -46,7 +46,16 @@ namespace ASAPPVC.App.Controllers
         [HttpGet("View/{id:guid}")]
         public Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
         {
-            return GetAndShowDetails(id, ct);
+            return GetAndShowDetails(id: id, code: null, ct);
+        }
+
+        // GET /Orders/View/{code}
+        [HttpGet("View/{code}")]
+        public Task<IActionResult> DetailsByCode([FromRoute] string code, CancellationToken ct)
+        {
+            return string.IsNullOrWhiteSpace(code)
+                ? Task.FromResult<IActionResult>(GoIndexWithError("Order not found."))
+                : GetAndShowDetails(id: null, code: code.Trim(), ct);
         }
 
         // GET /Orders/AddNew
@@ -62,7 +71,16 @@ namespace ASAPPVC.App.Controllers
         [HttpGet("Edit/{id:guid}")]
         public Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
         {
-            return GetAndShowForm(id, ct);
+            return GetAndShowForm(id: id, code: null, ct);
+        }
+
+        // GET /Orders/Edit/{code}
+        [HttpGet("Edit/{code}")]
+        public Task<IActionResult> EditByCode([FromRoute] string code, CancellationToken ct)
+        {
+            return string.IsNullOrWhiteSpace(code)
+                ? Task.FromResult<IActionResult>(GoIndexWithError("Order not found."))
+                : GetAndShowForm(id: null, code: code.Trim(), ct);
         }
 
         // POST /Orders/Upsert
@@ -109,17 +127,62 @@ namespace ASAPPVC.App.Controllers
 
         // ===== Helpers =====
 
-        private async Task<IActionResult> GetAndShowDetails(Guid id, CancellationToken ct)
+        private async Task<IActionResult> GetAndShowDetails(Guid? id, string? code, CancellationToken ct)
         {
-            var res = await _orders.GetDetailAsync(id, ct);
+            Guid resolvedId;
+            if (id.HasValue)
+            {
+                resolvedId = id.Value;
+            }
+            else if (!string.IsNullOrWhiteSpace(code))
+            {
+                // Attempt to find by code using SearchAsync then load detail by Id
+                var searchRes = await _orders.SearchAsync(code.Trim(), ct);
+                if (!searchRes.Ok || searchRes.Value is null || !searchRes.Value.Any())
+                    return GoIndexWithError(searchRes.Error ?? "Order not found.");
+
+                var match = searchRes.Value.FirstOrDefault(x => string.Equals(x.OrderCode, code.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (match is null)
+                    return GoIndexWithError("Order not found.");
+
+                resolvedId = match.Id;
+            }
+            else
+            {
+                return GoIndexWithError("Order not found.");
+            }
+
+            var res = await _orders.GetDetailAsync(resolvedId, ct);
             if (!res.Ok || res.Value is null)
                 return GoIndexWithError(res.Error ?? "Order not found.");
             return View(DetailsViewName, res.Value);
         }
 
-        private async Task<IActionResult> GetAndShowForm(Guid id, CancellationToken ct)
+        private async Task<IActionResult> GetAndShowForm(Guid? id, string? code, CancellationToken ct)
         {
-            var orderRes = await _orders.GetDomainAsync(id, ct);
+            Guid resolvedId;
+            if (id.HasValue)
+            {
+                resolvedId = id.Value;
+            }
+            else if (!string.IsNullOrWhiteSpace(code))
+            {
+                var searchRes = await _orders.SearchAsync(code.Trim(), ct);
+                if (!searchRes.Ok || searchRes.Value is null || !searchRes.Value.Any())
+                    return GoIndexWithError(searchRes.Error ?? "Order not found.");
+
+                var match = searchRes.Value.FirstOrDefault(x => string.Equals(x.OrderCode, code.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (match is null)
+                    return GoIndexWithError("Order not found.");
+
+                resolvedId = match.Id;
+            }
+            else
+            {
+                return GoIndexWithError("Order not found.");
+            }
+
+            var orderRes = await _orders.GetDomainAsync(resolvedId, ct);
             if (!orderRes.Ok || orderRes.Value is null)
                 return GoIndexWithError(orderRes.Error ?? "Order not found.");
 

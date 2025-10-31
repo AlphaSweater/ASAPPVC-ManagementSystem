@@ -121,16 +121,32 @@
 			});
 		}
 
-		// Header status toggle sync -> Status <select>
+		// Header status toggle sync -> Hidden form input
 		const headerCheckbox = document.getElementById('IsActiveHeader');
 		const headerLabel = document.getElementById('IsActiveLabel');
 		const headerText = document.getElementById('IsActiveText');
+		// Hidden input rendered in the form (asp-for IsActive)
+		const hiddenIsActive = document.querySelector('input[name="IsActive"][type="hidden"]');
+
 		if (headerCheckbox && headerLabel && headerText) {
+			// Initialize header checkbox from hidden input if present, otherwise from checkbox attribute
+			if (hiddenIsActive) {
+				try {
+					// hidden input value is "true"/"false" string
+					const hv = hiddenIsActive.value;
+					headerCheckbox.checked = hv === 'True' || hv === 'true' || hv === '1';
+				} catch (e) { /* ignore */ }
+			}
+
 			const setState = () => {
 				headerLabel.setAttribute('aria-pressed', headerCheckbox.checked ? 'true' : 'false');
 				headerLabel.classList.toggle('btn-primary', headerCheckbox.checked);
 				headerLabel.classList.toggle('btn-secondary', !headerCheckbox.checked);
 				headerText.textContent = headerCheckbox.checked ? 'Active' : 'Inactive';
+				// Update hidden input so server gets the right value
+				if (hiddenIsActive) {
+					hiddenIsActive.value = headerCheckbox.checked ? 'true' : 'false';
+				}
 				const selectId = opts.isActiveSelectId;
 				if (selectId) {
 					const select = document.getElementById(selectId);
@@ -141,6 +157,13 @@
 			};
 			setState();
 			headerCheckbox.addEventListener('change', setState);
+
+			// allow clicking the label to toggle checkbox
+			headerLabel.addEventListener('click', e => {
+				e.preventDefault();
+				headerCheckbox.checked = !headerCheckbox.checked;
+				headerCheckbox.dispatchEvent(new Event('change'));
+			});
 		}
 
 		// New: adjust step attributes for qty/reorder based on unit

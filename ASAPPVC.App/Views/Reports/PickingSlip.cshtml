@@ -1,273 +1,599 @@
 ﻿@using ASAPPVC.App.ViewModels.Reports
 @model PickingSlipViewModel
 @{
-    Layout = null;
+	Layout = null;
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Picking Slip • @Model.PickingSlipNumber</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="~/css/views/Reports/PickingSlip.css" />
-    <style>
-        @@page {
-            size: A4; /* 210mm × 297mm */
-            margin: 12mm;
-        }
+	<meta charset="utf-8" />
+	<title>Picking Slip • @Model.PickingSlipNumber</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+		/* ================= CSS Variables ================= */
+		:root {
+			--text-primary: #111827;
+			--text-secondary: #6b7280;
+			--border-color: #e5e7eb;
+			--background-light: #f9fafb;
+			--brand-color: #0ea5e9;
+			--accent-color: #f59e0b;
+			--success-color: #10b981;
+			--warning-color: #f59e0b;
+			--danger-color: #ef4444;
+			--table-header-bg: #f2f8ff;
+			--table-header-text: #0b3b57;
+		}
 
-        @@top-right {
-            content: "Page " counter(page) " of " counter(pages);
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
+		/* ================= Base Styles ================= */
+		html, body {
+			margin: 0;
+			padding: 0;
+			color: var(--text-primary);
+			font: 12px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+			background: #fff;
+		}
 
-        @@bottom-center {
-            content: "";
-        }
+		* {
+			box-sizing: border-box;
+		}
 
-        @@page:left {
-            margin-left: 16mm;
-            margin-right: 10mm;
-        }
+		/* ================= Print Page Setup ================= */
+		@@page {
+			size: A4;
+			margin: 12mm;
+		}
 
-        @@page:right {
-            margin-left: 10mm;
-            margin-right: 16mm;
-        }
+		@@media print {
+			body {
+				-webkit-print-color-adjust: exact;
+				print-color-adjust: exact;
+			}
 
-        @@media print {
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+			.no-print {
+				display: none !important;
+			}
 
-            .no-print {
-                display: none !important;
-            }
+			thead {
+				display: table-header-group;
+			}
 
-            thead {
-                display: table-header-group;
-            }
+			tfoot {
+				display: table-footer-group;
+			}
 
-            tfoot {
-                display: table-footer-group;
-            }
+			.avoid-page-break {
+				break-inside: avoid;
+				page-break-inside: avoid;
+			}
 
-            .avoid-page-break {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
+			.force-page-break {
+				break-after: page;
+				page-break-before: always;
+			}
 
-            .force-page-break {
-                break-after: page;
-                page-break-before: always;
-            }
+			table {
+				page-break-inside: auto;
+			}
 
-            table {
-                page-break-inside: auto;
-            }
+			tr, td, th {
+				page-break-inside: avoid;
+			}
+		}
 
-            tr, td, th {
-                page-break-inside: avoid;
-            }
-        }
-    </style>
+		/* ================= Page Container ================= */
+		.page-container {
+			max-width: 186mm;
+			margin: 0 auto;
+			padding: 16px;
+			background: #fff;
+		}
+
+		/* ================= Grid Layouts ================= */
+		.grid-three-columns {
+			display: grid;
+			grid-template-columns: 1.1fr 1.1fr 0.9fr;
+			gap: 10px;
+		}
+
+		/* ================= Flex Layouts ================= */
+		.flex-row-space-between {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		/* ================= Report Header Section ================= */
+		.report-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-bottom: 10px;
+			border-bottom: 2px solid var(--border-color);
+			margin-bottom: 12px;
+		}
+
+		.company-logo {
+			height: 18mm;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+			.company-logo img {
+				display: block;
+				max-height: 100%;
+				max-width: 100%;
+				object-fit: contain;
+			}
+
+		.report-identity {
+			text-align: right;
+		}
+
+		.report-type-badge {
+			display: inline-block;
+			padding: 3px 8px;
+			border-radius: 999px;
+			font-weight: 600;
+			border: 1px solid var(--brand-color);
+			color: var(--brand-color);
+			font-size: 11px;
+		}
+
+		.report-number {
+			display: flex;
+			justify-content: end;
+			margin: 4px 0 2px;
+			font-size: 22px;
+			line-height: 1.1;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.report-metadata {
+			color: var(--text-secondary);
+			font-size: 12px;
+		}
+
+		/* ================= Information Boxes ================= */
+		.info-box {
+			border: 1px solid var(--border-color);
+			border-radius: 10px;
+			padding: 10px;
+			background: #fff;
+		}
+
+		.info-box-title {
+			margin: 0 0 6px;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: .05em;
+			color: var(--text-secondary);
+		}
+
+		.info-fields {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 8px 0;
+		}
+
+		.info-field {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.field-label {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: .04em;
+			color: var(--text-secondary);
+		}
+
+		.field-value {
+			font-size: 12px;
+		}
+
+		/* ================= Signature Section ================= */
+		.signature-section {
+			margin-top: 12px;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 10px;
+		}
+
+		.signature-box {
+			border: 1px solid var(--border-color);
+			border-radius: 10px;
+			padding: 10px;
+			min-height: 46mm;
+		}
+
+		.signature-box-title {
+			margin: 0 0 6px;
+			font-size: 12px;
+			color: var(--text-secondary);
+			text-transform: uppercase;
+			letter-spacing: .05em;
+		}
+
+		.signature-line {
+			border-bottom: 1px dashed var(--border-color);
+			height: 22px;
+			margin-bottom: 6px;
+		}
+
+		/* ================= Utility - Typography ================= */
+		.small-text {
+			font-size: 11px;
+			color: var(--text-secondary);
+		}
+
+		.monospace {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.text-center {
+			text-align: center;
+		}
+
+		.text-right {
+			text-align: right;
+		}
+
+		.mt-10 {
+			margin-top: 10px;
+		}
+
+		.ml-auto {
+			margin-left: auto;
+		}
+
+		/* ================= QR Code Placeholder ================= */
+		.qr-code-placeholder {
+			width: 22mm;
+			height: 22mm;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--text-secondary);
+			font-size: 11px;
+		}
+
+		/* ================= Picking Slip Specific ================= */
+		.qr-section {
+			margin-top: 8px;
+		}
+
+		.location-summary {
+			border: 1px solid var(--border-color);
+			border-radius: 10px;
+			padding: 10px;
+			background: #fff;
+			margin-top: 10px;
+		}
+
+		.summary-title {
+			margin: 0 0 6px;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: .05em;
+			color: var(--text-secondary);
+		}
+
+		.location-chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
+
+		.location-chip {
+			border: 1px solid var(--border-color);
+			background: #fff;
+			border-radius: 999px;
+			padding: 3px 8px;
+			font-size: 11px;
+		}
+
+		/* ================= Parts Table ================= */
+		.parts-table {
+			width: 100%;
+			border-collapse: collapse;
+			table-layout: fixed;
+			margin-top: 10px;
+		}
+
+			.parts-table td,
+			.parts-table th {
+				overflow-wrap: break-word;
+				word-break: break-word;
+			}
+
+		.column-number {
+			width: 18mm;
+		}
+
+		.column-unit {
+			width: 16mm;
+		}
+
+		.column-location {
+			width: 26mm;
+		}
+
+		.column-picked {
+			width: 20mm;
+		}
+
+		.column-notes {
+			width: 30mm;
+		}
+
+		.column-product-part {
+			width: 30mm;
+		}
+
+		.parts-table th,
+		.parts-table td {
+			border: 1px solid var(--border-color);
+			padding: 8px 10px;
+			vertical-align: middle;
+		}
+
+		.parts-table thead th {
+			background: var(--table-header-bg);
+			color: var(--table-header-text);
+			font-weight: 700;
+			font-size: 11px;
+			text-align: left;
+		}
+
+		.parts-table td {
+			font-size: 12px;
+		}
+
+		.product-group {
+			break-inside: avoid;
+			page-break-inside: avoid;
+		}
+
+		.product-group-header td {
+			background: #fff;
+			font-weight: 700;
+			border-top: 2px solid var(--border-color);
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+
+		.product-info {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+			width: 100%;
+		}
+
+		.product-type-badge {
+			display: inline-block;
+			border: 1px solid var(--brand-color);
+			color: var(--brand-color);
+			border-radius: 999px;
+			padding: 3px 8px;
+			font-size: 11px;
+		}
+
+			.product-type-badge.loose-item {
+				border-color: var(--accent-color);
+				color: var(--accent-color);
+			}
+
+		.status-pill {
+			display: inline-block;
+			padding: 3px 8px;
+			border-radius: 999px;
+			font-weight: 600;
+			border: 1px solid var(--brand-color);
+			color: var(--brand-color);
+			font-size: 11px;
+		}
+	</style>
 </head>
 
 <body>
-    <div class="page-container">
-        <!-- ===== Header ===== -->
-        <div class="report-header avoid-page-break">
-            <div class="company-logo">
-                <img src="~/Assets/Images/Logos/asap-pvc-logo-dark.png" alt="ASAPPVC" />
-            </div>
-            <div class="report-identity">
+	<div class="page-container">
+		<!-- ===== Header ===== -->
+		<div class="report-header avoid-page-break">
+			<div class="company-logo">
+				<img src="~/Assets/Images/Logos/asap-pvc-logo-dark.png" alt="ASAPPVC" />
+			</div>
+			<div class="report-identity">
+				<div class="report-number monospace">@Model.PickingSlipNumber <span class="report-type-badge">Picking Slip</span></div>
+				<div class="report-metadata">
+					Order <strong>#@Model.OrderNumber</strong> • Created <span class="monospace">@Model.CreatedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • Priority <span class="status-pill">@Model.Priority</span>
+				</div>
+			</div>
+		</div>
 
-                <div class="report-number monospace">@Model.PickingSlipNumber <span class="report-type-badge">Picking Slip</span></div>
-                <div class="report-metadata">
-                    Order <strong>#@Model.OrderNumber</strong> • Created <span class="monospace">@Model.CreatedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • Priority <span class="status-pill">@Model.Priority</span>
-                </div>
-            </div>
-        </div>
+		<!-- ===== Top Info ===== -->
+		<div class="grid-three-columns avoid-page-break">
+			<!-- From -->
+			<div class="info-box">
+				<h3 class="info-box-title">From</h3>
+				<div class="info-fields">
+					<div class="info-field">
+						<div class="field-label">Company</div>
+						<div class="field-value">@Model.From.Company</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Warehouse</div>
+						<div class="field-value">@Model.From.Warehouse</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Contact</div>
+						<div class="field-value">@Model.From.Contact</div>
+					</div>
+				</div>
+			</div>
 
-        <!-- ===== Top Info ===== -->
-        <div class="grid-three-columns avoid-page-break">
-            <!-- From -->
-            <div class="info-box">
-                <h3 class="info-box-title">From</h3>
-                <div class="info-fields">
-                    <div class="info-field">
-                        <div class="field-label">Company</div>
-                        <div class="field-value">@Model.From.Company</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Warehouse</div>
-                        <div class="field-value">@Model.From.Warehouse</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Contact</div>
-                        <div class="field-value">@Model.From.Contact</div>
-                    </div>
-                </div>
-            </div>
+			<!-- For -->
+			<div class="info-box">
+				<h3 class="info-box-title">For</h3>
+				<div class="info-fields">
+					<div class="info-field">
+						<div class="field-label">Client</div>
+						<div class="field-value">@Model.For.Client</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Project / Site</div>
+						<div class="field-value">@Model.For.ProjectSite</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Contact</div>
+						<div class="field-value">@Model.For.Contact</div>
+					</div>
+				</div>
+			</div>
 
-            <!-- For -->
-            <div class="info-box">
-                <h3 class="info-box-title">For</h3>
-                <div class="info-fields">
-                    <div class="info-field">
-                        <div class="field-label">Client</div>
-                        <div class="field-value">@Model.For.Client</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Project / Site</div>
-                        <div class="field-value">@Model.For.ProjectSite</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Contact</div>
-                        <div class="field-value">@Model.For.Contact</div>
-                    </div>
-                </div>
-            </div>
+			<!-- Order -->
+			<div class="info-box">
+				<h3 class="info-box-title">Order</h3>
+				<div class="info-fields">
+					<div class="info-field">
+						<div class="field-label">Order #</div>
+						<div class="field-value monospace">@Model.Order.OrderNumber</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Created</div>
+						<div class="field-value monospace">@Model.Order.Created.ToString("yyyy-MM-dd HH:mm")</div>
+					</div>
+					<div class="info-field">
+						<div class="field-label">Pick By</div>
+						<div class="field-value monospace">@Model.Order.PickBy.ToString("yyyy-MM-dd HH:mm")</div>
+					</div>
+				</div>
+				<div class="flex-row-space-between qr-section">
+					<div class="small-text">Scan to open order</div>
+					<div class="qr-code-placeholder">QR</div>
+				</div>
+			</div>
+		</div>
 
-            <!-- Order -->
-            <div class="info-box">
-                <h3 class="info-box-title">Order</h3>
-                <div class="info-fields">
-                    <div class="info-field">
-                        <div class="field-label">Order #</div>
-                        <div class="field-value monospace">@Model.Order.OrderNumber</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Created</div>
-                        <div class="field-value monospace">@Model.Order.Created.ToString("yyyy-MM-dd HH:mm")</div>
-                    </div>
-                    <div class="info-field">
-                        <div class="field-label">Pick By</div>
-                        <div class="field-value monospace">@Model.Order.PickBy.ToString("yyyy-MM-dd HH:mm")</div>
-                    </div>
-                </div>
-                <div class="flex-row-space-between qr-section">
-                    <div class="small-text">Scan to open order</div>
-                    <div class="qr-code-placeholder">QR</div>
-                </div>
-            </div>
-        </div>
+		<!-- ===== Location Summary ===== -->
+		<div class="location-summary avoid-page-break">
+			<h3 class="summary-title">Location Summary (Aisle → Bin)</h3>
+			<div class="location-chips">
+				@foreach (var location in Model.LocationSummary)
+				{
+					<span class="location-chip">@location</span>
+				}
+			</div>
+		</div>
 
-        <!-- ===== Location Summary ===== -->
-        <div class="location-summary avoid-page-break">
-            <h3 class="summary-title">Location Summary (Aisle → Bin)</h3>
-            <div class="location-chips">
-                @foreach (var location in Model.LocationSummary)
-                {
-                    <span class="location-chip">@location</span>
-                }
-            </div>
-        </div>
+		<!-- ===== Parts Table ===== -->
+		<table class="parts-table">
+			<colgroup>
+				<col />
+				<col />
+				<col class="column-unit" />
+				<col class="column-number" />
+				<col class="column-location" />
+				<col class="column-picked" />
+				<col class="column-notes" />
+			</colgroup>
+			<thead>
+				<tr>
+					<th class="column-product-part">Product / Part</th>
+					<th>Description</th>
+					<th class="text-center">Unit</th>
+					<th class="text-right">Qty</th>
+					<th class="text-center">Location</th>
+					<th class="text-center">Picked</th>
+					<th>Notes</th>
+				</tr>
+			</thead>
 
-        <!-- ===== Parts Table ===== -->
-        <table class="parts-table">
-            <colgroup>
-                <col />
-                <col />
-                <col class="column-unit" />
-                <col class="column-number" />
-                <col class="column-location" />
-                <col class="column-picked" />
-                <col class="column-notes" />
-            </colgroup>
-            <thead>
-                <tr>
-                    <th class="column-product-part">Product / Part</th>
-                    <th>Description</th>
-                    <th class="text-center">Unit</th>
-                    <th class="text-right">Qty</th>
-                    <th class="text-center">Location</th>
-                    <th class="text-center">Picked</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
+			@foreach (var group in Model.ProductGroups)
+			{
+				<!-- Product Group -->
+				<tbody class="product-group">
+					<tr class="product-group-header">
+						<td colspan="7">
+							<div class="product-info">
+								<span class="product-type-badge @(group.IsProduct ? "" : "loose-item")">@(group.IsProduct ? "Product" : "Loose")</span>
+								@if (!string.IsNullOrEmpty(group.ProductCode))
+								{
+									<span class="monospace">@group.ProductCode</span>
+									<text> • </text>
+								}
+								@group.ProductDescription
+								@if (group.RequiredSets.HasValue)
+								{
+									<span class="report-metadata ml-auto">Required Sets: <strong>@group.RequiredSets</strong></span>
+								}
+							</div>
+						</td>
+					</tr>
+					@foreach (var item in group.Items)
+					{
+						<tr>
+							<td class="monospace">@item.PartNumber</td>
+							<td>@item.Description</td>
+							<td class="text-center">@item.Unit</td>
+							<td class="text-right">@item.Quantity</td>
+							<td class="monospace text-center">@item.Location</td>
+							<td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
+							<td class="small-text">@item.Notes</td>
+						</tr>
+					}
+				</tbody>
+			}
 
-            @foreach (var group in Model.ProductGroups)
-            {
-                <!-- Product Group -->
-                <tbody class="product-group">
-                    <tr class="product-group-header">
-                        <td colspan="7">
-                            <div class="product-info">
-                                <span class="product-type-badge @(group.IsProduct ? "" : "loose-item")">@(group.IsProduct ? "Product" : "Loose")</span>
-                                @if (!string.IsNullOrEmpty(group.ProductCode))
-                                {
-                                    <span class="monospace">@group.ProductCode</span>
-                                    <text> • </text>
-                                }
-                                @group.ProductDescription
-                                @if (group.RequiredSets.HasValue)
-                                {
-                                    <span class="report-metadata ml-auto">Required Sets: <strong>@group.RequiredSets</strong></span>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                    @foreach (var item in group.Items)
-                    {
-                        <tr>
-                            <td class="monospace">@item.PartNumber</td>
-                            <td>@item.Description</td>
-                            <td class="text-center">@item.Unit</td>
-                            <td class="text-right">@item.Quantity</td>
-                            <td class="monospace text-center">@item.Location</td>
-                            <td class="text-center"><input type="checkbox" aria-label="Picked" /></td>
-                            <td class="small-text">@item.Notes</td>
-                        </tr>
-                    }
-                </tbody>
-            }
+			<tfoot>
+				<tr>
+					<td colspan="7">
+						<div class="flex-row-space-between">
+							<div class="small-text">
+								Auto-generated on <span class="monospace">@Model.GeneratedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • All quantities shown are required to fulfill the order.
+							</div>
+							<div class="monospace">Total Lines: <strong>@Model.TotalLines</strong> • Total Units: <strong>@Model.TotalUnits</strong></div>
+						</div>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
 
-            <tfoot>
-                <tr>
-                    <td colspan="7">
-                        <div class="flex-row-space-between">
-                            <div class="small-text">
-                                Auto-generated on <span class="monospace">@Model.GeneratedDateTime.ToString("yyyy-MM-dd HH:mm")</span> • All quantities shown are required to fulfill the order.
-                            </div>
-                            <div class="monospace">Total Lines: <strong>@Model.TotalLines</strong> • Total Units: <strong>@Model.TotalUnits</strong></div>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+		<!-- ===== Special Instructions ===== -->
+		@if (!string.IsNullOrEmpty(Model.SpecialInstructions))
+		{
+			<div class="info-box avoid-page-break mt-10">
+				<h3 class="info-box-title">Special Instructions</h3>
+				<div>@Model.SpecialInstructions</div>
+			</div>
+		}
 
-        <!-- ===== Special Instructions ===== -->
-        @if (!string.IsNullOrEmpty(Model.SpecialInstructions))
-        {
-            <div class="info-box avoid-page-break mt-10">
-                <h3 class="info-box-title">Special Instructions</h3>
-                <div>@Model.SpecialInstructions</div>
-            </div>
-        }
-
-        <!-- ===== Footer / Sign-off ===== -->
-        <div class="signature-section avoid-page-break">
-            <div class="signature-box">
-                <h4 class="signature-box-title">Picked By</h4>
-                <div class="signature-line"></div>
-                <div>Date &amp; Time: ____________________</div>
-            </div>
-            <div class="signature-box">
-                <h4 class="signature-box-title">Checked By</h4>
-                <div class="signature-line"></div>
-                <div>Date &amp; Time: ____________________</div>
-            </div>
-            <div class="signature-box">
-                <h4 class="signature-box-title">Dispatch</h4>
-                <div>Courier: ________________________</div>
-                <div class="signature-line"></div>
-                <div>Pallets / Parcels: ______________</div>
-            </div>
-        </div>
-    </div>
+		<!-- ===== Footer / Sign-off ===== -->
+		<div class="signature-section avoid-page-break">
+			<div class="signature-box">
+				<h4 class="signature-box-title">Picked By</h4>
+				<div class="signature-line"></div>
+				<div>Date &amp; Time: ____________________</div>
+			</div>
+			<div class="signature-box">
+				<h4 class="signature-box-title">Checked By</h4>
+				<div class="signature-line"></div>
+				<div>Date &amp; Time: ____________________</div>
+			</div>
+			<div class="signature-box">
+				<h4 class="signature-box-title">Dispatch</h4>
+				<div>Courier: ________________________</div>
+				<div class="signature-line"></div>
+				<div>Pallets / Parcels: ______________</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

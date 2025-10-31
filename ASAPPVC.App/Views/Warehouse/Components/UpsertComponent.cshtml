@@ -35,16 +35,18 @@
 						<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Inactive")</span>
 					</label>
 				}
-				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
+				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
 			</div>
 		</header>
 
-		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" novalidate class="fxg-f-col fxg-u-gap-6">
+		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" class="fxg-f-col fxg-u-gap-6">
 			@Html.AntiForgeryToken()
 
 			<input asp-for="Id" type="hidden" />
 			<input asp-for="IsEdit" type="hidden" value="@(isEdit ? "true" : "false")" />
 			<input asp-for="ExistingImageUrl" type="hidden" />
+			<input asp-for="ComponentCode" type="hidden" />
+			<input asp-for="IsActive" type="hidden" />
 
 			<div class="card-body fxg-f-col fxg-u-gap-6">
 				<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
