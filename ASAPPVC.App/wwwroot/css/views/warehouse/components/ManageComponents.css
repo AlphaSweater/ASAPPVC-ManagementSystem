@@ -90,11 +90,10 @@ html, body {
 		background: rgba(255, 255, 255, 0.1);
 	}
 
-/* ---------- Action Buttons (reused from customer form) ---------- */
+/* ---------- Action Buttons ---------- */
 .actions {
-	display: inline-flex;
+	display: flex;
 	justify-content: center;
-	align-items: center;
 	gap: 8px;
 	white-space: nowrap;
 }
@@ -118,7 +117,6 @@ html, body {
 		transform: scale(0.98);
 	}
 
-	/* Specific sizes for table buttons */
 	.btn.btn-sm {
 		height: 36px;
 		padding: 0 16px;
@@ -144,7 +142,6 @@ html, body {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(255, 255, 255, 0.6);
 	}
-
 /* ---------- Table Styling ---------- */
 .table-section {
 	overflow-x: auto;
@@ -338,6 +335,7 @@ html, body {
 		clip: rect(0 0 0 0);
 		border: 0;
 	}
+
 
 @media (max-width: 960px) {
 	.manage-components .card-body {
