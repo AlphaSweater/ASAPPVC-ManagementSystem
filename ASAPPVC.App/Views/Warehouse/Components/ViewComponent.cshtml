@@ -1,4 +1,4 @@
-@using ASAPPVC.App.Models;
+﻿@using ASAPPVC.App.Models;
 @model ComponentDetailVm
 @{
 	ViewData["Title"] = "Component Details";
@@ -18,94 +18,135 @@
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/flexy-grids.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/ViewComponent.css" asp-append-version="true" />
 }
 
-<div class="page">
+<div class="page fxg-u-container fxg-u-min-h-20vh">
 	@{
 		ViewData["BackText"] = "Back";
 	}
 	@await Html.PartialAsync("_BackButton")
 
-	<div role="region" aria-labelledby="page-title">
-		<header class="card-header">
+	<div role="region" aria-labelledby="page-title" class="fxg-f-col fxg-u-gap-6">
+
+		<header class="card-header fxg-f-row fxg-f-main-between fxg-f-cross-center fxg-u-p-4 fxg-u-rounded">
 			<div>
 				<h1 id="page-title" class="card-title">@Model?.ComponentCode: @Model?.ComponentName</h1>
-				<p class="card-subtitle">Component details and stock info.</p>
+				<p class="card-subtitle">Component details and stock information.</p>
 			</div>
-			<div class="card-actions">
-				<a class="btn btn-ghost"
-				   asp-area="Warehouse"
-				   asp-controller="Components"
-				   asp-action="Index">
-					Back to Components
-				</a>
+
+			<div class="card-actions fxg-f-row fxg-u-gap-4 fxg-f-cross-center">
+				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
 			</div>
 		</header>
 
-		<div class="card-body">
-			<section class="fields-panel" style="width:100%">
-				<div class="details-layout-grid">
-					<!-- Image Column -->
-					<div class="image-col">
-						<div class="image-box">
-							<img src="@imageSource" alt="@Model?.ComponentName Component Image" />
-						</div>
+		<div class="card-body fxg-f-col fxg-u-gap-6">
+			<!-- Row 1: Media + Details Grid -->
+			<div class="fxg-f-row fxg-f-nowrap fxg-u-gap-6">
+				<section class="media-panel fxg-f-col fxg-f-main-center fxg-f-cross-center fxg-f-grow-1">
+					<h2 class="sr-only">Component Image</h2>
+					<div class="image-box">
+						<img src="@imageSource" alt="@Model?.ComponentName Component Image" />
 					</div>
+				</section>
 
-					<!-- Details Column -->
-					<div class="info-grid">
-						<div class="info-pair">
-							<div class="label">Component Code</div>
-							<div class="value">@Model?.ComponentCode</div>
+				<div class="fxg-f-col fxg-f-grow-1 fxg-u-gap-6">
+					<section class="section-card fxg-f-col fxg-u-gap-4">
+						<h2 class="section-title">Identification</h2>
+
+						<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+							<div class="info-pair" style="flex: 1 1 240px; min-width: 220px;">
+								<div class="label">Component Code</div>
+								<div class="value">@Model?.ComponentCode</div>
+							</div>
+							<div class="info-pair" style="flex: 1 1 240px; min-width: 220px;">
+								<div class="label">Component Name</div>
+								<div class="value">@Model?.ComponentName</div>
+							</div>
 						</div>
-						<div class="info-pair">
-							<div class="label">Component Name</div>
-							<div class="value">@Model?.ComponentName</div>
+					</section>
+
+					<section class="section-card fxg-f-col fxg-u-gap-4">
+						<h2 class="section-title">Classification</h2>
+
+						<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+							<div class="info-pair" style="flex: 1 1 240px; min-width: 220px;">
+								<div class="label">Material Type</div>
+								<div class="value">@Model?.MaterialType</div>
+							</div>
+							<div class="info-pair" style="flex: 1 1 240px; min-width: 220px;">
+								<div class="label">Colour</div>
+								<div class="value">@Model?.ColourOption</div>
+							</div>
 						</div>
-						<div class="info-pair">
+					</section>
+				</div>
+			</div>
+
+			<!-- Row 2: Stock & Pricing -->
+			<div class="fxg-f-row fxg-f-wrap fxg-u-gap-6">
+				<section class="section-card fxg-f-col fxg-u-gap-4" style="flex: 1 1 420px; min-width: 320px;">
+					<h2 class="section-title">Stock &amp; Units</h2>
+
+					<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+						<div class="info-pair" style="flex: 1 1 200px; min-width: 180px;">
 							<div class="label">Unit of Measurement</div>
 							<div class="value">@Model?.UnitOfMeasure</div>
 						</div>
-						<div class="info-pair">
-							<div class="label">Storage Location</div>
-							<div class="value">@Model?.LocationCode</div>
-						</div>
-						<div class="info-pair">
+						<div class="info-pair" style="flex: 1 1 200px; min-width: 180px;">
 							<div class="label">Current Stock</div>
 							<div class="value">@Model?.QuantityOnHand</div>
 						</div>
-						<div class="info-pair">
+					</div>
+				</section>
+
+				<section class="section-card fxg-f-col fxg-u-gap-4" style="flex: 1 1 420px; min-width: 320px;">
+					<h2 class="section-title">Pricing</h2>
+
+					<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+						<div class="info-pair" style="flex: 1 1 200px; min-width: 180px;">
 							<div class="label">Cost Per Unit</div>
 							<div class="value">@(Model?.UnitCost.ToString("C") ?? string.Empty)</div>
 						</div>
-						<div class="info-pair">
+						<div class="info-pair" style="flex: 1 1 200px; min-width: 180px;">
 							<div class="label">Total Stock Value</div>
 							<div class="value">@totalStockValue.ToString("C")</div>
 						</div>
-						@if (Model?.UsedInProductsCount > 0)
-						{
-							<div class="info-pair">
-								<div class="label">Used in Products</div>
-								<div class="value">@Model.UsedInProductsCount product(s)</div>
-							</div>
-						}
 					</div>
-				</div>
+				</section>
+			</div>
 
-				<!-- Footer Actions -->
-				<div class="actions">
-					<a class="btn btn-primary"
-					   asp-area="Warehouse"
-					   asp-controller="Components"
-					   asp-action="Edit"
-					   asp-route-code="@urlIdentifier"
-					   asp-route-id="@Model?.Id">
-						Edit Component
-					</a>
+			<!-- Row 3: Storage -->
+			<section class="section-card fxg-f-col fxg-u-gap-4" style="flex: 1 1 100%; min-width: 320px;">
+				<h2 class="section-title">Storage Details</h2>
+
+				<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+					<div class="info-pair" style="flex: 1 1 300px; min-width: 220px;">
+						<div class="label">Storage Location</div>
+						<div class="value">@Model?.LocationCode</div>
+					</div>
+					@if (Model?.UsedInProductsCount > 0)
+					{
+						<div class="info-pair" style="flex: 1 1 300px; min-width: 220px;">
+							<div class="label">Used in Products</div>
+							<div class="value">@Model.UsedInProductsCount product(s)</div>
+						</div>
+					}
 				</div>
 			</section>
+
+			<!-- Actions -->
+			<div class="form-actions fxg-f-row fxg-f-main-end fxg-u-gap-4">
+				<a class="btn btn-primary"
+				   asp-area="Warehouse"
+				   asp-controller="Components"
+				   asp-action="Edit"
+				   asp-route-code="@urlIdentifier"
+				   asp-route-id="@Model?.Id">
+					Edit Component
+				</a>
+			</div>
 		</div>
 	</div>
 </div>

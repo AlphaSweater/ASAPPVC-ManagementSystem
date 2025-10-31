@@ -64,6 +64,7 @@
 /* Column alignment utilities */
 .ft-left {
 	text-align: left !important;
+	white-space: pre-wrap !important;
 }
 
 .ft-center {
@@ -91,7 +92,6 @@
 
 .ft-name {
 	font-weight: 500;
-	white-space: nowrap !important;
 	color: var(--ft-text);
 }
 
@@ -106,7 +106,6 @@
 
 .fancy-table th.ft-shrink,
 .fancy-table td.ft-shrink {
-	white-space: nowrap;
 	width: 1%;
 }
 

@@ -45,6 +45,8 @@
 			<input asp-for="Id" type="hidden" />
 			<input asp-for="IsEdit" type="hidden" value="@(isEdit ? "true" : "false")" />
 			<input asp-for="ExistingImageUrl" type="hidden" />
+			<input asp-for="ComponentCode" type="hidden" />
+			<input asp-for="IsActive" type="hidden" />
 
 			<div class="card-body fxg-f-col fxg-u-gap-6">
 				<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
