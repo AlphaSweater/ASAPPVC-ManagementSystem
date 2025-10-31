@@ -1,9 +1,9 @@
-﻿using FluentValidation;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ASAPPVC.App.Models.Filters
+namespace ASAPPVC.App.Models.Validation
 {
     /// Runs any IValidator<T> for action arguments automatically.
     public sealed class ValidationActionFilter : IAsyncActionFilter
@@ -27,11 +27,9 @@ namespace ASAPPVC.App.Models.Filters
                     continue;
 
                 var vCtxType = typeof(FluentValidation.ValidationContext<>).MakeGenericType(arg.GetType());
-                var vCtx = Activator.CreateInstance(vCtxType, arg)!;
+                var vCtx = (IValidationContext)Activator.CreateInstance(vCtxType, arg)!;
 
-                var method = vType.GetMethod(nameof(IValidator<object>.ValidateAsync), new[] { vCtxType, typeof(CancellationToken) })!;
-                var task = (Task<ValidationResult>)method.Invoke(validator, new object[] { vCtx, ctx.HttpContext.RequestAborted })!;
-                var result = await task;
+                var result = await validator.ValidateAsync(vCtx, ctx.HttpContext.RequestAborted);
 
                 if (!result.IsValid)
                 {
