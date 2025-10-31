@@ -8,108 +8,162 @@ namespace ASAPPVC.App.Controllers.Warehouse
 {
     [Area("Warehouse")]
     [Authorize]
+    [AutoValidateAntiforgeryToken]
+    [Route("Warehouse/[controller]")]
     public class ProductsController(IProductService products, IComponentService components) : Controller
     {
         private readonly IProductService _products = products;
         private readonly IComponentService _components = components;
 
-        // Products view paths - reuse WarehouseController.ViewRoot
+        // Views
+
         public const string ViewRoot = WarehouseController.ViewRoot + "Products/";
-
         private const string ManageProductsViewName = ViewRoot + "ManageProducts.cshtml";
-        private const string ViewProductViewName = ViewRoot + "ViewProduct.cshtml";
-        private const string AddProductViewName = ViewRoot + "AddProduct.cshtml";
+        private const string DetailsViewName = ViewRoot + "ViewProduct.cshtml";
+        private const string UpsertViewName = ViewRoot + "UpsertProduct.cshtml";
 
-        // Views the products main page
-        [HttpGet]
+        // GET /Warehouse/Products
+        [HttpGet("")]
         public async Task<IActionResult> Index(CancellationToken ct)
         {
             var result = await _products.ListAsync(ct);
             if (!result.Ok || result.Value is null)
-            {
-                TempData["ErrorMessage"] = result.Error ?? "Failed to load products.";
-                return View(ManageProductsViewName, ManageProductsVm.Create());
-            }
+                return GoIndexWithError(result.Error ?? "Failed to load products.");
 
-            var vm = ManageProductsVm.Create(result.Value);
-            return View(ManageProductsViewName, vm);
+            return View(ManageProductsViewName, ManageProductsVm.Create(result.Value));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> AddProduct(CancellationToken ct)
-        {
-            var componentLookupResult = await _components.ListAsync(ct);
-            return View(AddProductViewName, new ProductFormVm());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProduct(ProductFormVm vm, CancellationToken ct)
-        {
-            // If a file was uploaded via the form input named 'ImageFile', read it into the VM
-            if (HttpContext.Request?.Form?.Files?.Count > 0)
-            {
-                var file = HttpContext.Request.Form.Files.FirstOrDefault(f => f.Name == "ImageFile" || f.Name == "imageFile");
-                if (file is not null && file.Length > 0)
-                {
-                    using var ms = new MemoryStream();
-                    await file.CopyToAsync(ms, ct);
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
-                // Reload components for the form
-                var componentsResult = await _components.ListAsync(ct);
-                ViewData["Components"] = componentsResult.Ok && componentsResult.Value is not null
-                    ? componentsResult.Value
-                    : new List<ComponentListVm>();
-                return View(AddProductViewName, vm);
-            }
-
-            var result = await _products.CreateAsync(vm, ct);
-            if (!result.Ok || result.Value is null)
-            {
-                ModelState.AddModelError(string.Empty, result.Error ?? "Unable to create product.");
-
-                // Reload components for the form
-                var componentsResult = await _components.ListAsync(ct);
-                ViewData["Components"] = componentsResult.Ok && componentsResult.Value is not null
-                    ? componentsResult.Value
-                    : new List<ComponentListVm>();
-                return View(AddProductViewName, vm);
-            }
-
-            var product = result.Value;
-            TempData["AlertMessage"] = $"Product '{vm.ProductName}' created successfully.";
-            return RedirectToAction(nameof(ViewProduct), new { id = product.Id });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ViewProduct(Guid id, CancellationToken ct)
-        {
-            var result = await _products.GetDetailAsync(id: id, ct: ct);
-            if (!result.Ok || result.Value is null)
-            {
-                TempData["ErrorMessage"] = result.Error ?? "Product not found.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(ViewProductViewName, result.Value);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Search(string? term, CancellationToken ct)
+        // GET /Warehouse/Products/Search?term=...
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search([FromQuery] string? term, CancellationToken ct)
         {
             var result = await _products.SearchAsync(term, ct);
             if (!result.Ok || result.Value is null)
+                return GoIndexWithError(result.Error ?? "Failed to search products.");
+
+            return View(ManageProductsViewName, ManageProductsVm.Create(result.Value, searchQuery: term));
+        }
+
+        // GET /Warehouse/Products/View/{id:guid}
+        [HttpGet("View/{id:guid}")]
+        public async Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
+        {
+            var byId = await _products.GetDetailAsync(id: id, code: null, ct: ct);
+            if (!byId.Ok || byId.Value is null)
+                return GoIndexWithError(byId.Error ?? "Product not found.");
+
+            return View(DetailsViewName, byId.Value);
+        }
+
+        // GET /Warehouse/Products/View/{code}
+        [HttpGet("View/{code}")]
+        public async Task<IActionResult> DetailsByCode([FromRoute] string code, CancellationToken ct)
+        {
+            code = (code ?? string.Empty).Trim();
+            if (code.Length == 0)
+                return GoIndexWithError("Product not found.");
+
+            var byCode = await _products.GetDetailAsync(id: null, code: code, ct: ct);
+            if (!byCode.Ok || byCode.Value is null)
+                return GoIndexWithError(byCode.Error ?? "Product not found.");
+
+            return View(DetailsViewName, byCode.Value);
+        }
+
+        // --- Create ---
+
+        // GET /Warehouse/Products/AddNew
+        [HttpGet("AddNew")]
+        public async Task<IActionResult> AddNew(CancellationToken ct)
+        {
+            var vm = new ProductFormVm();
+
+            var compsResult = await _products.GetAvailableComponentsAsync(ct);
+            vm.AvailableProductComponents = compsResult.Ok && compsResult.Value is not null
+                ? compsResult.Value
+                : new();
+
+            return View(UpsertViewName, vm);
+        }
+
+        // --- Edit ---
+
+        // GET /Warehouse/Products/Edit/{id:guid}
+        [HttpGet("Edit/{id:guid}")]
+        public async Task<IActionResult> EditById([FromRoute] Guid id, CancellationToken ct)
+        {
+            var byId = await _products.GetFormAsync(id: id, ct: ct);
+            if (!byId.Ok || byId.Value is null)
+                return GoIndexWithError(byId.Error ?? "Product not found.");
+
+            var vm = byId.Value;
+            var compsResult = await _products.GetAvailableComponentsAsync(ct);
+            vm.AvailableProductComponents = compsResult.Ok && compsResult.Value is not null
+                ? compsResult.Value
+                : new();
+
+            return View(UpsertViewName, vm);
+        }
+
+        // GET /Warehouse/Products/Edit/{code}
+        [HttpGet("Edit/{code}")]
+        public async Task<IActionResult> EditByCode([FromRoute] string code, CancellationToken ct)
+        {
+            code = (code ?? string.Empty).Trim();
+            if (code.Length == 0)
+                return GoIndexWithError("Product not found.");
+
+            var byCode = await _products.GetFormAsync(code: code, ct: ct);
+            if (!byCode.Ok || byCode.Value is null)
+                return GoIndexWithError(byCode.Error ?? "Product not found.");
+
+            var vm = byCode.Value;
+            var compsResult = await _products.GetAvailableComponentsAsync(ct);
+            vm.AvailableProductComponents = compsResult.Ok && compsResult.Value is not null
+                ? compsResult.Value
+                : new();
+
+            return View(UpsertViewName, vm);
+        }
+
+        // --- Save (create or update) ---
+
+        // POST /Warehouse/Products/Upsert
+        [HttpPost("Upsert")]
+        public async Task<IActionResult> Upsert([FromForm] ProductFormVm vm, CancellationToken ct)
+        {
+            if (!ModelState.IsValid)
+                return View(UpsertViewName, vm);
+
+            var op = vm.IsEdit
+                ? await _products.UpdateAsync(vm, ct)
+                : await _products.CreateAsync(vm, ct);
+
+            if (!op.Ok || op.Value is null)
             {
-                TempData["ErrorMessage"] = result.Error ?? "Failed to search products.";
-                return View(ManageProductsViewName, ManageProductsVm.Create());
+                ModelState.AddModelError(string.Empty, op.Error ?? (vm.IsEdit ? "Unable to update product." : "Unable to create product."));
+                return View(UpsertViewName, vm);
             }
 
-            var vm = ManageProductsVm.Create(result.Value, searchQuery: term);
-            return View(ManageProductsViewName, vm);
+            var saved = op.Value;
+            TempData["AlertMessage"] = vm.IsEdit
+                ? $"Product '{saved.ProductName}' updated."
+                : $"Product '{saved.ProductName}' created.";
+
+            return !string.IsNullOrWhiteSpace(saved.ProductCode)
+                ? RedirectToAction(nameof(DetailsByCode), new { code = saved.ProductCode })
+                : RedirectToAction(nameof(DetailsById), new { id = saved.Id });
+        }
+
+        // Centralized: set error + go back to Warehouse index
+        private RedirectToActionResult GoIndexWithError(string message)
+        {
+            TempData["ErrorMessage"] = message;
+            return RedirectToAction(
+                actionName: "Index",
+                controllerName: "Warehouse",
+                routeValues: new { area = "Warehouse" }
+            );
         }
     }
 }

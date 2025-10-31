@@ -14,6 +14,8 @@ namespace ASAPPVC.App.Controllers.Warehouse
     {
         private readonly IComponentService _components = components;
 
+        // Views
+
         public const string ViewRoot = WarehouseController.ViewRoot + "Components/";
         private const string ManageComponentsViewName = ViewRoot + "ManageComponents.cshtml";
         private const string DetailsViewName = ViewRoot + "ViewComponent.cshtml";

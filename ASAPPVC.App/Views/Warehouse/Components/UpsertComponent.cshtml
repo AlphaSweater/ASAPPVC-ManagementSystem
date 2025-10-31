@@ -13,7 +13,7 @@
 
 @section Styles {
 	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/components/UpsertComponent.css" asp-append-version="true" />
 }
 
 <div class="page">
@@ -27,6 +27,18 @@
 			</div>
 
 			<div class="card-actions">
+				@if (isEdit)
+				{
+					<div style="display:flex;align-items:center;gap:10px;margin-right:6px;">
+						<form id="activeToggleForm" style="margin:0">
+							<input asp-for="IsActive" id="IsActiveHeader" type="checkbox" style="display:none;" />
+							<label for="IsActiveHeader" id="IsActiveLabel" class="btn btn-secondary" role="button" aria-pressed="@(Model?.IsActive == true ? "true" : "false")">
+								<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Discontinued")</span>
+							</label>
+						</form>
+					</div>
+				}
+
 				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">
 					🏷️ Components
 				</a>
@@ -103,10 +115,34 @@
 							<span asp-validation-for="QuantityOnHand" class="field-error"></span>
 						</div>
 
+						<div class="form-field half">
+							<label asp-for="MaterialType" class="label"></label>
+							<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
+							<span asp-validation-for="MaterialType" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
+							<label asp-for="ColourOption" class="label"></label>
+							<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
+							<span asp-validation-for="ColourOption" class="field-error"></span>
+						</div>
+
 						<div class="form-field full">
+							<label asp-for="LocationNote" class="label"></label>
+							<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
+							<span asp-validation-for="LocationNote" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
 							<label asp-for="UnitOfMeasure" class="label"></label>
 							<select asp-for="UnitOfMeasure" class="input" asp-items="Html.GetEnumSelectList<Unit>()"></select>
 							<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
+						</div>
+
+						<div class="form-field half">
+							<label asp-for="ReorderLevel" class="label"></label>
+							<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
+							<span asp-validation-for="ReorderLevel" class="field-error"></span>
 						</div>
 					</div>
 
@@ -167,6 +203,25 @@
 					input.click();
 				}
 			});
+
+			// Header active toggle handling (only present on edit pages)
+			const headerCheckbox = document.getElementById('IsActiveHeader');
+			const headerLabel = document.getElementById('IsActiveLabel');
+			const headerText = document.getElementById('IsActiveText');
+
+			if (headerCheckbox && headerLabel && headerText) {
+				// initialize label state
+				const setState = () => {
+					headerLabel.setAttribute('aria-pressed', headerCheckbox.checked ? 'true' : 'false');
+					headerLabel.classList.toggle('btn-primary', headerCheckbox.checked);
+					headerLabel.classList.toggle('btn-secondary', !headerCheckbox.checked);
+					headerText.textContent = headerCheckbox.checked ? 'Active' : 'Inactive';
+				};
+
+				setState();
+
+				headerCheckbox.addEventListener('change', setState);
+			}
 		})();
 	</script>
 }

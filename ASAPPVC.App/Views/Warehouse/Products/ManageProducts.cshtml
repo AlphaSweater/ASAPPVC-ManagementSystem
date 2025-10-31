@@ -11,8 +11,6 @@
 }
 
 <div class="page">
-	@await Html.PartialAsync("_BackButton")
-
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
@@ -20,7 +18,7 @@
 				<p class="card-subtitle">Browse, search and manage products in your catalog.</p>
 			</div>
 			<div class="card-actions">
-				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddNew">+ Add Product</a>
 			</div>
 		</header>
 
@@ -64,12 +62,12 @@
 													<a class="btn btn-secondary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="ViewProduct"
+													   asp-action="DetailsById"
 													   asp-route-id="@product.Id">View</a>
 													<a class="btn btn-primary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="EditProduct"
+													   asp-action="EditById"
 													   asp-route-id="@product.Id">Edit</a>
 												</div>
 											</td>
