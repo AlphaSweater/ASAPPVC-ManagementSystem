@@ -1,5 +1,4 @@
 ﻿using ASAPPVC.App.Models;
-using ASAPPVC.App.Models.Validation;
 using ASAPPVC.App.Services;
 using ASAPPVC.App.ViewModels.Warehouse;
 using Microsoft.AspNetCore.Authorization;
@@ -86,7 +85,6 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
         // POST /Warehouse/Components/Upsert
         [HttpPost("Upsert")]
-        [ValidateWithView(UpsertViewName)]
         public async Task<IActionResult> Upsert([FromForm] ComponentFormVm vm, CancellationToken ct)
         {
             if (!ModelState.IsValid)
