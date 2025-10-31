@@ -98,6 +98,7 @@ namespace ASAPPVC.App
             // ============================================
             // Singleton services
             services.AddSingleton<IImageService, ImageService>();
+            services.AddSingleton<IPdfService, PdfService>();
 
             // Scoped services (business logic)
             services.AddScoped<ICodeGenerationService, CodeGenerationService>();
