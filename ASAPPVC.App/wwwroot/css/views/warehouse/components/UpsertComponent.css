@@ -4,10 +4,10 @@
 
 /* Tokens to match Add Product */
 :root {
-    --primary-red: #d62828;
-    --hover-red: #e03a3a;
-    --text-light: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.8);
+	--primary-red: #d62828;
+	--hover-red: #e03a3a;
+	--text-light: #ffffff;
+	--text-muted: rgba(255, 255, 255, 0.8);
 }
 
 /* Page */
@@ -213,10 +213,10 @@ select.input {
 
 /* ---------- Buttons ---------- */
 .form-actions {
-    margin-top: 16px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+	margin-top: 16px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
 }
 
 .btn {
@@ -266,31 +266,31 @@ select.input {
 	}
 
 .btn-remove {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border-radius: 50%;
+	background: rgba(255, 255, 255, 0.08);
+	color: var(--text-muted);
+	border: 1px solid transparent;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: 50%;
 }
 
-    .btn-remove:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: var(--text-light);
-    }
+	.btn-remove:hover {
+		background: rgba(255, 255, 255, 0.15);
+		color: var(--text-light);
+	}
 
 .btn-ghost {
-    background: transparent;
-    color: var(--text-light);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-    .btn-ghost:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.6);
-        color: var(--text-light);
-    }
+	.btn-ghost:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255, 255, 255, 0.6);
+		color: var(--text-light);
+	}
 
 /* Accessibility helpers */
 .sr-only {
@@ -301,6 +301,142 @@ select.input {
 	overflow: hidden;
 	clip: rect(0 0 0 0);
 	border: 0;
+}
+
+/* ================================================================
+   Component-specific rules moved from the Razor view
+   ================================================================ */
+
+/* ================= Joined Unit + Quantity control ================= */
+.unitqty {
+	display: flex;
+	align-items: stretch;
+	width: 100%;
+}
+
+	.unitqty .unit-select,
+	.unitqty .qty-input {
+		height: 42px;
+		border: 1px solid rgba(255,255,255,.22);
+		background: rgba(255,255,255,.08);
+		color: #fff;
+		outline: none;
+		transition: background .2s, border-color .2s, box-shadow .2s;
+	}
+
+	.unitqty .unit-select {
+		/* left chip */
+		min-width: 140px;
+		max-width: 200px;
+		border-right: 0;
+		border-radius: 10px 0 0 10px;
+		padding: 0 12px;
+	}
+
+	.unitqty .qty-input {
+		/* right numeric */
+		flex: 1 1 auto;
+		border-radius: 10px 10px 0 0;
+		padding: 0 12px;
+	}
+
+	.unitqty:focus-within .unit-select,
+	.unitqty:focus-within .qty-input {
+		background: rgba(255,255,255,.12);
+		border-color: rgba(255,255,255,.45);
+		box-shadow: 0 3px rgba(255,255,255,.08);
+	}
+
+/* ================= Section grouping ================= */
+.sections {
+	display: grid;
+	gap: 16px;
+}
+
+.section-card {
+	border: 1px solid var(--glass-border, rgba(255,255,255,.15));
+	border-radius: 16px;
+	padding: 16px;
+	background: rgba(255,255,255,.04);
+}
+
+.section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.section-title {
+	font-weight: 700;
+	color: #fff;
+	font-size: 14px;
+	letter-spacing: .4px;
+	text-transform: uppercase;
+}
+
+.section-grid {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0,1fr));
+	gap: 14px;
+}
+
+.col-12 {
+	grid-column: span 12
+}
+
+.col-8 {
+	grid-column: span 8
+}
+
+.col-6 {
+	grid-column: span 6
+}
+
+.col-4 {
+	grid-column: span 4
+}
+
+.col-3 {
+	grid-column: span 3
+}
+
+.form-field {
+	/* ensure consistent spacing for section fields */
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.label {
+	font-size: 13px;
+	color: var(--text-muted, rgba(255,255,255,.75));
+}
+
+.input, select.input, textarea.input {
+	height: 42px;
+	padding: 0 12px;
+	border-radius: 10px;
+	background: rgba(255,255,255,.08);
+	border: 1px solid rgba(255,255,255,.22);
+	color: #fff;
+	outline: none;
+}
+
+textarea.input {
+	height: 96px;
+	padding: 10px 12px;
+	resize: vertical;
+}
+
+@media (max-width: 960px) {
+	.section-grid {
+		grid-template-columns: repeat(6, minmax(0,1fr));
+	}
+
+	.col-md-12 {
+		grid-column: span 6;
+	}
 }
 
 /* Responsive */
