@@ -2,6 +2,7 @@ using ASAPPVC.App.Models;
 using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Services;
 using ASAPPVC.App.ViewModels.Auth;
+using ASAPPVC.App.ViewModels.Customer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -225,6 +226,16 @@ namespace ASAPPVC.App.Data
             }
         };
 
+        // Demo customers for seeding
+        private static readonly CreateCustomerViewModel[] DemoCustomers = new CreateCustomerViewModel[]
+        {
+            new() { FirstName = "Acme", LastName = "Holdings", Company = "Acme Holdings Pty", PhoneNumber = "+27110000001", Email = "sales@acme.co.za" },
+            new() { FirstName = "Jane", LastName = "Doe", Company = "Doe Contractors", PhoneNumber = "+27110000002", Email = "jane.doe@example.com" },
+            new() { FirstName = "John", LastName = "Smith", Company = null, PhoneNumber = "+27110000003", Email = "john.smith@example.com" },
+            new() { FirstName = "Supply", LastName = "Partner", Company = "Supply Partner Ltd", PhoneNumber = "+27110000004", Email = "orders@supplypartner.co.za" },
+            new() { FirstName = "Retail", LastName = "Customer", Company = "Retail Store", PhoneNumber = "+27110000005", Email = "contact@retailstore.co.za" }
+        };
+
         // Map of which demo components (by component name) should be used for each demo product.
         // The array index corresponds to the DemoProducts index.
         private static readonly (string name, decimal qty)[][] DemoProductComponentMap = new (string name, decimal qty)[][]
@@ -289,6 +300,8 @@ namespace ASAPPVC.App.Data
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
             var authService = services.GetRequiredService<IAuthService>();
 
+            var customerService = services.GetRequiredService<ICustomerService>();
+
             var componentService = services.GetRequiredService<IComponentService>();
             var productService = services.GetRequiredService<IProductService>();
 
@@ -297,6 +310,9 @@ namespace ASAPPVC.App.Data
 
             // Development Seeders
             await SeedDemoUsersAsync(userManager, authService);
+
+            // Seed customers before creating orders/products that might reference them
+            await SeedDemoCustomersAsync(customerService);
 
             await SeedDemoComponentsAsync(componentService);
 
@@ -456,6 +472,32 @@ namespace ASAPPVC.App.Data
                 catch
                 {
                     // swallow to allow other seed items to proceed
+                }
+            }
+        }
+
+        /// <summary>
+        /// Seeds demo customers using ICustomerService. Skips if any customers already exist.
+        /// </summary>
+        public static async Task SeedDemoCustomersAsync(ICustomerService customerService)
+        {
+            if (customerService == null)
+                return;
+
+            // If customers already exist, skip seeding
+            var existing = await customerService.ListAsync();
+            if (existing is not null && existing.Count > 0)
+                return;
+
+            foreach (var vm in DemoCustomers)
+            {
+                try
+                {
+                    await customerService.CreateAsync(vm);
+                }
+                catch
+                {
+                    // swallow exceptions to allow other seeds to continue
                 }
             }
         }

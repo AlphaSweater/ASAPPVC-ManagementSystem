@@ -180,3 +180,151 @@
 .text-right {
 	text-align: right;
 }
+
+/* ---------- Page-specific layout & form styles (migrated from ManageProducts.cshtml inline styles) ---------- */
+.page {
+	display: block;
+}
+
+.card-header {
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: #fff;
+}
+
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.card-body {
+	padding: 24px 32px;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	gap: 28px;
+}
+
+.fields-panel {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.form-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+	.form-field.half {
+		flex: 1 1 calc(50% - 8px);
+		min-width: 260px;
+	}
+
+	.form-field.full {
+		flex: 1 1 100%;
+	}
+
+.label {
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+/* Merge: textarea.input specifics */
+textarea.input {
+	min-height: 100px;
+	padding: 10px 12px;
+}
+
+/* Input group prefix */
+.input-group {
+	position: relative;
+}
+
+	.input-group .prefix {
+		position: absolute;
+		left: 10px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.input-group .input {
+		padding-left: 28px;
+	}
+
+.validation-summary, .field-error {
+	color: #ffb3b3;
+}
+
+.validation-summary {
+	margin: 10px 32px 0;
+	font-size: 14px;
+}
+
+.field-error {
+	font-size: 12px;
+}
+
+.form-actions {
+	margin-top: 16px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+/* Buttons: additional ghost style preserved */
+.btn-ghost {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	color: #fff;
+}
+
+	.btn-ghost:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.34);
+		color: #fff;
+	}
+
+.sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0000);
+	border: 0;
+}
+
+@media (max-width: 960px) {
+	.card-body {
+		flex-wrap: wrap;
+	}
+}

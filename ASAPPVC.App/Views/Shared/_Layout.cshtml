@@ -26,7 +26,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - ASAPPVC.UI</title>
+	<title>@ViewData["Title"] - ASAPPVC</title>
 
 	<!-- Fonts for site.css (Montserrat) -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,7 +86,7 @@
 				</section>
 
 				<a class="sb-item @(IsActive(area, controller, null, "Order") ? "active" : "")"
-				   asp-area="" asp-controller="Order" asp-action="ViewOrders">
+				   asp-area="" asp-controller="Orders" asp-action="Index">
 					<span class="sb-icon">🚚</span><span class="sb-label">Manage Orders</span>
 				</a>
 			</nav>

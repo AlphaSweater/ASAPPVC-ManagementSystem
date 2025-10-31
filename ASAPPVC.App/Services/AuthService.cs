@@ -13,6 +13,9 @@ namespace ASAPPVC.App.Services
         Task<IdentityResult> RegisterAsync(RegisterViewModel model);
 
         Task LogoutAsync();
+
+        // Returns the current authenticated user's Id or null when not available
+        Task<Guid?> GetCurrentUserIdAsync(CancellationToken ct = default);
     }
 
     #endregion Interface
@@ -24,10 +27,13 @@ namespace ASAPPVC.App.Services
 
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly IHttpContextAccessor? _http;
+
+        public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IHttpContextAccessor? httpContextAccessor = null)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _http = httpContextAccessor;
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
@@ -72,6 +78,33 @@ namespace ASAPPVC.App.Services
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Returns the current authenticated user's Guid Id, or null if not available
+        public Task<Guid?> GetCurrentUserIdAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                var ctx = _http?.HttpContext;
+                var user = ctx?.User;
+                if (user == null)
+                    return Task.FromResult<Guid?>(null);
+
+                // Use UserManager helper to get the id string (works with Identity types)
+                var idStr = _userManager.GetUserId(user);
+                if (string.IsNullOrWhiteSpace(idStr))
+                    return Task.FromResult<Guid?>(null);
+
+                if (Guid.TryParse(idStr, out var gid))
+                    return Task.FromResult<Guid?>(gid);
+
+                return Task.FromResult<Guid?>(null);
+            }
+            catch
+            {
+                return Task.FromResult<Guid?>(null);
+            }
         }
     }
 }

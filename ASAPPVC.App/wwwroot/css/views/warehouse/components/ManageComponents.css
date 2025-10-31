@@ -149,3 +149,198 @@ html, body {
 .table-section {
 	overflow-x: auto;
 }
+
+/* ---------- Styles moved from ManageComponents.cshtml (scoped) ---------- */
+.manage-components {
+	/* ensure top-level page styles apply when manage-components class is present */
+}
+
+	.manage-components .page {
+		display: block;
+	}
+
+	.manage-components .card-header {
+		background-color: transparent;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 20px 28px;
+		border-bottom: 1px solid var(--text-muted);
+	}
+
+	.manage-components .card-title {
+		margin: 0;
+		font-size: 26px;
+		font-weight: 800;
+		color: #fff;
+	}
+
+	.manage-components .card-subtitle {
+		margin-top: 4px;
+		font-size: 14px;
+		color: var(--text-muted);
+	}
+
+	.manage-components .card-actions {
+		display: flex;
+		gap: 10px;
+	}
+
+	.manage-components .card-body {
+		padding: 24px 32px;
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: flex-start;
+		gap: 28px;
+	}
+
+	.manage-components .fields-panel {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+
+	.manage-components .form-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.manage-components .form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+		.manage-components .form-field.half {
+			flex: 1 1 calc(50% - 8px);
+			min-width: 260px;
+		}
+
+		.manage-components .form-field.full {
+			flex: 1 1 100%;
+		}
+
+	.manage-components .label {
+		font-size: 13px;
+		color: var(--text-muted);
+	}
+
+	.manage-components .input,
+	.manage-components select.input,
+	.manage-components textarea.input {
+		height: 42px;
+		padding: 0 12px;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, .08);
+		border: 1px solid rgba(255, 255, 255, .22);
+		color: #fff;
+		outline: none;
+		transition: background .2s, border-color .2s, box-shadow .2s;
+	}
+
+	.manage-components textarea.input {
+		min-height: 100px;
+		padding: 10px 12px;
+	}
+
+	.manage-components .input::placeholder {
+		color: rgba(255, 255, 255, .55);
+	}
+
+	.manage-components .input:focus {
+		background: rgba(255, 255, 255, .12);
+		border-color: rgba(255, 255, 255, .45);
+		box-shadow: 0 3px rgba(255, 255, 255, .08);
+	}
+
+	.manage-components .input-group {
+		position: relative;
+	}
+
+		.manage-components .input-group .prefix {
+			position: absolute;
+			left: 10px;
+			top: 0;
+			bottom: 0;
+			display: flex;
+			align-items: center;
+			font-weight: 700;
+			color: rgba(255, 255, 255, .9);
+		}
+
+		.manage-components .input-group .input {
+			padding-left: 28px;
+		}
+
+	.manage-components .validation-summary,
+	.manage-components .field-error {
+		color: #ffb3b3;
+	}
+
+	.manage-components .validation-summary {
+		margin: 10px 32px 0;
+		font-size: 14px;
+	}
+
+	.manage-components .field-error {
+		font-size: 12px;
+	}
+
+	.manage-components .form-actions {
+		margin-top: 16px;
+		display: flex;
+		justify-content: flex-end;
+		gap: 12px;
+	}
+
+	.manage-components .btn {
+		border-radius: 999px;
+		padding: 10px 18px;
+		font-weight: 700;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		cursor: pointer;
+		transition: all .2s ease;
+	}
+
+	.manage-components .btn-primary {
+		color: #fff;
+		border: none;
+		box-shadow: 0 1px 12px rgba(255, 82, 82, .4);
+	}
+
+		.manage-components .btn-primary:hover {
+			filter: brightness(1.08);
+			box-shadow: 0 2px 20px rgba(255, 82, 82, .55);
+		}
+
+	.manage-components .btn-ghost {
+		background: transparent;
+		border: 1px solid rgba(255, 255, 255, .12);
+		color: #fff;
+	}
+
+		.manage-components .btn-ghost:hover {
+			background: rgba(255, 255, 255, .08);
+			border-color: rgba(255, 255, 255, .34);
+			color: #fff;
+		}
+
+	.manage-components .sr-only {
+		position: absolute !important;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		border: 0;
+	}
+
+@media (max-width: 960px) {
+	.manage-components .card-body {
+		flex-wrap: wrap;
+	}
+}

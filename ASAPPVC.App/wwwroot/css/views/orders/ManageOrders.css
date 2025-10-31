@@ -1,0 +1,168 @@
+﻿/* ManageOrders page specific styles
+ Copied and adapted from Warehouse/Products/ManageProducts.css
+ and simplified for Orders view. */
+
+/* ---------- Root & Variables ---------- */
+:root {
+	--primary-red: #d62828;
+	--primary-blue: #0d47a1;
+	--hover-red: #e03a3a;
+	--text-light: #ffffff;
+	--text-muted: rgba(255,255,255,0.8);
+	--accent-orange: #ef4723;
+}
+
+/* ---------- Base & Layout ---------- */
+* {
+	box-sizing: border-box;
+}
+
+.page {
+	display: block;
+}
+
+.card-header {
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: #fff;
+}
+
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: rgba(255,255,255,0.8);
+}
+
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.card-body {
+	padding: 24px 32px;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	gap: 28px;
+}
+
+.fields-panel {
+	flex: 11 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+/* ---------- Buttons & Inputs ---------- */
+.actions {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	white-space: nowrap;
+}
+
+.btn {
+	height: 44px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 16px;
+	cursor: pointer;
+	border: none;
+	transition: all .2s ease;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+	.btn:active {
+		transform: scale(0.98);
+	}
+
+	.btn.btn-sm {
+		height: 36px;
+		padding: 0 16px;
+		font-size: 14px;
+	}
+
+.btn-primary {
+	background: var(--primary-red);
+	color: var(--text-light);
+}
+
+	.btn-primary:hover {
+		background: var(--hover-red);
+	}
+
+.btn-secondary {
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255,255,255,0.4);
+}
+
+	.btn-secondary:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
+	}
+
+.btn-ghost {
+	background: transparent;
+	border: 1px solid rgba(255,255,255,0.12);
+	color: #fff;
+}
+
+	.btn-ghost:hover {
+		background: rgba(255,255,255,0.08);
+		border-color: rgba(255,255,255,0.34);
+		color: #fff;
+	}
+
+/* ---------- Alerts ---------- */
+.alert {
+	padding: 16px 20px;
+	border-radius: 8px;
+	margin-bottom: 24px;
+	background: rgba(76,175,80,0.2);
+	border: 1px solid rgba(76,175,80,0.5);
+	color: var(--text-light);
+	font-size: 15px;
+}
+
+/* ---------- Table overrides (works with fancy-tables.css) ---------- */
+.table-section {
+	overflow-x: auto;
+}
+
+.ft-center {
+	text-align: center;
+}
+
+.ft-left {
+	text-align: left;
+}
+
+.text-end, .ft-right, .ft-number {
+	text-align: right;
+}
+
+/* Small responsive tweaks */
+@media (max-width:960px) {
+	.card-body {
+		flex-wrap: wrap;
+	}
+
+	.fancy-table {
+		min-width: 0;
+	}
+}
