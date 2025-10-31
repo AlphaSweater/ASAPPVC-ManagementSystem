@@ -1,4 +1,4 @@
-﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Services;
 using FluentAssertions;
@@ -10,11 +10,17 @@ namespace ASAPPVC.UnitTests.Services
     {
         private readonly Mock<IComponentRepository> _repo = new();
         private readonly Mock<IComponentMapper> _mapper = new();
+        private readonly Mock<IStockAlertServices> _stockAlertServices = new();
+        private readonly ILogger<ComponentService> _logger = new Mock<ILogger<ComponentService>>().Object;
         private readonly ComponentService _sut;
 
         public ComponentServiceTests()
         {
-            _sut = new ComponentService(_repo.Object, _mapper.Object);
+            _sut = new ComponentService(
+                _repo.Object, 
+                _mapper.Object, 
+                _stockAlertServices.Object, 
+                _logger);
         }
 
         // ---------------- Create: Invalid VM ----------------
