@@ -70,19 +70,15 @@ namespace ASAPPVC.App.Models
                     string? normalizedLocationNote = Normalize(value); // trim or null
                     context.InstanceToValidate.LocationNote = normalizedLocationNote; // keep null allowed
                     if (normalizedLocationNote is { Length: > 100 })
-                        context.AddFailure("Location note must be100 characters or fewer.");
+                        context.AddFailure("Location note must be 100 characters or fewer.");
                 });
 
-            // ---------- Reorder ----------
+            // ---------- Reorder Level ----------
             RuleFor(vm => vm.ReorderLevel)
-                .GreaterThanOrEqualTo(0m).WithMessage("Reorder level cannot be negative.");
-
-            RuleFor(vm => vm.ReorderLevel)
-                .GreaterThanOrEqualTo(0m).WithMessage("Reorder level cannot be negative.");
-
-            RuleFor(vm => vm)
-                .Must(model => !(model.ReorderLevel > 0m && model.ReorderLevel <= 0m))
-                .WithMessage("Reorder level should be greater than 0 when a reorder level is set.");
+                .GreaterThanOrEqualTo(0m).WithMessage("Reorder level cannot be negative.")
+                .LessThan(MaxDecimal).WithMessage($"Reorder level must be less than {MaxDecimal:N0}.")
+                .Must((vm, reorderLevel) => !IsIntegerOnlyUnit(vm.UnitOfMeasure) || reorderLevel == decimal.Floor(reorderLevel))
+                .WithMessage("This unit does not allow fractional reorder levels.");
 
             // ---------- Edit-only (normalize code first) ----------
             RuleFor(vm => vm.ComponentCode)

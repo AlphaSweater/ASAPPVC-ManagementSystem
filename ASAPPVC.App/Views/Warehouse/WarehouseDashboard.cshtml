@@ -1,3 +1,4 @@
+@model ASAPPVC.App.ViewModels.Warehouse.WarehouseDashVm
 @{
     ViewData["Title"] = "Warehouse • Dashboard";
 }
@@ -22,19 +23,19 @@
                 <section class="kpis-grid" aria-label="Key statistics">
                     <div class="kpi-card">
                         <div class="kpi-label">Products</div>
-                        <div class="kpi-value">—</div>
+                        <div class="kpi-value">@Model.ProductCount</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Components</div>
-                        <div class="kpi-value">—</div>
+                        <div class="kpi-value">@Model.ComponentCount</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Open Orders</div>
-                        <div class="kpi-value">—</div>
+                        <div class="kpi-value">@Model.OpenOrdersCount</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Low Stock</div>
-                        <div class="kpi-value">—</div>
+                        <div class="kpi-value">@Model.LowStockCount</div>
                     </div>
                 </section>
 
@@ -85,7 +86,7 @@
                         <span class="btn btn-primary">Start</span>
                     </a>
 
-                    <a class="action-card" asp-area="" asp-controller="Order" asp-action="ViewOrders">
+                    <a class="action-card" asp-area="" asp-controller="Orders" asp-action="Index">
                         <div class="icon">🗂️</div>
                         <div class="text">
                             <h2>View Orders</h2>
@@ -94,7 +95,7 @@
                         <span class="btn btn-primary">Open</span>
                     </a>
 
-                    <a class="action-card" asp-area="" asp-controller="Order" asp-action="AddOrder">
+                    <a class="action-card" asp-area="" asp-controller="Orders" asp-action="AddNew">
                         <div class="icon">🧾</div>
                         <div class="text">
                             <h2>Create Order</h2>

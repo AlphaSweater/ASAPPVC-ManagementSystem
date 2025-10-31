@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -38,7 +37,16 @@ namespace ASAPPVC.App.Models.Validation
 
                     if (ctx.Controller is Controller c)
                     {
-                        ctx.Result = c.View(ctx.RouteData.Values["action"]?.ToString(), arg);
+                        // Check for ValidateWithViewAttribute first
+                        var viewName = ctx.ActionDescriptor.EndpointMetadata
+                            .OfType<ValidateWithViewAttribute>()
+                            .FirstOrDefault()?.ViewName;
+
+                        // Fallback to TempData or action name
+                        viewName ??= c.TempData["ValidationViewName"] as string
+                            ?? ctx.RouteData.Values["action"]?.ToString();
+
+                        ctx.Result = c.View(viewName, arg);
                     }
                     else
                     {
@@ -49,6 +57,21 @@ namespace ASAPPVC.App.Models.Validation
             }
 
             await next();
+        }
+    }
+
+    /// <summary>
+    /// Specifies the view name to use when validation fails in an action.
+    /// Used by ValidationActionFilter to return the correct view with model errors.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public sealed class ValidateWithViewAttribute : Attribute
+    {
+        public string ViewName { get; }
+
+        public ValidateWithViewAttribute(string viewName)
+        {
+            ViewName = viewName ?? throw new ArgumentNullException(nameof(viewName));
         }
     }
 }

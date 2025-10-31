@@ -35,11 +35,11 @@
 						<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Inactive")</span>
 					</label>
 				}
-				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
+				<a asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
 			</div>
 		</header>
 
-		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" novalidate class="fxg-f-col fxg-u-gap-6">
+		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" class="fxg-f-col fxg-u-gap-6">
 			@Html.AntiForgeryToken()
 
 			<input asp-for="Id" type="hidden" />
