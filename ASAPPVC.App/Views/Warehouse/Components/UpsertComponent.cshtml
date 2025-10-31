@@ -7,19 +7,149 @@
 
 	string placeholder = Url.Content("~/Assets/Images/placeholder.png");
 	string startImg = !string.IsNullOrWhiteSpace(Model?.ExistingImageUrl)
-		? Model.ExistingImageUrl
+		? Model.ExistingImageUrl!
 		: placeholder;
 }
 
 @section Styles {
 	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/UpsertComponent.css" asp-append-version="true" />
+	<style>
+		/* ================= Joined Unit + Quantity control ================= */
+		.unitqty {
+			display: flex;
+			align-items: stretch;
+			width: 100%;
+		}
+
+			.unitqty .unit-select,
+			.unitqty .qty-input {
+				height: 42px;
+				border: 1px solid rgba(255,255,255,.22);
+				background: rgba(255,255,255,.08);
+				color: #fff;
+				outline: none;
+				transition: background .2s, border-color .2s, box-shadow .2s;
+			}
+
+			.unitqty .unit-select { /* left chip */
+				min-width: 140px;
+				max-width: 200px;
+				border-right: 0;
+				border-radius: 10px 0 0 10px;
+				padding: 0 12px;
+			}
+
+			.unitqty .qty-input { /* right numeric */
+				flex: 1 1 auto;
+				border-radius: 0 10px 10px 0;
+				padding: 0 12px;
+			}
+
+			.unitqty:focus-within .unit-select,
+			.unitqty:focus-within .qty-input {
+				background: rgba(255,255,255,.12);
+				border-color: rgba(255,255,255,.45);
+				box-shadow: 0 0 0 3px rgba(255,255,255,.08);
+			}
+
+		/* ================= Section grouping ================= */
+		.sections {
+			display: grid;
+			gap: 16px;
+		}
+
+		.section-card {
+			border: 1px solid var(--glass-border, rgba(255,255,255,.15));
+			border-radius: 16px;
+			padding: 16px;
+			background: rgba(255,255,255,.04);
+		}
+
+		.section-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 10px;
+		}
+
+		.section-title {
+			font-weight: 700;
+			color: #fff;
+			font-size: 14px;
+			letter-spacing: .4px;
+			text-transform: uppercase;
+		}
+
+		.section-grid {
+			display: grid;
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.col-12 {
+			grid-column: span 12
+		}
+
+		.col-8 {
+			grid-column: span 8
+		}
+
+		.col-6 {
+			grid-column: span 6
+		}
+
+		.col-4 {
+			grid-column: span 4
+		}
+
+		.col-3 {
+			grid-column: span 3
+		}
+
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			gap: 6px
+		}
+
+		.label {
+			font-size: 13px;
+			color: var(--text-muted, rgba(255,255,255,.75))
+		}
+
+		.input, select.input, textarea.input {
+			height: 42px;
+			padding: 0 12px;
+			border-radius: 10px;
+			background: rgba(255,255,255,.08);
+			border: 1px solid rgba(255,255,255,.22);
+			color: #fff;
+			outline: none
+		}
+
+		textarea.input {
+			height: 96px;
+			padding: 10px 12px;
+			resize: vertical
+		}
+
+		@@media (max-width: 960px) {
+			.section-grid {
+				grid-template-columns: repeat(6, minmax(0, 1fr));
+			}
+
+			.col-md-12 {
+				grid-column: span 6
+			}
+		}
+	</style>
 }
 
 <div class="page">
 	@await Html.PartialAsync("_BackButton")
 
-	<div class="" role="region" aria-labelledby="page-title">
+	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
 				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
@@ -33,26 +163,19 @@
 						<form id="activeToggleForm" style="margin:0">
 							<input asp-for="IsActive" id="IsActiveHeader" type="checkbox" style="display:none;" />
 							<label for="IsActiveHeader" id="IsActiveLabel" class="btn btn-secondary" role="button" aria-pressed="@(Model?.IsActive == true ? "true" : "false")">
-								<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Discontinued")</span>
+								<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Inactive")</span>
 							</label>
 						</form>
 					</div>
 				}
 
-				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">
-					🏷️ Components
-				</a>
+				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
 			</div>
 		</header>
 
 		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-		<form asp-area="Warehouse"
-			  asp-controller="Components"
-			  asp-action="Upsert"
-			  method="post"
-			  enctype="multipart/form-data"
-			  novalidate>
+		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" novalidate>
 			@Html.AntiForgeryToken()
 
 			<!-- Upsert essentials -->
@@ -65,92 +188,116 @@
 				<!-- Image panel -->
 				<section class="media-panel">
 					<h2 class="sr-only">Component Image</h2>
-
 					<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
 						<img id="previewImg" src="@startImg" alt="Preview" />
-						<div class="dropzone-overlay">
-							📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span>
-						</div>
+						<div class="dropzone-overlay">📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span></div>
 					</label>
-
 					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
 					<span asp-validation-for="Image" class="field-error"></span>
-
-					@* Optionally display read-only code on edit *@
 					@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
 					{
-						<div class="meta">
-							<small class="muted">Code: <strong>@Model.ComponentCode</strong></small>
-						</div>
+						<div class="meta"><small class="muted">Code: <strong>@Model.ComponentCode</strong></small></div>
 					}
 				</section>
 
-				<!-- Fields -->
-				<section class="fields-panel">
-					<div class="form-grid">
-						<div class="form-field half">
-							<label asp-for="ComponentName" class="label"></label>
-							<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
-							<span asp-validation-for="ComponentName" class="field-error"></span>
-						</div>
+				<!-- Right side fields -->
+				<section class="fields-panel" style="min-width:0;flex:1 1 auto;">
+					<div class="sections">
 
-						<div class="form-field half">
-							<label asp-for="LocationCode" class="label"></label>
-							<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
-							<span asp-validation-for="LocationCode" class="field-error"></span>
-						</div>
-
-						<div class="form-field half">
-							<label asp-for="UnitCost" class="label"></label>
-							<div class="input-group">
-								<span class="prefix">R</span>
-								<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
+						<!-- Identification -->
+						<div class="section-card">
+							<div class="section-head"><div class="section-title">Identification</div></div>
+							<div class="section-grid">
+								<div class="form-field col-8 col-md-12">
+									<label asp-for="ComponentName" class="label"></label>
+									<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
+									<span asp-validation-for="ComponentName" class="field-error"></span>
+								</div>
+								<div class="form-field col-4 col-md-12">
+									<label asp-for="LocationCode" class="label"></label>
+									<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
+									<span asp-validation-for="LocationCode" class="field-error"></span>
+								</div>
 							</div>
-							<span asp-validation-for="UnitCost" class="field-error"></span>
 						</div>
 
-						<div class="form-field half">
-							<label asp-for="QuantityOnHand" class="label"></label>
-							<input asp-for="QuantityOnHand" class="input" type="number" min="0" placeholder="e.g. 100" />
-							<span asp-validation-for="QuantityOnHand" class="field-error"></span>
+						<!-- Classification -->
+						<div class="section-card">
+							<div class="section-head"><div class="section-title">Classification</div></div>
+							<div class="section-grid">
+								<div class="form-field col-6 col-md-12">
+									<label asp-for="MaterialType" class="label"></label>
+									<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
+									<span asp-validation-for="MaterialType" class="field-error"></span>
+								</div>
+								<div class="form-field col-6 col-md-12">
+									<label asp-for="ColourOption" class="label"></label>
+									<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
+									<span asp-validation-for="ColourOption" class="field-error"></span>
+								</div>
+							</div>
 						</div>
 
-						<div class="form-field half">
-							<label asp-for="MaterialType" class="label"></label>
-							<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
-							<span asp-validation-for="MaterialType" class="field-error"></span>
+						<!-- Stock & Units (Joined control) -->
+						<div class="section-card">
+							<div class="section-head"><div class="section-title">Stock & Units</div></div>
+							<div class="section-grid">
+								<div class="form-field col-6 col-md-12">
+									<label class="label">@Html.DisplayNameFor(m => m.UnitOfMeasure) &nbsp;/&nbsp; @Html.DisplayNameFor(m => m.QuantityOnHand)</label>
+									<div class="unitqty" role="group" aria-label="Unit of measure and quantity on hand">
+										<select asp-for="UnitOfMeasure" class="unit-select" asp-items="Html.GetEnumSelectList<Unit>()"></select>
+										<input asp-for="QuantityOnHand" class="qty-input" type="number" min="0" step="0.0001" placeholder="e.g. 100" />
+									</div>
+									<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
+									<span asp-validation-for="QuantityOnHand" class="field-error"></span>
+								</div>
+								<div class="form-field col-6 col-md-12">
+									<label asp-for="ReorderLevel" class="label"></label>
+									<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
+									<span asp-validation-for="ReorderLevel" class="field-error"></span>
+								</div>
+							</div>
 						</div>
 
-						<div class="form-field half">
-							<label asp-for="ColourOption" class="label"></label>
-							<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
-							<span asp-validation-for="ColourOption" class="field-error"></span>
+						<!-- Pricing -->
+						<div class="section-card">
+							<div class="section-head"><div class="section-title">Pricing</div></div>
+							<div class="section-grid">
+								<div class="form-field col-6 col-md-12">
+									<label asp-for="UnitCost" class="label"></label>
+									<div class="input-group">
+										<span class="prefix">R</span>
+										<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
+									</div>
+									<span asp-validation-for="UnitCost" class="field-error"></span>
+								</div>
+								<div class="form-field col-6 col-md-12">
+									<label asp-for="IsActive" class="label">Status</label>
+									<select asp-for="IsActive" class="input">
+										<option value="true">Active</option>
+										<option value="false">Inactive</option>
+									</select>
+									<span asp-validation-for="IsActive" class="field-error"></span>
+								</div>
+							</div>
 						</div>
 
-						<div class="form-field full">
-							<label asp-for="LocationNote" class="label"></label>
-							<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
-							<span asp-validation-for="LocationNote" class="field-error"></span>
+						<!-- Storage Note -->
+						<div class="section-card">
+							<div class="section-head"><div class="section-title">Storage Notes</div></div>
+							<div class="section-grid">
+								<div class="form-field col-12">
+									<label asp-for="LocationNote" class="label"></label>
+									<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
+									<span asp-validation-for="LocationNote" class="field-error"></span>
+								</div>
+							</div>
 						</div>
 
-						<div class="form-field half">
-							<label asp-for="UnitOfMeasure" class="label"></label>
-							<select asp-for="UnitOfMeasure" class="input" asp-items="Html.GetEnumSelectList<Unit>()"></select>
-							<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
+						<div class="form-actions" style="margin-top:4px;">
+							<button type="submit" class="btn btn-primary">@(isEdit ? "Save Changes" : "Save Component")</button>
+							<button type="reset" class="btn btn-ghost">Reset</button>
 						</div>
-
-						<div class="form-field half">
-							<label asp-for="ReorderLevel" class="label"></label>
-							<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
-							<span asp-validation-for="ReorderLevel" class="field-error"></span>
-						</div>
-					</div>
-
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">
-							@(isEdit ? "Save Changes" : "Save Component")
-						</button>
-						<button type="reset" class="btn btn-ghost">Reset</button>
 					</div>
 				</section>
 			</div>
@@ -172,54 +319,31 @@
 				reader.readAsDataURL(file);
 			};
 
-			// If we already have an existing image (server-set), keep it unless user selects a new one.
-			input.addEventListener('change', () => previewFile(input.files[0]));
+			input?.addEventListener('change', () => previewFile(input.files[0]));
 
-			['dragenter', 'dragover'].forEach(evt =>
-				zone.addEventListener(evt, e => {
-					e.preventDefault();
-					zone.classList.add('is-dragover');
-				})
-			);
+			['dragenter','dragover'].forEach(evt => zone?.addEventListener(evt, e => {e.preventDefault(); zone.classList.add('is-dragover');}));
+			['dragleave','drop'].forEach(evt => zone?.addEventListener(evt, e => {e.preventDefault(); zone.classList.remove('is-dragover');}));
 
-			['dragleave', 'drop'].forEach(evt =>
-				zone.addEventListener(evt, e => {
-					e.preventDefault();
-					zone.classList.remove('is-dragover');
-				})
-			);
-
-			zone.addEventListener('drop', e => {
+			zone?.addEventListener('drop', e => {
 				const file = e.dataTransfer?.files?.[0];
-				if (file) {
-					input.files = e.dataTransfer.files;
-					previewFile(file);
-				}
+				if (file) { input.files = e.dataTransfer.files; previewFile(file); }
 			});
 
-			zone.addEventListener('keydown', e => {
-				if (['Enter', ' '].includes(e.key)) {
-					e.preventDefault();
-					input.click();
-				}
+			zone?.addEventListener('keydown', e => {
+				if (['Enter',' '].includes(e.key)) { e.preventDefault(); input.click(); }
 			});
 
-			// Header active toggle handling (only present on edit pages)
 			const headerCheckbox = document.getElementById('IsActiveHeader');
 			const headerLabel = document.getElementById('IsActiveLabel');
 			const headerText = document.getElementById('IsActiveText');
-
 			if (headerCheckbox && headerLabel && headerText) {
-				// initialize label state
 				const setState = () => {
 					headerLabel.setAttribute('aria-pressed', headerCheckbox.checked ? 'true' : 'false');
 					headerLabel.classList.toggle('btn-primary', headerCheckbox.checked);
 					headerLabel.classList.toggle('btn-secondary', !headerCheckbox.checked);
 					headerText.textContent = headerCheckbox.checked ? 'Active' : 'Inactive';
 				};
-
 				setState();
-
 				headerCheckbox.addEventListener('change', setState);
 			}
 		})();
