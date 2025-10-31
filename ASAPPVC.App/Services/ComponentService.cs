@@ -1,6 +1,8 @@
 using ASAPPVC.App.Models;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
+using ASAPPVC.App.Models.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace ASAPPVC.App.Services
 {
@@ -139,11 +141,13 @@ namespace ASAPPVC.App.Services
     public class ComponentService(
           IComponentRepository componentRepository,
           IComponentMapper componentMapper,
-          IStockAlertServices stockAlertServices) : IComponentService
+          IStockAlertServices stockAlertServices,
+          ILogger<ComponentService> logger) : IComponentService
     {
         private readonly IComponentRepository _components = componentRepository;
         private readonly IComponentMapper _mapper = componentMapper;
         private readonly IStockAlertServices _stockAlerts = stockAlertServices;
+        private readonly ILogger<ComponentService> _logger = logger;
 
         // ---------- Input validation + normalization helpers ----------
 
@@ -253,12 +257,28 @@ namespace ASAPPVC.App.Services
                         return Result<Component>.Fail($"Component code '{vm.ComponentCode}' is already in use.");
                 }
 
+                // Log current values before update
+                _logger.LogDebug("Before update - Qty: {OldQty}, Reorder: {OldReorder}, Status: {OldStatus}", 
+                    existing.QuantityOnHand, existing.ReorderLevel, 
+                    ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel));
+
+                // Capture previous status before applying updates
+                var previousStatus = ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel);
+
                 // Apply changes via mapper (handles image processing if new image uploaded)
                 await _mapper.ApplyUpdateAsync(existing, vm, ct);
 
                 // Persist changes
                 _components.Update(existing);
                 await _components.SaveAsync(ct);
+
+                // Compute new status and notify if it worsened to a tracked level
+                var newStatus = ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel);
+                
+                _logger.LogDebug("After update - Qty: {NewQty}, Reorder: {NewReorder}, Status: {NewStatus}", 
+                    existing.QuantityOnHand, existing.ReorderLevel, newStatus);
+                    
+                await _stockAlerts.NotifyOnUpdateAsync(existing, previousStatus, newStatus, ct);
 
                 return Result<Component>.Success(existing);
             }
