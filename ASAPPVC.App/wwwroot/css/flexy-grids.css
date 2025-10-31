@@ -1,0 +1,447 @@
+﻿/* ======================================
+ FlexyGrids v1.5 — Hybrid Flex + Grid
+ Lightweight, readable utilities for robust, controllable layouts
+ ====================================== */
+/* Tokens: design tokens for spacing, gap, radius, and container width */
+:root {
+	--fxg-space-0: 0;
+	--fxg-space-1: 0.25rem;
+	--fxg-space-2: 0.5rem;
+	--fxg-space-3: 0.75rem;
+	--fxg-space-4: 1rem;
+	--fxg-space-6: 1.5rem;
+	--fxg-space-8: 2rem;
+	--fxg-gap: var(--fxg-space-4);
+	--fxg-radius: 8px;
+	--fxg-container: 80vw;
+}
+
+/* Container: centers content and constrains horizontal width */
+.fxg-u-container {
+	max-width: var(--fxg-container);
+	margin-inline: auto;
+	padding-inline: var(--fxg-space-4);
+	box-sizing: border-box;
+}
+
+/* ----------------------
+ Flex primitives: utilities for flex containers and items
+ ---------------------- */
+.fxg-f-row {
+	display: flex;
+	flex-direction: row;
+	gap: var(--fxg-gap);
+	min-width: 0; /* allow children to shrink */
+}
+
+.fxg-f-col {
+	display: flex;
+	flex-direction: column;
+	gap: var(--fxg-gap);
+	min-height: 0; /* allow children to shrink */
+}
+
+.fxg-f-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+	min-width: 0;
+	min-height: 0;
+	box-sizing: border-box;
+}
+
+/* Flex directions & alignment helpers (apply on flex containers/items) */
+.fxg-f-dir-row {
+	flex-direction: row !important;
+}
+
+.fxg-f-dir-col {
+	flex-direction: column !important;
+}
+
+.fxg-f-main-center {
+	justify-content: center !important;
+}
+
+.fxg-f-main-end {
+	justify-content: flex-end !important;
+}
+
+.fxg-f-main-between {
+	justify-content: space-between !important;
+}
+
+.fxg-f-main-around {
+	justify-content: space-around !important;
+}
+
+.fxg-f-main-evenly {
+	justify-content: space-evenly !important;
+}
+
+.fxg-f-cross-start {
+	align-items: flex-start !important;
+}
+
+.fxg-f-cross-center {
+	align-items: center !important;
+}
+
+.fxg-f-cross-end {
+	align-items: flex-end !important;
+}
+
+.fxg-f-cross-stretch {
+	align-items: stretch !important;
+}
+
+/* Flex wrapping and growth utilities */
+.fxg-f-wrap {
+	flex-wrap: wrap;
+}
+
+.fxg-f-nowrap {
+	flex-wrap: nowrap;
+}
+/* corrected flex shorthand values for predictable growth */
+.fxg-f-grow-0 {
+	flex: 0 0 auto;
+}
+
+.fxg-f-grow-1 {
+	flex: 1 1 0;
+}
+
+.fxg-f-grow-2 {
+	flex: 2 1 0;
+}
+
+.fxg-f-grow-3 {
+	flex: 3 1 0;
+}
+
+.fxg-f-grow-4 {
+	flex: 4 1 0;
+}
+
+/* ----------------------
+ Grid primitives: utilities for CSS Grid containers and items
+ ---------------------- */
+.fxg-g-grid {
+	display: grid;
+	gap: var(--fxg-gap);
+}
+
+/* Grid column helpers (unchanged) */
+.fxg-g-cols-1 {
+	grid-template-columns: repeat(1, minmax(0,1fr));
+}
+
+.fxg-g-cols-2 {
+	grid-template-columns: repeat(2, minmax(0,1fr));
+}
+
+.fxg-g-cols-3 {
+	grid-template-columns: repeat(3, minmax(0,1fr));
+}
+
+.fxg-g-cols-4 {
+	grid-template-columns: repeat(4, minmax(0,1fr));
+}
+
+.fxg-g-cols-5 {
+	grid-template-columns: repeat(5, minmax(0,1fr));
+}
+
+.fxg-g-cols-6 {
+	grid-template-columns: repeat(6, minmax(0,1fr));
+}
+
+.fxg-g-cols-12 {
+	grid-template-columns: repeat(12, minmax(0,1fr));
+}
+
+/* Auto-fit responsive cards: use for card lists that should wrap responsively */
+.fxg-g-auto {
+	grid-template-columns: repeat(auto-fit, minmax(var(--fxg-min,240px),1fr));
+}
+
+.fxg-g-auto-180 {
+	--fxg-min: 180px;
+}
+
+.fxg-g-auto-200 {
+	--fxg-min: 200px;
+}
+
+.fxg-g-auto-240 {
+	--fxg-min: 240px;
+}
+
+.fxg-g-auto-250 {
+	--fxg-min: 250px;
+}
+
+.fxg-g-auto-300 {
+	--fxg-min: 300px;
+}
+
+/* Grid alignment helpers */
+.fxg-g-place-items-start {
+	place-items: start;
+}
+
+.fxg-g-place-items-center {
+	place-items: center;
+}
+
+.fxg-g-place-items-end {
+	place-items: end;
+}
+
+.fxg-g-place-content-center {
+	place-content: center;
+}
+
+.fxg-g-place-content-between {
+	place-content: space-between;
+}
+
+/* Grid span utilities (use `span N / span N`) */
+.fxg-g-col-span-1 {
+	grid-column: span1 / span1;
+}
+
+.fxg-g-col-span-2 {
+	grid-column: span2 / span2;
+}
+
+.fxg-g-col-span-3 {
+	grid-column: span3 / span3;
+}
+
+.fxg-g-col-span-4 {
+	grid-column: span4 / span4;
+}
+
+.fxg-g-col-span-6 {
+	grid-column: span6 / span6;
+}
+
+.fxg-g-col-span-12 {
+	grid-column: span12 / span12;
+}
+
+/* Named areas via custom properties: helpful for layout sketches */
+.fxg-g-areas {
+	display: grid;
+	gap: var(--fxg-gap);
+	grid-template-areas: var(--fxg-areas);
+	grid-template-columns: var(--fxg-columns,1fr);
+	grid-template-rows: var(--fxg-rows, auto);
+}
+
+.fxg-g-area {
+	grid-area: var(--fxg-area);
+}
+
+/* ----------------------
+ Spacing & radius: utility classes for gaps, padding and margins
+ ---------------------- */
+.fxg-u-gap-0 {
+	gap: var(--fxg-space-0) !important;
+}
+
+.fxg-u-gap-1 {
+	gap: var(--fxg-space-1) !important;
+}
+
+.fxg-u-gap-2 {
+	gap: var(--fxg-space-2) !important;
+}
+
+.fxg-u-gap-3 {
+	gap: var(--fxg-space-3) !important;
+}
+
+.fxg-u-gap-4 {
+	gap: var(--fxg-space-4) !important;
+}
+
+.fxg-u-gap-6 {
+	gap: var(--fxg-space-6) !important;
+}
+
+.fxg-u-gap-8 {
+	gap: var(--fxg-space-8) !important;
+}
+
+.fxg-u-p-0 {
+	padding: var(--fxg-space-0) !important;
+}
+
+.fxg-u-p-2 {
+	padding: var(--fxg-space-2) !important;
+}
+
+.fxg-u-p-4 {
+	padding: var(--fxg-space-4) !important;
+}
+
+.fxg-u-p-6 {
+	padding: var(--fxg-space-6) !important;
+}
+
+.fxg-u-mt-2 {
+	margin-top: var(--fxg-space-2) !important;
+}
+
+.fxg-u-mt-4 {
+	margin-top: var(--fxg-space-4) !important;
+}
+
+.fxg-u-rounded {
+	border-radius: var(--fxg-radius);
+}
+
+/* Helpers: common small utilities for sizing and simple boxes */
+.fxg-u-box {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: var(--fxg-radius);
+	padding: var(--fxg-space-4);
+}
+
+.fxg-u-w-320 {
+	width: 320px !important;
+}
+
+.fxg-u-min-h-140 {
+	min-height: 140px !important;
+}
+
+.fxg-u-w-full {
+	width: 100%;
+}
+
+.fxg-u-h-full {
+	height: 100%;
+}
+
+.fxg-u-text-center {
+	text-align: center !important;
+}
+
+.fxg-u-min-w-280 {
+	min-width: 280px !important;
+}
+
+.fxg-u-w-fit {
+	width: fit-content !important;
+}
+
+.fxg-u-h-fit {
+	height: fit-content !important;
+}
+
+.fxg-u-min-h-100vh {
+	min-height: 100vh !important;
+}
+
+.fxg-u-min-h-20vh {
+	min-height: 20vh !important;
+}
+
+.fxg-u-max-h-20vh {
+	max-height: 20vh !important;
+}
+
+.flex-hidden {
+	display: none !important;
+}
+
+/* Responsive column utilities: breakpointed grid column helpers */
+@media (min-width:640px) {
+	.fxg-sm-cols-1, .fxg-g-sm-cols-1 {
+		grid-template-columns: repeat(1, minmax(0,1fr));
+	}
+
+	.fxg-sm-cols-2, .fxg-g-sm-cols-2 {
+		grid-template-columns: repeat(2, minmax(0,1fr));
+	}
+
+	.fxg-sm-cols-3, .fxg-g-sm-cols-3 {
+		grid-template-columns: repeat(3, minmax(0,1fr));
+	}
+
+	.fxg-sm-cols-4, .fxg-g-sm-cols-4 {
+		grid-template-columns: repeat(4, minmax(0,1fr));
+	}
+}
+
+@media (min-width:768px) {
+	.fxg-md-cols-2, .fxg-g-md-cols-2 {
+		grid-template-columns: repeat(2, minmax(0,1fr));
+	}
+
+	.fxg-md-cols-3, .fxg-g-md-cols-3 {
+		grid-template-columns: repeat(3, minmax(0,1fr));
+	}
+
+	.fxg-md-cols-4, .fxg-g-md-cols-4 {
+		grid-template-columns: repeat(4, minmax(0,1fr));
+	}
+}
+
+@media (min-width:1024px) {
+	.fxg-lg-cols-2, .fxg-g-lg-cols-2 {
+		grid-template-columns: repeat(2, minmax(0,1fr));
+	}
+
+	.fxg-lg-cols-3, .fxg-g-lg-cols-3 {
+		grid-template-columns: repeat(3, minmax(0,1fr));
+	}
+
+	.fxg-lg-cols-4, .fxg-g-lg-cols-4 {
+		grid-template-columns: repeat(4, minmax(0,1fr));
+	}
+}
+
+@media (min-width:1280px) {
+	.fxg-xl-cols-4, .fxg-g-xl-cols-4 {
+		grid-template-columns: repeat(4, minmax(0,1fr));
+	}
+
+	.fxg-xl-cols-6, .fxg-g-xl-cols-6 {
+		grid-template-columns: repeat(6, minmax(0,1fr));
+	}
+}
+
+/* Minimal color helpers for quick prototyping (optional in production) */
+.fxg-u-bg-red {
+	background: #fee2e2;
+}
+
+.fxg-u-bg-blue {
+	background: #dbeafe;
+}
+
+.fxg-u-bg-green {
+	background: #dcfce7;
+}
+
+.fxg-u-bg-yellow {
+	background: #fef9c3;
+}
+
+.fxg-u-bg-purple {
+	background: #ede9fe;
+}
+
+/* --------------------------------------
+ Quick reference (usage notes)
+ - Flex: use fxg-f-* classes on flex containers/items
+ - Grid: use fxg-g-* classes on grid containers/items
+ - Utilities: fxg-u-* are safe anywhere
+ --------------------------------------*/
