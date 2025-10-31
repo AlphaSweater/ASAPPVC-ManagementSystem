@@ -1,6 +1,6 @@
 using ASAPPVC.App.Data;
 using ASAPPVC.App.Models;
-using ASAPPVC.App.Models.Filters;
+using ASAPPVC.App.Models.Validation;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Services;
 using FluentValidation;
@@ -105,6 +105,7 @@ namespace ASAPPVC.App
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IComponentService, ComponentService>();
+            services.AddScoped<IStockAlertServices, StockAlertServices>();
             services.AddScoped<ICustomerService, CustomerService>();
 
             // Mapper registrations
@@ -135,6 +136,10 @@ namespace ASAPPVC.App
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
+            }
+            else
+            {
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();
