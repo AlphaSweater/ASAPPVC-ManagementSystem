@@ -141,13 +141,11 @@ namespace ASAPPVC.App.Services
     public class ComponentService(
           IComponentRepository componentRepository,
           IComponentMapper componentMapper,
-          IStockAlertServices stockAlertServices,
-          ILogger<ComponentService> logger) : IComponentService
+          IStockAlertServices stockAlertServices) : IComponentService
     {
         private readonly IComponentRepository _components = componentRepository;
         private readonly IComponentMapper _mapper = componentMapper;
         private readonly IStockAlertServices _stockAlerts = stockAlertServices;
-        private readonly ILogger<ComponentService> _logger = logger;
 
         // ---------- Input validation + normalization helpers ----------
 
@@ -257,11 +255,6 @@ namespace ASAPPVC.App.Services
                         return Result<Component>.Fail($"Component code '{vm.ComponentCode}' is already in use.");
                 }
 
-                // Log current values before update
-                _logger.LogDebug("Before update - Qty: {OldQty}, Reorder: {OldReorder}, Status: {OldStatus}", 
-                    existing.QuantityOnHand, existing.ReorderLevel, 
-                    ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel));
-
                 // Capture previous status before applying updates
                 var previousStatus = ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel);
 
@@ -274,9 +267,6 @@ namespace ASAPPVC.App.Services
 
                 // Compute new status and notify if it worsened to a tracked level
                 var newStatus = ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel);
-                
-                _logger.LogDebug("After update - Qty: {NewQty}, Reorder: {NewReorder}, Status: {NewStatus}", 
-                    existing.QuantityOnHand, existing.ReorderLevel, newStatus);
                     
                 await _stockAlerts.NotifyOnUpdateAsync(existing, previousStatus, newStatus, ct);
 

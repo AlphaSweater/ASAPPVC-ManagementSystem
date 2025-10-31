@@ -10,17 +10,12 @@ namespace ASAPPVC.UnitTests.Services
     {
         private readonly Mock<IComponentRepository> _repo = new();
         private readonly Mock<IComponentMapper> _mapper = new();
-        private readonly Mock<IStockAlertServices> _stockAlertServices = new();
-        private readonly ILogger<ComponentService> _logger = new Mock<ILogger<ComponentService>>().Object;
+        private readonly Mock<IStockAlertServices> _stockService = new();
         private readonly ComponentService _sut;
 
         public ComponentServiceTests()
         {
-            _sut = new ComponentService(
-                _repo.Object, 
-                _mapper.Object, 
-                _stockAlertServices.Object, 
-                _logger);
+            _sut = new ComponentService(_repo.Object, _mapper.Object, _stockService.Object);
         }
 
         // ---------------- Create: Invalid VM ----------------
