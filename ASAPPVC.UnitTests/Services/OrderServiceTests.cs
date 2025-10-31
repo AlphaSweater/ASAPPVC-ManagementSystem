@@ -23,8 +23,9 @@ namespace ASAPPVC.UnitTests.Services
                 _products.Object,
                 _mapper.Object,
                 _authService.Object);
+            // Return a non-empty GUID to simulate an authenticated user for create/update tests
             _authService.Setup(a => a.GetCurrentUserIdAsync(It.IsAny<System.Threading.CancellationToken>()))
-                        .ReturnsAsync(Guid.Empty);
+                        .ReturnsAsync(Guid.NewGuid());
         }
 
         // ---------------- Create: Invalid view model returns failure ----------------
@@ -46,7 +47,7 @@ namespace ASAPPVC.UnitTests.Services
                 Products = new List<OrderProductVm> { new() { ProductId = Guid.NewGuid(), Quantity = 1 } }
             };
 
-            _customers.Setup(c => c.GetByIdAsync(vm.CustomerId, true, It.IsAny<System.Threading.CancellationToken>()))
+            _customers.Setup(c => c.GetByIdAsync(vm.CustomerId, true, It.IsAny<CancellationToken>()))
                       .ReturnsAsync((Customer?)null);
 
             var res = await _sut.CreateAsync(vm);
