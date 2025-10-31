@@ -12,11 +12,19 @@ namespace ASAPPVC.UnitTests.Services
         private readonly Mock<ICustomerRepository> _customers = new();
         private readonly Mock<IProductRepository> _products = new();
         private readonly Mock<IOrderMapper> _mapper = new();
+        private readonly Mock<IAuthService> _authService = new();
         private readonly OrderService _sut;
 
         public OrderServiceTests()
         {
-            _sut = new OrderService(_orders.Object, _customers.Object, _products.Object, _mapper.Object);
+            _sut = new OrderService(
+                _orders.Object,
+                _customers.Object,
+                _products.Object,
+                _mapper.Object,
+                _authService.Object);
+            _authService.Setup(a => a.GetCurrentUserIdAsync(It.IsAny<System.Threading.CancellationToken>()))
+                        .ReturnsAsync(Guid.Empty);
         }
 
         // ---------------- Create: Invalid view model returns failure ----------------

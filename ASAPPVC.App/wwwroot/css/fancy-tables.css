@@ -90,7 +90,7 @@
 }
 
 .ft-name {
-	font-weight: 600;
+	font-weight: 500;
 	white-space: nowrap !important;
 	color: var(--ft-text);
 }

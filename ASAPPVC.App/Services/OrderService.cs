@@ -102,12 +102,14 @@ namespace ASAPPVC.App.Services
         IOrderRepository orderRepository,
         ICustomerRepository customerRepository,
         IProductRepository productRepository,
-        IOrderMapper orderMapper) : IOrderService
+        IOrderMapper orderMapper,
+        IAuthService authService) : IOrderService
     {
         private readonly IOrderRepository _orders = orderRepository;
         private readonly ICustomerRepository _customers = customerRepository;
         private readonly IProductRepository _products = productRepository;
         private readonly IOrderMapper _mapper = orderMapper;
+        private readonly IAuthService _auth = authService;
 
         // ---------- Input validation + normalization helpers ----------
 
@@ -190,6 +192,12 @@ namespace ASAPPVC.App.Services
 
             try
             {
+                // Determine current user via auth service
+                var userIdNullable = await _auth.GetCurrentUserIdAsync(ct);
+                if (!userIdNullable.HasValue || userIdNullable.Value == Guid.Empty)
+                    return Result<Order>.Fail("Unable to determine current user.");
+                var userId = userIdNullable.Value;
+
                 // Verify customer exists
                 var customer = await _customers.GetByIdAsync(vm.CustomerId, asNoTracking: true, ct);
                 if (customer is null)
@@ -206,6 +214,9 @@ namespace ASAPPVC.App.Services
 
                 // Map VM to domain entity (mapper handles code generation and order line creation)
                 var order = _mapper.FromFormVm(vm);
+
+                // Set required audit FK
+                order.CreatedByUserId = userId;
 
                 // Persist
                 var added = await _orders.AddAsync(order, ct);
@@ -235,6 +246,12 @@ namespace ASAPPVC.App.Services
 
             try
             {
+                // Determine current user via auth service
+                var userIdNullable = await _auth.GetCurrentUserIdAsync(ct);
+                if (!userIdNullable.HasValue || userIdNullable.Value == Guid.Empty)
+                    return Result<Order>.Fail("Unable to determine current user.");
+                var userId = userIdNullable.Value;
+
                 // Fetch existing order with details (tracking enabled for update)
                 var existing = await _orders.GetByIdOrCodeWithDetailsAsync(vm.Id!.Value, asNoTracking: false, ct: ct);
                 if (existing is null)
@@ -264,6 +281,10 @@ namespace ASAPPVC.App.Services
 
                 // Apply changes via mapper (handles property updates and OrderProducts reconciliation)
                 _mapper.ApplyUpdate(existing, vm);
+
+                // Set updated audit
+                existing.UpdatedByUserId = userId;
+                existing.UpdatedAt = DateTime.UtcNow;
 
                 // Persist changes
                 _orders.Update(existing);
