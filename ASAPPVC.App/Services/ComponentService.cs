@@ -169,7 +169,7 @@ namespace ASAPPVC.App.Services
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
-            if (vm.Id == Guid.Empty)
+            if (!vm.Id.HasValue || vm.Id.Value == Guid.Empty)
                 return Result.Fail("Component ID is required.");
             if (string.IsNullOrWhiteSpace(vm.ComponentCode))
                 return Result.Fail("Component code is required.");
