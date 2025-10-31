@@ -24,7 +24,7 @@ namespace ASAPPVC.UnitTests.Services
                 _mapper.Object,
                 _authService.Object);
             // Return a non-empty GUID to simulate an authenticated user for create/update tests
-            _authService.Setup(a => a.GetCurrentUserIdAsync(It.IsAny<System.Threading.CancellationToken>()))
+            _authService.Setup(a => a.GetCurrentUserIdAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Guid.NewGuid());
         }
 
