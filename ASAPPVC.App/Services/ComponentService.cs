@@ -1,4 +1,4 @@
-﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
 
@@ -138,10 +138,12 @@ namespace ASAPPVC.App.Services
 
     public class ComponentService(
           IComponentRepository componentRepository,
-          IComponentMapper componentMapper) : IComponentService
+          IComponentMapper componentMapper,
+          IStockAlertServices stockAlertServices) : IComponentService
     {
         private readonly IComponentRepository _components = componentRepository;
         private readonly IComponentMapper _mapper = componentMapper;
+        private readonly IStockAlertServices _stockAlerts = stockAlertServices;
 
         // ---------- Input validation + normalization helpers ----------
 
@@ -207,6 +209,9 @@ namespace ASAPPVC.App.Services
                 // Persist
                 var added = await _components.AddAsync(component, ct);
                 await _components.SaveAsync(ct);
+
+                // Fire-and-forget style notification (respecting CancellationToken)
+                await _stockAlerts.NotifyOnCreateAsync(added, ct);
 
                 return Result<Component>.Success(added);
             }
