@@ -7,116 +7,187 @@
 
 	string placeholder = Url.Content("~/Assets/Images/placeholder.png");
 	string startImg = !string.IsNullOrWhiteSpace(Model?.ExistingImageUrl)
-		? Model.ExistingImageUrl
+		? Model.ExistingImageUrl!
 		: placeholder;
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/views/warehouse/components/AddComponent.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/flexy-grids.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/components/UpsertComponent.css" asp-append-version="true" />
 }
 
-<div class="page">
+<div class="page fxg-u-container fxg-u-min-h-20vh">
 	@await Html.PartialAsync("_BackButton")
 
-	<div class="" role="region" aria-labelledby="page-title">
-		<header class="card-header">
-			<div>
+	<div role="region" aria-labelledby="page-title" class="fxg-f-col fxg-u-gap-6">
+		<!-- Header -->
+		<header class="card-header fxg-f-row fxg-f-main-between fxg-f-cross-center fxg-u-p-4 fxg-u-rounded">
+			<div class="fxg-f-col fxg-u-gap-2">
 				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
 				<p class="card-subtitle">Capture or update a stock component with image, cost, and storage details.</p>
 			</div>
 
-			<div class="card-actions">
-				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">
-					🏷️ Components
-				</a>
+			<div class="card-actions fxg-f-row fxg-u-gap-4 fxg-f-cross-center">
+				@if (isEdit)
+				{
+					<div class="status-toggle fxg-f-row fxg-f-cross-center">
+						<input asp-for="IsActive" id="IsActiveHeader" type="checkbox" hidden />
+						<label for="IsActiveHeader" id="IsActiveLabel" class="btn btn-secondary" role="button" aria-pressed="@(Model?.IsActive == true ? "true" : "false")">
+							<span id="IsActiveText">@(Model?.IsActive == true ? "Active" : "Inactive")</span>
+						</label>
+					</div>
+				}
+				<a asp-area="Warehouse" asp-controller="Components" asp-action="Index" class="btn btn-ghost">🏷️ Components</a>
 			</div>
 		</header>
 
-		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
-
-		<form asp-area="Warehouse"
-			  asp-controller="Components"
-			  asp-action="Upsert"
-			  method="post"
-			  enctype="multipart/form-data"
-			  novalidate>
+		<!-- Form -->
+		<form asp-area="Warehouse" asp-controller="Components" asp-action="Upsert" method="post" enctype="multipart/form-data" novalidate
+			  class="fxg-f-col fxg-u-gap-6">
 			@Html.AntiForgeryToken()
 
-			<!-- Upsert essentials -->
+			<!-- Hidden essentials -->
 			<input asp-for="Id" type="hidden" />
 			<input asp-for="IsEdit" type="hidden" value="@(isEdit ? "true" : "false")" />
 			<input asp-for="ComponentCode" type="hidden" />
 			<input asp-for="ExistingImageUrl" type="hidden" />
 
-			<div class="card-body">
-				<!-- Image panel -->
-				<section class="media-panel">
-					<h2 class="sr-only">Component Image</h2>
+			<div class="card-body fxg-f-col fxg-u-gap-6">
+				<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-					<label for="imageFile" class="dropzone" id="dropzone" tabindex="0">
-						<img id="previewImg" src="@startImg" alt="Preview" />
-						<div class="dropzone-overlay">
-							📷 <span><strong>Drop an image</strong> or choose a file<br><small>PNG, JPG, WEBP — up to 5MB</small></span>
-						</div>
-					</label>
+				<!-- Row 1 -->
+				<div class="fxg-f-row fxg-f-nowrap fxg-u-gap-6">
+					<!-- Left: Media column (grow 1) -->
+					<section class="fxg-f-cell media-panel fxg-f-grow-1">
+						<h2 class="sr-only">Component Image</h2>
 
-					<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
-					<span asp-validation-for="Image" class="field-error"></span>
-
-					@* Optionally display read-only code on edit *@
-					@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
-					{
-						<div class="meta">
-							<small class="muted">Code: <strong>@Model.ComponentCode</strong></small>
-						</div>
-					}
-				</section>
-
-				<!-- Fields -->
-				<section class="fields-panel">
-					<div class="form-grid">
-						<div class="form-field half">
-							<label asp-for="ComponentName" class="label"></label>
-							<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
-							<span asp-validation-for="ComponentName" class="field-error"></span>
-						</div>
-
-						<div class="form-field half">
-							<label asp-for="LocationCode" class="label"></label>
-							<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
-							<span asp-validation-for="LocationCode" class="field-error"></span>
-						</div>
-
-						<div class="form-field half">
-							<label asp-for="UnitCost" class="label"></label>
-							<div class="input-group">
-								<span class="prefix">R</span>
-								<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
+						<label for="imageFile" id="dropzone"
+							   class="dropzone fxg-f-col fxg-f-main-center fxg-f-cross-center"
+							   tabindex="0" aria-label="Choose or drop an image">
+							<img id="previewImg" src="@startImg" alt="Component image preview" />
+							<div class="dropzone-overlay">
+								📷 <span><strong>Drop an image</strong> or choose a file<br /><small>PNG, JPG, WEBP — up to 5MB</small></span>
 							</div>
-							<span asp-validation-for="UnitCost" class="field-error"></span>
-						</div>
+						</label>
+						<input id="imageFile" asp-for="Image" type="file" accept="image/*" class="file-input" />
+						<span asp-validation-for="Image" class="field-error"></span>
 
-						<div class="form-field half">
-							<label asp-for="QuantityOnHand" class="label"></label>
-							<input asp-for="QuantityOnHand" class="input" type="number" min="0" placeholder="e.g. 100" />
-							<span asp-validation-for="QuantityOnHand" class="field-error"></span>
-						</div>
+						@if (isEdit && !string.IsNullOrWhiteSpace(Model?.ComponentCode))
+						{
+							<div class="meta"><small class="muted">Code: <strong>@Model.ComponentCode</strong></small></div>
+						}
 
-						<div class="form-field full">
-							<label asp-for="UnitOfMeasure" class="label"></label>
-							<select asp-for="UnitOfMeasure" class="input" asp-items="Html.GetEnumSelectList<Unit>()"></select>
-							<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
-						</div>
+						<noscript>
+							<p class="field-error">Image preview requires JavaScript.</p>
+						</noscript>
+					</section>
+
+					<!-- Right: Content stack (grow 2) -->
+					<div class="fxg-f-cell fxg-f-grow-1 fxg-u-gap-6">
+						<!-- Row 1: Identification -->
+						<section class="section-card fxg-f-col fxg-u-gap-4">
+							<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
+								<div class="section-title">Identification</div>
+							</div>
+							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+								<div class="form-field fxg-f-cell" style="flex: 2 1 360px; min-width: 260px;">
+									<label asp-for="ComponentName" class="label"></label>
+									<input asp-for="ComponentName" class="input" placeholder="e.g. Resistor 10k Ohm" />
+									<span asp-validation-for="ComponentName" class="field-error"></span>
+								</div>
+								<div class="form-field fxg-f-cell" style="flex: 1 1 200px; min-width: 220px;">
+									<label asp-for="LocationCode" class="label"></label>
+									<input asp-for="LocationCode" class="input" placeholder="e.g. Bin A-01" />
+									<span asp-validation-for="LocationCode" class="field-error"></span>
+								</div>
+							</div>
+						</section>
+
+						<!-- Row 1b: Classification -->
+						<section class="section-card fxg-f-col fxg-u-gap-4">
+							<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
+								<div class="section-title">Classification</div>
+							</div>
+							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+								<div class="form-field fxg-f-cell" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="MaterialType" class="label"></label>
+									<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
+									<span asp-validation-for="MaterialType" class="field-error"></span>
+								</div>
+								<div class="form-field fxg-f-cell" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="ColourOption" class="label"></label>
+									<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
+									<span asp-validation-for="ColourOption" class="field-error"></span>
+								</div>
+							</div>
+						</section>
 					</div>
+				</div>
 
-					<div class="form-actions">
-						<button type="submit" class="btn btn-primary">
-							@(isEdit ? "Save Changes" : "Save Component")
-						</button>
-						<button type="reset" class="btn btn-ghost">Reset</button>
+				<!-- Row 2: Stock & Units + Pricing/Status -->
+				<div class="fxg-f-row fxg-f-wrap fxg-u-gap-6">
+					<!-- Stock & Units -->
+					<section class="section-card fxg-f-col fxg-f-cell fxg-u-gap-4" style="flex: 1 1 420px; min-width: 320px;">
+						<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
+							<div class="section-title">Stock &amp; Units</div>
+						</div>
+						<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+							<div class="form-field fxg-f-cell" style="flex: 1 1 300px; min-width: 260px;">
+								<label class="label">
+									@Html.DisplayNameFor(m => m.UnitOfMeasure) &nbsp;/&nbsp; @Html.DisplayNameFor(m => m.QuantityOnHand)
+								</label>
+								<div class="unitqty" role="group" aria-label="Unit of measure and quantity on hand">
+									<select asp-for="UnitOfMeasure" class="unit-select" asp-items="Html.GetEnumSelectList<Unit>()"></select>
+									<input asp-for="QuantityOnHand" class="qty-input" type="number" min="0" step="0.0001" placeholder="e.g. 100" />
+								</div>
+								<span asp-validation-for="UnitOfMeasure" class="field-error"></span>
+								<span asp-validation-for="QuantityOnHand" class="field-error"></span>
+							</div>
+							<div class="form-field fxg-f-cell" style="flex: 1 1 200px; min-width: 220px;">
+								<label asp-for="ReorderLevel" class="label"></label>
+								<input asp-for="ReorderLevel" class="input" step="0.01" min="0" placeholder="0" />
+								<span asp-validation-for="ReorderLevel" class="field-error"></span>
+							</div>
+						</div>
+					</section>
+
+					<!-- Pricing / Status -->
+					<section class="section-card fxg-f-col fxg-f-cell fxg-u-gap-4" style="flex: 1 1 420px; min-width: 320px;">
+						<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
+							<div class="section-title">Pricing</div>
+						</div>
+						<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+							<div class="form-field fxg-f-cell" style="flex: 1 1 100%; min-width: 260px;">
+								<label asp-for="UnitCost" class="label"></label>
+								<div class="input-group">
+									<span class="prefix">R</span>
+									<input asp-for="UnitCost" class="input" step="0.01" placeholder="15.50" />
+								</div>
+								<span asp-validation-for="UnitCost" class="field-error"></span>
+							</div>
+						</div>
+					</section>
+				</div>
+
+				<!-- Row 3: Storage notes (full width) -->
+				<section class="section-card fxg-f-col fxg-f-cell fxg-u-gap-4" style="flex: 1 1 100%; min-width: 320px;">
+					<div class="section-head fxg-f-row fxg-f-main-between fxg-f-cross-center">
+						<div class="section-title">Storage Notes</div>
+					</div>
+					<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+						<div class="form-field fxg-f-cell" style="flex: 1 1 100%; min-width: 320px;">
+							<label asp-for="LocationNote" class="label"></label>
+							<textarea asp-for="LocationNote" class="input" placeholder="Optional location note (e.g. top shelf)"></textarea>
+							<span asp-validation-for="LocationNote" class="field-error"></span>
+						</div>
 					</div>
 				</section>
+
+				<!-- Row 4: Actions -->
+				<div class="form-actions fxg-f-row fxg-f-main-end fxg-u-gap-4" style="flex: 1 1 100%;">
+					<button type="submit" class="btn btn-primary">@(isEdit ? "Save Changes" : "Save Component")</button>
+					<button type="reset" class="btn btn-ghost">Reset</button>
+				</div>
 			</div>
 		</form>
 	</div>
@@ -136,37 +207,39 @@
 				reader.readAsDataURL(file);
 			};
 
-			// If we already have an existing image (server-set), keep it unless user selects a new one.
-			input.addEventListener('change', () => previewFile(input.files[0]));
-
+			input?.addEventListener('change', () => previewFile(input.files[0]));
 			['dragenter', 'dragover'].forEach(evt =>
-				zone.addEventListener(evt, e => {
-					e.preventDefault();
-					zone.classList.add('is-dragover');
-				})
+				zone?.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('is-dragover'); })
 			);
-
 			['dragleave', 'drop'].forEach(evt =>
-				zone.addEventListener(evt, e => {
-					e.preventDefault();
-					zone.classList.remove('is-dragover');
-				})
+				zone?.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('is-dragover'); })
 			);
-
-			zone.addEventListener('drop', e => {
+			zone?.addEventListener('drop', e => {
 				const file = e.dataTransfer?.files?.[0];
-				if (file) {
-					input.files = e.dataTransfer.files;
-					previewFile(file);
-				}
+				if (file) { input.files = e.dataTransfer.files; previewFile(file); }
+			});
+			zone?.addEventListener('keydown', e => {
+				if (['Enter', ' '].includes(e.key)) { e.preventDefault(); input.click(); }
 			});
 
-			zone.addEventListener('keydown', e => {
-				if (['Enter', ' '].includes(e.key)) {
-					e.preventDefault();
-					input.click();
-				}
-			});
+			// Header status toggle sync -> Status <select>
+			const headerCheckbox = document.getElementById('IsActiveHeader');
+			const headerLabel = document.getElementById('IsActiveLabel');
+			const headerText = document.getElementById('IsActiveText');
+			if (headerCheckbox && headerLabel && headerText) {
+				const setState = () => {
+					headerLabel.setAttribute('aria-pressed', headerCheckbox.checked ? 'true' : 'false');
+					headerLabel.classList.toggle('btn-primary', headerCheckbox.checked);
+					headerLabel.classList.toggle('btn-secondary', !headerCheckbox.checked);
+					headerText.textContent = headerCheckbox.checked ? 'Active' : 'Inactive';
+					const select = document.getElementById('@Html.IdFor(m => m.IsActive)');
+					if (select && select.tagName === 'SELECT') {
+						select.value = headerCheckbox.checked ? 'true' : 'false';
+					}
+				};
+				setState();
+				headerCheckbox.addEventListener('change', setState);
+			}
 		})();
 	</script>
 }

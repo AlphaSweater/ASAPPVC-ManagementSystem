@@ -43,6 +43,18 @@ namespace ASAPPVC.App.Models
         /// creates missing rows and drops lines marked for removal.
         /// </summary>
         List<ProductComponent> ApplyUpdateToBridgeVms(IEnumerable<ProductComponent> existingComponents, Guid productId, IEnumerable<ProductComponentVm> items);
+
+        /// <summary>
+        /// Create a ProductComponentVm from a Component domain entity.
+        /// Optional: provide a productId and an initial requiredQuantity (defaults to 1).
+        /// </summary>
+        ProductComponentVm FromComponent(Component component, Guid productId = default, decimal requiredQuantity = 1m);
+
+        /// <summary>
+        /// Create a ProductComponentVm from a ComponentListVm (lookup/list VM).
+        /// Useful when available components are fetched as list VMs but the UI expects ProductComponentVm entries.
+        /// </summary>
+        ProductComponentVm FromComponentListVm(ComponentListVm listVm, Guid productId = default, decimal requiredQuantity = 1m);
     }
 
     #endregion Interface
@@ -71,6 +83,47 @@ namespace ASAPPVC.App.Models
                 RequiredQuantity = productComponent.RequiredQuantity,
                 UnitCost = productComponent.Component?.UnitCost ?? 0m,
                 Remove = false // Default for display/edit scenarios
+            };
+        }
+
+        /// <summary>
+        /// Map a standalone Component domain entity into a ProductComponentVm.
+        /// If no productId is provided the ProductId will be Guid.Empty.
+        /// </summary>
+        public ProductComponentVm FromComponent(Component component, Guid productId = default, decimal requiredQuantity = 1m)
+        {
+            ArgumentNullException.ThrowIfNull(component);
+
+            return new ProductComponentVm
+            {
+                ProductId = productId,
+                ComponentId = component.Id,
+                ComponentCode = component.ComponentCode ?? string.Empty,
+                ComponentName = component.ComponentName ?? string.Empty,
+                UnitOfMeasure = component.UnitOfMeasure,
+                RequiredQuantity = NormalizeQuantity(requiredQuantity),
+                UnitCost = component.UnitCost,
+                Remove = false
+            };
+        }
+
+        /// <summary>
+        /// Map a ComponentListVm into a ProductComponentVm. Safe for use when available components are returned as list VMs.
+        /// </summary>
+        public ProductComponentVm FromComponentListVm(ComponentListVm listVm, Guid productId = default, decimal requiredQuantity = 1m)
+        {
+            ArgumentNullException.ThrowIfNull(listVm);
+
+            return new ProductComponentVm
+            {
+                ProductId = productId,
+                ComponentId = listVm.Id,
+                ComponentCode = listVm.ComponentCode ?? string.Empty,
+                ComponentName = listVm.ComponentName ?? string.Empty,
+                UnitOfMeasure = listVm.UnitOfMeasure,
+                RequiredQuantity = NormalizeQuantity(requiredQuantity),
+                UnitCost = listVm.UnitCost,
+                Remove = false
             };
         }
 

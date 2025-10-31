@@ -1,0 +1,387 @@
+/* ================================================================
+ UpsertComponent • Cleaned Flexbox form layout (dark-blue friendly)
+ ---------------------------------------------------------------- */
+
+:root {
+	--primary-red: #d62828;
+	--hover-red: #e03a3a;
+	--text-light: #ffffff;
+	--text-muted: rgba(255,255,255,0.8);
+	--glass-border: rgba(255,255,255,0.15);
+}
+
+/* Page container helpers */
+.page {
+	display: block;
+}
+
+/* Media column (left) — used by the view alongside fxg utilities */
+.media-panel {
+	flex: 11320px;
+	max-width: 320px;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	box-sizing: border-box;
+}
+
+	.media-panel .dropzone {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+	}
+
+		.media-panel .dropzone img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+/* Header */
+.card-header {
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid var(--glass-border);
+}
+
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: #fff;
+}
+
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: var(--text-muted);
+}
+
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+/* Card body */
+.card-body {
+	padding: 24px 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+	box-sizing: border-box;
+}
+
+/* Dropzone */
+.dropzone {
+	position: relative;
+	width: 100%;
+	height: 260px;
+	border: 1px dashed var(--glass-border);
+	border-radius: 16px;
+	background: rgba(255,255,255,0.06);
+	display: grid;
+	place-items: center;
+	cursor: pointer;
+	overflow: hidden;
+	transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+	.dropzone:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.35);
+		box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+	}
+
+	.dropzone.is-dragover {
+		transform: scale(1.02);
+		border-color: #fff;
+	}
+
+	.dropzone img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: inherit;
+		opacity: 0.96;
+	}
+
+.dropzone-overlay {
+	position: relative;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-radius: 999px;
+	background: rgba(0,0,0,0.35);
+	backdrop-filter: blur(6px);
+	color: #fff;
+	font-size: 13px;
+	text-align: center;
+}
+
+/* File input hidden */
+.file-input {
+	display: none;
+}
+
+/* Fields panel */
+.fields-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+/* Section card base */
+.section-card {
+	border: 1px solid var(--glass-border);
+	border-radius: 16px;
+	padding: 16px;
+	background: rgba(255,255,255,0.04);
+	box-sizing: border-box;
+}
+
+.section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.section-title {
+	font-weight: 700;
+	color: #fff;
+	font-size: 14px;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+}
+
+/* Section grid uses fxg utilities in markup; keep a lightweight helper for wrapping */
+.section-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+}
+
+/* Form fields */
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.label {
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+/* Inputs */
+.input, select.input, textarea.input {
+	height: 42px;
+	padding: 0 12px;
+	border-radius: 10px;
+	background: rgba(255,255,255,0.08);
+	border: 1px solid rgba(255,255,255,0.22);
+	color: #fff;
+	outline: none;
+	box-sizing: border-box;
+}
+
+textarea.input {
+	height: 96px;
+	padding: 10px 12px;
+	resize: vertical;
+}
+
+.input::placeholder {
+	color: rgba(255,255,255,0.55);
+}
+
+.input:focus {
+	background: rgba(255,255,255,0.12);
+	border-color: rgba(255,255,255,0.45);
+	box-shadow: 0 3px 6px rgba(255,255,255,0.08) inset;
+}
+
+/* Input with currency prefix */
+.input-group {
+	position: relative;
+}
+
+	.input-group .prefix {
+		position: absolute;
+		left: 10px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		font-weight: 700;
+		color: rgba(255,255,255,0.9);
+		pointer-events: none;
+	}
+
+	.input-group .input {
+		padding-left: 34px;
+	}
+
+/* Validation */
+.validation-summary, .field-error {
+	color: #ffb3b3;
+}
+
+.validation-summary {
+	margin: 10px 32px 0;
+	font-size: 14px;
+}
+
+.field-error {
+	font-size: 12px;
+}
+
+/* Buttons */
+.form-actions {
+	margin-top: 16px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+.btn {
+	height: 44px;
+	padding: 0 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 16px;
+	cursor: pointer;
+	border: none;
+	transition: all .2s ease;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+	.btn:active {
+		transform: scale(0.98);
+	}
+
+	.btn.btn-sm {
+		height: 36px;
+		padding: 0 16px;
+		font-size: 14px;
+	}
+
+.btn-primary {
+	background: var(--primary-red);
+	color: var(--text-light);
+}
+
+	.btn-primary:hover {
+		background: var(--hover-red);
+	}
+
+.btn-secondary {
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255,255,255,0.4);
+}
+
+	.btn-secondary:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
+	}
+
+.btn-remove {
+	background: rgba(255,255,255,0.08);
+	color: var(--text-muted);
+	border: 1px solid transparent;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: 50%;
+}
+
+	.btn-remove:hover {
+		background: rgba(255,255,255,0.15);
+		color: var(--text-light);
+	}
+
+.btn-ghost {
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255,255,255,0.4);
+}
+
+	.btn-ghost:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
+		color: var(--text-light);
+	}
+
+/* Accessibility helpers */
+.sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Unit + Quantity control */
+.unitqty {
+	display: flex;
+	align-items: stretch;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+	.unitqty .unit-select,
+	.unitqty .qty-input {
+		height: 42px;
+		border: 1px solid rgba(255,255,255,0.22);
+		background: rgba(255,255,255,0.08);
+		color: #fff;
+		outline: none;
+		transition: background .2s, border-color .2s, box-shadow .2s;
+		box-sizing: border-box;
+	}
+
+	.unitqty .unit-select {
+		min-width: 140px;
+		max-width: 200px;
+		border-right: 0;
+		border-radius: 10px 0 0 10px;
+		padding: 0 12px;
+	}
+
+	.unitqty .qty-input {
+		flex: 11 auto;
+		border-radius: 0 10px 10px 0;
+		padding: 0 12px;
+	}
+
+	.unitqty:focus-within .unit-select,
+	.unitqty:focus-within .qty-input {
+		background: rgba(255,255,255,0.12);
+		border-color: rgba(255,255,255,0.45);
+		box-shadow: 0 3px 6px rgba(255,255,255,0.08) inset;
+	}
+
+/* Responsive tweaks - keep minimal because layout is handled with fxg utilities */
+@media (max-width:960px) {
+	.media-panel {
+		max-width: 420px;
+		width: 100%;
+	}
+}
+
+/* End of file */

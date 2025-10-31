@@ -1,4 +1,4 @@
-@using ASAPPVC.App.ViewModels.Warehouse
+﻿@using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
 	ViewData["Title"] = "Products";
@@ -11,8 +11,6 @@
 }
 
 <div class="page">
-	@await Html.PartialAsync("_BackButton")
-
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
@@ -20,7 +18,7 @@
 				<p class="card-subtitle">Browse, search and manage products in your catalog.</p>
 			</div>
 			<div class="card-actions">
-				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">+ Add Product</a>
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddNew">+ Add Product</a>
 			</div>
 		</header>
 
@@ -40,8 +38,9 @@
 						<table class="fancy-table">
 							<thead>
 								<tr>
+									<th></th>
 									<th class="ft-left ft-shrink">Product Code</th>
-									<th class="ft-left ft-grow">Product</th>
+									<th class="ft-left ft-shrink">Product</th>
 									<th class="ft-left ft-grow">Description</th>
 									<th class="ft-right ft-shrink">Price</th>
 									<th class="ft-center ft-shrink"># Components</th>
@@ -54,8 +53,18 @@
 									foreach (var product in Model.Products)
 									{
 										<tr>
+											<td class="ft-media ft-shrink">
+												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
+												{
+													<img src="@product.ThumbUrl" class="ft-media__img" />
+												}
+												else
+												{
+													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
+												}
+											</td>
 											<td class="ft-code ft-shrink">@product.ProductCode</td>
-											<td class="ft-left ft-grow ft-name">@product.ProductName</td>
+											<td class="ft-name ft-shrink ">@product.ProductName</td>
 											<td class="ft-left ft-grow">@product.Description</td>
 											<td class="ft-money ft-shrink">@product.DisplayPrice</td>
 											<td class="ft-center ft-shrink">@product.ComponentCount</td>
@@ -64,12 +73,12 @@
 													<a class="btn btn-secondary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="ViewProduct"
+													   asp-action="DetailsById"
 													   asp-route-id="@product.Id">View</a>
 													<a class="btn btn-primary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="EditProduct"
+													   asp-action="EditById"
 													   asp-route-id="@product.Id">Edit</a>
 												</div>
 											</td>

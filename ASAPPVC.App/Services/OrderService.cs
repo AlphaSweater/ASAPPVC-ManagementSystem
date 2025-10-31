@@ -75,6 +75,18 @@ namespace ASAPPVC.App.Services
         Task<Result<List<OrderListVm>>> ListAsync(CancellationToken ct = default);
 
         /// <summary>
+        /// Searches orders using a free-text term against order code and customer information.
+        /// </summary>
+        /// <param name="term">
+        /// The search term, which may match part of the order code or customer name/email.
+        /// Case-insensitive. If null or empty, all orders are returned.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Result{T}"/> containing a list of <see cref="OrderListVm"/> instances that match the search criteria.
+        /// </returns>
+        Task<Result<List<OrderListVm>>> SearchAsync(string? term, CancellationToken ct = default);
+
+        /// <summary>
         /// Deletes an order by its internal identifier.
         /// </summary>
         /// <param name="id">The internal GUID identifier of the order to delete.</param>
@@ -329,7 +341,6 @@ namespace ASAPPVC.App.Services
 
                 return Result<Order>.Success(order);
             }
-
             catch (Exception ex)
             {
                 return Result<Order>.Fail($"Failed to retrieve order: {ex.Message}");
@@ -349,6 +360,23 @@ namespace ASAPPVC.App.Services
             catch (Exception ex)
             {
                 return Result<List<OrderListVm>>.Fail($"Failed to list orders: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Searches orders by term (order code, customer name/email, case-insensitive)
+        public async Task<Result<List<OrderListVm>>> SearchAsync(string? term, CancellationToken ct = default)
+        {
+            try
+            {
+                term ??= string.Empty;
+                var orders = await _orders.SearchAsync(term, asNoTracking: true, ct);
+                var listVms = orders.Select(o => _mapper.ToListVm(o)).ToList();
+                return Result<List<OrderListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<OrderListVm>>.Fail($"Failed to search orders: {ex.Message}");
             }
         }
 
@@ -375,4 +403,5 @@ namespace ASAPPVC.App.Services
         }
     }
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\

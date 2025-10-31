@@ -1,0 +1,136 @@
+@using ASAPPVC.App.Models
+@model ProductFormVm
+@{
+	ViewData["Title"] = Model.IsEdit ? "Edit Product" : "Add New Product";
+}
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/views/warehouse/products/UpsertProduct.css" asp-append-version="true" />
+}
+
+<div class="page">
+	@await Html.PartialAsync("_BackButton")
+
+	<div role="region" aria-labelledby="page-title">
+		<header class="card-header">
+			<div>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+				<p class="card-subtitle">Create or edit a product, set price and link components.</p>
+			</div>
+			<div class="card-actions">
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="Index">Products</a>
+			</div>
+		</header>
+
+		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
+
+		<form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="Upsert" method="post" enctype="multipart/form-data">
+			@Html.AntiForgeryToken()
+
+			@if (Model.IsEdit)
+			{
+				<input asp-for="Id" type="hidden" />
+				<input asp-for="ProductCode" type="hidden" />
+			}
+
+			<div class="card-body add-product-body">
+				<!-- Top Section: Image and Form Fields Side by Side -->
+				<div class="form-layout">
+					<!-- Left: Image Upload -->
+					<div class="form-image">
+						<div class="image-box" onclick="document.getElementById('imageFile').click();">
+							<img id="previewImg" src="@(Model.ExistingImageUrl ?? "/Assets/Images/placeholder.png")" alt="Product Image Preview" />
+						</div>
+						<button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
+						<input id="imageFile" name="Image" type="file" accept="image/*" class="hidden-file-input" />
+					</div>
+
+					<!-- Right: Form Fields -->
+					<div class="form-fields">
+						<div class="form-field">
+							<label asp-for="ProductName" class="label"></label>
+							<input asp-for="ProductName" class="input" placeholder="Enter product name" />
+							<span asp-validation-for="ProductName" class="field-error"></span>
+						</div>
+						<div class="form-field">
+							<label asp-for="SellingPrice" class="label"></label>
+							<input asp-for="SellingPrice" class="input" step="0.01" placeholder="e.g. R 299.99" />
+							<span asp-validation-for="SellingPrice" class="field-error"></span>
+						</div>
+						<div class="form-field">
+							<label asp-for="Description" class="label"></label>
+							<textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
+							<span asp-validation-for="Description" class="field-error"></span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Components Section -->
+				<div class="components-section">
+					<div class="parts-card">
+						<div class="parts-header">
+							<h3>Components in this Product</h3>
+
+							<!-- Typeahead add box -->
+							<div class="parts-add">
+								<input id="componentSearch"
+									   class="input"
+									   type="text"
+									   list="componentsList"
+									   placeholder="Search component by name or code…"
+									   autocomplete="off" />
+								<datalist id="componentsList">
+									@foreach (var c in Model.AvailableProductComponents ?? new List<ProductComponentVm>())
+									{
+										// Try to show both code + name if you have them; otherwise just name
+										var name = c.ComponentName ?? c.GetType().GetProperty("Name")?.GetValue(c)?.ToString() ?? "";
+										var code = c.GetType().GetProperty("ComponentCode")?.GetValue(c)?.ToString();
+										var label = string.IsNullOrWhiteSpace(code) ? name : $"{code} — {name}";
+										<option value="@label" data-id="@c.ComponentId"></option>
+									}
+								</datalist>
+
+								<button type="button" id="addComponentBtn" class="btn btn-primary btn-sm">+ Add Component</button>
+							</div>
+						</div>
+
+						<table class="parts-table" id="partsTable">
+							<thead>
+								<tr>
+									<th>Part</th>
+									<th style="width:110px; text-align:center;">Quantity</th>
+									<th class="align-right" style="width:120px;">Unit Price</th>
+									<th class="align-right" style="width:120px;">Subtotal</th>
+									<th style="width:60px;"></th>
+								</tr>
+							</thead>
+							<tbody id="partsTbody"></tbody>
+							<tfoot>
+								<tr>
+									<td colspan="3" class="align-right">Grand Total:</td>
+									<td class="align-right grand-total" id="grandTotal">R0.00</td>
+									<td></td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+
+				<!-- Form Actions at Bottom -->
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Save Product</button>
+					<button type="reset" class="btn btn-ghost">Reset</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<script type="application/json" id="upsert-product-data">
+		@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new { available = Model.AvailableProductComponents ?? new List<ProductComponentVm>(), selected = Model.SelectedProductComponents ?? new List<ProductComponentVm>() }))
+	</script>
+	<script src="~/js/views/warehouse/products/UpsertProduct.js" asp-append-version="true"></script>
+}

@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASAPPVC.App.Models
 {
+    [Index(nameof(Email), IsUnique = true)]
     public class Customer
     {
         // Internal GUID primary key for safe relations
@@ -28,5 +30,11 @@ namespace ASAPPVC.App.Models
         [EmailAddress]
         [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
+
+        // Audit / lifecycle
+
+        public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 }

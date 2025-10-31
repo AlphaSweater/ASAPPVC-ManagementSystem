@@ -89,6 +89,12 @@
 	font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono","Segoe UI Mono",monospace;
 }
 
+.ft-name {
+	font-weight: 600;
+	white-space: nowrap !important;
+	color: var(--ft-text);
+}
+
 /* Grow/Shrink helpers
    - Use .ft-grow on a single main column (e.g., name/description) */
 .fancy-table th.ft-grow,
