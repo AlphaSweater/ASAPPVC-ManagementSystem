@@ -195,6 +195,20 @@
 	box-sizing: border-box;
 }
 
+/* Select dropdown options styling */
+select.input option {
+	background: #1a1a2e;
+	color: #ffffff;
+	padding: 8px 12px;
+}
+
+select.input option:hover,
+select.input option:focus,
+select.input option:checked {
+	background: #2a2a4e;
+	color: #ffffff;
+}
+
 textarea.input {
 	height: 96px;
 	padding: 10px 12px;
@@ -364,6 +378,20 @@ textarea.input {
 		border-right: 0;
 		border-radius: 10px 0 0 10px;
 		padding: 0 12px;
+	}
+
+	/* Unit select dropdown options */
+	.unitqty .unit-select option {
+		background: #1a1a2e;
+		color: #ffffff;
+		padding: 8px 12px;
+	}
+
+	.unitqty .unit-select option:hover,
+	.unitqty .unit-select option:focus,
+	.unitqty .unit-select option:checked {
+		background: #2a2a4e;
+		color: #ffffff;
 	}
 
 	.unitqty .qty-input {

@@ -54,12 +54,12 @@
                         <div class="icon">🏷️</div>
                         <div class="text">
                             <h2>Manage Components</h2>
-                            <p>Track inventory parts and locations.</p>
+                            <p>Track inventory Components and locations.</p>
                         </div>
                         <span class="btn btn-primary">Open</span>
                     </a>
 
-                    <a class="action-card" asp-area="Warehouse" asp-controller="Products" asp-action="AddProduct">
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Products" asp-action="AddNew">
                         <div class="icon">➕</div>
                         <div class="text">
                             <h2>Add Product</h2>
@@ -68,22 +68,13 @@
                         <span class="btn btn-accent">Create</span>
                     </a>
 
-                    <a class="action-card" asp-area="Warehouse" asp-controller="Components" asp-action="AddComponent">
+                    <a class="action-card" asp-area="Warehouse" asp-controller="Components" asp-action="AddNew">
                         <div class="icon">➕</div>
                         <div class="text">
                             <h2>Add Component</h2>
                             <p>Capture a new inventory component.</p>
                         </div>
                         <span class="btn btn-accent">Create</span>
-                    </a>
-
-                    <a class="action-card" asp-area="" asp-controller="Warehouse" asp-action="StockTake">
-                        <div class="icon">🧭</div>
-                        <div class="text">
-                            <h2>Stock Take</h2>
-                            <p>Count and reconcile on-hand quantities.</p>
-                        </div>
-                        <span class="btn btn-primary">Start</span>
                     </a>
 
                     <a class="action-card" asp-area="" asp-controller="Orders" asp-action="Index">
