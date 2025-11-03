@@ -7,6 +7,7 @@
 @section Styles {
 	<link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/copy.css" asp-append-version="true" />
 }
 
 <div class="page">
@@ -96,9 +97,10 @@
 													<button type="button"
 															class="ft-code__copy"
 															data-copy="@product.ProductCode"
+															data-action="copy"
 															aria-label="Copy product code">
 														<lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
-													</button>
+														</button>
 												</div>
 											</td>
 
@@ -157,3 +159,7 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+	<script src="~/js/copy.js" asp-append-version="true"></script>
+}

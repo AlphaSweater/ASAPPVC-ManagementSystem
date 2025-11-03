@@ -8,6 +8,7 @@
 @section Styles {
 	<link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/ManageComponents.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/copy.css" asp-append-version="true" />
 }
 
 <div class="page">
@@ -20,8 +21,8 @@
 
 			<div class="card-actions">
 				<a class="btn btn-ghost"
-				   asp-area="Warehouse"
-				   asp-controller="Components"
+				 asp-area="Warehouse"
+				 asp-controller="Components"
 				asp-action="AddNew">
 					+ Add Component
 				</a>
@@ -31,18 +32,18 @@
 		<div class="card-body">
 			<section class="fields-panel full-width">
 				<form class="search-form"
-					  asp-area="Warehouse"
-					  asp-controller="Components"
-					  asp-action="Search"
-					  method="get"
-					  role="search"
-					  aria-label="Search components">
+					 asp-area="Warehouse"
+					 asp-controller="Components"
+					 asp-action="Search"
+					 method="get"
+					 role="search"
+					 aria-label="Search components">
 					<input class="input"
-						   type="text"
-						   name="term"
-						   placeholder="Search by component name or location..."
-						   value="@Model.SearchQuery"
-						   aria-label="Search query" />
+						 type="text"
+						 name="term"
+						 placeholder="Search by component name or location..."
+						 value="@Model.SearchQuery"
+						 aria-label="Search query" />
 					<button type="submit" class="btn btn-ghost">Search</button>
 				</form>
 
@@ -85,10 +86,10 @@
 												@if (component.HasImage && !string.IsNullOrWhiteSpace(component.ThumbUrl))
 												{
 													<img src="@component.ThumbUrl"
-														 class="ft-media__img"
-														 loading="lazy"
-														 alt=""
-														 width="52" height="52" />
+													 class="ft-media__img"
+													 loading="lazy"
+													 alt=""
+													 width="52" height="52" />
 												}
 												else
 												{
@@ -101,13 +102,14 @@
 												<div class="ft-code__text">
 													<span>@component.ComponentCode</span>
 													<button type="button"
-															class="ft-code__copy"
-															data-copy="@component.ComponentCode"
-															aria-label="Copy component code">
+														class="ft-code__copy"
+														data-copy="@component.ComponentCode"
+														data-action="copy"
+														aria-label="Copy component code">
 														<lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
-													</button>
-												</div>
-											</td>
+														</button>
+													</div>
+												</td>
 
 											<!-- Name (2-line clamp) -->
 											<td class="ft-name" title="@component.ComponentName">
@@ -129,39 +131,39 @@
 													@if (!string.IsNullOrWhiteSpace(component.ComponentCode))
 													{
 														<a class="btn btn-secondary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="DetailsByCode"
-														   asp-route-code="@component.ComponentCode"
-														   aria-label="View @component.ComponentName">
-															View
+													 asp-area="Warehouse"
+													 asp-controller="Components"
+													 asp-action="DetailsByCode"
+													 asp-route-code="@component.ComponentCode"
+													 aria-label="View @component.ComponentName">
+														View
 														</a>
 														<a class="btn btn-primary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="EditByCode"
-														   asp-route-code="@component.ComponentCode"
-														   aria-label="Edit @component.ComponentName">
-															Edit
+													 asp-area="Warehouse"
+													 asp-controller="Components"
+													 asp-action="EditByCode"
+													 asp-route-code="@component.ComponentCode"
+													 aria-label="Edit @component.ComponentName">
+														Edit
 														</a>
 													}
 													else
 													{
 														<a class="btn btn-secondary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="DetailsById"
-														   asp-route-id="@component.Id"
-														   aria-label="View @component.ComponentName">
-															View
+													 asp-area="Warehouse"
+													 asp-controller="Components"
+													 asp-action="DetailsById"
+													 asp-route-id="@component.Id"
+													 aria-label="View @component.ComponentName">
+														View
 														</a>
 														<a class="btn btn-primary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="EditById"
-														   asp-route-id="@component.Id"
-														 aria-label="Edit @component.ComponentName">
-															Edit
+													 asp-area="Warehouse"
+													 asp-controller="Components"
+													 asp-action="EditById"
+													 asp-route-id="@component.Id"
+													 aria-label="Edit @component.ComponentName">
+														Edit
 														</a>
 													}
 												</div>
@@ -187,22 +189,22 @@
 						var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
 						<nav class="pager" aria-label="Components pagination">
 							<a class="pager__btn @(Model.Page <= 1 ? "is-disabled" : null)"
-							   asp-area="Warehouse"
-							   asp-controller="Components"
-							   asp-action="Index"
+							 asp-area="Warehouse"
+							 asp-controller="Components"
+							 asp-action="Index"
 							   asp-route-page="@(Model.Page - 1)"
-							   asp-route-pageSize="@Model.PageSize"
-							   asp-route-term="@Model.SearchQuery">Prev</a>
+							 asp-route-pageSize="@Model.PageSize"
+							 asp-route-term="@Model.SearchQuery">Prev</a>
 
 							<span class="pager__status">Page @Model.Page of @totalPages</span>
 
 							<a class="pager__btn @(Model.Page >= totalPages ? "is-disabled" : null)"
-							   asp-area="Warehouse"
-							   asp-controller="Components"
-							   asp-action="Index"
+							 asp-area="Warehouse"
+							 asp-controller="Components"
+							 asp-action="Index"
 							   asp-route-page="@(Model.Page + 1)"
-							   asp-route-pageSize="@Model.PageSize"
-							   asp-route-term="@Model.SearchQuery">Next</a>
+							 asp-route-pageSize="@Model.PageSize"
+							 asp-route-term="@Model.SearchQuery">Next</a>
 						</nav>
 					}
 				</section>
@@ -210,3 +212,7 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+	<script src="~/js/copy.js" asp-append-version="true"></script>
+}
