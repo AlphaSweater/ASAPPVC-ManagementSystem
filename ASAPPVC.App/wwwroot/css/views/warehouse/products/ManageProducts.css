@@ -260,7 +260,7 @@
 	.table-products td {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		vertical-align: top;
+		vertical-align: central;
 	}
 
 	/* <colgroup> widths (desktop ≥1280px) */
@@ -269,7 +269,7 @@
 	}
 
 	.table-products .ft-col--code {
-		width: 18ch;
+		width: 21ch;
 	}
 	/* fixed, no wrap */
 	.table-products .ft-col--name {
@@ -290,9 +290,41 @@
 	/* two small buttons */
 
 	/* Fixed/non-wrapping columns */
-	.table-products .ft-code {
+	.table-products .ft-code__text {
 		white-space: nowrap !important;
+		display: flex;
+		align-items: center;
+		gap: 6px;
 	}
+
+	.table-products .ft-code__copy {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: none;
+		border: none;
+		padding: 2px;
+		cursor: pointer;
+		color: inherit;
+		opacity: 0.6;
+		transition: opacity 0.15s ease, transform 0.1s ease;
+	}
+
+		.table-products .ft-code__copy:hover {
+			opacity: 1;
+			transform: scale(1.05);
+		}
+
+		.table-products .ft-code__copy:active {
+			transform: scale(0.95);
+		}
+
+		.table-products .ft-code__copy .icon {
+			width: 1em;
+			height: 1em;
+			stroke: currentColor;
+		}
+
 
 	.table-products .ft-money {
 		white-space: nowrap;

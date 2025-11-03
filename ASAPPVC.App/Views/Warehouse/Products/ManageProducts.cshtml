@@ -90,7 +90,18 @@
 											</td>
 
 											<!-- Code (fixed, no wrap) -->
-											<td class="ft-code" title="@product.ProductCode">@product.ProductCode</td>
+											<td class="ft-code" title="@product.ProductCode">
+												<div class="ft-code__text"> 
+													<span>@product.ProductCode</span>
+													<button type="button"
+															class="ft-code__copy"
+															data-copy="@product.ProductCode"
+															aria-label="Copy product code">
+														<lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
+													</button>
+												</div>
+											</td>
+
 
 											<!-- Name (2-line clamp) -->
 											<td class="ft-name" title="@product.ProductName">
