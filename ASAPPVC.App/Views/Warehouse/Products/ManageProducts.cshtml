@@ -34,15 +34,23 @@
 
 				<section class="table-section">
 					<div class="fancy-wrap">
-						<table class="fancy-table fancy-table--zebra">
+						<table class="fancy-table fancy-table--zebra table-products">
+							<colgroup>
+								<col class="ft-col ft-col--img" />
+								<col class="ft-col ft-col--code" />
+								<col class="ft-col ft-col--name" />
+								<col class="ft-col ft-col--desc" />
+								<col class="ft-col ft-col--price" />
+								<col class="ft-col ft-col--actions" />
+							</colgroup>
 							<thead>
 								<tr>
 									<th>IMG</th>
-									<th class="ft-left ft-shrink">Product Code</th>
-									<th class="ft-left ft-shrink">Product</th>
-									<th class="ft-left ft-grow">Description</th>
-									<th class="ft-right ft-shrink">Price</th>
-									<th class="ft-actions ft-shrink">Actions</th>
+									<th class="ft-left">Product Code</th>
+									<th class="ft-left">Product</th>
+									<th class="ft-left">Description</th>
+									<th class="ft-right">Price</th>
+									<th class="ft-actions">Actions</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -51,21 +59,23 @@
 									foreach (var product in Model.Products)
 									{
 										<tr>
-											<td class="ft-media ft-shrink">
+											<td class="ft-media">
 												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
 												{
-													<img src="@product.ThumbUrl" class="ft-media__img" />
+													<img src="@product.ThumbUrl" class="ft-media__img" alt="" />
 												}
 												else
 												{
 													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
 												}
 											</td>
-											<td class="ft-code ft-shrink">@product.ProductCode</td>
-											<td class="ft-name ft-shrink ">@product.ProductName</td>
-											<td class="ft-left ft-grow">@product.Description</td>
-											<td class="ft-money ft-shrink">@product.DisplayPrice</td>
-											<td class="ft-actions ft-shrink">
+											<td class="ft-code">@product.ProductCode</td>
+											<td class="ft-name"><span class="ft-clip ft-clip--2">@product.ProductName</span></td>
+											<td class="ft-desc" title="@product.Description">
+												<span class="ft-clip ft-clip--3">@product.Description</span>
+											</td>
+											<td class="ft-money">@product.DisplayPrice</td>
+											<td class="ft-actions">
 												<div class="actions">
 													<a class="btn btn-secondary btn-sm"
 													   asp-area="Warehouse"
