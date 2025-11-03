@@ -17,24 +17,36 @@
 				<p class="card-subtitle">Browse, search and manage products in your catalog.</p>
 			</div>
 			<div class="card-actions">
-				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddNew">+ Add Product</a>
+				<a class="btn btn-ghost"
+				   asp-area="Warehouse"
+				   asp-controller="Products"
+				   asp-action="AddNew">+ Add Product</a>
 			</div>
 		</header>
 
 		<div class="card-body">
 			<section class="fields-panel full-width">
+				<!-- Search -->
 				<form class="search-form"
 					  asp-area="Warehouse"
 					  asp-controller="Products"
 					  asp-action="Search"
-					  method="get">
-					<input class="input" type="text" name="term" placeholder="Search products by name or code..." value="@Model.SearchQuery" />
+					  method="get" role="search" aria-label="Search products">
+					<input class="input"
+						   type="text"
+						   name="term"
+						   placeholder="Search products by name or code..."
+						   value="@Model.SearchQuery"
+						   aria-label="Search query" />
 					<button type="submit" class="btn btn-ghost">Search</button>
 				</form>
 
+				<!-- Products table -->
 				<section class="table-section">
 					<div class="fancy-wrap">
 						<table class="fancy-table fancy-table--zebra table-products">
+							<caption class="sr-only">Products list with image, code, name, description, price and actions</caption>
+
 							<colgroup>
 								<col class="ft-col ft-col--img" />
 								<col class="ft-col ft-col--code" />
@@ -43,50 +55,75 @@
 								<col class="ft-col ft-col--price" />
 								<col class="ft-col ft-col--actions" />
 							</colgroup>
+
 							<thead>
 								<tr>
-									<th>IMG</th>
-									<th class="ft-left">Product Code</th>
-									<th class="ft-left">Product</th>
-									<th class="ft-left">Description</th>
-									<th class="ft-right">Price</th>
-									<th class="ft-actions">Actions</th>
+									<th scope="col">IMG</th>
+									<th scope="col" class="ft-left">Product Code</th>
+									<th scope="col" class="ft-left">Product</th>
+									<th scope="col" class="ft-left">Description</th>
+									<th scope="col" class="ft-right">Price</th>
+									<th scope="col" class="ft-actions">Actions</th>
 								</tr>
 							</thead>
+
 							<tbody>
 								@if (Model is { HasProducts: true })
 								{
 									foreach (var product in Model.Products)
 									{
 										<tr>
+											<!-- Image -->
 											<td class="ft-media">
 												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
 												{
-													<img src="@product.ThumbUrl" class="ft-media__img" alt="" />
+													<img src="@product.ThumbUrl"
+														 class="ft-media__img"
+														 loading="lazy"
+														 alt=""
+														 width="52" height="52" />
 												}
 												else
 												{
 													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
 												}
 											</td>
-											<td class="ft-code">@product.ProductCode</td>
-											<td class="ft-name"><span class="ft-clip ft-clip--2">@product.ProductName</span></td>
+
+											<!-- Code (fixed, no wrap) -->
+											<td class="ft-code" title="@product.ProductCode">@product.ProductCode</td>
+
+											<!-- Name (2-line clamp) -->
+											<td class="ft-name" title="@product.ProductName">
+												<span class="ft-clip ft-clip--2">@product.ProductName</span>
+											</td>
+
+											<!-- Description (3-line clamp on desktop) -->
 											<td class="ft-desc" title="@product.Description">
 												<span class="ft-clip ft-clip--3">@product.Description</span>
 											</td>
+
+											<!-- Price (fixed width, no wrap) -->
 											<td class="ft-money">@product.DisplayPrice</td>
+
+											<!-- Actions -->
 											<td class="ft-actions">
 												<div class="actions">
 													<a class="btn btn-secondary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
 													   asp-action="DetailsById"
-													   asp-route-id="@product.Id">View</a>
+													   asp-route-id="@product.Id"
+													   aria-label="View @product.ProductName">
+														View
+													</a>
 													<a class="btn btn-primary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
 													   asp-action="EditById"
-													   asp-route-id="@product.Id">Edit</a>
+													   asp-route-id="@product.Id"
+													   aria-label="Edit @product.ProductName">
+														Edit
+													</a>
 												</div>
 											</td>
 										</tr>
@@ -95,7 +132,10 @@
 								else
 								{
 									<tr>
-										<td colspan="6" class="ft-center" style="padding:40px; color:var(--text-muted);">No products found.</td>
+										<td colspan="6" class="ft-center" role="status"
+											style="padding:40px; color:var(--text-muted);">
+											No products found.
+										</td>
 									</tr>
 								}
 							</tbody>
