@@ -1,7 +1,7 @@
 @using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
-	ViewData["Title"] = "Products";
+	ViewData["Title"] = "Manage Products";
 }
 
 @section Styles {
@@ -122,16 +122,16 @@
 													<a class="btn btn-secondary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="DetailsById"
-													   asp-route-id="@product.Id"
+													   asp-action="DetailsByCode"
+													   asp-route-code="@product.ProductCode"
 													   aria-label="View @product.ProductName">
 														View
 													</a>
 													<a class="btn btn-primary btn-sm"
 													   asp-area="Warehouse"
 													   asp-controller="Products"
-													   asp-action="EditById"
-													   asp-route-id="@product.Id"
+													   asp-action="EditByCode"
+													   asp-route-code="@product.ProductCode"
 													   aria-label="Edit @product.ProductName">
 														Edit
 													</a>
