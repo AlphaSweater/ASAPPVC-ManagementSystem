@@ -35,6 +35,20 @@ namespace ASAPPVC.App.Controllers.Warehouse
             return View(ManageProductsViewName, ManageProductsVm.Create(result.Value, searchQuery: term));
         }
 
+        // GET /Warehouse/Products/Search?term=...
+        [HttpGet("Search")]
+        public async Task<IActionResult> SearchApi([FromQuery] string? term, CancellationToken ct)
+        {
+            var result = string.IsNullOrWhiteSpace(term)
+                ? await _products.ListAsync(ct)
+                : await _products.SearchAsync(term, ct);
+
+            if (!result.Ok || result.Value is null)
+                return Json(new { success = false, error = result.Error ?? "Failed to search products." });
+
+            return Json(new { success = true, products = result.Value });
+        }
+
         // GET /Warehouse/Products/View/{id:guid}
         [HttpGet("View/{id:guid}")]
         public Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)
