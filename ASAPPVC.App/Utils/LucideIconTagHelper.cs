@@ -118,10 +118,9 @@ namespace ASAPPVC.App.Utils
             if (!string.IsNullOrWhiteSpace(Title))
             {
                 // If a <title> exists, replace it; else insert after opening tag
-                if (Regex.IsMatch(svg, @"<title>.*?</title>", RegexOptions.Singleline | RegexOptions.IgnoreCase))
-                    svg = Regex.Replace(svg, @"<title>.*?</title>", $"<title>{System.Net.WebUtility.HtmlEncode(Title)}</title>", RegexOptions.Singleline | RegexOptions.IgnoreCase);
-                else
-                    svg = Regex.Replace(svg, @"<svg([^>]*)>", $"<svg$1><title>{System.Net.WebUtility.HtmlEncode(Title)}</title>");
+                svg = Regex.IsMatch(svg, @"<title>.*?</title>", RegexOptions.Singleline | RegexOptions.IgnoreCase)
+                    ? Regex.Replace(svg, @"<title>.*?</title>", $"<title>{System.Net.WebUtility.HtmlEncode(Title)}</title>", RegexOptions.Singleline | RegexOptions.IgnoreCase)
+                    : Regex.Replace(svg, @"<svg([^>]*)>", $"<svg$1><title>{System.Net.WebUtility.HtmlEncode(Title)}</title>");
             }
 
             output.Content.SetHtmlContent(svg);
