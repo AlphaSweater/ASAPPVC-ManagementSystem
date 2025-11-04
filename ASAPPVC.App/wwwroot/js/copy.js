@@ -14,13 +14,13 @@
 			transform: 'translateX(-50%)',
 			background: '#111',
 			color: '#fff',
-			padding: '6px8px',
+			padding: '6px 8px',
 			borderRadius: '4px',
 			fontSize: '12px',
 			zIndex: 10000,
 			pointerEvents: 'none',
 			opacity: '0',
-			transition: 'opacity150ms ease, transform150ms ease'
+			transition: 'opacity 150ms ease, transform 150ms ease'
 		});
 
 		document.body.appendChild(t);
