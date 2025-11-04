@@ -37,17 +37,19 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
         // GET /Warehouse/Products/Search?term=...
         [HttpGet("Search")]
-        public async Task<IActionResult> SearchApi([FromQuery] string? term, CancellationToken ct)
+        public async Task<IActionResult> Search([FromQuery] string? term, CancellationToken ct)
         {
-            var result = string.IsNullOrWhiteSpace(term)
+            var query = term?.Trim();
+            var result = string.IsNullOrWhiteSpace(query)
                 ? await _products.ListAsync(ct)
-                : await _products.SearchAsync(term, ct);
+                : await _products.SearchAsync(query, ct);
 
             if (!result.Ok || result.Value is null)
                 return Json(new { success = false, error = result.Error ?? "Failed to search products." });
 
-            // Return server-rendered rows partial (HTML) for the table to consume via JS
-            return PartialView("~/Views/Shared/Partials/_ProductRowsPartial.cshtml", result.Value);
+            var list = result.Value;
+
+            return PartialView("~/Views/Shared/Partials/_ProductRowsPartial.cshtml", list);
         }
 
         // GET /Warehouse/Products/View/{id:guid}

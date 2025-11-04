@@ -46,9 +46,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
                 : await _components.SearchAsync(query, ct);
 
             if (!result.Ok || result.Value is null)
-            {
                 return Json(new { success = false, error = result.Error ?? "Failed to search components." });
-            }
 
             var list = result.Value;
 
