@@ -8,21 +8,22 @@
 @section Styles {
 	<link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/components/ManageComponents.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/copy.css" asp-append-version="true" />
 }
 
-<div class="page manage-components">
+<div class="page">
 	<div role="region" aria-labelledby="page-title">
 		<header class="card-header">
 			<div>
-				<h1 id="page-title" class="card-title">Components</h1>
+				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
 				<p class="card-subtitle">Manage inventory components and stock levels.</p>
 			</div>
 
 			<div class="card-actions">
 				<a class="btn btn-ghost"
-				   asp-area="Warehouse"
-				   asp-controller="Components"
-				   asp-action="AddNew">
+				 asp-area="Warehouse"
+				 asp-controller="Components"
+				asp-action="AddNew">
 					+ Add Component
 				</a>
 			</div>
@@ -31,107 +32,60 @@
 		<div class="card-body">
 			<section class="fields-panel full-width">
 				<form class="search-form"
-					  asp-area="Warehouse"
-					  asp-controller="Components"
-					  asp-action="Search"
-					  method="get">
+					 asp-area="Warehouse"
+					 asp-controller="Components"
+					 asp-action="Search"
+					 method="get"
+					 role="search"
+					 aria-label="Search components">
 					<input class="input"
-						   type="text"
-						   name="term"
-						   placeholder="Search by component name or location..."
-						   value="@Model.SearchQuery" />
+						 type="text"
+						 name="term"
+						 placeholder="Search by component name or location..."
+						 value="@Model.SearchQuery"
+						 aria-label="Search query" />
 					<button type="submit" class="btn btn-ghost">Search</button>
 				</form>
 
 				<section class="table-section">
 					<div class="fancy-wrap">
-						<table class="fancy-table fancy-table--zebra">
+						<table class="fancy-table fancy-table--zebra table-components">
+							<caption class="sr-only">Components list with image, code, name, location, stock, cost and actions</caption>
+
+							<colgroup>
+								<col class="ft-col ft-col--img" />
+								<col class="ft-col ft-col--code" />
+								<col class="ft-col ft-col--name" />
+								<col class="ft-col ft-col--location" />
+								<col class="ft-col ft-col--stock" />
+								<col class="ft-col ft-col--cost" />
+								<col class="ft-col ft-col--actions" />
+							</colgroup>
+
 							<thead>
 								<tr>
-									<th>IMG</th>
-									<th scope="col" class="ft-left ft-shrink">Component Code</th>
-									<th scope="col" class="ft-left ft-grow">Component</th>
-									<th scope="col" class="ft-center ft-shrink">Location</th>
-									<th scope="col" class="ft-number ft-shrink">Current Stock</th>
-									<th scope="col" class="ft-money ft-shrink">Unit Cost</th>
-									<th scope="col" class="ft-actions ft-shrink">Actions</th>
+									<th scope="col">IMG</th>
+									<th scope="col" class="ft-left">Component Code</th>
+									<th scope="col" class="ft-left">Component</th>
+									<th scope="col" class="ft-center">Location</th>
+									<th scope="col" class="ft-right">Current Stock</th>
+									<th scope="col" class="ft-right">Unit Cost</th>
+									<th scope="col" class="ft-actions">Actions</th>
 								</tr>
 							</thead>
 
 							<tbody>
 								@if (Model is { HasComponents: true })
 								{
-									foreach (var component in Model.Components)
-									{
-										var stockValue = component.UnitCost * component.QuantityOnHand;
-										<tr>
-
-											<td class="ft-media ft-shrink">
-												@if (component.HasImage && !string.IsNullOrWhiteSpace(component.ThumbUrl))
-												{
-													<img src="@component.ThumbUrl" class="ft-media__img" />
-												}
-												else
-												{
-													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
-												}
-											</td>
-
-											<td class="ft-code ft-shrink">@component.ComponentCode</td>
-
-											<td class="ft-left ft-shrink">@component.ComponentName</td>
-
-											<td class="ft-center ft-shrink">@component.LocationCode</td>
-
-											<td class="ft-number ft-shrink">
-												@($"{component.ShortFormattedQuantity}")
-											</td>
-
-											<td class="ft-money ft-shrink">@component.DisplayCost</td>
-
-											<td class="ft-actions ft-shrink">
-												<div class="actions">
-													@if (!string.IsNullOrWhiteSpace(component.ComponentCode))
-													{
-														<!-- URL: /Warehouse/Components/View/{code} -->
-														<a class="btn btn-secondary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="DetailsByCode"
-														   asp-route-code="@component.ComponentCode">View</a>
-
-														<!-- URL: /Warehouse/Components/Edit/{code} -->
-														<a class="btn btn-primary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="EditByCode"
-														   asp-route-code="@component.ComponentCode">Edit</a>
-													}
-													else
-													{
-														<!-- URL: /Warehouse/Components/View/{id} -->
-														<a class="btn btn-secondary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="DetailsById"
-														   asp-route-id="@component.Id">View</a>
-
-														<!-- URL: /Warehouse/Components/Edit/{id} -->
-														<a class="btn btn-primary btn-sm"
-														   asp-area="Warehouse"
-														   asp-controller="Components"
-														   asp-action="EditById"
-														   asp-route-id="@component.Id">Edit</a>
-													}
-												</div>
-											</td>
-										</tr>
-									}
+									@await Html.PartialAsync("Partials/_ComponentRowsPartial", Model.Components)
 								}
 								else
 								{
 									<tr>
-										<td colspan="7" class="ft-center">No components found.</td>
+										<td colspan="7" class="ft-center" role="status"
+											style="padding:40px; color:var(--text-muted);">
+											No components found.
+										</td>
 									</tr>
 								}
 							</tbody>
@@ -143,22 +97,22 @@
 						var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
 						<nav class="pager" aria-label="Components pagination">
 							<a class="pager__btn @(Model.Page <= 1 ? "is-disabled" : null)"
-							   asp-area="Warehouse"
-							   asp-controller="Components"
-							   asp-action="Index"
+							 asp-area="Warehouse"
+							 asp-controller="Components"
+							 asp-action="Index"
 							   asp-route-page="@(Model.Page - 1)"
-							   asp-route-pageSize="@Model.PageSize"
-							   asp-route-term="@Model.SearchQuery">Prev</a>
+							 asp-route-pageSize="@Model.PageSize"
+							 asp-route-term="@Model.SearchQuery">Prev</a>
 
 							<span class="pager__status">Page @Model.Page of @totalPages</span>
 
 							<a class="pager__btn @(Model.Page >= totalPages ? "is-disabled" : null)"
-							   asp-area="Warehouse"
-							   asp-controller="Components"
-							   asp-action="Index"
+							 asp-area="Warehouse"
+							 asp-controller="Components"
+							 asp-action="Index"
 							   asp-route-page="@(Model.Page + 1)"
-							   asp-route-pageSize="@Model.PageSize"
-							   asp-route-term="@Model.SearchQuery">Next</a>
+							 asp-route-pageSize="@Model.PageSize"
+							 asp-route-term="@Model.SearchQuery">Next</a>
 						</nav>
 					}
 				</section>
@@ -166,3 +120,8 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+	<script src="~/js/copy.js" asp-append-version="true"></script>
+	<script src="~/js/views/warehouse/components/manageComponents.js" asp-append-version="true"></script>
+}

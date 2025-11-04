@@ -1,64 +1,111 @@
-﻿/* ---------- Root & Variables ---------- */
+﻿/*==============================================================================
+  ManageComponents.css  —  Components Index / Table View
+  ------------------------------------------------------------------------------
+  INDEX
+  00) Theme tokens
+  01) Global reset & misc utilities
+  02) Page & card layout
+03) Form controls (search)
+  04) Buttons
+  05) Generic tables (base)
+  06) Components table (view-specific overrides)
+      06.1) Column sizing & layout
+      06.2) Media cell & actions density
+ 06.3) Text wrapping & clamp helpers
+      06.4) Breakpoints (≤1280 / ≤1024 / ≤880 / ≤640)
+==============================================================================*/
+
+/*------------------------------------------------------------------------------
+  00) Theme tokens
+------------------------------------------------------------------------------*/
 :root {
 	--primary-red: #d62828;
 	--primary-blue: #0d47a1;
 	--hover-red: #e03a3a;
 	--text-light: #ffffff;
-	--text-muted: rgba(255, 255, 255, 0.8);
+	--text-muted: rgba(255,255,255,0.8);
 	--accent-orange: #ef4723;
 }
 
-/* ---------- Base & Background ---------- */
+/*------------------------------------------------------------------------------
+  01) Global reset & misc utilities
+------------------------------------------------------------------------------*/
 * {
 	box-sizing: border-box;
 }
 
-html, body {
-	height: 100%;
-	margin: 0;
-	font-family: "Segoe UI", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+.text-right {
+	text-align: right;
 }
 
-/* ---------- Main Content Layout ---------- */
-.viewport {
-	padding: 40px 24px;
-	min-height: 100vh;
+.sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	border: 0;
 }
 
-.content-container {
-	max-width: 1100px; /* Wider for tables */
-	margin: 0 auto;
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-	border-radius: 16px;
-	padding: 32px 40px;
+/*------------------------------------------------------------------------------
+  02) Page & card layout
+------------------------------------------------------------------------------*/
+.page {
+	display: block;
 }
 
-/* ---------- Header & Toolbar ---------- */
-.page-header {
-	margin-bottom: 32px;
-	padding-bottom: 24px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.main-title {
-	font-weight: 700;
-	font-size: 28px;
-	color: var(--text-light);
-	margin: 0;
-}
-
-.toolbar {
+.card-header {
+	background: transparent;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	gap: 16px;
-	margin-bottom: 24px;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: var(--text-light);
+}
+
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: var(--text-muted);
+}
+
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.card-body {
+	padding: 24px 32px;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	gap: 28px;
+}
+
+.fields-panel {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+@media (max-width: 960px) {
+	.card-body {
+		flex-wrap: wrap;
+	}
+}
+
+/*------------------------------------------------------------------------------
+  03) Form controls (search)
+------------------------------------------------------------------------------*/
 .search-form {
 	display: flex;
 	align-items: center;
@@ -66,31 +113,32 @@ html, body {
 	flex-grow: 1;
 }
 
-/* --- INPUT REDESIGN (reused from customer form) --- */
 .input {
+	width: 100%;
+	max-width: 400px;
 	height: 44px;
+	padding: 0 12px;
 	font-size: 16px;
 	color: var(--text-light);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.3);
+	background: rgba(255,255,255,0.05);
+	border: 1px solid rgba(255,255,255,0.3);
 	border-radius: 8px;
-	padding: 0 12px;
 	outline: none;
-	transition: border-color 0.3s ease, background-color 0.3s ease;
-	width: 100%;
-	max-width: 400px; /* Limit search input width */
+	transition: border-color .3s ease, background-color .3s ease;
 }
 
 	.input::placeholder {
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255,255,255,0.5);
 	}
 
 	.input:focus {
-		border-color: rgba(255, 255, 255, 0.7);
-		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255,255,255,0.7);
+		background: rgba(255,255,255,0.1);
 	}
 
-/* ---------- Action Buttons ---------- */
+/*------------------------------------------------------------------------------
+  04) Buttons
+------------------------------------------------------------------------------*/
 .actions {
 	display: flex;
 	justify-content: center;
@@ -135,210 +183,298 @@ html, body {
 .btn-secondary {
 	background: transparent;
 	color: var(--text-light);
-	border: 1px solid rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255,255,255,0.4);
 }
 
 	.btn-secondary:hover {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255, 255, 255, 0.6);
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
 	}
-/* ---------- Table Styling ---------- */
+
+.btn-ghost {
+	background: transparent;
+	border: 1px solid rgba(255,255,255,0.12);
+	color: var(--text-light);
+}
+
+	.btn-ghost:hover {
+		background: rgba(255,255,255,0.08);
+		border-color: rgba(255,255,255,0.34);
+		color: var(--text-light);
+	}
+
+/*------------------------------------------------------------------------------
+  05) Generic tables (base)
+  (You're also importing fancy-tables.css; these act as safe generic helpers)
+------------------------------------------------------------------------------*/
 .table-section {
 	overflow-x: auto;
 }
 
-/* ---------- Styles moved from ManageComponents.cshtml (scoped) ---------- */
-.manage-components {
-	/* ensure top-level page styles apply when manage-components class is present */
+.table {
+	width: 100%;
+	border-collapse: collapse;
 }
 
-	.manage-components .page {
-		display: block;
+	.table th, .table td {
+		padding: 14px 16px;
+		text-align: left;
+		border-bottom: 1px solid rgba(255,255,255,0.2);
 	}
 
-	.manage-components .card-header {
-		background-color: transparent;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 20px 28px;
-		border-bottom: 1px solid var(--text-muted);
-	}
-
-	.manage-components .card-title {
-		margin: 0;
-		font-size: 26px;
-		font-weight: 800;
-		color: #fff;
-	}
-
-	.manage-components .card-subtitle {
-		margin-top: 4px;
+	.table thead th {
 		font-size: 14px;
+		font-weight: 700;
+		color: var(--text-light);
+		background: rgba(0,0,0,0.15);
+	}
+
+	.table tbody tr {
+		transition: background-color .2s ease;
+	}
+
+		.table tbody tr:hover {
+			background-color: rgba(255,255,255,0.08);
+		}
+
+	.table td {
+		font-size: 15px;
 		color: var(--text-muted);
 	}
 
-	.manage-components .card-actions {
-		display: flex;
-		gap: 10px;
+		.table td:first-child {
+			color: var(--text-light);
+			font-weight: 600;
+		}
+
+/*------------------------------------------------------------------------------
+  06) Components table (view-specific overrides)
+------------------------------------------------------------------------------*/
+
+/* 06.1) Column sizing & layout */
+.table-components {
+	table-layout: fixed; /* predictable sizing & truncation */
+}
+
+	.table-components th,
+	.table-components td {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		vertical-align: central;
 	}
 
-	.manage-components .card-body {
-		padding: 24px 32px;
-		display: flex;
-		flex-wrap: nowrap;
-		align-items: flex-start;
-		gap: 28px;
+	/* <colgroup> widths (desktop ≥1280px) */
+	.table-components .ft-col--img {
+		width: 72px;
 	}
 
-	.manage-components .fields-panel {
-		flex: 1 1 auto;
-		display: flex;
-		flex-direction: column;
-		gap: 18px;
+	.table-components .ft-col--code {
+		width: 21ch;
 	}
-
-	.manage-components .form-grid {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 16px;
+	/* fixed, no wrap */
+	.table-components .ft-col--name {
+		width: 35ch;
 	}
+	/* wraps sooner than location */
+	.table-components .ft-col--location {
+		width: 12ch;
+	}
+	/* centered location code */
+	.table-components .ft-col--stock {
+		width: 14ch;
+	}
+	/* stock quantity */
+	.table-components .ft-col--cost {
+		width: 12.5ch;
+	}
+	/* show full cost */
+	.table-components .ft-col--actions {
+		width: 16ch;
+	}
+	/* two small buttons */
 
-	.manage-components .form-field {
+	/* Fixed/non-wrapping columns */
+	.table-components .ft-code__text {
+		white-space: nowrap !important;
 		display: flex;
-		flex-direction: column;
+		align-items: center;
 		gap: 6px;
 	}
 
-		.manage-components .form-field.half {
-			flex: 1 1 calc(50% - 8px);
-			min-width: 260px;
-		}
-
-		.manage-components .form-field.full {
-			flex: 1 1 100%;
-		}
-
-	.manage-components .label {
-		font-size: 13px;
-		color: var(--text-muted);
+	.table-components .ft-code__copy {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: none;
+		border: none;
+		padding: 2px;
+		cursor: pointer;
+		color: inherit;
+		opacity: 0.6;
+		transition: opacity 0.15s ease, transform 0.1s ease;
 	}
 
-	.manage-components .input,
-	.manage-components select.input,
-	.manage-components textarea.input {
-		height: 42px;
+		.table-components .ft-code__copy:hover {
+			opacity: 1;
+			transform: scale(1.05);
+		}
+
+		.table-components .ft-code__copy:active {
+			transform: scale(0.95);
+		}
+
+		.table-components .ft-code__copy .icon {
+			width: 1em;
+			height: 1em;
+			stroke: currentColor;
+		}
+
+	.table-components .ft-location {
+		text-align: center !important;
+		white-space: nowrap;
+	}
+
+	.table-components .ft-stock {
+		white-space: nowrap;
+		text-align: right !important;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.table-components .ft-money {
+		white-space: nowrap;
+		text-overflow: clip;
+		text-align: right !important;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* 06.2) Media cell & actions density */
+	.table-components .ft-media__img {
+		width: 52px;
+		height: 52px;
+	}
+
+	.table-components td.ft-actions .actions {
+		gap: 6px;
+	}
+
+	.table-components .btn.btn-sm {
 		padding: 0 12px;
-		border-radius: 10px;
-		background: rgba(255, 255, 255, .08);
-		border: 1px solid rgba(255, 255, 255, .22);
-		color: #fff;
-		outline: none;
-		transition: background .2s, border-color .2s, box-shadow .2s;
+		height: 32px;
+		font-size: 13px;
+		border-radius: 7px;
 	}
 
-	.manage-components textarea.input {
-		min-height: 100px;
-		padding: 10px 12px;
+	/* 06.3) Text wrapping & clamp helpers */
+	.table-components .ft-name {
+		white-space: normal;
+		overflow-wrap: anywhere;
+		hyphens: auto;
 	}
 
-	.manage-components .input::placeholder {
-		color: rgba(255, 255, 255, .55);
+/* Clamp UTILITIES (applied to inner <span> wrappers) */
+.ft-clip {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.ft-clip--2 {
+	-webkit-line-clamp: 2;
+}
+/* component name */
+
+/* 06.4) Breakpoints */
+@media (max-width: 1280px) {
+	.table-components .ft-col--img {
+		width: 56px;
 	}
 
-	.manage-components .input:focus {
-		background: rgba(255, 255, 255, .12);
-		border-color: rgba(255, 255, 255, .45);
-		box-shadow: 0 3px rgba(255, 255, 255, .08);
+	.table-components .ft-col--code {
+		width: 11.5ch;
 	}
 
-	.manage-components .input-group {
-		position: relative;
+	.table-components .ft-col--name {
+		width: 16ch;
 	}
 
-		.manage-components .input-group .prefix {
-			position: absolute;
-			left: 10px;
-			top: 0;
-			bottom: 0;
-			display: flex;
-			align-items: center;
-			font-weight: 700;
-			color: rgba(255, 255, 255, .9);
-		}
-
-		.manage-components .input-group .input {
-			padding-left: 28px;
-		}
-
-	.manage-components .validation-summary,
-	.manage-components .field-error {
-		color: #ffb3b3;
+	.table-components .ft-col--location {
+		width: 10ch;
 	}
 
-	.manage-components .validation-summary {
-		margin: 10px 32px 0;
-		font-size: 14px;
+	.table-components .ft-col--stock {
+		width: 12ch;
 	}
 
-	.manage-components .field-error {
+	.table-components .ft-col--cost {
+		width: 11ch;
+	}
+
+	.table-components .ft-col--actions {
+		width: 14ch;
+	}
+
+	.table-components .ft-media__img {
+		width: 46px;
+		height: 46px;
+	}
+}
+
+@media (max-width: 1024px) {
+	.table-components .ft-col--code {
+		width: 10.5ch;
+	}
+
+	.table-components .ft-col--name {
+		width: 14ch;
+	}
+
+	.table-components .ft-col--location {
+		width: 9ch;
+	}
+
+	.table-components .ft-col--stock {
+		width: 11ch;
+	}
+
+	.table-components .ft-col--cost {
+		width: 10ch;
+	}
+
+	.table-components .ft-col--actions {
+		width: 12ch;
+	}
+
+	.table-components .btn.btn-sm {
+		padding: 0 10px;
+		height: 30px;
+		font-size: 12.5px;
+	}
+
+	.table-components .ft-media__img {
+		width: 42px;
+		height: 42px;
+	}
+}
+
+@media (max-width: 880px) {
+	/* Keep all columns; rely on horizontal scroll if needed */
+	.fancy-table th, .fancy-table td {
+		padding: 12px 12px;
+	}
+	/* If you prefer no scroll: hide location col (uncomment)
+  .table-components th:nth-child(4),
+  .table-components td:nth-child(4) { display: none; }
+  */
+}
+
+@media (max-width: 640px) {
+	.table-components .btn.btn-sm {
+		padding: 0 8px;
+		height: 28px;
 		font-size: 12px;
 	}
 
-	.manage-components .form-actions {
-		margin-top: 16px;
-		display: flex;
-		justify-content: flex-end;
-		gap: 12px;
-	}
-
-	.manage-components .btn {
-		border-radius: 999px;
-		padding: 10px 18px;
-		font-weight: 700;
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		cursor: pointer;
-		transition: all .2s ease;
-	}
-
-	.manage-components .btn-primary {
-		color: #fff;
-		border: none;
-		box-shadow: 0 1px 12px rgba(255, 82, 82, .4);
-	}
-
-		.manage-components .btn-primary:hover {
-			filter: brightness(1.08);
-			box-shadow: 0 2px 20px rgba(255, 82, 82, .55);
-		}
-
-	.manage-components .btn-ghost {
-		background: transparent;
-		border: 1px solid rgba(255, 255, 255, .12);
-		color: #fff;
-	}
-
-		.manage-components .btn-ghost:hover {
-			background: rgba(255, 255, 255, .08);
-			border-color: rgba(255, 255, 255, .34);
-			color: #fff;
-		}
-
-	.manage-components .sr-only {
-		position: absolute !important;
-		width: 1px;
-		height: 1px;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0 0 0 0);
-		border: 0;
-	}
-
-
-@media (max-width: 960px) {
-	.manage-components .card-body {
-		flex-wrap: wrap;
+	.fancy-table th, .fancy-table td {
+		padding: 10px 10px;
 	}
 }

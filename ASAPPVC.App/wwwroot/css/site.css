@@ -89,3 +89,12 @@ body {
 .bg-blue-gradient {
 	background: linear-gradient(135deg, var(--sa-blue-1) 0%, var(--sa-blue-2) 50%, var(--sa-blue-3) 100%);
 }
+
+/* ------------------------------
+   Icons
+------------------------------ */
+.icon {
+	vertical-align: -0.125em; /* aligns with text baseline nicely */
+	stroke: currentColor; /* inherit text color */
+	fill: none;
+}

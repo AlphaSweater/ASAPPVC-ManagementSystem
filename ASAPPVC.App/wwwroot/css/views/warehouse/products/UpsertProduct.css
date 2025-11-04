@@ -1,182 +1,202 @@
-/* ---------- Root & Variables ---------- */
+/* ================================================================
+ UpsertProduct • Aligned with UpsertComponent styling
+ ---------------------------------------------------------------- */
+
 :root {
 	--primary-red: #d62828;
-	--primary-blue: #0d47a1;
 	--hover-red: #e03a3a;
 	--text-light: #ffffff;
-	--text-muted: rgba(255, 255, 255, 0.8);
+	--text-muted: rgba(255,255,255,0.8);
+	--glass-border: rgba(255,255,255,0.15);
 }
 
-/* ---------- Base & Background ---------- */
-* {
+/* Page container helpers */
+.page {
+	display: block;
+}
+
+/* Media column (left) — matches UpsertComponent */
+.media-panel {
+	flex: 1 1 320px;
+	max-width: 320px;
+	width: 100%;
+	height: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 	box-sizing: border-box;
 }
 
-html, body {
-	height: 100%;
+	.media-panel .dropzone {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+	}
+
+		.media-panel .dropzone img {
+			width: 100%;
+			height: 100%;
+			aspect-ratio: 1 / 1;
+			object-fit: cover;
+		}
+
+/* Header */
+.card-header {
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid var(--glass-border);
 }
 
-/* ---------- Main Content Layout ---------- */
-.viewport {
-	padding: 40px 24px;
-	min-height: 100vh;
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: #fff;
 }
 
-.form-container {
-	max-width: 1100px;
-	margin: 0 auto;
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-	border-radius: 16px;
-	padding: 32px 40px;
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: var(--text-muted);
 }
 
-/* Force vertical stacking for Add Product page body */
-.add-product-body {
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+/* Card body */
+.card-body {
+	padding: 24px 32px;
 	display: flex;
 	flex-direction: column;
-	align-items: stretch;
-	gap: 24px;
+	gap: 28px;
+	box-sizing: border-box;
 }
 
-/* ---------- HEADER ---------- */
-.form-header-section {
-	margin-bottom: 32px;
-	padding-bottom: 24px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+/* Dropzone */
+.dropzone {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	max-width: 100%;
+	border: 1px dashed var(--glass-border);
+	border-radius: 16px;
+	background: rgba(255,255,255,0.06);
+	display: grid;
+	place-items: center;
+	cursor: pointer;
+	overflow: hidden;
+	transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
-.back-link {
+	.dropzone:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.35);
+		box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+	}
+
+	.dropzone.is-dragover {
+		transform: scale(1.02);
+		border-color: #fff;
+	}
+
+	.dropzone img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: inherit;
+		opacity: 0.96;
+	}
+
+.dropzone-overlay {
+	position: relative;
+	z-index: 1;
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	color: var(--text-muted);
-	text-decoration: none;
-	font-weight: 600;
-	font-size: 14px;
-	margin-bottom: 16px;
-	transition: color 0.2s ease;
+	padding: 8px 12px;
+	border-radius: 999px;
+	background: rgba(0,0,0,0.35);
+	backdrop-filter: blur(6px);
+	color: #fff;
+	font-size: 13px;
+	text-align: center;
 }
 
-	.back-link:hover {
-		color: var(--text-light);
-	}
-
-.main-title {
-	font-weight: 700;
-	font-size: 28px;
-	color: var(--text-light);
-	margin: 0;
+/* File input hidden */
+.file-input {
+	display: none;
 }
 
-/* ---------- Form Layout ---------- */
-/* Main form layout */
-.form-layout {
+/* Section card base — matches UpsertComponent */
+.section-card {
+	border: 1px solid var(--glass-border);
+	border-radius: 16px;
+	padding: 16px;
+	background: rgba(255,255,255,0.04);
+	box-sizing: border-box;
+}
+
+.section-head {
 	display: flex;
-	gap: 30px;
-	margin-bottom: 30px;
-	width: 100%;
-	align-items: flex-start;
-}
-
-/* Image section */
-.form-image {
-	flex: 0 0 300px;
-	display: flex;
-	flex-direction: column;
 	align-items: center;
-	gap: 16px;
-}
-
-/* Form fields section */
-.form-fields {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-}
-
-/* Individual form field */
-.form-field {
-	width: 100%;
-}
-
-	/* Make textarea full width */
-	.form-field textarea {
-		width: 100%;
-		min-height: 100px;
-		resize: vertical;
-	}
-
-/* Components section */
-.components-section {
-	width: 100%;
-	margin: 0;
-	clear: both;
-}
-
-/* Form actions at bottom */
-.form-actions {
-	margin-top: 20px;
-	padding-top: 20px;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
-	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	flex-wrap: wrap;
 	gap: 12px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-	.form-layout {
-		flex-direction: column;
-		gap: 20px;
-	}
-
-	.form-image {
-		width: 100%;
-		max-width: 300px;
-		margin: 0 auto;
-	}
-
-	.form-fields {
-		width: 100%;
-	}
-
-	.components-section {
-		margin-top: 20px;
-	}
+.section-title {
+	font-weight: 700;
+	color: #fff;
+	font-size: 14px;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+	margin: 0;
 }
 
-/* ---------- Form Groups & Inputs ---------- */
-.group {
+/* Form fields */
+.form-field {
 	display: flex;
 	flex-direction: column;
+	gap: 6px;
 }
-
-	.group.full-width {
-		grid-column: 1 / -1;
-	}
 
 .label {
 	font-size: 13px;
-	font-weight: 600;
 	color: var(--text-muted);
-	margin-bottom: 6px;
 }
 
-.input, select.input {
+/* Inputs */
+.input, select.input, textarea.input {
 	height: 42px;
-	font-size: 15px;
-	color: var(--text-light);
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	border-radius: 10px;
 	padding: 0 12px;
+	border-radius: 10px;
+	background: rgba(255,255,255,0.08);
+	border: 1px solid rgba(255,255,255,0.22);
+	color: #fff;
 	outline: none;
-	transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+	box-sizing: border-box;
+	transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+/* Select dropdown options styling */
+select.input option {
+	background: #1a1a2e;
+	color: #ffffff;
+	padding: 8px 12px;
+}
+
+select.input option:hover,
+select.input option:focus,
+select.input option:checked {
+	background: #2a2a4e;
+	color: #ffffff;
 }
 
 textarea.input {
@@ -186,105 +206,84 @@ textarea.input {
 }
 
 .input::placeholder {
-	color: rgba(255, 255, 255, 0.6);
+	color: rgba(255,255,255,0.55);
 }
 
 .input:focus {
-	border-color: rgba(255, 255, 255, 0.6);
-	background: rgba(255, 255, 255, 0.12);
-	box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+	background: rgba(255,255,255,0.12);
+	border-color: rgba(255,255,255,0.45);
+	box-shadow: 0 3px 6px rgba(255,255,255,0.08) inset;
 }
 
-select.input option {
-	background-color: var(--primary-blue);
-	color: var(--text-light);
+/* Input with currency prefix */
+.input-group {
+	position: relative;
 }
 
-.text-danger {
-	color: #ffcdd2;
+	.input-group .prefix {
+		position: absolute;
+		left: 10px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		font-weight: 700;
+		color: rgba(255,255,255,0.9);
+		pointer-events: none;
+	}
+
+	.input-group .input {
+		padding-left: 34px;
+	}
+
+/* Validation */
+.validation-summary, .field-error {
+	color: #ffb3b3;
+}
+
+.validation-summary {
+	margin: 10px 32px 0;
+	font-size: 14px;
+}
+
+.field-error {
 	font-size: 12px;
-	margin-top: 6px;
 }
 
-/* ---------- Image Upload ---------- */
-.image-upload-section {
+/* Parts add section */
+.parts-add {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	gap: 16px;
-	background: rgba(255, 255, 255, 0.03);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 12px;
-	padding: 20px;
-	height: 100%;
-	box-sizing: border-box;
+	gap: 12px;
+	flex-wrap: wrap;
 }
 
-.image-box {
-	width: 220px;
-	aspect-ratio: 1 / 1;
-	border-radius: 14px;
-	border: 1px dashed rgba(255,255,255,.28);
-	background: rgba(255,255,255,.06);
-	display: grid;
-	place-items: center;
-	overflow: hidden;
-	cursor: pointer;
-	transition: background .2s, border-color .2s, box-shadow .2s;
+.component-search-input {
+	flex: 1 1 280px;
+	min-width: 200px;
 }
 
-	.image-box:hover {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255,255,255,.42);
-		box-shadow: 0 8px 24px rgba(0,0,0,.28);
-	}
-
-	.image-box img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-.hidden-file-input {
-	display: none;
-}
-
-/* ---------- Parts Collection Card ---------- */
-.parts-card {
-	grid-column: 1 / -1;
-	background: rgba(0,0,0,.15);
-	border: 1px solid rgba(255,255,255,.22);
-	border-radius: 14px;
-	padding: 14px 16px;
-	margin-top: 8px;
-	box-shadow: 0 6px 22px rgba(0,0,0,.20);
+/* Components table wrapper */
+.components-table-wrapper {
+	width: 100%;
+	overflow-x: auto;
+	border-radius: 8px;
+	background: rgba(0,0,0,0.2);
 	max-height: 420px;
-	overflow: auto;
+	overflow-y: auto;
 }
 
-.parts-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12px;
-}
-
-	.parts-header h3 {
-		font-size: 18px;
-		font-weight: 600;
-		margin: 0;
-	}
-
-.parts-table {
+/* Components table */
+.components-table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-	.parts-table thead th {
+	.components-table thead th {
 		text-align: left;
 		font-size: 12px;
 		font-weight: 700;
-		padding: 10px 8px;
+		padding: 10px 12px;
 		border-bottom: 1px solid rgba(255,255,255,.25);
 		color: #fff;
 		background: rgba(255,255,255,.08);
@@ -293,23 +292,35 @@ select.input option {
 		z-index: 1;
 	}
 
-	.parts-table tbody td {
-		padding: 10px 8px;
+	.components-table tbody td {
+		padding: 10px 12px;
 		border-bottom: 1px solid rgba(255,255,255,.15);
+		color: var(--text-light);
+		font-size: 15px;
 	}
 
-	.parts-table tfoot td {
-		padding: 12px 8px 0;
-		font-weight: 600;
+	.components-table tbody tr:hover {
+		background: rgba(255,255,255,.04);
 	}
 
-	.parts-table .input {
+	.components-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.components-table tfoot td {
+		padding: 16px 12px 12px;
+		font-weight: 700;
+		background: rgba(255,255,255,.05);
+		border-top: 2px solid rgba(255,255,255,.25);
+	}
+
+	.components-table .input {
 		height: 38px;
 		font-size: 14px;
 		padding: 0 8px;
 	}
 
-	.parts-table .qty-input {
+	.components-table .qty-input {
 		width: 80px;
 		text-align: center;
 	}
@@ -324,12 +335,12 @@ select.input option {
 	font-weight: 800;
 }
 
-/* ---------- Buttons ---------- */
-.actions {
+/* Buttons */
+.form-actions {
+	margin-top: 16px;
 	display: flex;
-	justify-content: center;
-	gap: 8px; /* Reduced gap for table actions */
-	white-space: nowrap;
+	justify-content: flex-end;
+	gap: 12px;
 }
 
 .btn {
@@ -351,7 +362,6 @@ select.input option {
 		transform: scale(0.98);
 	}
 
-	/* Specific sizes for table buttons */
 	.btn.btn-sm {
 		height: 36px;
 		padding: 0 16px;
@@ -370,16 +380,16 @@ select.input option {
 .btn-secondary {
 	background: transparent;
 	color: var(--text-light);
-	border: 1px solid rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255,255,255,0.4);
 }
 
 	.btn-secondary:hover {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255, 255, 255, 0.6);
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
 	}
 
 .btn-remove {
-	background: rgba(255, 255, 255, 0.08);
+	background: rgba(255,255,255,0.08);
 	color: var(--text-muted);
 	border: 1px solid transparent;
 	width: 32px;
@@ -389,16 +399,50 @@ select.input option {
 }
 
 	.btn-remove:hover {
-		background: rgba(255, 255, 255, 0.15);
+		background: rgba(255,255,255,0.15);
 		color: var(--text-light);
 	}
 
-/* Form actions */
-.form-actions {
-	margin: 20px 0 30px;
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
-	padding-top: 16px;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+.btn-ghost {
+	background: transparent;
+	color: var(--text-light);
+	border: 1px solid rgba(255,255,255,0.4);
 }
+
+	.btn-ghost:hover {
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
+		color: var(--text-light);
+	}
+
+/* Accessibility helpers */
+.sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Responsive tweaks - keep minimal because layout is handled with fxg utilities */
+@media (max-width:960px) {
+	.media-panel {
+		max-width: 420px;
+		width: 100%;
+	}
+
+	.section-head {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.parts-add {
+		width: 100%;
+	}
+}
+
+/* End of file */

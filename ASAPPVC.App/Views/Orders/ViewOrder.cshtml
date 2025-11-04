@@ -299,9 +299,10 @@
 										<td>
 											<div class="actions">
 												<a class="btn btn-secondary btn-sm"
-												   asp-controller="Inventory"
-												   asp-action="ViewProduct"
-												   asp-route-id="@(line.ProductId)">
+													asp-area="Warehouse"
+													asp-controller="Products"
+													asp-action="DetailsByCode"
+													asp-route-code="@(line.ProductCode)">
 													View
 												</a>
 											</div>
