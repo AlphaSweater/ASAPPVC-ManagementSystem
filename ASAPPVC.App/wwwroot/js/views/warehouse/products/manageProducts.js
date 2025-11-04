@@ -1,5 +1,6 @@
 ﻿/**
  * Live search functionality for Products Management page
+ * Now requests server-rendered rows partial instead of building HTML in JS.
  */
 
 (function () {
@@ -47,7 +48,7 @@
 			}, DEBOUNCE_DELAY);
 		});
 
-		// Clear search
+		// Clear search with Escape
 		searchInput.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape') {
 				searchInput.value = '';
@@ -57,7 +58,7 @@
 	}
 
 	/**
-	 * Perform the search via AJAX
+	 * Perform the search via AJAX requesting server-rendered rows partial
 	 * @param {string} term - Search term
 	 */
 	function performSearch(term) {
@@ -68,7 +69,6 @@
 
 		const controller = new AbortController();
 		currentRequest = controller;
-
 		const url = `/Warehouse/Products/Search?term=${encodeURIComponent(term)}`;
 
 		// Show loading state
@@ -77,26 +77,45 @@
 		fetch(url, {
 			method: 'GET',
 			headers: {
-				'Accept': 'application/json'
+				'Accept': 'text/html, application/json'
 			},
 			signal: controller.signal
 		})
-			.then(response => {
+			.then(async response => {
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-				return response.json();
+				const contentType = response.headers.get('content-type') || '';
+				if (contentType.indexOf('application/json') !== -1) {
+					return { json: await response.json() };
+				}
+				return { html: await response.text() };
 			})
-			.then(data => {
-				if (data.success) {
-					renderResults(data.products, term);
-				} else {
-					showError(data.error || 'Failed to search products');
+			.then(result => {
+				if (result.json) {
+					// Controller returns JSON for errors (success:false)
+					const data = result.json;
+					if (!data || data.success === false) {
+						// show error as table text instead of popup
+						showError(data?.error || 'Failed to search products');
+						return;
+					}
+					// If for some reason success=true JSON is returned, do nothing (we expect HTML for rows)
+				}
+				else if (result.html !== undefined) {
+					const tbody = document.querySelector('.table-products tbody');
+					if (!tbody) return;
+					tbody.innerHTML = result.html;
+					// Re-initialize copy buttons and any other client-side enhancers
+					if (window.initCopyButtons) {
+						window.initCopyButtons();
+					}
 				}
 			})
 			.catch(error => {
 				if (error.name !== 'AbortError') {
 					console.error('Search error:', error);
+					// Show error inside the table rather than a modal popup
 					showError('An error occurred while searching. Please try again.');
 				}
 			})
@@ -107,90 +126,9 @@
 	}
 
 	/**
-	 * Render search results
-	 * @param {Array} products - Array of product objects
-	 * @param {string} searchTerm - The search term used
-	 */
-	function renderResults(products, searchTerm) {
-		const tbody = document.querySelector('.table-products tbody');
-		if (!tbody) return;
-
-		if (!products || products.length === 0) {
-			tbody.innerHTML = `
-<tr>
-  <td colspan="6" class="ft-center" role="status" style="padding:40px; color:var(--text-muted);">
-              ${searchTerm ? `No products found for "${searchTerm}".` : 'No products found.'}
-          </td>
-       </tr>
-  `;
-			return;
-		}
-
-		tbody.innerHTML = products.map(product => createProductRow(product)).join('');
-
-		// Re-initialize copy buttons if they exist
-		if (window.initCopyButtons) {
-			window.initCopyButtons();
-		}
-	}
-
-	/**
-  * Create HTML for a product table row
-	 * @param {Object} product - Product object
-	 * @returns {string} HTML string
-	 */
-	function createProductRow(product) {
-		const hasImage = product.hasImage && product.thumbUrl;
-		const imageHtml = hasImage
-			? `<img src="${escapeHtml(product.thumbUrl)}" class="ft-media__img" loading="lazy" alt="" width="52" height="52" />`
-			: `<div class="ft-media__placeholder" aria-hidden="true">🧩</div>`;
-
-		return `
-            <tr>
-        <td class="ft-media">
-            ${imageHtml}
-            </td>
-            <td class="ft-code" title="${escapeHtml(product.productCode)}">
- <div class="ft-code__text">
-           <span>${escapeHtml(product.productCode)}</span>
-  <button type="button"
-    class="ft-code__copy"
-         data-copy="${escapeHtml(product.productCode)}"
-  data-action="copy"
-                aria-label="Copy product code">
- <lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
-            </button>
-               </div>
-        </td>
-             <td class="ft-name" title="${escapeHtml(product.productName)}">
-           <span class="ft-clip ft-clip--2">${escapeHtml(product.productName)}</span>
-</td>
-<td class="ft-desc" title="${escapeHtml(product.description)}">
-  <span class="ft-clip ft-clip--3">${escapeHtml(product.description)}</span>
-                </td>
-         <td class="ft-money">${escapeHtml(product.displayPrice)}</td>
-    <td class="ft-actions">
- <div class="actions">
-      <a class="btn btn-secondary btn-sm"
-       href="/Warehouse/Products/View/${encodeURIComponent(product.productCode)}"
-    aria-label="View ${escapeHtml(product.productName)}">
-        View
-            </a>
-              <a class="btn btn-primary btn-sm"
-         href="/Warehouse/Products/Edit/${encodeURIComponent(product.productCode)}"
-        aria-label="Edit ${escapeHtml(product.productName)}">
-            Edit
-       </a>
-      </div>
-    </td>
-            </tr>
-        `;
-	}
-
-	/**
 	 * Set loading state on the table
 	 * @param {boolean} isLoading - Whether loading is active
-  */
+	 */
 	function setLoadingState(isLoading) {
 		const table = document.querySelector('.table-products');
 		if (table) {
@@ -207,27 +145,26 @@
 	}
 
 	/**
-  * Show error message
+	 * Show error message inside the table as fallback
 	 * @param {string} message - Error message to display
 	 */
 	function showError(message) {
 		const tbody = document.querySelector('.table-products tbody');
 		if (!tbody) return;
-
 		tbody.innerHTML = `
-            <tr>
-        <td colspan="6" class="ft-center" role="alert" style="padding:40px; color:var(--error, #dc3545);">
-       ${escapeHtml(message)}
-      </td>
-          </tr>
-        `;
+<tr>
+ <td colspan="6" class="ft-center" role="alert" style="padding:40px; color:var(--error, #dc3545);">
+ ${escapeHtml(message)}
+ </td>
+</tr>
+`;
 	}
 
 	/**
-	   * Escape HTML to prevent XSS
-	   * @param {string} unsafe - Unsafe string
-	   * @returns {string} Escaped string
-	   */
+	 * Escape HTML to prevent XSS
+	 * @param {string} unsafe - Unsafe string
+	 * @returns {string} Escaped string
+	 */
 	function escapeHtml(unsafe) {
 		if (!unsafe) return '';
 		return unsafe
@@ -235,7 +172,7 @@
 			.replace(/&/g, "&amp;")
 			.replace(/</g, "&lt;")
 			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
+			.replace(/\"/g, "&quot;")
 			.replace(/'/g, "&#039;");
 	}
 

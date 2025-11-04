@@ -46,7 +46,8 @@ namespace ASAPPVC.App.Controllers.Warehouse
             if (!result.Ok || result.Value is null)
                 return Json(new { success = false, error = result.Error ?? "Failed to search products." });
 
-            return Json(new { success = true, products = result.Value });
+            // Return server-rendered rows partial (HTML) for the table to consume via JS
+            return PartialView("~/Views/Shared/Partials/_ProductRowsPartial.cshtml", result.Value);
         }
 
         // GET /Warehouse/Products/View/{id:guid}

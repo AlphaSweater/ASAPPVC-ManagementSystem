@@ -96,7 +96,8 @@
 					// Controller returns JSON for errors (success:false)
 					const data = result.json;
 					if (!data || data.success === false) {
-						showSwal(data?.error || 'Failed to search components');
+						// show error as table text instead of popup
+						showError(data?.error || 'Failed to search components');
 						return;
 					}
 					// If for some reason success=true JSON is returned, do nothing (we expect HTML for rows)
@@ -114,27 +115,14 @@
 			.catch(error => {
 				if (error.name !== 'AbortError') {
 					console.error('Search error:', error);
-					showSwal('An error occurred while searching. Please try again.');
+					// Show error inside the table rather than a modal popup
+					showError('An error occurred while searching. Please try again.');
 				}
 			})
 			.finally(() => {
 				setLoadingState(false);
 				currentRequest = null;
 			});
-	}
-
-	function showSwal(message) {
-		// Prefer global swal (SweetAlert). Fallback to simple in-table error row.
-		if (typeof window.swal === 'function') {
-			window.swal({ text: message, icon: 'error' });
-			return;
-		}
-		if (typeof swal === 'function') {
-			swal({ text: message, icon: 'error' });
-			return;
-		}
-		// fallback
-		showError(message);
 	}
 
 	/**

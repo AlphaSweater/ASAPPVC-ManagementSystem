@@ -52,7 +52,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
 
             var list = result.Value;
 
-            return PartialView("~/Views/Shared/_ComponentRowsPartial.cshtml", list);
+            return PartialView("~/Views/Shared/Partials/_ComponentRowsPartial.cshtml", list);
         }
 
         // GET /Warehouse/Components/View/{id:guid}

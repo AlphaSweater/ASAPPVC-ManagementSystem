@@ -71,76 +71,7 @@
 							<tbody>
 								@if (Model is { HasProducts: true })
 								{
-									foreach (var product in Model.Products)
-									{
-										<tr>
-											<!-- Image -->
-											<td class="ft-media">
-												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
-												{
-													<img src="@product.ThumbUrl"
-														 class="ft-media__img"
-														 loading="lazy"
-														 alt=""
-														 width="52" height="52" />
-												}
-												else
-												{
-													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
-												}
-											</td>
-
-											<!-- Code (fixed, no wrap) -->
-											<td class="ft-code" title="@product.ProductCode">
-												<div class="ft-code__text">
-													<span>@product.ProductCode</span>
-													<button type="button"
-															class="ft-code__copy"
-															data-copy="@product.ProductCode"
-															data-action="copy"
-															aria-label="Copy product code">
-														<lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
-														</button>
-												</div>
-											</td>
-
-
-											<!-- Name (2-line clamp) -->
-											<td class="ft-name" title="@product.ProductName">
-												<span class="ft-clip ft-clip--2">@product.ProductName</span>
-											</td>
-
-											<!-- Description (3-line clamp on desktop) -->
-											<td class="ft-desc" title="@product.Description">
-												<span class="ft-clip ft-clip--3">@product.Description</span>
-											</td>
-
-											<!-- Price (fixed width, no wrap) -->
-											<td class="ft-money">@product.DisplayPrice</td>
-
-											<!-- Actions -->
-											<td class="ft-actions">
-												<div class="actions">
-													<a class="btn btn-secondary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Products"
-													   asp-action="DetailsByCode"
-													   asp-route-code="@product.ProductCode"
-													   aria-label="View @product.ProductName">
-														View
-													</a>
-													<a class="btn btn-primary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Products"
-													   asp-action="EditByCode"
-													   asp-route-code="@product.ProductCode"
-													   aria-label="Edit @product.ProductName">
-														Edit
-													</a>
-												</div>
-											</td>
-										</tr>
-									}
+									@await Html.PartialAsync("Partials/_ProductRowsPartial", Model.Products)
 								}
 								else
 								{

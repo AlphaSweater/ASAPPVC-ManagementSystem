@@ -77,7 +77,7 @@
 							<tbody>
 								@if (Model is { HasComponents: true })
 								{
-									@await Html.PartialAsync("_ComponentRowsPartial", Model.Components)
+									@await Html.PartialAsync("Partials/_ComponentRowsPartial", Model.Components)
 								}
 								else
 								{
