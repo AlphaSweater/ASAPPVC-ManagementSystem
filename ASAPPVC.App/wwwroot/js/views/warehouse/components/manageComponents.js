@@ -1,5 +1,6 @@
 ﻿/**
  * Live search functionality for Components Management page
+ * Now requests server-rendered rows partial instead of building HTML in JS.
  */
 
 (function () {
@@ -57,7 +58,7 @@
 	}
 
 	/**
-	* Perform the search via AJAX
+	* Perform the search via AJAX requesting server-rendered rows partial
 	* @param {string} term - Search term
 	*/
 	function performSearch(term) {
@@ -68,7 +69,6 @@
 
 		const controller = new AbortController();
 		currentRequest = controller;
-
 		const url = `/Warehouse/Components/Search?term=${encodeURIComponent(term)}`;
 
 		// Show loading state
@@ -77,27 +77,44 @@
 		fetch(url, {
 			method: 'GET',
 			headers: {
-				'Accept': 'application/json'
+				'Accept': 'text/html, application/json'
 			},
 			signal: controller.signal
 		})
-			.then(response => {
+			.then(async response => {
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-				return response.json();
+				const contentType = response.headers.get('content-type') || '';
+				if (contentType.indexOf('application/json') !== -1) {
+					return { json: await response.json() };
+				}
+				return { html: await response.text() };
 			})
-			.then(data => {
-				if (data.success) {
-					renderResults(data.components, term);
-				} else {
-					showError(data.error || 'Failed to search components');
+			.then(result => {
+				if (result.json) {
+					// Controller returns JSON for errors (success:false)
+					const data = result.json;
+					if (!data || data.success === false) {
+						showSwal(data?.error || 'Failed to search components');
+						return;
+					}
+					// If for some reason success=true JSON is returned, do nothing (we expect HTML for rows)
+				}
+				else if (result.html !== undefined) {
+					const tbody = document.querySelector('.table-components tbody');
+					if (!tbody) return;
+					tbody.innerHTML = result.html;
+					// Re-initialize copy buttons and any other client-side enhancers
+					if (window.initCopyButtons) {
+						window.initCopyButtons();
+					}
 				}
 			})
 			.catch(error => {
 				if (error.name !== 'AbortError') {
 					console.error('Search error:', error);
-					showError('An error occurred while searching. Please try again.');
+					showSwal('An error occurred while searching. Please try again.');
 				}
 			})
 			.finally(() => {
@@ -106,77 +123,18 @@
 			});
 	}
 
-	/**
-	* Render search results
-	* @param {Array} components - Array of component objects
-	* @param {string} searchTerm - The search term used
-	*/
-	function renderResults(components, searchTerm) {
-		const tbody = document.querySelector('.table-components tbody');
-		if (!tbody) return;
-
-		if (!components || components.length === 0) {
-			tbody.innerHTML = `
-<tr>
- <td colspan="7" class="ft-center" role="status" style="padding:40px; color:var(--text-muted);">
- ${searchTerm ? `No components found for "${escapeHtml(searchTerm)}".` : 'No components found.'}
- </td>
-</tr>
-`;
+	function showSwal(message) {
+		// Prefer global swal (SweetAlert). Fallback to simple in-table error row.
+		if (typeof window.swal === 'function') {
+			window.swal({ text: message, icon: 'error' });
 			return;
 		}
-
-		tbody.innerHTML = components.map(component => createComponentRow(component)).join('');
-
-		// Re-initialize copy buttons if they exist
-		if (window.initCopyButtons) {
-			window.initCopyButtons();
+		if (typeof swal === 'function') {
+			swal({ text: message, icon: 'error' });
+			return;
 		}
-	}
-
-	/**
-	* Create HTML for a component table row
-	* @param {Object} component - Component object
-	* @returns {string} HTML string
-	*/
-	function createComponentRow(component) {
-		const hasImage = component.hasImage && component.thumbUrl;
-		const imageHtml = hasImage
-			? `<img src="${escapeHtml(component.thumbUrl)}" class="ft-media__img" loading="lazy" alt="" width="52" height="52" />`
-			: `<div class="ft-media__placeholder" aria-hidden="true">🧩</div>`;
-
-		return `
-<tr>
- <td class="ft-media">
- ${imageHtml}
- </td>
- <td class="ft-code" title="${escapeHtml(component.componentCode)}">
- <div class="ft-code__text">
- <span>${escapeHtml(component.componentCode)}</span>
- <button type="button" class="ft-code__copy" data-copy="${escapeHtml(component.componentCode)}" data-action="copy" aria-label="Copy component code">
- <lucideIcon class="icon" name="copy" size="16" stroke-width="1.75" />
- </button>
- </div>
- </td>
- <td class="ft-name" title="${escapeHtml(component.componentName)}">
- <span class="ft-clip ft-clip--2">${escapeHtml(component.componentName)}</span>
- </td>
- <td class="ft-location">${escapeHtml(component.locationCode)}</td>
- <td class="ft-stock">${escapeHtml(component.shortFormattedQuantity)}</td>
- <td class="ft-money">${escapeHtml(component.displayCost)}</td>
- <td class="ft-actions">
- <div class="actions">
- ${component.componentCode ?
-				`<a class="btn btn-secondary btn-sm" href="/Warehouse/Components/View/${encodeURIComponent(component.componentCode)}" aria-label="View ${escapeHtml(component.componentName)}">View</a>
- <a class="btn btn-primary btn-sm" href="/Warehouse/Components/Edit/${encodeURIComponent(component.componentCode)}" aria-label="Edit ${escapeHtml(component.componentName)}">Edit</a>`
-				:
-				`<a class="btn btn-secondary btn-sm" href="/Warehouse/Components/View/${encodeURIComponent(component.id)}" aria-label="View ${escapeHtml(component.componentName)}">View</a>
- <a class="btn btn-primary btn-sm" href="/Warehouse/Components/Edit/${encodeURIComponent(component.id)}" aria-label="Edit ${escapeHtml(component.componentName)}">Edit</a>`
-			}
- </div>
- </td>
-</tr>
-`;
+		// fallback
+		showError(message);
 	}
 
 	/**
@@ -199,13 +157,12 @@
 	}
 
 	/**
-	* Show error message
+	* Show error message inside the table as fallback
 	* @param {string} message - Error message to display
 	*/
 	function showError(message) {
 		const tbody = document.querySelector('.table-components tbody');
 		if (!tbody) return;
-
 		tbody.innerHTML = `
 <tr>
  <td colspan="7" class="ft-center" role="alert" style="padding:40px; color:var(--error, #dc3545);">
