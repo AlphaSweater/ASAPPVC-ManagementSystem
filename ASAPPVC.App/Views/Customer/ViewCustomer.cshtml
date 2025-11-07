@@ -10,7 +10,6 @@
 }
 
 <div class="page">
-    @await Html.PartialAsync("_BackButton")
 
     <div role="region" aria-labelledby="page-title">
         <header class="card-header">
@@ -25,15 +24,7 @@
 
         <div class="card-body">
             <section class="fields-panel" style="width:100%">
-                <div class="form-grid">
-                    <div class="form-field full">
-                        <form class="search-form" asp-controller="Customers" asp-action="Index" method="get">
-                            <input class="search-input input" type="text" name="q" placeholder="Search customers..." value="@Context.Request.Query["q"]" />
-                            <button class="btn btn-ghost" type="submit">Search</button>
-                        </form>
-                    </div>
-                </div>
-
+              
                 <!-- Table -->
                 <section class="table-section">
                     <table class="table">
