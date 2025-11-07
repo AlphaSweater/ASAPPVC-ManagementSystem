@@ -107,6 +107,36 @@ namespace ASAPPVC.App.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST /Orders/MarkPicked/{id}
+        [HttpPost("MarkPicked/{id:guid}")]
+        public async Task<IActionResult> MarkPicked([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.MarkPickedAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order marked as picked and stock reduced." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
+        }
+
+        // POST /Orders/MarkCompleted/{id}
+        [HttpPost("MarkCompleted/{id:guid}")]
+        public async Task<IActionResult> MarkCompleted([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.MarkCompletedAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order marked as completed." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
+        }
+
+        // POST /Orders/Cancel/{id}
+        [HttpPost("Cancel/{id:guid}")]
+        public async Task<IActionResult> Cancel([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.CancelAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order cancelled." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
+        }
+
         // ===== Helpers =====
 
         private async Task<IActionResult> GetAndShowDetails(Guid id, CancellationToken ct)

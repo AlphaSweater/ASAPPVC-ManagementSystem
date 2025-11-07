@@ -1,6 +1,7 @@
 @model ASAPPVC.App.Models.OrderDetailVm
 @{
 	ViewData["Title"] = $"Order #{Model.OrderCode}";
+	@using ASAPPVC.App.Models.Enums
 }
 
 @section Styles {
@@ -228,8 +229,28 @@
 				<h1 id="page-title" class="card-title">Order #@Model.OrderCode</h1>
 				<p class="card-subtitle">Order details and items.</p>
 			</div>
-			<div class="card-actions">
+			<div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
 				<a asp-action="PickingSlip" asp-route-id="@Model.Id" class="btn btn-ghost">Create Picking Slip</a>
+
+				@* Show actions based on status *@
+				@if (Model.OrderStatus == OrderStatus.Pending)
+				{
+					<form asp-action="MarkPicked" asp-controller="Orders" asp-route-id="@Model.Id" method="post" class="inline">
+						<button type="submit" class="btn btn-primary">Mark as Picked</button>
+					</form>
+					<form asp-action="Cancel" asp-controller="Orders" asp-route-id="@Model.Id" method="post" class="inline">
+						<button type="submit" class="btn btn-secondary">Cancel Order</button>
+					</form>
+				}
+				else if (Model.OrderStatus == OrderStatus.Processing)
+				{
+					<form asp-action="MarkCompleted" asp-controller="Orders" asp-route-id="@Model.Id" method="post" class="inline">
+						<button type="submit" class="btn btn-primary">Order Completed</button>
+					</form>
+					<form asp-action="Cancel" asp-controller="Orders" asp-route-id="@Model.Id" method="post" class="inline">
+						<button type="submit" class="btn btn-secondary">Cancel Order</button>
+					</form>
+				}
 			</div>
 		</header>
 

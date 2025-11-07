@@ -1,4 +1,5 @@
 ﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
 
@@ -94,6 +95,10 @@ namespace ASAPPVC.App.Services
         /// A <see cref="Result"/> indicating success or failure with an error message.
         /// </returns>
         Task<Result> DeleteAsync(Guid id, CancellationToken ct = default);
+
+        Task<Result> MarkPickedAsync(Guid orderId, CancellationToken ct = default);
+        Task<Result> MarkCompletedAsync(Guid orderId, CancellationToken ct = default);
+        Task<Result> CancelAsync(Guid orderId, CancellationToken ct = default);
     }
 
     #endregion Interface
@@ -102,12 +107,14 @@ namespace ASAPPVC.App.Services
         IOrderRepository orderRepository,
         ICustomerRepository customerRepository,
         IProductRepository productRepository,
+        IComponentRepository componentRepository,
         IOrderMapper orderMapper,
         IAuthService authService) : IOrderService
     {
         private readonly IOrderRepository _orders = orderRepository;
         private readonly ICustomerRepository _customers = customerRepository;
         private readonly IProductRepository _products = productRepository;
+        private readonly IComponentRepository _components = componentRepository;
         private readonly IOrderMapper _mapper = orderMapper;
         private readonly IAuthService _auth = authService;
 
@@ -421,6 +428,137 @@ namespace ASAPPVC.App.Services
             {
                 return Result.Fail($"Failed to delete order: {ex.Message}");
             }
+        }
+
+        public async Task<Result> MarkPickedAsync(Guid orderId, CancellationToken ct = default)
+        {
+            if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
+
+            // Load full graph (tracking enabled for updates)
+            var order = await _orders.GetFullDomainAsync(orderId, asNoTracking: false, ct);
+            if (order is null) return Result.Fail("Order not found.");
+
+            // Guards / idempotency
+            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Cannot pick a cancelled order.");
+            if (order.OrderStatus == OrderStatus.Completed) return Result.Fail("Order already completed.");
+            if (order.OrderStatus == OrderStatus.Processing) return Result.Success();
+
+            var totals = ComputeRequiredComponentTotals(order);
+            if (totals.Count == 0) return Result.Fail("Order has no components to pick.");
+
+            // Validate stock
+            var insufficient = new List<string>();
+            foreach (var (cid, needed) in totals)
+            {
+                var comp = order.OrderProducts
+                    .SelectMany(x => x.Product!.ProductComponents)
+                    .Select(pc => pc.Component!)
+                    .First(c => c.Id == cid);
+
+                if (comp.QuantityOnHand < needed)
+                    insufficient.Add($"{comp.ComponentCode} needs {needed} {comp.UnitOfMeasure} (have {comp.QuantityOnHand})");
+            }
+            if (insufficient.Count > 0) return Result.Fail("Insufficient stock: " + string.Join("; ", insufficient));
+
+            // Deduct stock
+            foreach (var (cid, needed) in totals)
+            {
+                var comp = order.OrderProducts
+                    .SelectMany(x => x.Product!.ProductComponents)
+                    .Select(pc => pc.Component!)
+                    .First(c => c.Id == cid);
+
+                comp.QuantityOnHand -= needed;
+                _components.Update(comp);
+            }
+
+            order.OrderStatus = OrderStatus.Processing;
+            order.UpdatedAt = DateTime.UtcNow;
+            _orders.Update(order);
+
+            await _components.SaveAsync(ct);
+            await _orders.SaveAsync(ct);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> MarkCompletedAsync(Guid orderId, CancellationToken ct = default)
+        {
+            if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
+
+            var order = await _orders.GetByIdAsync(orderId, asNoTracking: false, ct);
+            if (order is null) return Result.Fail("Order not found.");
+
+            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Order is cancelled.");
+            if (order.OrderStatus == OrderStatus.Completed) return Result.Success(); // idempotent
+            if (order.OrderStatus != OrderStatus.Processing)
+                return Result.Fail("Only picked orders can be marked as completed.");
+
+            order.OrderStatus = OrderStatus.Completed;
+            order.UpdatedAt = DateTime.UtcNow;
+            _orders.Update(order);
+            await _orders.SaveAsync(ct);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> CancelAsync(Guid orderId, CancellationToken ct = default)
+        {
+            if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
+
+            var order = await _orders.GetFullDomainAsync(orderId, asNoTracking: false, ct);
+            if (order is null) return Result.Fail("Order not found.");
+
+            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Success(); // idempotent
+            if (order.OrderStatus == OrderStatus.Completed)
+                return Result.Fail("Completed orders cannot be cancelled.");
+
+            // If already picked, put stock back
+            if (order.OrderStatus == OrderStatus.Processing)
+            {
+                var totals = ComputeRequiredComponentTotals(order);
+                foreach (var (cid, qty) in totals)
+                {
+                    var comp = order.OrderProducts
+                        .SelectMany(x => x.Product!.ProductComponents)
+                        .Select(pc => pc.Component!)
+                        .First(c => c.Id == cid);
+
+                    comp.QuantityOnHand += qty;
+                    _components.Update(comp);
+                }
+                await _components.SaveAsync(ct);
+            }
+
+            order.OrderStatus = OrderStatus.Cancelled;
+            order.UpdatedAt = DateTime.UtcNow;
+            _orders.Update(order);
+            await _orders.SaveAsync(ct);
+
+            return Result.Success();
+        }
+
+        //helper
+        private static Dictionary<Guid, decimal> ComputeRequiredComponentTotals(Order order)
+        {
+            var totals = new Dictionary<Guid, decimal>();
+
+            foreach (var op in order.OrderProducts)
+            {
+                if (op.Product?.ProductComponents is null) continue;
+
+                foreach (var pc in op.Product.ProductComponents)
+                {
+                    if (pc.Component is null) continue;
+
+                    var required = pc.RequiredQuantity * op.OrderedQuantity;
+                    totals[pc.Component.Id] = totals.TryGetValue(pc.Component.Id, out var cur)
+                        ? cur + required
+                        : required;
+                }
+            }
+
+            return totals;
         }
     }
 }
