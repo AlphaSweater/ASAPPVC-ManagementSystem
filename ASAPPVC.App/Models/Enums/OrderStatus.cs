@@ -7,7 +7,7 @@ namespace ASAPPVC.App.Models.Enums
     public enum OrderStatus
     {
         Pending,
-        Processing,
+        Picked,
         Shipped,
         Completed,
         Cancelled

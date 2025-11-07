@@ -51,7 +51,7 @@ namespace ASAPPVC.App.Controllers.Warehouse
             // Get open orders count (Pending + Processing)
             var ordersResult = await _orderService.ListAsync(ct);
             vm.OpenOrdersCount = ordersResult.Ok && ordersResult.Value != null
-                ? ordersResult.Value.Count(o => o.OrderStatus == OrderStatus.Pending || o.OrderStatus == OrderStatus.Processing)
+                ? ordersResult.Value.Count(o => o.OrderStatus == OrderStatus.Pending || o.OrderStatus == OrderStatus.Picked)
                 : 0;
 
             // Get low stock count (components with status Low, Critical, or OutOfStock)
