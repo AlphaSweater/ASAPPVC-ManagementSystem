@@ -27,7 +27,7 @@
 			</div>
 		</header>
 
-		<form id="upsert-order-form" asp-action="Upsert" method="post" novalidate class="fxg-f-col fxg-u-gap-6">
+		<form id="upsert-order-form" asp-action="Upsert" method="post" class="fxg-f-col fxg-u-gap-6">
 			@Html.AntiForgeryToken()
 
 			@if (isEdit)
@@ -116,6 +116,9 @@
 								   class="input qty-input-inline"
 								   value="1"
 								   min="1"
+								   step="1"
+								   required
+								   inputmode="numeric"
 								   aria-label="Quantity"
 								   style="width: 100px; text-align: center;" />
 
