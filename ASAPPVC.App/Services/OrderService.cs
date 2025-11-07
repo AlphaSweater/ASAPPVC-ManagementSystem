@@ -441,7 +441,7 @@ namespace ASAPPVC.App.Services
             // Guards / idempotency
             if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Cannot pick a cancelled order.");
             if (order.OrderStatus == OrderStatus.Completed) return Result.Fail("Order already completed.");
-            if (order.OrderStatus == OrderStatus.Processing) return Result.Success();
+            if (order.OrderStatus == OrderStatus.Picked) return Result.Success();
 
             var totals = ComputeRequiredComponentTotals(order);
             if (totals.Count == 0) return Result.Fail("Order has no components to pick.");
@@ -472,7 +472,7 @@ namespace ASAPPVC.App.Services
                 _components.Update(comp);
             }
 
-            order.OrderStatus = OrderStatus.Processing;
+            order.OrderStatus = OrderStatus.Picked;
             order.UpdatedAt = DateTime.UtcNow;
             _orders.Update(order);
 
@@ -491,7 +491,7 @@ namespace ASAPPVC.App.Services
 
             if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Order is cancelled.");
             if (order.OrderStatus == OrderStatus.Completed) return Result.Success(); // idempotent
-            if (order.OrderStatus != OrderStatus.Processing)
+            if (order.OrderStatus != OrderStatus.Picked)
                 return Result.Fail("Only picked orders can be marked as completed.");
 
             order.OrderStatus = OrderStatus.Completed;
@@ -514,7 +514,7 @@ namespace ASAPPVC.App.Services
                 return Result.Fail("Completed orders cannot be cancelled.");
 
             // If already picked, put stock back
-            if (order.OrderStatus == OrderStatus.Processing)
+            if (order.OrderStatus == OrderStatus.Picked)
             {
                 var totals = ComputeRequiredComponentTotals(order);
                 foreach (var (cid, qty) in totals)
