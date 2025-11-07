@@ -1,4 +1,5 @@
 ﻿@using ASAPPVC.App.Models
+@using ASAPPVC.App.Models.Enums
 @model ProductFormVm
 @{
 	ViewData["Title"] = Model.IsEdit ? "Edit Product" : "Add New Product";
@@ -86,19 +87,19 @@
 							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
 								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
 									<label asp-for="Category" class="label"></label>
-									<input asp-for="Category" class="input" placeholder="e.g. Electronics" />
+									<select asp-for="Category" class="input" asp-items="Html.GetEnumSelectList<Category>()"></select>
 									<span asp-validation-for="Category" class="field-error"></span>
 								</div>
 
 								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
 									<label asp-for="MaterialType" class="label"></label>
-									<input asp-for="MaterialType" class="input" placeholder="e.g. Plastic" />
+									<select asp-for="MaterialType" class="input" asp-items="Html.GetEnumSelectList<Material>()"></select>
 									<span asp-validation-for="MaterialType" class="field-error"></span>
 								</div>
 
 								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
 									<label asp-for="ColourOption" class="label"></label>
-									<input asp-for="ColourOption" class="input" placeholder="e.g. Blue" />
+									<select asp-for="ColourOption" class="input" asp-items="Html.GetEnumSelectList<Colour>()"></select>
 									<span asp-validation-for="ColourOption" class="field-error"></span>
 								</div>
 							</div>
