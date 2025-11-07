@@ -230,7 +230,7 @@
 				<p class="card-subtitle">Order details and items.</p>
 			</div>
 			<div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
-				<a asp-action="PickingSlip" asp-route-id="@Model.Id" class="btn btn-ghost">Create Picking Slip</a>
+				<a asp-controller="Reports" asp-action="PickingSlip" asp-route-id="@Model.Id" class="btn btn-ghost">Create Picking Slip</a>
 
 				@if (Model.OrderStatus == OrderStatus.Pending)
 				{
