@@ -1,84 +1,99 @@
 @model List<ASAPPVC.App.Models.OrderListVm>
 @{
-	ViewData["Title"] = "Orders";
+    ViewData["Title"] = "Orders";
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/flexy-grids.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/views/orders/ManageOrders.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/flexy-grids.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/views/orders/ManageOrders.css" asp-append-version="true" />
 }
 
 <div class="page">
-	<div role="region" aria-labelledby="page-title">
-		<header class="card-header">
-			<div>
-				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
-				<p class="card-subtitle">Browse and manage customer orders.</p>
-			</div>
-			<div class="card-actions">
-				<a class="btn btn-ghost"
-				   asp-area=""
-				   asp-controller="Orders"
-				   asp-action="AddNew">
-					+ Create Order
-				</a>
-			</div>
-		</header>
+    <div role="region" aria-labelledby="page-title">
+        <header class="card-header">
+            <div>
+                <h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
+                <p class="card-subtitle">Browse and manage customer orders.</p>
+            </div>
+            <div class="card-actions">
+                <a class="btn btn-ghost" asp-controller="Orders" asp-action="AddNew">+ Create Order</a>
+            </div>
+        </header>
 
-		@if (TempData["AlertMessage"] is string alert)
-		{
-			<div class="alert">@alert</div>
-		}
+        @if (TempData["AlertMessage"] is string alert)
+        {
+            <div class="alert">@alert</div>
+        }
 
-		<div class="card-body">
-			<section class="fields-panel" style="width:100%">
-				<section class="table-section">
-					<div class="fancy-wrap">
-						<table class="fancy-table fancy-table--zebra">
-							<thead>
-								<tr>
-									<th class="ft-shrink ft-code" style="width:110px;">Order #</th>
-									<th class="ft-grow ft-name">Customer</th>
-									<th class="ft-shrink" style="width:180px;">Date</th>
-									<th class="ft-shrink">Status</th>
-									<th class="ft-right ft-shrink" style="width:120px;"># Products</th>
-									<th class="ft-actions ft-shrink" style="width:150px; text-align:center;">Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								@if (Model == null || !Model.Any())
-								{
-									<tr>
-										<td colspan="6" class="ft-center" style="padding:40px; color: var(--text-muted);">
-											No orders yet.
-										</td>
-									</tr>
-								}
-								else
-								{
-									foreach (var o in Model)
-									{
-										<tr>
-											<td class="ft-code">@o.OrderCode</td>
-											<td class="ft-name">@o.CustomerName</td>
-											<td class="ft-left">@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-											<td class="ft-left">@o.OrderStatus</td>
-											<td class="ft-number ft-right">@o.ItemCount</td>
-											<td>
-												<div class="actions">
-													<a Asp-area="" asp-action="DetailsByCode" asp-route-code="@o.OrderCode" class="btn btn-secondary btn-sm">View</a>
-													<a asp-controller="Reports" asp-action="PickingSlip" asp-route-id="@o.Id" class="btn btn-primary btn-sm">Picking Slip</a>
-												</div>
-											</td>
-										</tr>
-									}
-								}
-							</tbody>
-						</table>
-					</div>
-				</section>
-			</section>
-		</div>
-	</div>
+        <div class="card-body">
+            <section class="fields-panel" style="width:100%">
+
+                <!-- Search + Status filter (mirrors Components) -->
+                <form class="search-form"
+                      asp-controller="Orders"
+                      asp-action="Index"
+                      method="get"
+                      role="search"
+                      aria-label="Search orders"
+                      style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    <input class="input"
+                           type="text"
+                           name="term"
+                           placeholder="Search by order code or customer..."
+                           value="@(ViewData["SearchQuery"] as string ?? string.Empty)"
+                           aria-label="Search query" />
+
+                    @{
+                        var statusFilter = (ViewData["StatusFilter"] as string ?? "").ToLowerInvariant();
+                        string Sel(string v) => statusFilter == v ? "selected" : null;
+                    }
+                    <select class="input" name="status" aria-label="Order status filter">
+                        <option value="pendingpicked" selected>Pending + Picked</option>
+                        <option value="pending">Pending</option>
+                        <option value="picked">Picked</option>
+                        <option value="completed">Completed</option>
+                        <option value="all">All statuses</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-ghost">Search</button>
+                </form>
+
+                <section class="table-section">
+                    <div class="fancy-wrap">
+                        <table class="fancy-table fancy-table--zebra table-orders">
+                            <thead>
+                                <tr>
+                                    <th class="ft-shrink ft-code" style="width:110px;">Order #</th>
+                                    <th class="ft-grow ft-name">Customer</th>
+                                    <th class="ft-shrink" style="width:180px;">Date</th>
+                                    <th class="ft-shrink">Status</th>
+                                    <th class="ft-right ft-shrink" style="width:120px;"># Products</th>
+                                    <th class="ft-actions ft-shrink" style="width:150px; text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model == null || !Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="ft-center" style="padding:40px; color: var(--text-muted);">
+                                            No orders yet.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @await Html.PartialAsync("Partials/_OrderRowsPartial", Model)
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/views/orders/manageOrders.js" asp-append-version="true"></script>
+}

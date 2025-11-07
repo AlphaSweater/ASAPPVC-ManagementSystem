@@ -87,6 +87,8 @@ namespace ASAPPVC.App.Services
         /// </returns>
         Task<Result<List<OrderListVm>>> SearchAsync(string? term, CancellationToken ct = default);
 
+        Task<Result<List<OrderListVm>>> SearchAsync(string? term, OrderStatus? statusFilter, CancellationToken ct = default);
+
         /// <summary>
         /// Deletes an order by its internal identifier.
         /// </summary>
@@ -97,7 +99,9 @@ namespace ASAPPVC.App.Services
         Task<Result> DeleteAsync(Guid id, CancellationToken ct = default);
 
         Task<Result> MarkPickedAsync(Guid orderId, CancellationToken ct = default);
+
         Task<Result> MarkCompletedAsync(Guid orderId, CancellationToken ct = default);
+
         Task<Result> CancelAsync(Guid orderId, CancellationToken ct = default);
     }
 
@@ -409,6 +413,29 @@ namespace ASAPPVC.App.Services
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Searches orders by term and status filter (overload method allows for backwards compatibility by preserving original search method)
+        public async Task<Result<List<OrderListVm>>> SearchAsync(string? term, OrderStatus? statusFilter, CancellationToken ct = default)
+        {
+            try
+            {
+                term ??= string.Empty;
+
+                // reuse your repo search (by term)
+                var orders = await _orders.SearchAsync(term, asNoTracking: true, ct);
+
+                if (statusFilter.HasValue)
+                    orders = orders.Where(o => o.OrderStatus == statusFilter.Value).ToList();
+
+                var listVms = orders.Select(o => _mapper.ToListVm(o)).ToList();
+                return Result<List<OrderListVm>>.Success(listVms);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<OrderListVm>>.Fail($"Failed to search orders: {ex.Message}");
+            }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         // Deletes an order by ID
         public async Task<Result> DeleteAsync(Guid id, CancellationToken ct = default)
         {
@@ -430,18 +457,27 @@ namespace ASAPPVC.App.Services
             }
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Marks an order as picked (deducts stock)
         public async Task<Result> MarkPickedAsync(Guid orderId, CancellationToken ct = default)
         {
             if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
 
-            // Load full graph (tracking enabled for updates)
             var order = await _orders.GetFullDomainAsync(orderId, asNoTracking: false, ct);
             if (order is null) return Result.Fail("Order not found.");
 
-            // Guards / idempotency
-            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Cannot pick a cancelled order.");
-            if (order.OrderStatus == OrderStatus.Completed) return Result.Fail("Order already completed.");
-            if (order.OrderStatus == OrderStatus.Picked) return Result.Success();
+            if (order.OrderStatus == OrderStatus.Cancelled)
+            {
+                return Result.Fail("Cannot pick a cancelled order.");
+            }
+            if (order.OrderStatus == OrderStatus.Completed)
+            {
+                return Result.Fail("Order already completed.");
+            }
+            if (order.OrderStatus == OrderStatus.Picked)
+            {
+                return Result.Success();
+            }
 
             var totals = ComputeRequiredComponentTotals(order);
             if (totals.Count == 0) return Result.Fail("Order has no components to pick.");
@@ -482,6 +518,8 @@ namespace ASAPPVC.App.Services
             return Result.Success();
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Marks an order as completed
         public async Task<Result> MarkCompletedAsync(Guid orderId, CancellationToken ct = default)
         {
             if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
@@ -489,10 +527,18 @@ namespace ASAPPVC.App.Services
             var order = await _orders.GetByIdAsync(orderId, asNoTracking: false, ct);
             if (order is null) return Result.Fail("Order not found.");
 
-            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Fail("Order is cancelled.");
-            if (order.OrderStatus == OrderStatus.Completed) return Result.Success(); // idempotent
+            if (order.OrderStatus == OrderStatus.Cancelled)
+            {
+                return Result.Fail("Order is cancelled.");
+            }
+            if (order.OrderStatus == OrderStatus.Completed)
+            {
+                return Result.Success();
+            }
             if (order.OrderStatus != OrderStatus.Picked)
+            {
                 return Result.Fail("Only picked orders can be marked as completed.");
+            }
 
             order.OrderStatus = OrderStatus.Completed;
             order.UpdatedAt = DateTime.UtcNow;
@@ -502,16 +548,26 @@ namespace ASAPPVC.App.Services
             return Result.Success();
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        // Cancels an order (restores stock if picked)
         public async Task<Result> CancelAsync(Guid orderId, CancellationToken ct = default)
         {
-            if (orderId == Guid.Empty) return Result.Fail("Order ID is required.");
+            if (orderId == Guid.Empty)
+            {
+                return Result.Fail("Order ID is required.");
+            }
 
             var order = await _orders.GetFullDomainAsync(orderId, asNoTracking: false, ct);
             if (order is null) return Result.Fail("Order not found.");
 
-            if (order.OrderStatus == OrderStatus.Cancelled) return Result.Success(); // idempotent
-            if (order.OrderStatus == OrderStatus.Completed)
+            if (order.OrderStatus == OrderStatus.Cancelled)
+            {
+                return Result.Success();
+            }
+            if (order.OrderStatus == OrderStatus.Completed) 
+            { 
                 return Result.Fail("Completed orders cannot be cancelled.");
+            }   
 
             // If already picked, put stock back
             if (order.OrderStatus == OrderStatus.Picked)
@@ -538,6 +594,7 @@ namespace ASAPPVC.App.Services
             return Result.Success();
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         //helper
         private static Dictionary<Guid, decimal> ComputeRequiredComponentTotals(Order order)
         {
