@@ -1,32 +1,37 @@
-@using ASAPPVC.App.Models
+﻿@using ASAPPVC.App.Models
 @model ProductFormVm
 @{
 	ViewData["Title"] = Model.IsEdit ? "Edit Product" : "Add New Product";
+	ViewData["ShowBackPageName"] = true;
+
+	string placeholder = Url.Content("~/Assets/Images/placeholder.png");
+	string startImg = !string.IsNullOrWhiteSpace(Model?.ExistingImageUrl)
+		? Model.ExistingImageUrl!
+		: placeholder;
 }
 
 @section Styles {
-	<link rel="stylesheet" href="~/css/views/shared/FormEnhanced.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/views/shared/FormCard.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/flexy-grids.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/products/UpsertProduct.css" asp-append-version="true" />
 }
 
-<div class="page">
+<div class="page fxg-u-container fxg-u-min-h-20vh">
 	@await Html.PartialAsync("_BackButton")
 
-	<div role="region" aria-labelledby="page-title">
-		<header class="card-header">
+	<div role="region" aria-labelledby="page-title" class="fxg-f-col fxg-u-gap-6">
+
+		<header class="card-header fxg-f-row fxg-f-main-between fxg-f-cross-center fxg-u-p-4 fxg-u-rounded">
 			<div>
 				<h1 id="page-title" class="card-title">@ViewData["Title"]</h1>
 				<p class="card-subtitle">Create or edit a product, set price and link components.</p>
 			</div>
-			<div class="card-actions">
-				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="Index">Products</a>
+
+			<div class="card-actions fxg-f-row fxg-u-gap-4 fxg-f-cross-center">
+				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="Index">🏷️ Products</a>
 			</div>
 		</header>
 
-		<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
-
-		<form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="Upsert" method="post" enctype="multipart/form-data">
+		<form id="addProductForm" asp-area="Warehouse" asp-controller="Products" asp-action="Upsert" method="post" enctype="multipart/form-data" class="fxg-f-col fxg-u-gap-6">
 			@Html.AntiForgeryToken()
 
 			@if (Model.IsEdit)
@@ -35,71 +40,115 @@
 				<input asp-for="ProductCode" type="hidden" />
 			}
 
-			<div class="card-body add-product-body">
-				<!-- Top Section: Image and Form Fields Side by Side -->
-				<div class="form-layout">
-					<!-- Left: Image Upload -->
-					<div class="form-image">
-						<div class="image-box" onclick="document.getElementById('imageFile').click();">
-							<img id="previewImg" src="@(Model.ExistingImageUrl ?? "/Assets/Images/placeholder.png")" alt="Product Image Preview" />
-						</div>
-						<button type="button" class="btn btn-primary" onclick="document.getElementById('imageFile').click();">Upload Image</button>
-						<input id="imageFile" name="Image" type="file" accept="image/*" class="hidden-file-input" />
-					</div>
+			<div class="card-body fxg-f-col fxg-u-gap-6">
+				<div class="validation-summary" asp-validation-summary="ModelOnly"></div>
 
-					<!-- Right: Form Fields -->
-					<div class="form-fields">
-						<div class="form-field">
-							<label asp-for="ProductName" class="label"></label>
-							<input asp-for="ProductName" class="input" placeholder="Enter product name" />
-							<span asp-validation-for="ProductName" class="field-error"></span>
-						</div>
-						<div class="form-field">
-							<label asp-for="SellingPrice" class="label"></label>
-							<input asp-for="SellingPrice" class="input" step="0.01" placeholder="e.g. R 299.99" />
-							<span asp-validation-for="SellingPrice" class="field-error"></span>
-						</div>
-						<div class="form-field">
-							<label asp-for="Description" class="label"></label>
-							<textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
-							<span asp-validation-for="Description" class="field-error"></span>
-						</div>
+				<!-- Row 1: Media + Product Information -->
+				<div class="fxg-f-row fxg-f-nowrap fxg-u-gap-6">
+					<section class="media-panel fxg-f-col fxg-f-main-center fxg-f-cross-center fxg-f-grow-1">
+						<h2 class="sr-only">Product Image</h2>
+
+						<label for="imageFile" id="dropzone" class="dropzone fxg-f-col fxg-f-main-center fxg-f-cross-center" tabindex="0" aria-label="Choose or drop an image">
+							<img id="previewImg" src="@startImg" alt="Product image preview" />
+							<div class="dropzone-overlay">
+								📷 <span><strong>Drop an image</strong> or choose a file<br /><small>PNG, JPG, WEBP — up to 5MB</small></span>
+							</div>
+						</label>
+						<input id="imageFile" name="Image" type="file" accept="image/*" class="file-input" />
+						<noscript><p class="field-error">Image preview requires JavaScript.</p></noscript>
+					</section>
+
+					<div class="fxg-f-col fxg-f-grow-1 fxg-u-gap-6">
+						<section class="section-card fxg-f-col fxg-u-gap-4">
+							<h2 class="section-title">Product Information</h2>
+
+							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+								<div class="form-field" style="flex: 2 1 360px; min-width: 260px;">
+									<label asp-for="ProductName" class="label"></label>
+									<input asp-for="ProductName" class="input" placeholder="Enter product name" />
+									<span asp-validation-for="ProductName" class="field-error"></span>
+								</div>
+
+								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="SellingPrice" class="label"></label>
+									<div class="input-group">
+										<span class="prefix">R</span>
+										<input asp-for="SellingPrice" class="input" step="0.01" placeholder="299.99" />
+									</div>
+									<span asp-validation-for="SellingPrice" class="field-error"></span>
+								</div>
+							</div>
+						</section>
+
+						<section class="section-card fxg-f-col fxg-u-gap-4">
+							<h2 class="section-title">Classification</h2>
+
+							<div class="fxg-f-row fxg-f-wrap fxg-u-gap-4">
+								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="Category" class="label"></label>
+									<input asp-for="Category" class="input" placeholder="e.g. Electronics" />
+									<span asp-validation-for="Category" class="field-error"></span>
+								</div>
+
+								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="MaterialType" class="label"></label>
+									<input asp-for="MaterialType" class="input" placeholder="e.g. Plastic" />
+									<span asp-validation-for="MaterialType" class="field-error"></span>
+								</div>
+
+								<div class="form-field" style="flex: 1 1 240px; min-width: 220px;">
+									<label asp-for="ColourOption" class="label"></label>
+									<input asp-for="ColourOption" class="input" placeholder="e.g. Blue" />
+									<span asp-validation-for="ColourOption" class="field-error"></span>
+								</div>
+							</div>
+						</section>
 					</div>
 				</div>
 
-				<!-- Components Section -->
-				<div class="components-section">
-					<div class="parts-card">
-						<div class="parts-header">
-							<h3>Components in this Product</h3>
+				<!-- Row 2: Description -->
+				<section class="section-card fxg-f-col fxg-u-gap-4" style="flex: 1 1 100%; min-width: 320px;">
+					<h2 class="section-title">Description</h2>
 
-							<!-- Typeahead add box -->
-							<div class="parts-add">
-								<input id="componentSearch"
-									   class="input"
-									   type="text"
-									   list="componentsList"
-									   placeholder="Search component by name or code�"
-									   autocomplete="off" />
-								<datalist id="componentsList">
-									@foreach (var c in Model.AvailableProductComponents ?? new List<ProductComponentVm>())
-									{
-										// Try to show both code + name if you have them; otherwise just name
-										var name = c.ComponentName ?? c.GetType().GetProperty("Name")?.GetValue(c)?.ToString() ?? "";
-										var code = c.GetType().GetProperty("ComponentCode")?.GetValue(c)?.ToString();
-										var label = string.IsNullOrWhiteSpace(code) ? name : $"{code} � {name}";
-										<option value="@label" data-id="@c.ComponentId"></option>
-									}
-								</datalist>
+					<div class="form-field">
+						<label asp-for="Description" class="label"></label>
+						<textarea asp-for="Description" class="input" placeholder="A short description of the product..."></textarea>
+						<span asp-validation-for="Description" class="field-error"></span>
+					</div>
+				</section>
 
-								<button type="button" id="addComponentBtn" class="btn btn-primary btn-sm">+ Add Component</button>
-							</div>
+				<!-- Row 3: Components Section -->
+				<section class="section-card fxg-f-col fxg-u-gap-4" style="flex: 1 1 100%; min-width: 320px;">
+					<div class="section-head">
+						<h2 class="section-title">Components in this Product</h2>
+
+						<!-- Typeahead add box -->
+						<div class="parts-add fxg-f-row fxg-u-gap-3" style="flex: 1 1 100%;">
+							<input id="componentSearch"
+								   class="input component-search-input"
+								   type="text"
+								   list="componentsList"
+								   placeholder="Search component by name or code…"
+								   autocomplete="off" />
+							<datalist id="componentsList">
+								@foreach (var c in Model.AvailableProductComponents ?? new List<ProductComponentVm>())
+								{
+									var name = c.ComponentName ?? c.GetType().GetProperty("Name")?.GetValue(c)?.ToString() ?? "";
+									var code = c.GetType().GetProperty("ComponentCode")?.GetValue(c)?.ToString();
+									var label = string.IsNullOrWhiteSpace(code) ? name : $"{code} — {name}";
+									<option value="@label" data-id="@c.ComponentId"></option>
+								}
+							</datalist>
+							<button type="button" id="addComponentBtn" class="btn btn-primary btn-sm">+ Add</button>
 						</div>
+						
+					</div>
 
-						<table class="parts-table" id="partsTable">
+					<div class="components-table-wrapper">
+						<table class="components-table" id="partsTable">
 							<thead>
 								<tr>
-									<th>Part</th>
+									<th>Component</th>
 									<th style="width:110px; text-align:center;">Quantity</th>
 									<th class="align-right" style="width:120px;">Unit Price</th>
 									<th class="align-right" style="width:120px;">Subtotal</th>
@@ -116,10 +165,10 @@
 							</tfoot>
 						</table>
 					</div>
-				</div>
+				</section>
 
-				<!-- Form Actions at Bottom -->
-				<div class="form-actions">
+				<!-- Actions -->
+				<div class="form-actions fxg-f-row fxg-f-main-end fxg-u-gap-4">
 					<button type="submit" class="btn btn-primary">Save Product</button>
 					<button type="reset" class="btn btn-ghost">Reset</button>
 				</div>

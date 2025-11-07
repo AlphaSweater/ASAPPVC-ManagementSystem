@@ -122,14 +122,14 @@ namespace ASAPPVC.App.Models
     //-----------------------------------------------\\
     // Create/Update form (Add + Edit)
     //-----------------------------------------------\\
-    public sealed class ComponentFormVm
+    public sealed class ComponentFormVm : IValidatableObject
     {
         public Guid? Id { get; set; }
         public bool IsEdit => Id.HasValue;
 
         [Display(Name = "Component Code")]
         [StringLength(64)]
-        public string? ComponentCode { get; set; } // required only on Edit (see Validate)
+        public string? ComponentCode { get; set; }
 
         [Display(Name = "Component Name")]
         [Required(ErrorMessage = "Component name is required.")]
@@ -151,11 +151,12 @@ namespace ASAPPVC.App.Models
 
         [Display(Name = "Quantity on Hand")]
         [Required(ErrorMessage = "Quantity on hand is required.")]
+        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Quantity on hand cannot be negative.")]
         public decimal QuantityOnHand { get; set; }
 
         [Display(Name = "Unit Cost")]
         [Required(ErrorMessage = "Unit cost is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Unit cost must be a positive amount.")]
+        [Range(0.01, 1_000_000_000, ErrorMessage = "Unit cost must be a positive amount.")]
         public decimal UnitCost { get; set; }
 
         // Storage
@@ -166,12 +167,12 @@ namespace ASAPPVC.App.Models
         public string LocationCode { get; set; } = string.Empty;
 
         [Display(Name = "Location Note")]
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "Location note must be 100 characters or fewer.")]
         public string? LocationNote { get; set; }
 
         // Reorder settings
         [Display(Name = "Reorder Level")]
-        [Range(0, double.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
+        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
         public decimal ReorderLevel { get; set; }
 
         // Media
@@ -184,5 +185,55 @@ namespace ASAPPVC.App.Models
         // Audit + Lifecycle
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Normalize inputs
+            ComponentName = ComponentName?.Trim() ?? string.Empty;
+            LocationCode = LocationCode?.Trim().ToUpperInvariant() ?? string.Empty;
+            LocationNote = string.IsNullOrWhiteSpace(LocationNote) ? null : LocationNote.Trim();
+            ComponentCode = ComponentCode?.Trim();
+
+            // Edit-only validation
+            if (IsEdit && string.IsNullOrWhiteSpace(ComponentCode))
+            {
+                yield return new ValidationResult(
+                    "Component code is required when editing.",
+                    new[] { nameof(ComponentCode) });
+            }
+
+            // Integer-only units validation
+            if (UnitOfMeasure is Unit.Piece or Unit.Pair)
+            {
+                if (QuantityOnHand != decimal.Floor(QuantityOnHand))
+                {
+                    yield return new ValidationResult(
+                        "This unit does not allow fractional quantities.",
+                        new[] { nameof(QuantityOnHand) });
+                }
+
+                if (ReorderLevel != decimal.Floor(ReorderLevel))
+                {
+                    yield return new ValidationResult(
+                        "This unit does not allow fractional reorder levels.",
+                        new[] { nameof(ReorderLevel) });
+                }
+            }
+
+            // Max value validation
+            if (QuantityOnHand >= 1_000_000_000_000m)
+            {
+                yield return new ValidationResult(
+                    "Quantity on hand must be less than 1,000,000,000,000.",
+                    new[] { nameof(QuantityOnHand) });
+            }
+
+            if (ReorderLevel >= 1_000_000_000_000m)
+            {
+                yield return new ValidationResult(
+                    "Reorder level must be less than 1,000,000,000,000.",
+                    new[] { nameof(ReorderLevel) });
+            }
+        }
     }
 }

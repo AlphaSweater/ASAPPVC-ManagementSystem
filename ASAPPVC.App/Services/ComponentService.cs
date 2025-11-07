@@ -1,8 +1,7 @@
 using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Repositories;
 using ASAPPVC.App.Utils;
-using ASAPPVC.App.Models.Enums;
-using Microsoft.Extensions.Logging;
 
 namespace ASAPPVC.App.Services
 {
@@ -169,7 +168,7 @@ namespace ASAPPVC.App.Services
         {
             if (vm is null)
                 return Result.Fail("Edit view model is required.");
-            if (vm.Id == Guid.Empty)
+            if (!vm.Id.HasValue || vm.Id.Value == Guid.Empty)
                 return Result.Fail("Component ID is required.");
             if (string.IsNullOrWhiteSpace(vm.ComponentCode))
                 return Result.Fail("Component code is required.");
@@ -267,7 +266,7 @@ namespace ASAPPVC.App.Services
 
                 // Compute new status and notify if it worsened to a tracked level
                 var newStatus = ReorderStatusPolicy.Evaluate(existing.QuantityOnHand, existing.ReorderLevel);
-                    
+
                 await _stockAlerts.NotifyOnUpdateAsync(existing, previousStatus, newStatus, ct);
 
                 return Result<Component>.Success(existing);

@@ -306,7 +306,7 @@
 		transform: translateY(-50%);
 		width: 14px;
 		height: 14px;
-		background-image: url('/Assets/Icons/Chevrons/chevron-right.svg');
+		background-image: url('/assets/icons/lucide/chevron-right.svg');
 		background-size: contain;
 		background-repeat: no-repeat;
 		filter: brightness(0) invert(1);

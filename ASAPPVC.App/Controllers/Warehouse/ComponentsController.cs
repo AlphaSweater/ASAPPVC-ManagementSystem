@@ -36,6 +36,23 @@ namespace ASAPPVC.App.Controllers.Warehouse
             return View(ManageComponentsViewName, ManageComponentsVm.Create(result.Value, searchQuery: query));
         }
 
+        // GET /Warehouse/Components/Search?term=...
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search([FromQuery] string? term, CancellationToken ct)
+        {
+            var query = term?.Trim();
+            var result = string.IsNullOrWhiteSpace(query)
+                ? await _components.ListAsync(ct)
+                : await _components.SearchAsync(query, ct);
+
+            if (!result.Ok || result.Value is null)
+                return Json(new { success = false, error = result.Error ?? "Failed to search components." });
+
+            var list = result.Value;
+
+            return PartialView("~/Views/Shared/Partials/_ComponentRowsPartial.cshtml", list);
+        }
+
         // GET /Warehouse/Components/View/{id:guid}
         [HttpGet("View/{id:guid}")]
         public Task<IActionResult> DetailsById([FromRoute] Guid id, CancellationToken ct)

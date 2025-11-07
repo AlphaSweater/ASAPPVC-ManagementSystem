@@ -132,73 +132,108 @@ namespace ASAPPVC.App.Models
         public bool IsEdit => Id.HasValue;
 
         [Display(Name = "Product Code")]
-        [StringLength(64)]
+     [StringLength(64, ErrorMessage = "Product code must be 64 characters or fewer.")]
         public string? ProductCode { get; set; }
 
-        [Display(Name = "Product Name")]
+      [Display(Name = "Product Name")]
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 100 characters.")]
-        public string ProductName { get; set; } = string.Empty;
+public string ProductName { get; set; } = string.Empty;
 
         [Display(Name = "Description")]
         [Required(ErrorMessage = "Description is required.")]
-        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
-        public string Description { get; set; } = string.Empty;
+     [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters.")]
+  public string Description { get; set; } = string.Empty;
 
         // Image upload
-        [Display(Name = "Image (optional)")]
+    [Display(Name = "Image (optional)")]
         public IFormFile? Image { get; set; }
 
-        public string? ExistingImageUrl { get; set; }
+   public string? ExistingImageUrl { get; set; }
 
         // Modifiers
         [Display(Name = "Category")]
         public Category Category { get; set; } = Category.None;
 
         [Display(Name = "Material Type")]
-        public Material MaterialType { get; set; } = Material.None;
+      public Material MaterialType { get; set; } = Material.None;
 
         [Display(Name = "Colour Option")]
         public Colour ColourOption { get; set; } = Colour.None;
 
-        [Display(Name = "Selling Price")]
+[Display(Name = "Selling Price")]
         [Required(ErrorMessage = "Selling Price is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Selling Price must be a positive amount.")]
+ [Range(0.01, 1_000_000_000, ErrorMessage = "Selling Price must be a positive amount.")]
         public decimal SellingPrice { get; set; }
 
         [Display(Name = "Reorder Level")]
-        [Range(0, double.MaxValue, ErrorMessage = "Reorder level cannot be negative.")]
+        [Range(0, 1_000_000_000_000, ErrorMessage = "Reorder level cannot be negative.")]
         public decimal ReorderLevel { get; set; }
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
-        // Component lines (match model naming)
+   // Component lines (match model naming)
         [Display(Name = "Components")]
-        [MinLength(1, ErrorMessage = "A product requires at least one component.")]
-        public List<ProductComponentVm> SelectedProductComponents { get; set; } = new();
+   [MinLength(1, ErrorMessage = "A product requires at least one component.")]
+      public List<ProductComponentVm> SelectedProductComponents { get; set; } = new();
 
-        public List<ProductComponentVm> AvailableProductComponents { get; set; } = new();
+ public List<ProductComponentVm> AvailableProductComponents { get; set; } = new();
 
         // --------------------------------------------------
         // Validation & helpers
         // --------------------------------------------------
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
+     {
+            // Normalize inputs
+            ProductName = ProductName?.Trim() ?? string.Empty;
+            Description = Description?.Trim() ?? string.Empty;
+            ProductCode = ProductCode?.Trim();
+
+       // Edit-only validation
             if (IsEdit && string.IsNullOrWhiteSpace(ProductCode))
-            {
-                yield return new ValidationResult(
-                    "Product code is required when editing.",
-                    new[] { nameof(ProductCode) });
+         {
+      yield return new ValidationResult(
+         "Product code is required when editing.",
+            new[] { nameof(ProductCode) });
+     }
+
+   // Selling price decimal places
+ if (SellingPrice != decimal.Round(SellingPrice, 2))
+      {
+     yield return new ValidationResult(
+       "Selling Price must have at most 2 decimal places.",
+       new[] { nameof(SellingPrice) });
             }
 
-            if (SelectedProductComponents is { Count: > 0 })
-            {
+      // Validate components
+   if (SelectedProductComponents is null || SelectedProductComponents.Count == 0)
+   {
+     yield return new ValidationResult(
+    "A product requires at least one component.",
+          new[] { nameof(SelectedProductComponents) });
+        }
+     else
+     {
                 for (int i = 0; i < SelectedProductComponents.Count; i++)
-                {
-                    var c = SelectedProductComponents[i];
-                }
-            }
+        {
+     var c = SelectedProductComponents[i];
+       
+      if (c.ComponentId == Guid.Empty)
+        {
+       yield return new ValidationResult(
+ $"Component at position {i + 1} is required.",
+  new[] { $"{nameof(SelectedProductComponents)}[{i}].{nameof(c.ComponentId)}" });
+   }
+
+     if (c.RequiredQuantity <= 0)
+      {
+            yield return new ValidationResult(
+         $"Quantity for component at position {i + 1} must be greater than zero.",
+             new[] { $"{nameof(SelectedProductComponents)}[{i}].{nameof(c.RequiredQuantity)}" });
+     }
+     }
+     }
         }
     }
 }

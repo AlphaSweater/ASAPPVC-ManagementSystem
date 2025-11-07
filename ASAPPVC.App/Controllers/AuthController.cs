@@ -42,7 +42,7 @@ namespace ASAPPVC.App.Controllers
             if (result.Succeeded)
                 return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
                     ? Redirect(returnUrl)
-                    : RedirectToAction("Index", "Home");
+                    : RedirectToAction("Index", "Warehouse");
 
             ModelState.AddModelError(string.Empty, "Incorrect email or password.");
             return View(LoginViewName, vm);

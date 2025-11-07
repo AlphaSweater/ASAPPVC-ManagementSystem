@@ -58,23 +58,19 @@
 			</div>
 
 			<nav class="sb-nav">
-				<a class="sb-item @(IsActive(area, controller, null, "Home") ? "active" : "")"
+				@*
+					<a class="sb-item @(IsActive(area, controller, null, "Home") ? "active" : "")"
 				   asp-area="" asp-controller="Home" asp-action="Index">
 					<span class="sb-icon">🏠</span><span class="sb-label">Dashboard</span>
 				</a>
-
-				<a class="sb-item @(IsActive(area, controller, null, "Customer") ? "active" : "")"
-				   asp-area="" asp-controller="Customer" asp-action="ViewCustomer">
-					<span class="sb-icon">👥</span><span class="sb-label">Manage Customers</span>
-				</a>
-
+			*@
 				<section class="sb-group" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
 					<a asp-area="" asp-controller="Warehouse" asp-action="Index"
 					   class="sb-toggle @(isWarehouseOpen ? "active" : "")"
 					   aria-controls="grp-warehouse" aria-expanded="@(isWarehouseOpen ? "true" : "false")">
 						<span class="sb-icon">🏭</span>
 						<span class="sb-label">Warehouse</span>
-						<img src="~/Assets/Icons/Chevrons/chevron-right.svg" alt="" class="sb-chevron" />
+						<lucideIcon name="chevron-right" class="sb-chevron" size="18" stroke-width="3" aria-label="Expand" />
 					</a>
 
 					<div id="grp-warehouse" class="sb-subnav">
@@ -89,6 +85,12 @@
 				   asp-area="" asp-controller="Orders" asp-action="Index">
 					<span class="sb-icon">🚚</span><span class="sb-label">Manage Orders</span>
 				</a>
+
+				<a class="sb-item @(IsActive(area, controller, null, "Customer") ? "active" : "")"
+				   asp-area="" asp-controller="Customer" asp-action="ViewCustomer">
+					<span class="sb-icon">👥</span><span class="sb-label">Manage Customers</span>
+				</a>
+
 			</nav>
 		</aside>
 

@@ -95,7 +95,7 @@ namespace ASAPPVC.App.Models
         public bool IsEdit => Id.HasValue;
 
         [Display(Name = "Order Code")]
-        [StringLength(64)]
+        [StringLength(64, ErrorMessage = "Order code must be 64 characters or fewer.")]
         public string? OrderCode { get; set; }
 
         [Display(Name = "Customer")]
@@ -113,7 +113,7 @@ namespace ASAPPVC.App.Models
         public List<OrderProductVm> Products { get; set; } = new();
 
         [Display(Name = "Notes (optional)")]
-        [StringLength(500)]
+        [StringLength(500, ErrorMessage = "Notes must be 500 characters or fewer.")]
         public string? Notes { get; set; }
 
         // Lookup collections for form UI
@@ -148,6 +148,11 @@ namespace ASAPPVC.App.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            // Normalize inputs
+            OrderCode = OrderCode?.Trim();
+            Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim();
+
+            // Edit-only validation
             if (IsEdit && string.IsNullOrWhiteSpace(OrderCode))
             {
                 yield return new ValidationResult(
@@ -155,11 +160,58 @@ namespace ASAPPVC.App.Models
                     new[] { nameof(OrderCode) });
             }
 
-            if (Products is { Count: > 0 })
+            // Customer validation
+            if (CustomerId == Guid.Empty)
+            {
+                yield return new ValidationResult(
+                    "Customer is required.",
+                    new[] { nameof(CustomerId) });
+            }
+
+            // Order date validation
+            if (OrderDate.HasValue)
+            {
+                if (OrderDate.Value < new DateTime(2000, 1, 1))
+                {
+                    yield return new ValidationResult(
+                        "Order date is unrealistically old.",
+                        new[] { nameof(OrderDate) });
+                }
+
+                if (OrderDate.Value > DateTime.UtcNow.AddDays(1))
+                {
+                    yield return new ValidationResult(
+                        "Order date cannot be far in the future.",
+                        new[] { nameof(OrderDate) });
+                }
+            }
+
+            // Products validation
+            if (Products is null || Products.Count == 0)
+            {
+                yield return new ValidationResult(
+                    "An order requires at least 1 product line.",
+                    new[] { nameof(Products) });
+            }
+            else
             {
                 for (int i = 0; i < Products.Count; i++)
                 {
                     var p = Products[i];
+
+                    if (p.ProductId == Guid.Empty)
+                    {
+                        yield return new ValidationResult(
+                            $"Product at position {i + 1} is required.",
+                            new[] { $"{nameof(Products)}[{i}].{nameof(p.ProductId)}" });
+                    }
+
+                    if (p.Quantity <= 0)
+                    {
+                        yield return new ValidationResult(
+                            $"Quantity for product at position {i + 1} must be greater than zero.",
+                            new[] { $"{nameof(Products)}[{i}].{nameof(p.Quantity)}" });
+                    }
                 }
             }
         }

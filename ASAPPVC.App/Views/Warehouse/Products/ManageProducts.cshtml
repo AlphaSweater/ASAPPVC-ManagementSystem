@@ -1,12 +1,13 @@
-﻿@using ASAPPVC.App.ViewModels.Warehouse
+@using ASAPPVC.App.ViewModels.Warehouse
 @model ManageProductsVm
 @{
-	ViewData["Title"] = "Products";
+	ViewData["Title"] = "Manage Products";
 }
 
 @section Styles {
 	<link rel="stylesheet" href="~/css/fancy-tables.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/views/warehouse/products/ManageProducts.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/copy.css" asp-append-version="true" />
 }
 
 <div class="page">
@@ -17,77 +18,68 @@
 				<p class="card-subtitle">Browse, search and manage products in your catalog.</p>
 			</div>
 			<div class="card-actions">
-				<a class="btn btn-ghost" asp-area="Warehouse" asp-controller="Products" asp-action="AddNew">+ Add Product</a>
+				<a class="btn btn-ghost"
+				   asp-area="Warehouse"
+				   asp-controller="Products"
+				   asp-action="AddNew">+ Add Product</a>
 			</div>
 		</header>
 
 		<div class="card-body">
 			<section class="fields-panel full-width">
+				<!-- Search -->
 				<form class="search-form"
 					  asp-area="Warehouse"
 					  asp-controller="Products"
 					  asp-action="Search"
-					  method="get">
-					<input class="input" type="text" name="term" placeholder="Search products by name or code..." value="@Model.SearchQuery" />
+					  method="get" role="search" aria-label="Search products">
+					<input class="input"
+						   type="text"
+						   name="term"
+						   placeholder="Search products by name or code..."
+						   value="@Model.SearchQuery"
+						   aria-label="Search query" />
 					<button type="submit" class="btn btn-ghost">Search</button>
 				</form>
 
+				<!-- Products table -->
 				<section class="table-section">
 					<div class="fancy-wrap">
-						<table class="fancy-table fancy-table--zebra">
+						<table class="fancy-table fancy-table--zebra table-products">
+							<caption class="sr-only">Products list with image, code, name, description, price and actions</caption>
+
+							<colgroup>
+								<col class="ft-col ft-col--img" />
+								<col class="ft-col ft-col--code" />
+								<col class="ft-col ft-col--name" />
+								<col class="ft-col ft-col--desc" />
+								<col class="ft-col ft-col--price" />
+								<col class="ft-col ft-col--actions" />
+							</colgroup>
+
 							<thead>
 								<tr>
-									<th>IMG</th>
-									<th class="ft-left ft-shrink">Product Code</th>
-									<th class="ft-left ft-shrink">Product</th>
-									<th class="ft-left ft-grow">Description</th>
-									<th class="ft-right ft-shrink">Price</th>
-									<th class="ft-center ft-shrink"># Components</th>
-									<th class="ft-actions ft-shrink">Actions</th>
+									<th scope="col">IMG</th>
+									<th scope="col" class="ft-left">Product Code</th>
+									<th scope="col" class="ft-left">Product</th>
+									<th scope="col" class="ft-left">Description</th>
+									<th scope="col" class="ft-right">Price</th>
+									<th scope="col" class="ft-actions">Actions</th>
 								</tr>
 							</thead>
+
 							<tbody>
 								@if (Model is { HasProducts: true })
 								{
-									foreach (var product in Model.Products)
-									{
-										<tr>
-											<td class="ft-media ft-shrink">
-												@if (product.HasImage && !string.IsNullOrWhiteSpace(product.ThumbUrl))
-												{
-													<img src="@product.ThumbUrl" class="ft-media__img" />
-												}
-												else
-												{
-													<div class="ft-media__placeholder" aria-hidden="true">🧩</div>
-												}
-											</td>
-											<td class="ft-code ft-shrink">@product.ProductCode</td>
-											<td class="ft-name ft-shrink ">@product.ProductName</td>
-											<td class="ft-left ft-grow">@product.Description</td>
-											<td class="ft-money ft-shrink">@product.DisplayPrice</td>
-											<td class="ft-center ft-shrink">@product.ComponentCount</td>
-											<td class="ft-actions ft-shrink">
-												<div class="actions">
-													<a class="btn btn-secondary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Products"
-													   asp-action="DetailsById"
-													   asp-route-id="@product.Id">View</a>
-													<a class="btn btn-primary btn-sm"
-													   asp-area="Warehouse"
-													   asp-controller="Products"
-													   asp-action="EditById"
-													   asp-route-id="@product.Id">Edit</a>
-												</div>
-											</td>
-										</tr>
-									}
+									@await Html.PartialAsync("Partials/_ProductRowsPartial", Model.Products)
 								}
 								else
 								{
 									<tr>
-										<td colspan="6" class="ft-center" style="padding:40px; color:var(--text-muted);">No products found.</td>
+										<td colspan="6" class="ft-center" role="status"
+											style="padding:40px; color:var(--text-muted);">
+											No products found.
+										</td>
 									</tr>
 								}
 							</tbody>
@@ -98,3 +90,8 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+	<script src="~/js/copy.js" asp-append-version="true"></script>
+	<script src="~/js/views/warehouse/products/manageProducts.js" asp-append-version="true"></script>
+}

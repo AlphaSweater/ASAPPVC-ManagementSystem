@@ -1,58 +1,111 @@
-﻿/* ---------- Root & Variables ---------- */
+﻿/*==============================================================================
+  ManageProducts.css  —  Products Index / Table View
+  ------------------------------------------------------------------------------
+  INDEX
+  00) Theme tokens
+  01) Global reset & misc utilities
+  02) Page & card layout
+  03) Form controls (search)
+  04) Buttons
+  05) Generic tables (base)
+  06) Products table (view-specific overrides)
+      06.1) Column sizing & layout
+      06.2) Media cell & actions density
+      06.3) Text wrapping & clamp helpers
+      06.4) Breakpoints (≤1280 / ≤1024 / ≤880 / ≤640)
+==============================================================================*/
+
+/*------------------------------------------------------------------------------
+  00) Theme tokens
+------------------------------------------------------------------------------*/
 :root {
 	--primary-red: #d62828;
 	--primary-blue: #0d47a1;
 	--hover-red: #e03a3a;
 	--text-light: #ffffff;
-	--text-muted: rgba(255, 255, 255, 0.8);
+	--text-muted: rgba(255,255,255,0.8);
 	--accent-orange: #ef4723;
 }
 
-/* ---------- Base & Background ---------- */
+/*------------------------------------------------------------------------------
+  01) Global reset & misc utilities
+------------------------------------------------------------------------------*/
 * {
 	box-sizing: border-box;
 }
 
-/* ---------- Main Content Layout ---------- */
-.viewport {
-	padding: 40px 24px;
-	min-height: 100vh;
+.text-right {
+	text-align: right;
 }
 
-.content-container {
-	max-width: 1100px; /* Wider for tables */
-	margin: 0 auto;
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-	border-radius: 16px;
-	padding: 32px 40px;
+.sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	border: 0;
 }
 
-/* ---------- Header & Toolbar ---------- */
-.page-header {
-	margin-bottom: 32px;
-	padding-bottom: 24px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+/*------------------------------------------------------------------------------
+  02) Page & card layout
+------------------------------------------------------------------------------*/
+.page {
+	display: block;
 }
 
-.main-title {
-	font-weight: 700;
-	font-size: 28px;
-	color: var(--text-light);
-	margin: 0;
-}
-
-.toolbar {
+.card-header {
+	background: transparent;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	gap: 16px;
-	margin-bottom: 24px;
+	justify-content: space-between;
+	padding: 20px 28px;
+	border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
+.card-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	color: var(--text-light);
+}
+
+.card-subtitle {
+	margin-top: 4px;
+	font-size: 14px;
+	color: var(--text-muted);
+}
+
+.card-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.card-body {
+	padding: 24px 32px;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	gap: 28px;
+}
+
+.fields-panel {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+@media (max-width: 960px) {
+	.card-body {
+		flex-wrap: wrap;
+	}
+}
+
+/*------------------------------------------------------------------------------
+  03) Form controls (search)
+------------------------------------------------------------------------------*/
 .search-form {
 	display: flex;
 	align-items: center;
@@ -61,29 +114,31 @@
 }
 
 .input {
-	height: 44px;
-	font-size: 16px;
-	color: var(--text-light);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.3);
-	border-radius: 8px;
-	padding: 0 12px;
-	outline: none;
-	transition: border-color 0.3s ease, background-color 0.3s ease;
 	width: 100%;
 	max-width: 400px;
+	height: 44px;
+	padding: 0 12px;
+	font-size: 16px;
+	color: var(--text-light);
+	background: rgba(255,255,255,0.05);
+	border: 1px solid rgba(255,255,255,0.3);
+	border-radius: 8px;
+	outline: none;
+	transition: border-color .3s ease, background-color .3s ease;
 }
 
 	.input::placeholder {
-		color: rgba(255, 255, 255, 0.5);
+		color: rgba(255,255,255,0.5);
 	}
 
 	.input:focus {
-		border-color: rgba(255, 255, 255, 0.7);
-		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(255,255,255,0.7);
+		background: rgba(255,255,255,0.1);
 	}
 
-/* ---------- Action Buttons ---------- */
+/*------------------------------------------------------------------------------
+  04) Buttons
+------------------------------------------------------------------------------*/
 .actions {
 	display: flex;
 	justify-content: center;
@@ -128,15 +183,30 @@
 .btn-secondary {
 	background: transparent;
 	color: var(--text-light);
-	border: 1px solid rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255,255,255,0.4);
 }
 
 	.btn-secondary:hover {
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(255, 255, 255, 0.6);
+		background: rgba(255,255,255,0.1);
+		border-color: rgba(255,255,255,0.6);
 	}
 
-/* ---------- Table Styling ---------- */
+.btn-ghost {
+	background: transparent;
+	border: 1px solid rgba(255,255,255,0.12);
+	color: var(--text-light);
+}
+
+	.btn-ghost:hover {
+		background: rgba(255,255,255,0.08);
+		border-color: rgba(255,255,255,0.34);
+		color: var(--text-light);
+	}
+
+/*------------------------------------------------------------------------------
+  05) Generic tables (base)
+  (You’re also importing fancy-tables.css; these act as safe generic helpers)
+------------------------------------------------------------------------------*/
 .table-section {
 	overflow-x: auto;
 }
@@ -149,22 +219,22 @@
 	.table th, .table td {
 		padding: 14px 16px;
 		text-align: left;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		border-bottom: 1px solid rgba(255,255,255,0.2);
 	}
 
 	.table thead th {
 		font-size: 14px;
 		font-weight: 700;
 		color: var(--text-light);
-		background-color: rgba(0, 0, 0, 0.15);
+		background: rgba(0,0,0,0.15);
 	}
 
 	.table tbody tr {
-		transition: background-color 0.2s ease;
+		transition: background-color .2s ease;
 	}
 
 		.table tbody tr:hover {
-			background-color: rgba(255, 255, 255, 0.08);
+			background-color: rgba(255,255,255,0.08);
 		}
 
 	.table td {
@@ -177,154 +247,211 @@
 			font-weight: 600;
 		}
 
-.text-right {
-	text-align: right;
+/*------------------------------------------------------------------------------
+  06) Products table (view-specific overrides)
+------------------------------------------------------------------------------*/
+
+/* 06.1) Column sizing & layout */
+.table-products {
+	table-layout: fixed; /* predictable sizing & truncation */
 }
 
-/* ---------- Page-specific layout & form styles (migrated from ManageProducts.cshtml inline styles) ---------- */
-.page {
-	display: block;
-}
-
-.card-header {
-	background-color: transparent;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 20px 28px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.card-title {
-	margin: 0;
-	font-size: 26px;
-	font-weight: 800;
-	color: #fff;
-}
-
-.card-subtitle {
-	margin-top: 4px;
-	font-size: 14px;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.card-actions {
-	display: flex;
-	gap: 10px;
-}
-
-.card-body {
-	padding: 24px 32px;
-	display: flex;
-	flex-wrap: nowrap;
-	align-items: flex-start;
-	gap: 28px;
-}
-
-.fields-panel {
-	flex: 1 1 auto;
-	display: flex;
-	flex-direction: column;
-	gap: 18px;
-}
-
-.form-grid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px;
-}
-
-.form-field {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-
-	.form-field.half {
-		flex: 1 1 calc(50% - 8px);
-		min-width: 260px;
+	.table-products th,
+	.table-products td {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		vertical-align: central;
 	}
 
-	.form-field.full {
-		flex: 1 1 100%;
+	/* <colgroup> widths (desktop ≥1280px) */
+	.table-products .ft-col--img {
+		width: 72px;
 	}
 
-.label {
-	font-size: 13px;
-	color: rgba(255, 255, 255, 0.8);
-}
+	.table-products .ft-col--code {
+		width: 21ch;
+	}
+	/* fixed, no wrap */
+	.table-products .ft-col--name {
+		width: 35ch;
+	}
+	/* wraps sooner than desc */
+	.table-products .ft-col--desc {
+		width: auto;
+	}
+	/* flexible main column */
+	.table-products .ft-col--price {
+		width: 12.5ch;
+	}
+	/* show full price */
+	.table-products .ft-col--actions {
+		width: 16ch;
+	}
+	/* two small buttons */
 
-/* Merge: textarea.input specifics */
-textarea.input {
-	min-height: 100px;
-	padding: 10px 12px;
-}
-
-/* Input group prefix */
-.input-group {
-	position: relative;
-}
-
-	.input-group .prefix {
-		position: absolute;
-		left: 10px;
-		top: 0;
-		bottom: 0;
+	/* Fixed/non-wrapping columns */
+	.table-products .ft-code__text {
+		white-space: nowrap !important;
 		display: flex;
 		align-items: center;
-		font-weight: 700;
-		color: rgba(255, 255, 255, 0.9);
+		gap: 6px;
 	}
 
-	.input-group .input {
-		padding-left: 28px;
+	.table-products .ft-code__copy {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: none;
+		border: none;
+		padding: 2px;
+		cursor: pointer;
+		color: inherit;
+		opacity: 0.6;
+		transition: opacity 0.15s ease, transform 0.1s ease;
 	}
 
-.validation-summary, .field-error {
-	color: #ffb3b3;
-}
+		.table-products .ft-code__copy:hover {
+			opacity: 1;
+			transform: scale(1.05);
+		}
 
-.validation-summary {
-	margin: 10px 32px 0;
-	font-size: 14px;
-}
+		.table-products .ft-code__copy:active {
+			transform: scale(0.95);
+		}
 
-.field-error {
-	font-size: 12px;
-}
+		.table-products .ft-code__copy .icon {
+			width: 1em;
+			height: 1em;
+			stroke: currentColor;
+		}
 
-.form-actions {
-	margin-top: 16px;
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
-}
 
-/* Buttons: additional ghost style preserved */
-.btn-ghost {
-	background: transparent;
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	color: #fff;
-}
-
-	.btn-ghost:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(255, 255, 255, 0.34);
-		color: #fff;
+	.table-products .ft-money {
+		white-space: nowrap;
+		text-overflow: clip;
+		text-align: right !important;
+		font-variant-numeric: tabular-nums;
 	}
 
-.sr-only {
-	position: absolute !important;
-	width: 1px;
-	height: 1px;
-	margin: -1px;
+	/* 06.2) Media cell & actions density */
+	.table-products .ft-media__img {
+		width: 52px;
+		height: 52px;
+	}
+
+	.table-products td.ft-actions .actions {
+		gap: 6px;
+	}
+
+	.table-products .btn.btn-sm {
+		padding: 0 12px;
+		height: 32px;
+		font-size: 13px;
+		border-radius: 7px;
+	}
+
+	/* 06.3) Text wrapping & clamp helpers */
+	.table-products .ft-name,
+	.table-products .ft-desc {
+		white-space: normal;
+		overflow-wrap: anywhere;
+		hyphens: auto;
+	}
+
+/* Clamp UTILITIES (applied to inner <span> wrappers) */
+.ft-clip {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
 	overflow: hidden;
-	clip: rect(0000);
-	border: 0;
 }
 
-@media (max-width: 960px) {
-	.card-body {
-		flex-wrap: wrap;
+.ft-clip--2 {
+	-webkit-line-clamp: 2;
+}
+/* product name */
+.ft-clip--3 {
+	-webkit-line-clamp: 3;
+}
+/* description (desktop) */
+
+/* 06.4) Breakpoints */
+@media (max-width: 1280px) {
+	.table-products .ft-col--img {
+		width: 56px;
+	}
+
+	.table-products .ft-col--code {
+		width: 11.5ch;
+	}
+
+	.table-products .ft-col--name {
+		width: 16ch;
+	}
+
+	.table-products .ft-col--price {
+		width: 11ch;
+	}
+
+	.table-products .ft-col--actions {
+		width: 14ch;
+	}
+
+	.table-products .ft-media__img {
+		width: 46px;
+		height: 46px;
+	}
+
+	/* description gets tighter on small laptops; use .ft-clip--2 on the span if desired */
+}
+
+@media (max-width: 1024px) {
+	.table-products .ft-col--code {
+		width: 10.5ch;
+	}
+
+	.table-products .ft-col--name {
+		width: 14ch;
+	}
+
+	.table-products .ft-col--price {
+		width: 10ch;
+	}
+
+	.table-products .ft-col--actions {
+		width: 12ch;
+	}
+
+	.table-products .btn.btn-sm {
+		padding: 0 10px;
+		height: 30px;
+		font-size: 12.5px;
+	}
+
+	.table-products .ft-media__img {
+		width: 42px;
+		height: 42px;
+	}
+}
+
+@media (max-width: 880px) {
+	/* Keep all columns; rely on horizontal scroll if needed */
+	.fancy-table th, .fancy-table td {
+		padding: 12px 12px;
+	}
+	/* If you prefer no scroll: hide description col (uncomment)
+  .table-products th:nth-child(4),
+  .table-products td:nth-child(4) { display: none; }
+  */
+}
+
+@media (max-width: 640px) {
+	.table-products .btn.btn-sm {
+		padding: 0 8px;
+		height: 28px;
+		font-size: 12px;
+	}
+
+	.fancy-table th, .fancy-table td {
+		padding: 10px 10px;
 	}
 }
