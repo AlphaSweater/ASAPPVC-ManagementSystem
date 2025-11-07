@@ -1,4 +1,5 @@
 ﻿using ASAPPVC.App.Models;
+using ASAPPVC.App.Models.Enums;
 using ASAPPVC.App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,54 @@ namespace ASAPPVC.App.Controllers
 
             ViewData["SearchQuery"] = query;
             return View(ManageOrdersViewName, result.Value);
+        }
+
+        // GET /Orders/Search?term=...&status=...
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search([FromQuery] string? term, [FromQuery] string? status, CancellationToken ct)
+        {
+            var query = term?.Trim();
+            var statusKey = (status ?? "").Trim().ToLowerInvariant();
+
+            // Fetch all matching orders first (term search)
+            var res = await _orders.SearchAsync(query, ct);
+            if (!res.Ok || res.Value is null)
+                return Json(new { success = false, error = res.Error ?? "Failed to search orders." });
+
+            var list = res.Value;
+
+            // Default behaviour — show Pending + Picked when no status specified
+            if (string.IsNullOrWhiteSpace(statusKey) || statusKey == "pendingpicked")
+            {
+                list = list
+                    .Where(o => o.OrderStatus == OrderStatus.Pending || o.OrderStatus == OrderStatus.Picked)
+                    .ToList();
+            }
+            else
+            {
+                // Handle single-status filters (Pending, Picked, Completed, All)
+                var sf = ParseStatus(statusKey);
+                if (sf.HasValue)
+                    list = list.Where(o => o.OrderStatus == sf.Value).ToList();
+            }
+
+            return PartialView("~/Views/Shared/Partials/_OrderRowsPartial.cshtml", list);
+        }
+
+        // Map dropdown string -> enum (Picked -> Processing)
+        private static OrderStatus? ParseStatus(string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status)) return null;
+
+            switch (status.Trim().ToLowerInvariant())
+            {
+                case "pending": return OrderStatus.Pending;
+                case "picked": return OrderStatus.Picked; // your enum doesn't have Picked
+                case "completed": return OrderStatus.Completed;
+                case "all": return null;
+                case "pendingpicked": return null;
+                default: return null;
+            }
         }
 
         // GET /Orders/View/{id:guid}
@@ -123,6 +172,36 @@ namespace ASAPPVC.App.Controllers
                 TempData["AlertMessage"] = "Order deleted successfully.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // POST /Orders/MarkPicked/{id}
+        [HttpPost("MarkPicked/{id:guid}")]
+        public async Task<IActionResult> MarkPicked([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.MarkPickedAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order marked as picked and stock reduced." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
+        }
+
+        // POST /Orders/MarkCompleted/{id}
+        [HttpPost("MarkCompleted/{id:guid}")]
+        public async Task<IActionResult> MarkCompleted([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.MarkCompletedAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order marked as completed." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
+        }
+
+        // POST /Orders/Cancel/{id}
+        [HttpPost("Cancel/{id:guid}")]
+        public async Task<IActionResult> Cancel([FromRoute] Guid id, CancellationToken ct)
+        {
+            var op = await _orders.CancelAsync(id, ct);
+            TempData[op.Ok ? "AlertMessage" : "ErrorMessage"] =
+                op.Ok ? "Order cancelled." : op.Error;
+            return RedirectToAction(nameof(DetailsById), new { id });
         }
 
         // ===== Helpers =====

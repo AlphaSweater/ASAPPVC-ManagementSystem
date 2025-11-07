@@ -11,6 +11,7 @@ namespace ASAPPVC.UnitTests.Services
         private readonly Mock<IOrderRepository> _orders = new();
         private readonly Mock<ICustomerRepository> _customers = new();
         private readonly Mock<IProductRepository> _products = new();
+        private readonly Mock<IComponentRepository> _components = new();
         private readonly Mock<IOrderMapper> _mapper = new();
         private readonly Mock<IAuthService> _authService = new();
         private readonly OrderService _sut;
@@ -21,6 +22,7 @@ namespace ASAPPVC.UnitTests.Services
                 _orders.Object,
                 _customers.Object,
                 _products.Object,
+                _components.Object,
                 _mapper.Object,
                 _authService.Object);
             // Return a non-empty GUID to simulate an authenticated user for create/update tests

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ASAPPVC.App.Models.OrderListVm>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var o in Model)
+    {
+        <tr>
+            <td class="ft-code">@o.OrderCode</td>
+            <td class="ft-name">@o.CustomerName</td>
+            <td class="ft-left">@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+            <td class="ft-left">@o.OrderStatus</td>
+            <td class="ft-number ft-right">@o.ItemCount</td>
+            <td>
+                <div class="actions">
+                    <a asp-controller="Orders" asp-action="DetailsById" asp-route-id="@o.Id" class="btn btn-secondary btn-sm">View</a>
+                    <a asp-controller="Reports" asp-action="PickingSlip" asp-route-id="@o.Id" class="btn btn-primary btn-sm">Picking Slip</a>
+                </div>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="6" class="ft-center" role="status" style="padding:40px; color:var(--text-muted);">
+            No matching orders found.
+        </td>
+    </tr>
+}
